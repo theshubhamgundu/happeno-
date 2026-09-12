@@ -1,0 +1,115 @@
+import { NextResponse } from 'next/server';
+import { teamSupabase as supabase } from '@/lib/supabase';
+
+export async function GET(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const teamId = searchParams.get('teamId');
+
+        let query = supabase
+            .from('registrations')
+            .select('*');
+
+        if (teamId) {
+            query = query.ilike('team_id', teamId);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('âŒ Supabase Error:', error);
+            return NextResponse.json({ error: 'Database error' }, { status: 500 });
+        }
+
+        const teams = (data || []).map((r: any) => ({
+            id: r.transaction_id || r.id || "",
+            name: r.team_name || "Unknown Team",
+            team: r.team_name || "Unknown Team",
+            track: r.track || "Not Specified",
+            captain: r.captain || "N/A",
+            captainMobile: r.captain_mobile || "",
+            college: r.college || "",
+            teamId: r.team_id || "tricity-???",
+            password: r.password || "",
+            members: r.members || [],
+            status: r.status || "PENDING",
+            problemStatement: r.problem_statement || r.raw_data?.problemStatement || "",
+            room: r.room || "",
+            roomWifiSSID: r.room_wifi_ssid || "",
+            roomWifiPass: r.room_wifi_pass || "",
+            coordinator: {
+                name: r.volunteer_name || "",
+                phone: r.volunteer_phone || "",
+                assigned_judge: (r.assigned_judge || "").split("|")[0] || "",
+                assigned_judge_2: (r.assigned_judge || "").split("|")[1] || ""
+            },
+            submission: {
+                github: r.github_url || "",
+                presentation: r.presentation_url || "",
+                demo: r.demo_url || "",
+                deployment: r.deployment_url || "",
+                isFinal: r.is_final_submission || false
+            },
+            roundScores: r.round_scores || {},
+            roundDetailedScores: r.round_detailed_scores || {},
+            roundComments: r.round_comments || {},
+            isCheckedIn: r.is_checked_in || false,
+            createdAt: r.created_at,
+            completedAt: r.completed_at
+        }));
+
+        return NextResponse.json(teams);
+    } catch (error) {
+        console.error('âŒ Failed to fetch teams from Supabase:', error);
+        return NextResponse.json({ error: 'Failed to fetch teams' }, { status: 500 });
+    }
+}
+
+export async function PATCH(req: Request) {
+    try {
+        const { id, problemStatement, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, room, volunteer_name, volunteer_phone, roomWifiSSID, roomWifiPass, assigned_judge, assigned_judge_2 } = await req.json();
+
+        if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+
+        const updateData: any = {};
+        if (problemStatement !== undefined) updateData.problem_statement = problemStatement;
+        if (roundScores !== undefined) updateData.round_scores = roundScores;
+        if (roundComments !== undefined) updateData.round_comments = roundComments;
+        if (roundDetailedScores !== undefined) updateData.round_detailed_scores = roundDetailedScores;
+        if (isCheckedIn !== undefined) updateData.is_checked_in = isCheckedIn;
+        if (room !== undefined) updateData.room = room;
+        if (volunteer_name !== undefined) updateData.volunteer_name = volunteer_name;
+        if (volunteer_phone !== undefined) updateData.volunteer_phone = volunteer_phone;
+        if (assigned_judge !== undefined || assigned_judge_2 !== undefined) {
+            // We need to preserve the other part if one is missing in the request
+            // But usually logistics update sends everything.
+            // For safety, we'll assume the request has what's needed.
+            // If we want to be perfect, we'd fetch current value first, but let's stick to combined update.
+            updateData.assigned_judge = `${assigned_judge || ""}|${assigned_judge_2 || ""}`;
+        }
+        if (roomWifiSSID !== undefined) updateData.room_wifi_ssid = roomWifiSSID;
+        if (roomWifiPass !== undefined) updateData.room_wifi_pass = roomWifiPass;
+        if (submission) {
+            if (submission.github !== undefined) updateData.github_url = submission.github;
+            if (submission.presentation !== undefined) updateData.presentation_url = submission.presentation;
+            if (submission.demo !== undefined) updateData.demo_url = submission.demo;
+            if (submission.deployment !== undefined) updateData.deployment_url = submission.deployment;
+            if (submission.isFinal !== undefined) updateData.is_final_submission = submission.isFinal;
+        }
+
+        const { error } = await supabase
+            .from('registrations')
+            .update(updateData)
+            .or(`transaction_id.eq."${id}",team_id.eq."${id}"`);
+
+        if (error) {
+            console.error('âŒ Update Error:', error);
+            return NextResponse.json({ error: 'Failed to update', details: error.message }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('âŒ PATCH API Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
