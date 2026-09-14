@@ -1,131 +1,20 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { CalendarDays, Download, MapPin, QrCode, ShieldCheck, Users } from "lucide-react";
+import QRCode from "qrcode";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
-import { useEffect, useState, useMemo } from "react";
-import { QrCode, Download, MapPin, Calendar, Clock, ShieldCheck } from "lucide-react";
-import QRCode from "qrcode";
 import { DEMO_PROJECT, DEMO_TEAM_ID } from "@/lib/demo-data";
 
 export default function TeamTicket() {
-    const { user } = useAuth();
-    const { projects, isLoading, wifiDetails } = useHackathon();
-    const [qrDataUrl, setQrDataUrl] = useState<string>("");
-
-    // Find the team matching the logged-in user's teamId
-    const activeTeam = useMemo(() => {
-        if (!user?.teamId) return null;
-        const matchingTeam = projects.find(p => p.teamId === user.teamId || p.id === user.teamId);
-        return matchingTeam || (user.teamId === DEMO_TEAM_ID ? DEMO_PROJECT : null);
-    }, [projects, user]);
-
-    useEffect(() => {
-        if (activeTeam) {
-            // Encode the Team ID or Transaction ID for the scanner
-            const data = activeTeam.teamId || activeTeam.id.toString();
-            QRCode.toDataURL(data, {
-                width: 400,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#FFEE00',
-                },
-            }).then(setQrDataUrl);
-        }
-    }, [activeTeam]);
-
-    if (isLoading || !activeTeam) return null;
-
-    return (
-        <DashboardLayout type="team" title="Digital Entry Pass">
-            <div className="max-w-md mx-auto">
-                {/* Ticket Container */}
-                <div className="bg-[#FFEE00] rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(255,238,0,0.3)] border-4 border-black relative">
-
-                    {/* Top Section: Official Legend */}
-                    <div className="bg-black p-8 text-center border-b-4 border-dashed border-[#FFEE00]/50">
-                        <div className="flex items-center justify-center gap-2">
-                            <ShieldCheck className="text-[#FFEE00]" size={24} />
-                            <span className="text-[12px] font-black text-[#FFEE00] uppercase tracking-[0.5em]">Gate Pass Authorized</span>
-                        </div>
-                    </div>
-
-                    {/* Middle Section: QR Code */}
-                    <div className="p-10 flex flex-col items-center justify-center bg-[#FFEE00]">
-                        <div className="bg-black p-4 rounded-[2.5rem] shadow-2xl mb-8 translate-x-6 group transition-transform hover:scale-105">
-                            {qrDataUrl ? (
-                                <img src={qrDataUrl} alt="Team QR Code" className="w-64 h-64 rounded-3xl" />
-                            ) : (
-                                <div className="w-64 h-64 bg-white/10 animate-pulse rounded-3xl" />
-                            )}
-                        </div>
-
-                        <div className="text-center space-y-1">
-                            <span className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em]">Team Identity</span>
-                            <h3 className="text-3xl font-black italic uppercase tracking-tighter text-black">{activeTeam.team}</h3>
-                            <div className="inline-block px-4 py-1 bg-black text-[#FFEE00] rounded-full text-xs font-black tracking-widest uppercase">
-                                {activeTeam.teamId}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Bottom Section: Details Grid */}
-                    <div className="p-8 bg-black/5 border-t-4 border-dashed border-black/10 space-y-6">
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-1">
-                                <span className="text-[9px] font-black text-black/30 uppercase tracking-widest flex items-center gap-1">
-                                    <MapPin size={10} /> Venue
-                                </span>
-                                <p className="text-sm font-black text-black uppercase italic">{activeTeam.room || "C-BLOCK 304"}</p>
-                            </div>
-                            <div className="space-y-1">
-                                <span className="text-[9px] font-black text-black/30 uppercase tracking-widest flex items-center gap-1">
-                                    <Clock size={10} /> Check-In
-                                </span>
-                                <p className="text-sm font-black text-black uppercase italic">08:00 AM IST</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <span className="text-[9px] font-black text-black/30 uppercase tracking-widest block">Team Roster</span>
-                            <div className="flex flex-wrap gap-2">
-                                {activeTeam.members.map((m: any, i: number) => (
-                                    <span key={i} className="px-3 py-1 bg-black/10 rounded-lg text-[10px] font-bold text-black border border-black/5">
-                                        {typeof m === 'string' ? m : m.fullName}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Decorative Cutouts */}
-                    <div className="absolute top-1/2 -left-4 w-8 h-8 bg-[#06000D] rounded-full -translate-y-1/2 border-r-4 border-black" />
-                    <div className="absolute top-1/2 -right-4 w-8 h-8 bg-[#06000D] rounded-full -translate-y-1/2 border-l-4 border-black" />
-                </div>
-
-                {/* Actions */}
-                <div className="mt-8 flex gap-4">
-                    <button
-                        onClick={() => window.print()}
-                        className="flex-grow py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black uppercase italic text-xs tracking-widest flex items-center justify-center gap-3 hover:bg-white/10 transition-all"
-                    >
-                        <Download size={18} /> Download PDF
-                    </button>
-                </div>
-
-                <p className="mt-6 text-center text-white/20 text-[10px] font-medium uppercase tracking-[0.2em]">
-                    Present this QR code to the volunteer at the entrance.
-                </p>
-            </div>
-
-            <style jsx global>{`
-                @media print {
-                    .no-print { display: none; }
-                    body { background: white !important; }
-                    .print-ticket { margin: 0; padding: 0; }
-                }
-            `}</style>
-        </DashboardLayout>
-    );
+    const { user } = useAuth(); const { projects, isLoading } = useHackathon(); const [qr, setQr] = useState("");
+    const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || (user?.teamId === DEMO_TEAM_ID ? DEMO_PROJECT : null), [projects, user]);
+    useEffect(() => { if (team) QRCode.toDataURL(team.teamId || String(team.id), { width: 360, margin: 1, color: { dark: "#172033", light: "#ffffff" } }).then(setQr); }, [team]);
+    if (isLoading || !team) return <DashboardLayout type="team" title="Event pass"><div className="grid min-h-[360px] place-items-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" /></div></DashboardLayout>;
+    const names = team.members.map((member: any) => typeof member === "string" ? member : member.fullName);
+    return <DashboardLayout type="team" title="Event pass"><div className="mx-auto grid max-w-4xl gap-4 lg:grid-cols-[minmax(0,1fr)_300px]"><section className="overflow-hidden rounded-2xl border border-slate-200 bg-white"><div className="flex items-center justify-between border-b border-slate-100 p-5"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-600 text-white"><ShieldCheck size={19} /></span><div><p className="text-xs font-semibold text-slate-400">TRICITY AI HACKATHON</p><p className="text-sm font-semibold">Team entry pass</p></div></div><span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">Valid</span></div><div className="grid gap-5 p-5 sm:grid-cols-[180px_1fr] sm:items-center md:p-7"><div className="rounded-2xl border border-slate-100 bg-slate-50 p-3">{qr ? <img src={qr} alt="Team entry QR code" className="aspect-square w-full" /> : <div className="aspect-square animate-pulse rounded-xl bg-slate-200" />}</div><div><p className="text-xs font-semibold text-slate-400">TEAM</p><h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">{team.team}</h2><p className="mt-2 inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">{team.teamId}</p><p className="mt-5 text-sm leading-6 text-slate-500">Show this code at the entrance. One team member can present it for the entire group.</p></div></div><div className="grid border-t border-slate-100 sm:grid-cols-2"><Detail icon={MapPin} label="Assigned space" value={team.room || "To be assigned"} /><Detail icon={CalendarDays} label="Check-in" value="8:00 AM · Event day" /></div></section><aside className="space-y-4"><section className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><Users size={16} className="text-indigo-600" /><p className="text-sm font-semibold">Team members</p></div><div className="mt-4 space-y-2">{names.map((name, index) => <div key={`${name}-${index}`} className="flex items-center gap-2 text-sm text-slate-600"><span className="grid h-7 w-7 place-items-center rounded-full bg-slate-100 text-xs font-bold">{name?.charAt(0)}</span>{name}</div>)}</div></section><button onClick={() => window.print()} className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white"><Download size={16} /> Print or save pass</button><p className="flex items-center justify-center gap-1 text-xs text-slate-400"><QrCode size={13} /> QR code is unique to your team</p></aside></div></DashboardLayout>;
 }
+
+function Detail({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) { return <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"><Icon size={17} className="text-slate-400" /><div><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</p><p className="mt-1 text-sm font-semibold text-slate-700">{value}</p></div></div>; }

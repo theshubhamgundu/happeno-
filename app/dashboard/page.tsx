@@ -19,8 +19,8 @@ export default function DashboardRedirect() {
     }, [user, isLoading, router]);
 
     return (
-        <div className="min-h-screen bg-[#06000D] flex items-center justify-center">
-            <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+        <div className="min-h-screen bg-[#f7f8fc] flex items-center justify-center">
+            <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
         </div>
     );
 }

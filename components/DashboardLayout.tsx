@@ -135,143 +135,81 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
 
     if (isLoading || !user || user.role !== type) {
         return (
-            <div className="min-h-screen bg-[#06000D] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-[#f7f8fc] flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-[#df6d59] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#06000D] text-white">
-            {/* Top Navigation Bar */}
-            <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0B0114]/80 backdrop-blur-xl border-b border-white/10">
-                <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-                    {/* Left: Branding & Role */}
-                    <div className="flex items-center gap-8">
-                        <Link href="/" className="flex items-center gap-3 group">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(147,51,234,0.5)] overflow-hidden bg-black transition-transform group-hover:scale-110">
-                                <span className="text-[#FFEE00]">T</span>
-                            </div>
-                            <div className="flex flex-col">
-                                <TricityMark compact className="text-xl" />
-                                <span className="text-[10px] text-white/40 uppercase tracking-[0.3em] mt-1">{type} PANEL</span>
-                            </div>
-                        </Link>
-
-                        {/* Desktop Menu Items */}
-                        <div className="hidden md:flex items-center gap-1">
-                            {menuItems[type].map((item: any) => (
-                                <Link key={item.href} href={item.href}>
-                                    <div className={`px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 group ${pathname === item.href ? "bg-purple-600/20 text-purple-400" : "text-white/60 hover:text-white hover:bg-white/5"}`}>
-                                        <item.icon size={18} className={pathname === item.href ? "text-purple-400" : "group-hover:scale-110 transition-transform"} />
-                                        <span className="font-medium text-sm flex items-center gap-2">
-                                            {item.label}
-                                            {item.label === "Submissions" && isSubmissionCurrentlyLocked && (
-                                                <Lock size={12} className="text-white/40 group-hover:text-purple-400 transition-colors" />
-                                            )}
-                                        </span>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
+        <div className={`dashboard-app dashboard-${type} min-h-screen bg-[#f1eeeb] p-0 text-slate-900 lg:p-3`}>
+            <div className="mx-auto min-h-screen max-w-[1600px] overflow-hidden bg-[#faf9f7] lg:min-h-[calc(100vh-24px)] lg:rounded-2xl lg:border lg:border-white lg:shadow-[0_12px_36px_rgba(77,57,48,0.08)] lg:grid lg:grid-cols-[218px_minmax(0,1fr)]">
+            <aside className="hidden lg:flex lg:flex-col lg:border-r lg:border-slate-200/80 lg:bg-white lg:p-3">
+                <Link href="/" className="flex items-center gap-2.5 rounded-xl px-2 py-2.5 transition hover:bg-slate-50">
+                    <div className="grid h-9 w-9 place-items-center rounded-lg bg-[#df6d59] text-base font-bold text-white shadow-sm">T</div>
+                    <div>
+                        <TricityMark compact className="text-lg" />
+                        <p className="mt-1 text-[9px] font-bold uppercase tracking-[.19em] text-slate-400">Event management</p>
                     </div>
+                </Link>
 
-                    {/* Right: Timer & User Profile */}
-                    <div className="flex items-center gap-4">
-                        {/* Timer */}
-                        <div className="hidden sm:flex flex-col items-end px-4 border-r border-white/10 mr-2 min-w-[120px]">
-                            <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest leading-none mb-1 text-right w-full">
-                                {isFinished ? "Event Ended" : hasStarted ? "Time Remaining" : "Starts In"}
-                            </span>
-                            <span className={`text-lg font-mono font-bold leading-none ${isFinished ? "text-red-400" : hasStarted ? "text-green-500" : "text-purple-400"}`}>
-                                {timeLeft}
-                            </span>
-                            {hasStarted && !isFinished && (
-                                <div className="w-full h-1 bg-white/5 rounded-full mt-2 overflow-hidden">
-                                    <div
-                                        className="h-full bg-linear-to-r from-green-500 to-emerald-400 transition-all duration-1000"
-                                        style={{ width: `${progress}%` }}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                <div className="mt-6 px-3 text-[9px] font-bold uppercase tracking-[.18em] text-slate-400">Navigation</div>
+                <nav className="mt-2 space-y-1">
+                    {menuItems[type].map((item: any) => {
+                        const isActive = pathname === item.href;
+                        return <Link key={item.href} href={item.href} className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition ${isActive ? "bg-[#df6d59] text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}>
+                            <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-[#c85847]"}`}><item.icon size={14} /></span>
+                            <span>{item.label}</span>
+                            {item.label === "Submissions" && isSubmissionCurrentlyLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
+                        </Link>;
+                    })}
+                </nav>
 
-                        {/* Profile Dropdown (Simplified for layout) */}
-                        <div className="flex items-center gap-4">
-                            <div className="hidden lg:flex flex-col items-end">
-                                <span className="text-sm font-bold leading-none">{displayName}</span>
-                                <button onClick={logout} className="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-widest mt-1 transition-colors">Sign Out</button>
-                            </div>
-                            {/* Avatar â€” hidden on mobile */}
-                            <div className="hidden md:flex w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 items-center justify-center shadow-[0_0_15px_rgba(147,51,234,0.3)]">
-                                <User size={20} />
-                            </div>
-                            {/* Mobile Hamburger */}
-                            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden p-2 text-white/60 hover:text-white">
-                                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                            </button>
-                        </div>
+                <div className="mt-auto rounded-2xl border border-slate-200 bg-[#fafafa] p-3">
+                    <div className="flex items-center gap-3">
+                        <div className="grid h-9 w-9 place-items-center rounded-full bg-[#fbe5df] text-[#c85847]"><User size={17} /></div>
+                        <div className="min-w-0"><p className="truncate text-sm font-bold text-slate-800">{displayName}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{type} access</p></div>
                     </div>
+                    <button onClick={logout} className="mt-3 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs font-semibold text-slate-500 transition hover:bg-white hover:text-rose-600"><LogOut size={15} /> Sign out</button>
                 </div>
+            </aside>
 
-                {/* Mobile Navigation Drawer */}
-                <AnimatePresence>
-                    {isMobileMenuOpen && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="md:hidden border-t border-white/10 bg-[#0B0114] overflow-hidden"
-                        >
-                            <div className="p-4 space-y-2">
-                                {menuItems[type].map((item: any) => (
-                                    <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
-                                        <div className={`p-4 rounded-xl flex items-center gap-3 ${pathname === item.href ? "bg-purple-600 text-white" : "bg-white/5 text-white/60"}`}>
-                                            <item.icon size={20} />
-                                            <span className="font-medium flex items-center gap-2">
-                                                {item.label}
-                                                {item.label === "Submissions" && isSubmissionCurrentlyLocked && (
-                                                    <Lock size={14} className="text-white/40" />
-                                                )}
-                                            </span>
-                                        </div>
-                                    </Link>
-                                ))}
-                                <button
-                                    onClick={logout}
-                                    className="w-full p-4 rounded-xl flex items-center gap-3 bg-red-500/10 text-red-500"
-                                >
-                                    <LogOut size={20} />
-                                    <span className="font-medium">Sign Out</span>
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </nav>
-
-            {/* Main Content Area */}
-            <main className="pt-20 lg:pt-24 pb-8 lg:pb-4 px-4 md:px-8 max-w-[1600px] mx-auto relative flex flex-col">
-                {/* Background Decorative Elements */}
-                <div className="fixed top-0 right-0 w-[400px] h-[400px] bg-purple-600/10 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                <div className="fixed bottom-0 left-0 w-[300px] h-[300px] bg-pink-600/5 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
-                <header className="mb-6 shrink-0">
-                    <h1 className="text-2xl md:text-3xl font-kanit font-black italic uppercase tracking-tight text-white/90">
-                        {title}
-                    </h1>
-                    <div className="h-1 w-20 bg-purple-600 mt-2 rounded-full shadow-[0_0_10px_rgba(147,51,234,0.6)]" />
+            <div className="min-w-0 lg:col-start-2">
+                <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 backdrop-blur-md md:px-5">
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => setIsMobileMenuOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 lg:hidden"><Menu size={20} /></button>
+                        <div className="lg:hidden"><p className="text-sm font-black text-[#c85847]">TRICITY</p><p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Workspace</p></div>
+                        <div className="hidden lg:block"><p className="text-xs font-semibold text-slate-400">{type.charAt(0).toUpperCase() + type.slice(1)} workspace</p><p className="text-sm font-bold text-slate-700">TriCity AI Hackathon</p></div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="hidden sm:block rounded-xl border border-slate-200 bg-[#fafafa] px-3 py-2 text-right">
+                            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{isFinished ? "Event ended" : hasStarted ? "Time remaining" : "Starts"}</p>
+                            <p className={`mt-0.5 font-mono text-sm font-bold ${isFinished ? "text-rose-600" : hasStarted ? "text-emerald-600" : "text-[#c85847]"}`}>{timeLeft}</p>
+                        </div>
+                        <div className="grid h-9 w-9 place-items-center rounded-full bg-[#fbe5df] text-[#c85847]"><User size={17} /></div>
+                    </div>
                 </header>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex-grow min-h-0 overflow-y-auto pr-2 custom-scrollbar"
-                >
-                    {children}
-                </motion.div>
-            </main>
+                <main className="mx-auto w-full max-w-[1480px] px-4 py-4 md:px-5 md:py-5">
+                    <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                        <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#c85847]">{type} portal</p><h1 className="mt-1 text-xl font-semibold tracking-[-0.025em] text-slate-900 md:text-2xl">{title}</h1></div>
+                        <p className="max-w-sm text-[13px] leading-5 text-slate-500">Stay informed, complete your tasks, and keep the event moving.</p>
+                    </div>
+                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="dashboard-content min-w-0">{children}</motion.div>
+                </main>
+            </div>
+            </div>
+
+            <AnimatePresence>
+                {isMobileMenuOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-slate-950/25 p-4 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
+                    <motion.div initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -24, opacity: 0 }} onClick={(event) => event.stopPropagation()} className="flex h-full w-full max-w-[320px] flex-col rounded-2xl bg-white p-5 shadow-2xl">
+                        <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-[#df6d59] font-bold text-white">T</div><TricityMark compact className="text-xl" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500"><X size={21} /></button></div>
+                        <p className="mt-9 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Workspace</p>
+                        <nav className="mt-3 space-y-1">{menuItems[type].map((item: any) => <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${pathname === item.href ? "bg-[#df6d59] text-white" : "text-slate-600"}`}><item.icon size={18} />{item.label}</Link>)}</nav>
+                        <button onClick={logout} className="mt-auto flex items-center gap-2 rounded-xl bg-rose-50 px-3 py-3 text-sm font-semibold text-rose-600"><LogOut size={17} /> Sign out</button>
+                    </motion.div>
+                </motion.div>}
+            </AnimatePresence>
         </div>
     );
 };

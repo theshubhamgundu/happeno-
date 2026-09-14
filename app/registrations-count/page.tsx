@@ -110,7 +110,7 @@ export default function RegistrationsCountPage() {
                                 <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider ml-1">Access Key</label>
                                 <input
                                     type="password"
-                                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                                    placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     autoFocus

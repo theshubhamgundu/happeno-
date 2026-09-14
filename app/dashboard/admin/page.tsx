@@ -53,7 +53,9 @@ export default function AdminDashboard() {
         addRoom,
         removeRoom,
         emergencyContact,
-        updateEmergencyContact
+        updateEmergencyContact,
+        isCertificatesEnabled,
+        toggleCertificatesEnabled
     } = useHackathon();
 
     const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'wifi' | 'rooms'>('teams');
@@ -299,6 +301,9 @@ export default function AdminDashboard() {
                             <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/55 md:text-base">Monitor registrations, complete pending approvals, and keep event operations organized from one focused workspace.</p>
                         </div>
                         <div className="flex flex-wrap gap-3">
+                            <button onClick={toggleCertificatesEnabled} className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black uppercase tracking-wider transition hover:-translate-y-0.5 ${isCertificatesEnabled ? 'bg-green-500 text-white shadow-[0_8px_24px_rgba(34,197,94,0.3)]' : 'bg-white/10 text-white/50 hover:bg-white/20'}`}>
+                                <Download size={16} /> {isCertificatesEnabled ? "Certificates: Enabled" : "Certificates: Disabled"}
+                            </button>
                             <button onClick={() => setActiveTab("teams")} className="inline-flex items-center gap-2 rounded-xl bg-[#FFEE00] px-5 py-3 text-xs font-black uppercase tracking-wider text-black transition hover:-translate-y-0.5 hover:bg-white">
                                 <Users size={16} /> View teams
                             </button>
@@ -396,7 +401,7 @@ export default function AdminDashboard() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track} â€¢ {team.college}</p>
+                                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track} • {team.college}</p>
                                                 {/* Password Badge */}
                                                 <div className="flex items-center gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
                                                     <Lock size={10} className="text-blue-400/60" />
@@ -406,7 +411,7 @@ export default function AdminDashboard() {
                                                         : 'text-white/20 bg-white/5 border border-white/10'
                                                         } px-2 py-0.5 rounded`}>
                                                         {team.password
-                                                            ? (visiblePasswords.has(team.id) ? team.password : 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢')
+                                                            ? (visiblePasswords.has(team.id) ? team.password : '••••••••')
                                                             : 'Not Set'}
                                                     </code>
                                                     {team.password && (
@@ -518,7 +523,7 @@ export default function AdminDashboard() {
                                                                 <span className="text-[10px] text-white/40 font-bold uppercase shrink-0">Team Password</span>
                                                                 <code className="text-xs font-mono font-black text-blue-400 bg-blue-500/10 px-3 py-1 rounded border border-blue-500/20">
                                                                     {team.password
-                                                                        ? (visiblePasswords.has(team.id) ? team.password : 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢')
+                                                                        ? (visiblePasswords.has(team.id) ? team.password : '••••••••')
                                                                         : <span className="text-white/20 italic">Not Set</span>}
                                                                 </code>
                                                                 {team.password && (
@@ -709,7 +714,7 @@ export default function AdminDashboard() {
                                                     <h4 className="text-lg font-black italic uppercase tracking-tight">{vol.name}</h4>
                                                     <span className="text-[9px] font-black text-blue-400 px-2 py-0.5 border border-blue-400/30 rounded bg-blue-400/5">{vol.generatedId}</span>
                                                 </div>
-                                                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{vol.role} â€¢ {vol.phone}</p>
+                                                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{vol.role} • {vol.phone}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">

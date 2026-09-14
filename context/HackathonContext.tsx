@@ -64,6 +64,8 @@ interface HackathonContextType {
     toggleSubmissionLock: () => void;
     isRoundLockEnabled: boolean;
     toggleRoundLock: () => void;
+    isCertificatesEnabled: boolean;
+    toggleCertificatesEnabled: () => void;
     roundConfigs: typeof STATIC_ROUNDS_CONFIG;
     updateRoundTime: (roundId: string, hour: number, minute: number, dayOffset: number) => void;
     projects: Project[];
@@ -161,6 +163,9 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     // Round Lock (Time Based)
     const [isRoundLockEnabled, setIsRoundLockEnabled] = useState(true);
 
+    // Certificates Enabled
+    const [isCertificatesEnabled, setIsCertificatesEnabled] = useState(false);
+
     // Dynamic Round Configs
     const [roundConfigs, setRoundConfigs] = useState(STATIC_ROUNDS_CONFIG);
 
@@ -191,6 +196,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                     if (dbSettings.emergency_contact) setEmergencyContact(dbSettings.emergency_contact);
                     if (dbSettings.is_submission_locked !== undefined) setIsSubmissionLocked(dbSettings.is_submission_locked);
                     if (dbSettings.is_round_lock_enabled !== undefined) setIsRoundLockEnabled(dbSettings.is_round_lock_enabled);
+                    if (dbSettings.is_certificates_enabled !== undefined) setIsCertificatesEnabled(dbSettings.is_certificates_enabled);
                     if (dbSettings.released_rounds) setReleasedRounds(dbSettings.released_rounds);
                     if (dbSettings.round_configs) {
                         // Merge static criteria with dynamic times
@@ -468,6 +474,15 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         await fetch('/api/settings', {
             method: 'POST',
             body: JSON.stringify({ key: 'is_submission_locked', value: newLockState })
+        });
+    };
+
+    const toggleCertificatesEnabled = async () => {
+        const newState = !isCertificatesEnabled;
+        setIsCertificatesEnabled(newState);
+        await fetch('/api/settings', {
+            method: 'POST',
+            body: JSON.stringify({ key: 'is_certificates_enabled', value: newState })
         });
     };
 
@@ -756,6 +771,8 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 toggleSubmissionLock,
                 isRoundLockEnabled,
                 toggleRoundLock,
+                isCertificatesEnabled,
+                toggleCertificatesEnabled,
                 projects,
                 isLoading,
                 updateProjectScore,

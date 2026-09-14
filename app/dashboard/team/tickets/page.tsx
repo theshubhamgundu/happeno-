@@ -69,7 +69,7 @@ export default function TeamTickets() {
                                 "Close ticket once resolved"
                             ].map((step, i) => (
                                 <li key={i} className="flex gap-3 text-xs text-white/40 font-medium italic">
-                                    <span className="text-purple-500">â€¢</span>
+                                    <span className="text-purple-500">•</span>
                                     {step}
                                 </li>
                             ))}

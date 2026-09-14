@@ -107,17 +107,17 @@ export default function VolunteerDashboard() {
             )}
 
             {/* Mobile Tab Navigation - Sticky/High Viz */}
-            <div className="sticky top-0 z-30 pt-2 pb-6 bg-[#06000D]">
-                <div className="flex gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl">
+            <div className="mb-4">
+                <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
                     <button
                         onClick={() => setActiveTab('roster')}
-                        className={`flex-1 py-3 rounded-xl font-black uppercase italic text-[10px] tracking-widest transition-all ${activeTab === 'roster' ? 'bg-[#FFEE00] text-black shadow-lg shadow-[#FFEE00]/20' : 'text-white/30'}`}
+                        className={`flex-1 rounded-md py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'roster' ? 'bg-[#df6d59] text-white shadow-sm' : 'text-slate-500'}`}
                     >
                         Squads
                     </button>
                     <button
                         onClick={() => setActiveTab('checkin')}
-                        className={`flex-1 py-3 rounded-xl font-black uppercase italic text-[10px] tracking-widest transition-all ${activeTab === 'checkin' ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'text-white/30'}`}
+                        className={`flex-1 rounded-md py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'checkin' ? 'bg-[#df6d59] text-white shadow-sm' : 'text-slate-500'}`}
                     >
                         Scanner
                     </button>
@@ -226,34 +226,11 @@ export default function VolunteerDashboard() {
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8 pt-10">
-                    <div className="relative group">
-                        <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-purple-600 to-purple-800 rounded-[3rem] flex items-center justify-center shadow-[0_0_50px_rgba(147,51,234,0.3)] relative z-10 transition-transform group-hover:scale-105 duration-500">
-                            <QrCode size={56} className="text-white" />
-                        </div>
-                        <div className="absolute inset-0 bg-purple-600/30 blur-[60px] animate-pulse rounded-full" />
-                    </div>
-
-                    <div className="text-center space-y-2">
-                        <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">Scanner Hub</h2>
-                        <div className="flex items-center justify-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                            <p className="text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">Operational Readiness Status: Green</p>
-                        </div>
-                    </div>
-
-                    <button
-                        onClick={() => setShowScanner(true)}
-                        className="w-full py-6 bg-[#FFEE00] text-black font-black uppercase italic rounded-2xl shadow-[0_15px_40px_rgba(255,238,0,0.15)] hover:shadow-none hover:translate-y-1 text-sm tracking-widest transition-all"
-                    >
-                        Initialize Tactical Scanner
-                    </button>
-
-                    <div className="pt-8 flex items-center gap-4 w-full opacity-30">
-                        <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent to-white" />
-                        <span className="text-[8px] font-black text-white uppercase tracking-[0.5em]">Command & Control</span>
-                        <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent to-white" />
-                    </div>
+                <div className="mx-auto max-w-md rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm">
+                    <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-[#fbe5df] text-[#c85847]"><QrCode size={24} /></div>
+                    <h2 className="mt-3 text-base font-semibold text-slate-800">Entry scanner</h2>
+                    <p className="mt-1 flex items-center justify-center gap-1.5 text-xs text-slate-500"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Ready to scan team passes</p>
+                    <button onClick={() => setShowScanner(true)} className="mt-5 w-full rounded-lg bg-[#df6d59] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#c85847]">Open scanner</button>
                 </div>
             )}
 

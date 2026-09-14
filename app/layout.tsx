@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Kanit, Poppins } from "next/font/google";
 import "./globals.css";
 import { ViewTransitions } from 'next-view-transitions'
 import SmoothScroll from "@/components/SmoothScroll";
-import ThemeToggle from "@/components/ThemeToggle";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -62,17 +61,13 @@ export default function RootLayout({
 }>) {
   return (
     <ViewTransitions>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en">
         <head>
           <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-          <script dangerouslySetInnerHTML={{
-            __html: "try { const savedTheme = localStorage.getItem('tricity-theme'); const preferredTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'; document.documentElement.dataset.theme = savedTheme || preferredTheme; } catch (_) { document.documentElement.dataset.theme = 'dark'; }",
-          }} />
         </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${poppins.className} antialiased overflow-x-hidden bg-black`}
         >
-          <ThemeToggle />
           <AuthProvider>
             <HackathonProvider>
               <SmoothScroll>
@@ -81,24 +76,24 @@ export default function RootLayout({
                 </LayoutWrapper>
                 <Toaster
                   position="top-center"
-                  theme="dark"
+                  theme="light"
                   richColors
                   toastOptions={{
                     style: {
-                      background: "rgba(11, 1, 20, 0.8)",
+                      background: "rgba(255, 255, 255, 0.94)",
                       backdropFilter: "blur(12px)",
-                      border: "1px solid rgba(255, 255, 255, 0.1)",
-                      color: "#fff",
-                      fontFamily: "var(--font-kanit)",
-                      borderRadius: "16px",
-                      boxShadow: "0 10px 30px -10px rgba(109, 40, 217, 0.3)",
+                      border: "1px solid #e7eaf1",
+                      color: "#172033",
+                      fontFamily: "var(--font-geist-sans)",
+                      borderRadius: "14px",
+                      boxShadow: "0 16px 35px -18px rgba(15, 23, 42, 0.25)",
                     },
                     classNames: {
                       toast: "group toast-group",
                       title: "group-[.toast]:font-bold group-[.toast]:text-base",
-                      description: "group-[.toast]:text-white/60",
-                      actionButton: "group-[.toast]:bg-purple-600 group-[.toast]:text-white",
-                      cancelButton: "group-[.toast]:bg-white/10 group-[.toast]:text-white",
+                      description: "group-[.toast]:text-slate-500",
+                      actionButton: "group-[.toast]:bg-indigo-600 group-[.toast]:text-white",
+                      cancelButton: "group-[.toast]:bg-slate-100 group-[.toast]:text-slate-700",
                       error: "group-[.toast]:text-red-400 group-[.toast]:border-red-500/20",
                       success: "group-[.toast]:text-green-400 group-[.toast]:border-green-500/20",
                       warning: "group-[.toast]:text-yellow-400 group-[.toast]:border-yellow-500/20",
