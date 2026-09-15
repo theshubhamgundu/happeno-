@@ -9,15 +9,21 @@ import { useHackathon } from "@/context/HackathonContext";
 import { DEMO_PROJECT, DEMO_TEAM_ID } from "@/lib/demo-data";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { toast } from "sonner";
 
 
+// TODO: Replace with the actual problem statements provided by the external team
 const DOMAIN_PROBLEM_STATEMENTS = [
-    "Open Innovation",
-    "Healthcare & MedTech",
-    "FinTech & Web3",
-    "EdTech",
-    "Sustainable Environment",
-    "Smart City & IoT"
+    "Design a real-time civic issue reporting system for urban areas",
+    "Build an AI-powered platform to detect and prevent financial fraud",
+    "Create a decentralized supply chain transparency solution using blockchain",
+    "Develop a smart campus navigation and resource booking system",
+    "Build a mental health support chatbot for students and young adults",
+    "Design a platform to connect rural farmers with buyers and logistics providers",
+    "Create an accessible e-learning platform for students with disabilities",
+    "Build a waste management and recycling incentive system using IoT",
+    "Develop a skill-matching platform for freelancers and small businesses",
+    "Design an emergency response coordination system for disaster management",
 ];
 
 const TECH_CATEGORIES = {
@@ -42,9 +48,10 @@ export default function TeamDashboard() {
     const [generatingCert, setGeneratingCert] = useState<string | null>(null);
     const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || (user?.teamId === DEMO_TEAM_ID ? DEMO_PROJECT : null), [projects, user]);
 
-    const isPSLocked = Boolean(team?.problemStatement);
-    const isPILocked = Boolean(team?.proposedIdea && team.proposedIdea !== "Add a concise proposed idea to keep your team aligned.");
-    const isTSLocked = Boolean(team?.techStack && Object.keys(team.techStack).length > 0);
+    // Lock state comes from the DB via the API — not guessed from data presence
+    const isPSLocked = Boolean(team?.isPSLocked);
+    const isPILocked = Boolean(team?.isPILocked);
+    const isTSLocked = Boolean(team?.isTSLocked);
 
     useEffect(() => { 
         if (team) {
@@ -54,29 +61,47 @@ export default function TeamDashboard() {
         }
     }, [team, editingPS, editingPI, editingTS]);
 
-    const saveField = async (field: string, value: any, setEditingState: (val: boolean) => void) => {
-        const confirmed = window.confirm("Are you sure? Once submitted, this section cannot be edited again.");
-        if (!confirmed) return;
-        
-        if (team?.id) {
-            const loadingToast = toast.loading("Submitting...");
-            try {
-                const res = await fetch("/api/teams", { 
-                    method: "PATCH", 
-                    headers: { "Content-Type": "application/json" }, 
-                    body: JSON.stringify({ 
-                        id: team.id, 
-                        [field]: value
-                    }) 
-                });
-                if (!res.ok) throw new Error("Failed to save");
-                toast.success("Submitted successfully!", { id: loadingToast });
-                setEditingState(false);
-                setTimeout(() => window.location.reload(), 1000); // Refresh to lock UI
-            } catch (error) {
-                toast.error("Error submitting", { id: loadingToast });
-            }
-        }
+    const saveField = (field: string, value: any, setEditingState: (val: boolean) => void) => {
+        toast.custom((id) => (
+            <div className={`animate-in fade-in zoom-in-95 max-w-md w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex flex-col ring-1 ring-black/5 overflow-hidden duration-200`}>
+                <div className="p-5">
+                    <h3 className="text-base font-semibold text-slate-900">Confirm Submission</h3>
+                    <p className="mt-2 text-sm text-slate-500 leading-relaxed">Are you sure? Once submitted, this section will be locked and cannot be edited again.</p>
+                </div>
+                <div className="flex border-t border-slate-100 bg-slate-50/50">
+                    <button
+                        onClick={() => toast.dismiss(id)}
+                        className="flex-1 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors border-r border-slate-100"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={async () => {
+                            toast.dismiss(id);
+                            if (team?.id) {
+                                const loadingToast = toast.loading("Submitting...");
+                                try {
+                                    const res = await fetch("/api/teams", { 
+                                        method: "PATCH", 
+                                        headers: { "Content-Type": "application/json" }, 
+                                        body: JSON.stringify({ id: team.id, [field]: value }) 
+                                    });
+                                    if (!res.ok) throw new Error("Failed to save");
+                                    toast.success("Submitted successfully!", { id: loadingToast });
+                                    setEditingState(false);
+                                    setTimeout(() => window.location.reload(), 1000); // Refresh to lock UI
+                                } catch (error) {
+                                    toast.error("Error submitting", { id: loadingToast });
+                                }
+                            }
+                        }}
+                        className="flex-1 px-4 py-3 text-sm font-bold text-[#df6d59] hover:bg-[#df6d59]/10 transition-colors"
+                    >
+                        Confirm & Lock
+                    </button>
+                </div>
+            </div>
+        ), { duration: Infinity, position: 'top-center' });
     };
 
     const downloadCertificate = async (member: { name: string, role: string, detail: string }) => {
@@ -123,95 +148,135 @@ export default function TeamDashboard() {
             </section>
 
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,1fr)]">
-                <section className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
-                    <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
-                        <div>
-                            <p className="text-xs font-semibold text-slate-400">PROJECT DETAILS</p>
-                            <h2 className="mt-1 text-lg font-semibold text-slate-900">What are you building?</h2>
-                        </div>
-                        {!isSubmissionLocked && (
-                            <button 
-                                onClick={saveBrief} 
-                                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold ${editing ? "bg-[#df6d59] text-white" : "bg-slate-100 text-slate-700"}`}
-                            >
-                                {editing ? <Save size={14} /> : <Edit3 size={14} />}
-                                {editing ? "Save Details" : "Edit"}
-                            </button>
-                        )}
+                <section className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6 space-y-8">
+                    <div>
+                        <p className="text-xs font-semibold text-slate-400">PROJECT DETAILS</p>
+                        <h2 className="mt-1 text-lg font-semibold text-slate-900">What are you building?</h2>
                     </div>
-                    
-                    <div className="space-y-6">
+
+                    <div className="space-y-8">
                         {/* Problem Statement */}
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">Problem Statement Domain</label>
-                            {editing ? (
+                        <div className="border border-slate-100 rounded-xl p-4 bg-slate-50/50">
+                            <div className="flex items-start justify-between gap-4 mb-3">
+                                <label className="block text-sm font-semibold text-slate-700">Problem Statement</label>
+                                {!isSubmissionLocked && !isPSLocked && (
+                                    <button 
+                                        onClick={() => editingPS ? saveField('problemStatement', problemStatement, setEditingPS) : setEditingPS(true)} 
+                                        className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold ${editingPS ? "bg-[#df6d59] text-white" : "bg-slate-200 text-slate-700"}`}
+                                    >
+                                        {editingPS ? <Save size={14} /> : <Edit3 size={14} />}
+                                        {editingPS ? "Submit & Lock" : "Edit"}
+                                    </button>
+                                )}
+                                {isPSLocked && <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md"><CheckCircle2 size={14}/> Submitted</span>}
+                            </div>
+                            {editingPS ? (
                                 <select 
                                     value={problemStatement} 
                                     onChange={(e) => setProblemStatement(e.target.value)}
                                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#df6d59]"
                                 >
-                                    <option value="">Select a domain...</option>
+                                    <option value="">Select a problem statement...</option>
                                     {DOMAIN_PROBLEM_STATEMENTS.map(ps => (
                                         <option key={ps} value={ps}>{ps}</option>
                                     ))}
                                 </select>
                             ) : (
-                                <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600 border border-slate-100">
+                                <div className="rounded-xl bg-white p-3 text-sm text-slate-600 border border-slate-200">
                                     {problemStatement || "Not selected yet"}
                                 </div>
                             )}
                         </div>
 
                         {/* Proposed Idea */}
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">Proposed Idea</label>
-                            {editing ? (
+                        <div className="border border-slate-100 rounded-xl p-4 bg-slate-50/50">
+                            <div className="flex items-start justify-between gap-4 mb-3">
+                                <label className="block text-sm font-semibold text-slate-700">Proposed Idea</label>
+                                {!isSubmissionLocked && !isPILocked && (
+                                    <button 
+                                        onClick={() => editingPI ? saveField('proposedIdea', proposedIdea, setEditingPI) : setEditingPI(true)} 
+                                        className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold ${editingPI ? "bg-[#df6d59] text-white" : "bg-slate-200 text-slate-700"}`}
+                                    >
+                                        {editingPI ? <Save size={14} /> : <Edit3 size={14} />}
+                                        {editingPI ? "Submit & Lock" : "Edit"}
+                                    </button>
+                                )}
+                                {isPILocked && <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md"><CheckCircle2 size={14}/> Submitted</span>}
+                            </div>
+                            {editingPI ? (
                                 <textarea 
                                     value={proposedIdea} 
                                     onChange={(event) => setProposedIdea(event.target.value)} 
-                                    className="min-h-32 w-full resize-none rounded-xl border border-slate-200 p-4 text-sm leading-6 outline-none focus:border-[#df6d59]" 
+                                    className="min-h-32 w-full resize-none rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 outline-none focus:border-[#df6d59]" 
                                     placeholder="Explain your approach..."
                                 />
                             ) : (
-                                <p className="min-h-32 rounded-xl bg-slate-50 p-5 text-sm leading-7 text-slate-600 border border-slate-100 whitespace-pre-wrap">
+                                <p className="min-h-32 rounded-xl bg-white p-5 text-sm leading-7 text-slate-600 border border-slate-200 whitespace-pre-wrap">
                                     {proposedIdea}
                                 </p>
                             )}
                         </div>
 
                         {/* Tech Stack */}
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">Tech Stack</label>
-                            {editing ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {AVAILABLE_TECH_STACKS.map(tech => (
-                                        <label key={tech} className={`cursor-pointer inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${techStack.includes(tech) ? "bg-[#df6d59] text-white border-[#df6d59]" : "bg-white text-slate-600 border-slate-200 hover:border-[#df6d59]"}`}>
-                                            <input 
-                                                type="checkbox" 
-                                                className="hidden" 
-                                                checked={techStack.includes(tech)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) setTechStack([...techStack, tech]);
-                                                    else setTechStack(techStack.filter(t => t !== tech));
-                                                }}
-                                            />
-                                            {tech}
-                                        </label>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="flex flex-wrap gap-2">
-                                    {techStack.length > 0 ? techStack.map(tech => (
-                                        <span key={tech} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                                            {tech}
-                                        </span>
-                                    )) : <span className="text-sm text-slate-400 italic">No tech stack selected</span>}
-                                </div>
-                            )}
+                        <div className="border border-slate-100 rounded-xl p-4 bg-slate-50/50">
+                            <div className="flex items-start justify-between gap-4 mb-4">
+                                <label className="block text-sm font-semibold text-slate-700">Tech Stack</label>
+                                {!isSubmissionLocked && !isTSLocked && (
+                                    <button 
+                                        onClick={() => editingTS ? saveField('techStack', techStack, setEditingTS) : setEditingTS(true)} 
+                                        className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold ${editingTS ? "bg-[#df6d59] text-white" : "bg-slate-200 text-slate-700"}`}
+                                    >
+                                        {editingTS ? <Save size={14} /> : <Edit3 size={14} />}
+                                        {editingTS ? "Submit & Lock" : "Edit"}
+                                    </button>
+                                )}
+                                {isTSLocked && <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md"><CheckCircle2 size={14}/> Submitted</span>}
+                            </div>
+                            
+                            <div className="space-y-4">
+                                {Object.entries(TECH_CATEGORIES).map(([category, techs]) => (
+                                    <div key={category}>
+                                        <p className="text-xs font-semibold text-slate-500 mb-2">{category.toUpperCase()}</p>
+                                        {editingTS ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {techs.map(tech => {
+                                                    const isSelected = techStack[category]?.includes(tech);
+                                                    return (
+                                                        <label key={tech} className={`cursor-pointer inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${isSelected ? "bg-[#df6d59] text-white border-[#df6d59]" : "bg-white text-slate-600 border-slate-200 hover:border-[#df6d59]"}`}>
+                                                            <input 
+                                                                type="checkbox" 
+                                                                className="hidden" 
+                                                                checked={isSelected}
+                                                                onChange={(e) => {
+                                                                    const currentCatStack = techStack[category] || [];
+                                                                    if (e.target.checked) {
+                                                                        setTechStack({ ...techStack, [category]: [...currentCatStack, tech] });
+                                                                    } else {
+                                                                        setTechStack({ ...techStack, [category]: currentCatStack.filter(t => t !== tech) });
+                                                                    }
+                                                                }}
+                                                            />
+                                                            {tech}
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-wrap gap-2">
+                                                {techStack[category] && techStack[category].length > 0 ? techStack[category].map(tech => (
+                                                    <span key={tech} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white text-slate-600 border border-slate-200 shadow-sm">
+                                                        {tech}
+                                                    </span>
+                                                )) : <span className="text-xs text-slate-400 italic">None selected</span>}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center gap-2 border-t border-slate-100 pt-4 text-xs text-slate-400">
+                    <div className="flex items-center gap-2 border-t border-slate-100 pt-4 text-xs text-slate-400">
                         <Presentation size={15} /> Keep this clear—these details are visible to your judges.
                     </div>
                 </section>

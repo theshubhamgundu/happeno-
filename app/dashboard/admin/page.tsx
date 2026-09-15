@@ -472,7 +472,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-[#FFEE00]" /> {filteredTeams.length} shown</div>
                     </div>
-                    <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-3 flex-wrap">
                         <div className="relative flex-grow">
                             <input
                                 type="text"
@@ -508,10 +508,10 @@ export default function AdminDashboard() {
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isImporting}
-                            className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-purple-600/20 px-4 text-[10px] font-black uppercase tracking-wider text-purple-400 transition hover:border-purple-400/50 hover:bg-purple-600/30 disabled:opacity-50"
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-[#a855f7]/40 bg-[#a855f7]/20 px-5 text-[10px] font-black uppercase tracking-wider text-[#c084fc] transition hover:border-[#a855f7]/70 hover:bg-[#a855f7]/30 disabled:opacity-50"
                         >
                             {isImporting ? (
-                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#c084fc] border-t-transparent" />
                             ) : (
                                 <Upload size={18} />
                             )}

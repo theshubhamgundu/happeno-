@@ -103,6 +103,9 @@ export interface Project {
     problemStatement: string;
     proposedIdea?: string;
     techStack?: Record<string, string[]>;
+    isPSLocked?: boolean;
+    isPILocked?: boolean;
+    isTSLocked?: boolean;
     members: (string | Member)[];
     captain: string;
     captainMobile: string;

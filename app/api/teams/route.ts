@@ -38,7 +38,10 @@ export async function GET(req: Request) {
             status: r.status || "PENDING",
             problemStatement: r.problem_statement || r.raw_data?.problemStatement || "",
             proposedIdea: r.proposed_idea || "",
-            techStack: r.tech_stack || [],
+            techStack: r.tech_stack || {},
+            isPSLocked: r.raw_data?.ps_locked || false,
+            isPILocked: r.raw_data?.pi_locked || false,
+            isTSLocked: r.raw_data?.ts_locked || false,
             room: r.room || "",
             roomWifiSSID: r.room_wifi_ssid || "",
             roomWifiPass: r.room_wifi_pass || "",
@@ -77,9 +80,31 @@ export async function PATCH(req: Request) {
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
         const updateData: any = {};
-        if (problemStatement !== undefined) updateData.problem_statement = problemStatement;
-        if (proposedIdea !== undefined) updateData.proposed_idea = proposedIdea;
-        if (techStack !== undefined) updateData.tech_stack = techStack;
+
+        // Participant-owned fields — fetch current raw_data to merge lock flags
+        const isParticipantUpdate = problemStatement !== undefined || proposedIdea !== undefined || techStack !== undefined;
+        if (isParticipantUpdate) {
+            const { data: existing } = await supabase
+                .from('registrations')
+                .select('raw_data')
+                .or(`transaction_id.eq."${id}",team_id.eq."${id}"`)
+                .single();
+            const rawData = existing?.raw_data || {};
+            if (problemStatement !== undefined) {
+                updateData.problem_statement = problemStatement;
+                rawData.ps_locked = true;
+            }
+            if (proposedIdea !== undefined) {
+                updateData.proposed_idea = proposedIdea;
+                rawData.pi_locked = true;
+            }
+            if (techStack !== undefined) {
+                updateData.tech_stack = techStack;
+                rawData.ts_locked = true;
+            }
+            updateData.raw_data = rawData;
+        }
+
         if (roundScores !== undefined) updateData.round_scores = roundScores;
         if (roundComments !== undefined) updateData.round_comments = roundComments;
         if (roundDetailedScores !== undefined) updateData.round_detailed_scores = roundDetailedScores;
@@ -88,10 +113,6 @@ export async function PATCH(req: Request) {
         if (volunteer_name !== undefined) updateData.volunteer_name = volunteer_name;
         if (volunteer_phone !== undefined) updateData.volunteer_phone = volunteer_phone;
         if (assigned_judge !== undefined || assigned_judge_2 !== undefined) {
-            // We need to preserve the other part if one is missing in the request
-            // But usually logistics update sends everything.
-            // For safety, we'll assume the request has what's needed.
-            // If we want to be perfect, we'd fetch current value first, but let's stick to combined update.
             updateData.assigned_judge = `${assigned_judge || ""}|${assigned_judge_2 || ""}`;
         }
         if (roomWifiSSID !== undefined) updateData.room_wifi_ssid = roomWifiSSID;
