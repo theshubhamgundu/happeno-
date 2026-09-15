@@ -11,18 +11,72 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 
+const DOMAIN_PROBLEM_STATEMENTS = [
+    "Open Innovation",
+    "Healthcare & MedTech",
+    "FinTech & Web3",
+    "EdTech",
+    "Sustainable Environment",
+    "Smart City & IoT"
+];
+
+const TECH_CATEGORIES = {
+    Frontend: ["React", "Next.js", "Vue", "Svelte", "HTML/CSS/JS"],
+    Backend: ["Node.js", "Express", "Python", "Flask", "Django"],
+    Database: ["PostgreSQL", "MongoDB", "MySQL", "Firebase DB", "Supabase DB"],
+    Auth: ["Firebase Auth", "Supabase Auth", "Auth0", "NextAuth"]
+};
+
 export default function TeamDashboard() {
     const { projects, isLoading, isSubmissionLocked, isCertificatesEnabled } = useHackathon();
     const { user } = useAuth();
-    const [brief, setBrief] = useState("");
-    const [editing, setEditing] = useState(false);
+    
+    const [problemStatement, setProblemStatement] = useState("");
+    const [proposedIdea, setProposedIdea] = useState("");
+    const [techStack, setTechStack] = useState<Record<string, string[]>>({ Frontend: [], Backend: [], Database: [], Auth: [] });
+    
+    const [editingPS, setEditingPS] = useState(false);
+    const [editingPI, setEditingPI] = useState(false);
+    const [editingTS, setEditingTS] = useState(false);
+    
     const [generatingCert, setGeneratingCert] = useState<string | null>(null);
     const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || (user?.teamId === DEMO_TEAM_ID ? DEMO_PROJECT : null), [projects, user]);
 
-    useEffect(() => { if (team) setBrief(team.problemStatement || "Add a concise project brief to keep your team aligned."); }, [team]);
-    const saveBrief = async () => {
-        if (editing && team?.id) await fetch("/api/teams", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: team.id, problemStatement: brief }) });
-        setEditing(!editing);
+    const isPSLocked = Boolean(team?.problemStatement);
+    const isPILocked = Boolean(team?.proposedIdea && team.proposedIdea !== "Add a concise proposed idea to keep your team aligned.");
+    const isTSLocked = Boolean(team?.techStack && Object.keys(team.techStack).length > 0);
+
+    useEffect(() => { 
+        if (team) {
+            if (!editingPS) setProblemStatement(team.problemStatement || "");
+            if (!editingPI) setProposedIdea(team.proposedIdea || "Add a concise proposed idea to keep your team aligned.");
+            if (!editingTS) setTechStack(team.techStack || { Frontend: [], Backend: [], Database: [], Auth: [] });
+        }
+    }, [team, editingPS, editingPI, editingTS]);
+
+    const saveField = async (field: string, value: any, setEditingState: (val: boolean) => void) => {
+        const confirmed = window.confirm("Are you sure? Once submitted, this section cannot be edited again.");
+        if (!confirmed) return;
+        
+        if (team?.id) {
+            const loadingToast = toast.loading("Submitting...");
+            try {
+                const res = await fetch("/api/teams", { 
+                    method: "PATCH", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: JSON.stringify({ 
+                        id: team.id, 
+                        [field]: value
+                    }) 
+                });
+                if (!res.ok) throw new Error("Failed to save");
+                toast.success("Submitted successfully!", { id: loadingToast });
+                setEditingState(false);
+                setTimeout(() => window.location.reload(), 1000); // Refresh to lock UI
+            } catch (error) {
+                toast.error("Error submitting", { id: loadingToast });
+            }
+        }
     };
 
     const downloadCertificate = async (member: { name: string, role: string, detail: string }) => {
@@ -69,7 +123,98 @@ export default function TeamDashboard() {
             </section>
 
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,1fr)]">
-                <section className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold text-slate-400">PROJECT BRIEF</p><h2 className="mt-1 text-lg font-semibold text-slate-900">What are you building?</h2></div>{!isSubmissionLocked && <button onClick={saveBrief} className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold ${editing ? "bg-[#df6d59] text-white" : "bg-slate-100 text-slate-700"}`}>{editing ? <Save size={14} /> : <Edit3 size={14} />}{editing ? "Save brief" : "Edit"}</button>}</div>{editing ? <textarea value={brief} onChange={(event) => setBrief(event.target.value)} className="mt-5 min-h-40 w-full resize-none rounded-xl border border-slate-200 p-4 text-sm leading-6 outline-none focus:border-[#df6d59]" /> : <p className="mt-5 min-h-40 rounded-xl bg-slate-50 p-5 text-sm leading-7 text-slate-600">{brief}</p>}<div className="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4 text-xs text-slate-400"><Presentation size={15} /> Keep this clear—the brief is visible to your judges.</div></section>
+                <section className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
+                    <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+                        <div>
+                            <p className="text-xs font-semibold text-slate-400">PROJECT DETAILS</p>
+                            <h2 className="mt-1 text-lg font-semibold text-slate-900">What are you building?</h2>
+                        </div>
+                        {!isSubmissionLocked && (
+                            <button 
+                                onClick={saveBrief} 
+                                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold ${editing ? "bg-[#df6d59] text-white" : "bg-slate-100 text-slate-700"}`}
+                            >
+                                {editing ? <Save size={14} /> : <Edit3 size={14} />}
+                                {editing ? "Save Details" : "Edit"}
+                            </button>
+                        )}
+                    </div>
+                    
+                    <div className="space-y-6">
+                        {/* Problem Statement */}
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">Problem Statement Domain</label>
+                            {editing ? (
+                                <select 
+                                    value={problemStatement} 
+                                    onChange={(e) => setProblemStatement(e.target.value)}
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#df6d59]"
+                                >
+                                    <option value="">Select a domain...</option>
+                                    {DOMAIN_PROBLEM_STATEMENTS.map(ps => (
+                                        <option key={ps} value={ps}>{ps}</option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600 border border-slate-100">
+                                    {problemStatement || "Not selected yet"}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Proposed Idea */}
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">Proposed Idea</label>
+                            {editing ? (
+                                <textarea 
+                                    value={proposedIdea} 
+                                    onChange={(event) => setProposedIdea(event.target.value)} 
+                                    className="min-h-32 w-full resize-none rounded-xl border border-slate-200 p-4 text-sm leading-6 outline-none focus:border-[#df6d59]" 
+                                    placeholder="Explain your approach..."
+                                />
+                            ) : (
+                                <p className="min-h-32 rounded-xl bg-slate-50 p-5 text-sm leading-7 text-slate-600 border border-slate-100 whitespace-pre-wrap">
+                                    {proposedIdea}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Tech Stack */}
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">Tech Stack</label>
+                            {editing ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {AVAILABLE_TECH_STACKS.map(tech => (
+                                        <label key={tech} className={`cursor-pointer inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${techStack.includes(tech) ? "bg-[#df6d59] text-white border-[#df6d59]" : "bg-white text-slate-600 border-slate-200 hover:border-[#df6d59]"}`}>
+                                            <input 
+                                                type="checkbox" 
+                                                className="hidden" 
+                                                checked={techStack.includes(tech)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) setTechStack([...techStack, tech]);
+                                                    else setTechStack(techStack.filter(t => t !== tech));
+                                                }}
+                                            />
+                                            {tech}
+                                        </label>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap gap-2">
+                                    {techStack.length > 0 ? techStack.map(tech => (
+                                        <span key={tech} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                            {tech}
+                                        </span>
+                                    )) : <span className="text-sm text-slate-400 italic">No tech stack selected</span>}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex items-center gap-2 border-t border-slate-100 pt-4 text-xs text-slate-400">
+                        <Presentation size={15} /> Keep this clear—these details are visible to your judges.
+                    </div>
+                </section>
                 <div className="space-y-4"><section className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center justify-between"><div><p className="text-xs font-semibold text-slate-400">TEAM</p><h2 className="mt-1 text-lg font-semibold">People on this project</h2></div><span className="grid h-9 w-9 place-items-center rounded-xl bg-[#fbe5df] text-[#c85847]"><Users size={17} /></span></div><div className="mt-4 space-y-2">{members.map((member, index) => <div key={`${member.name}-${index}`} className="flex items-center justify-between gap-3 rounded-xl p-2 hover:bg-slate-50"><div className="flex items-center gap-3 min-w-0"><div className="grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">{member.name?.charAt(0) || "M"}</div><div className="min-w-0"><p className="truncate text-sm font-medium text-slate-700">{member.name}</p><p className="text-xs text-slate-400">{member.role} · {member.detail}</p></div></div>{isCertificatesEnabled && <button onClick={() => downloadCertificate(member)} disabled={generatingCert === member.name} className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors disabled:opacity-50" title="Download Certificate">{generatingCert === member.name ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" /> : <Download size={16} />}</button>}</div>)}</div></section><section className="rounded-2xl border border-[#f3d8d1] bg-[#fdf1ed] p-5"><div className="flex items-start gap-3"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white text-[#c85847]"><Wifi size={17} /></span><div><p className="text-sm font-semibold text-slate-800">Venue network</p><p className="mt-1 text-xs leading-5 text-slate-500">{team.roomWifiSSID ? `Connect to ${team.roomWifiSSID}` : "Network credentials will appear once your workspace is assigned."}</p></div></div></section></div>
             </div>
         </div>

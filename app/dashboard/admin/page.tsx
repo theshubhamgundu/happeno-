@@ -22,6 +22,7 @@ import {
     Eye,
     EyeOff,
     Download,
+    Upload,
     LayoutDashboard,
     CheckCircle2,
     Clock3,
@@ -34,6 +35,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useHackathon, Project } from "@/context/HackathonContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Papa from "papaparse";
 
 export default function AdminDashboard() {
     const {
@@ -66,6 +68,10 @@ export default function AdminDashboard() {
     const [emergencyForm, setEmergencyForm] = useState({ name: "", phone: "" });
     const [isEditingEmergency, setIsEditingEmergency] = useState(false);
     const [visiblePasswords, setVisiblePasswords] = useState<Set<any>>(new Set());
+    
+    // Pagination state for scalability
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 50;
 
     // Silent one-time backfill: if any team has no password OR has old-format password (no '@'), regenerate all
     const backfillRan = useRef(false);
@@ -182,6 +188,13 @@ export default function AdminDashboard() {
         });
     }, [projects, searchQuery]);
 
+    const paginatedTeams = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredTeams.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredTeams, currentPage]);
+
+    const totalPages = Math.ceil(filteredTeams.length / itemsPerPage);
+
     const dashboardStats = useMemo(() => {
         const pending = projects.filter(project => project.status === "PENDING");
         const assigned = projects.filter(project => Boolean(project.room));
@@ -194,6 +207,110 @@ export default function AdminDashboard() {
             unassigned: projects.length - assigned.length,
         };
     }, [projects]);
+
+    // --- CSV IMPORT LOGIC ---
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isImporting, setIsImporting] = useState(false);
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsImporting(true);
+        const loadingToast = toast.loading(`Parsing ${file.name}...`);
+
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: async (results) => {
+                try {
+                    const rows = results.data as any[];
+                    // Map generic headers to our expected JSON
+                    const registrations = rows.map((row) => {
+                        const participants = [];
+                        
+                        // Leader
+                        if (row['Leader Name'] || row['Leader Email']) {
+                            participants.push({
+                                fullName: row['Leader Name'] || '',
+                                email: row['Leader Email'] || '',
+                                phone: row['Leader Phone'] || '',
+                                college: row['College'] || ''
+                            });
+                        }
+                        // Member 2
+                        if (row['Member 2 Name'] || row['Member 2 Email']) {
+                            participants.push({
+                                fullName: row['Member 2 Name'] || '',
+                                email: row['Member 2 Email'] || '',
+                                phone: row['Member 2 Phone'] || ''
+                            });
+                        }
+                        // Member 3
+                        if (row['Member 3 Name'] || row['Member 3 Email']) {
+                            participants.push({
+                                fullName: row['Member 3 Name'] || '',
+                                email: row['Member 3 Email'] || '',
+                                phone: row['Member 3 Phone'] || ''
+                            });
+                        }
+                        // Member 4
+                        if (row['Member 4 Name'] || row['Member 4 Email']) {
+                            participants.push({
+                                fullName: row['Member 4 Name'] || '',
+                                email: row['Member 4 Email'] || '',
+                                phone: row['Member 4 Phone'] || ''
+                            });
+                        }
+
+                        return {
+                            teamName: row['Team Name'] || '',
+                            track: row['Track'] || 'General',
+                            problemStatement: row['Problem Statement'] || '',
+                            participants
+                        };
+                    });
+
+                    toast.loading(`Importing ${registrations.length} teams...`, { id: loadingToast });
+
+                    // 1. Import Registrations
+                    const importRes = await fetch('/api/admin/import-registrations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ registrations })
+                    });
+                    const importData = await importRes.json();
+                    
+                    if (!importData.success) throw new Error(importData.error || 'Import failed');
+
+                    toast.loading(`Generating credentials for imported teams...`, { id: loadingToast });
+
+                    // 2. Generate Passwords & Team IDs
+                    const pwdRes = await fetch('/api/admin/generate-passwords', { method: 'POST' });
+                    const pwdData = await pwdRes.json();
+
+                    if (!pwdData.success) throw new Error(pwdData.error || 'Credential generation failed');
+
+                    toast.success(`Successfully imported ${importData.imported} teams and generated credentials!`, { id: loadingToast });
+                    
+                    // Reload page to fetch new data
+                    setTimeout(() => window.location.reload(), 2000);
+                } catch (error: any) {
+                    console.error("CSV Import Error:", error);
+                    toast.error(error.message || "Failed to process CSV file", { id: loadingToast });
+                } finally {
+                    setIsImporting(false);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                }
+            },
+            error: (error) => {
+                toast.error(`Error parsing CSV: ${error.message}`, { id: loadingToast });
+                setIsImporting(false);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+            }
+        });
+    };
+    // ------------------------
 
     // Shared branded report opener
     const openBrandedReport = (title: string, subtitle: string, headers: string[], rows: (string | number | undefined | null)[][], filename: string) => {
@@ -361,7 +478,10 @@ export default function AdminDashboard() {
                                 type="text"
                                 placeholder="Search by ID (e.g. 101) or Team Name..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             className="h-14 w-full rounded-xl border border-white/10 bg-[#0B0114]/60 py-3 pl-12 pr-4 text-sm font-medium text-white outline-none transition-all placeholder:text-white/25 focus:border-[#FFEE00]/70 focus:ring-2 focus:ring-[#FFEE00]/10"
                             />
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={19} />
@@ -376,10 +496,31 @@ export default function AdminDashboard() {
                         >
                             <Download size={18} /> Export
                         </button>
+                        
+                        {/* CSV Import */}
+                        <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileUpload}
+                            className="hidden"
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isImporting}
+                            className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-purple-600/20 px-4 text-[10px] font-black uppercase tracking-wider text-purple-400 transition hover:border-purple-400/50 hover:bg-purple-600/30 disabled:opacity-50"
+                        >
+                            {isImporting ? (
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
+                            ) : (
+                                <Upload size={18} />
+                            )}
+                            {isImporting ? 'Importing...' : 'Import CSV'}
+                        </button>
                     </div>
 
                     <div className="grid grid-cols-1 gap-6">
-                        {filteredTeams.map((team) => (
+                        {paginatedTeams.map((team) => (
                             <div
                                 key={team.id}
                                 className={`bg-white/5 border border-white/10 rounded-[2rem] transition-all hover:bg-white/[0.07] cursor-pointer overflow-hidden ${expandedTeamId === team.id ? 'bg-white/[0.08] shadow-2xl' : 'opacity-80'}`}
@@ -550,6 +691,29 @@ export default function AdminDashboard() {
                             </div>
                         ))}
                     </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-4 mt-8">
+                            <button
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-50 hover:bg-white/10 transition"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-white/50 text-sm font-bold">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-50 hover:bg-white/10 transition"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 

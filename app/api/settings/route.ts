@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+// Cache responses at the edge for 60 seconds to prevent DB spikes
+export const revalidate = 60;
+
 export async function GET() {
     try {
         const { data, error } = await supabase

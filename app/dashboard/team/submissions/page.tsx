@@ -18,8 +18,15 @@ export default function TeamSubmissions() {
     const [saving, setSaving] = useState<SubmissionKey | null>(null);
     const [timeLocked, setTimeLocked] = useState(false);
 
+    const [isInitialized, setIsInitialized] = useState(false);
+
     useEffect(() => { const update = () => setTimeLocked(new Date() < new Date("2026-02-27T09:30:00+05:30")); update(); const interval = setInterval(update, 10000); return () => clearInterval(interval); }, []);
-    useEffect(() => { if (team?.submission) setValues({ repo: team.submission.github || "", video: team.submission.demo || "", presentation: team.submission.presentation || "", demo: team.submission.deployment || "" }); }, [team]);
+    useEffect(() => { 
+        if (team?.submission && !isInitialized) { 
+            setValues({ repo: team.submission.github || "", video: team.submission.demo || "", presentation: team.submission.presentation || "", demo: team.submission.deployment || "" }); 
+            setIsInitialized(true);
+        } 
+    }, [team, isInitialized]);
 
     const save = async (key: SubmissionKey) => {
         if (!team) return;

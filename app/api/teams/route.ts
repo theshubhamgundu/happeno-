@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
 
+// Cache responses at the edge for 60 seconds to prevent DB spikes during high traffic
+export const revalidate = 60;
+
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
@@ -34,6 +37,8 @@ export async function GET(req: Request) {
             members: r.members || [],
             status: r.status || "PENDING",
             problemStatement: r.problem_statement || r.raw_data?.problemStatement || "",
+            proposedIdea: r.proposed_idea || "",
+            techStack: r.tech_stack || [],
             room: r.room || "",
             roomWifiSSID: r.room_wifi_ssid || "",
             roomWifiPass: r.room_wifi_pass || "",
@@ -67,12 +72,14 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
     try {
-        const { id, problemStatement, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, room, volunteer_name, volunteer_phone, roomWifiSSID, roomWifiPass, assigned_judge, assigned_judge_2 } = await req.json();
+        const { id, problemStatement, proposedIdea, techStack, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, room, volunteer_name, volunteer_phone, roomWifiSSID, roomWifiPass, assigned_judge, assigned_judge_2 } = await req.json();
 
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
         const updateData: any = {};
         if (problemStatement !== undefined) updateData.problem_statement = problemStatement;
+        if (proposedIdea !== undefined) updateData.proposed_idea = proposedIdea;
+        if (techStack !== undefined) updateData.tech_stack = techStack;
         if (roundScores !== undefined) updateData.round_scores = roundScores;
         if (roundComments !== undefined) updateData.round_comments = roundComments;
         if (roundDetailedScores !== undefined) updateData.round_detailed_scores = roundDetailedScores;

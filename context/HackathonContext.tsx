@@ -101,6 +101,8 @@ export interface Project {
     team: string;
     track: string;
     problemStatement: string;
+    proposedIdea?: string;
+    techStack?: Record<string, string[]>;
     members: (string | Member)[];
     captain: string;
     captainMobile: string;
@@ -351,12 +353,16 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         };
         initFetch();
 
+        // Dynamic polling interval based on user role
+        // Admins/Judges need faster updates (60s), Teams/Guests can be slower (3 minutes) to reduce DB load
+        const pollingInterval = user?.role === 'admin' || user?.role === 'judge' ? 60000 : 180000;
+
         const interval = setInterval(() => {
             if (document.visibilityState === 'visible' && mountedRef.current) {
                 fetchSettings(true);
                 fetchServerTeams(true);
             }
-        }, 30000); // Sync every 30s
+        }, pollingInterval);
 
         return () => {
             mountedRef.current = false;
