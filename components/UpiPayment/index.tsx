@@ -87,7 +87,7 @@ export const UpiPayment: React.FC<UpiPaymentProps> = ({
                 <div className="w-full mb-4 sm:mb-6 z-10">
                     <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                            <IndianRupee className="h-4 w-4 sm:h-5 sm:w-5 text-purple-400 group-focus-within:text-yellow-400 transition-colors" />
+                            <IndianRupee className="h-4 w-4 sm:h-5 sm:w-5 text-slate-900 group-focus-within:text-yellow-400 transition-colors" />
                         </div>
                         <input
                             type="number"
@@ -95,14 +95,14 @@ export const UpiPayment: React.FC<UpiPaymentProps> = ({
                             onChange={(e) => setAmount(e.target.value)}
                             disabled={fixedAmount}
                             placeholder="Enter Amount"
-                            className={`block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all text-base sm:text-lg font-medium ${fixedAmount ? "opacity-70 cursor-not-allowed" : ""
+                            className={`block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-slate-800 transition-all text-base sm:text-lg font-medium ${fixedAmount ? "opacity-70 cursor-not-allowed" : ""
                                 }`}
                         />
                     </div>
                 </div>
 
                 {/* QR Code Section */}
-                <div className="relative p-1 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl shadow-xl mb-4 sm:mb-6 group cursor-pointer z-10">
+                <div className="relative p-1 bg-gradient-to-br from-slate-900 via-slate-800 to-yellow-500 rounded-2xl shadow-xl mb-4 sm:mb-6 group cursor-pointer z-10">
                     <div className="bg-white rounded-[13px] p-1.5 sm:p-2">
                         {qrCodeUrl ? (
                             <div className="relative aspect-square w-48 sm:w-64 md:w-72">
@@ -136,7 +136,7 @@ export const UpiPayment: React.FC<UpiPaymentProps> = ({
                         <span className="text-white/40 text-[10px] sm:text-xs uppercase tracking-wider">UPI ID</span>
                         <button
                             onClick={handleCopyVpa}
-                            className="flex items-center gap-1.5 sm:gap-2 text-purple-400 hover:text-white transition-colors text-[10px] sm:text-sm font-mono bg-purple-500/10 hover:bg-purple-500/20 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md overflow-hidden max-w-[150px] sm:max-w-none"
+                            className="flex items-center gap-1.5 sm:gap-2 text-slate-900 hover:text-white transition-colors text-[10px] sm:text-sm font-mono bg-slate-900/10 hover:bg-slate-800/20 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md overflow-hidden max-w-[150px] sm:max-w-none"
                         >
                             <span className="truncate">{payeeVpa}</span>
                             {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
@@ -160,7 +160,7 @@ export const UpiPayment: React.FC<UpiPaymentProps> = ({
 
                 {/* Background Effects */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                    <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-purple-600 rounded-full blur-[60px] opacity-40"></div>
+                    <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-slate-900 rounded-full blur-[60px] opacity-40"></div>
                     <div className="absolute bottom-[-50px] left-[-50px] w-32 h-32 bg-yellow-500 rounded-full blur-[60px] opacity-20"></div>
                 </div>
 

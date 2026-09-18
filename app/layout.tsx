@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Kanit, Poppins } from "next/font/google";
+import { Geist, Geist_Mono, Kanit, Poppins, Montserrat } from "next/font/google";
 import "./globals.css";
 import { ViewTransitions } from 'next-view-transitions'
 import SmoothScroll from "@/components/SmoothScroll";
@@ -24,6 +24,12 @@ const kanit = Kanit({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-kanit",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -66,7 +72,7 @@ export default function RootLayout({
           <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${poppins.className} antialiased overflow-x-hidden bg-black`}
+          className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${montserrat.variable} ${poppins.className} antialiased overflow-x-hidden bg-white text-slate-900`}
         >
           <AuthProvider>
             <HackathonProvider>
@@ -94,7 +100,7 @@ export default function RootLayout({
                       description: "group-[.toast]:text-slate-500",
                       actionButton: "group-[.toast]:bg-indigo-600 group-[.toast]:text-white",
                       cancelButton: "group-[.toast]:bg-slate-100 group-[.toast]:text-slate-700",
-                      error: "group-[.toast]:text-red-400 group-[.toast]:border-red-500/20",
+                      error: "group-[.toast]:text-slate-900 group-[.toast]:border-slate-800/20",
                       success: "group-[.toast]:text-green-400 group-[.toast]:border-green-500/20",
                       warning: "group-[.toast]:text-yellow-400 group-[.toast]:border-yellow-500/20",
                       info: "group-[.toast]:text-blue-400 group-[.toast]:border-blue-500/20",

@@ -22,7 +22,7 @@ const FailedContent = () => {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.2, type: "spring" }}
-                        className="bg-red-500 w-24 h-24 rounded-full flex items-center justify-center relative z-10 shadow-[0_0_40px_rgba(239,68,68,0.4)]"
+                        className="bg-slate-900 w-24 h-24 rounded-full flex items-center justify-center relative z-10 shadow-[0_0_40px_rgba(239,68,68,0.4)]"
                     >
                         <XCircle size={48} className="text-white" />
                     </motion.div>
@@ -63,7 +63,7 @@ export default function PaymentFailedPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen bg-[#0B0114] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-slate-800 border-t-transparent rounded-full animate-spin" />
             </div>
         }>
             <FailedContent />

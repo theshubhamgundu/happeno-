@@ -53,7 +53,7 @@ export default function TeamOnboarding() {
                     <div className="space-y-6">
                         <div>
                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] block mb-3">Team Name</label>
-                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-purple-500/50 transition-all">
+                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-slate-800/50 transition-all">
                                 <Users size={20} className="text-white/20" />
                                 <input
                                     type="text"
@@ -66,7 +66,7 @@ export default function TeamOnboarding() {
 
                         <div>
                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] block mb-3">College / University</label>
-                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-purple-500/50 transition-all">
+                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-slate-800/50 transition-all">
                                 <School size={20} className="text-white/20" />
                                 <input
                                     type="text"
@@ -80,7 +80,7 @@ export default function TeamOnboarding() {
 
                         <div>
                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] block mb-3">Captain's Github</label>
-                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-purple-500/50 transition-all">
+                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-slate-800/50 transition-all">
                                 <Github size={20} className="text-white/20" />
                                 <input
                                     type="text"
@@ -94,7 +94,7 @@ export default function TeamOnboarding() {
 
                         <div>
                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] block mb-3">Captain's LinkedIn</label>
-                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-purple-500/50 transition-all">
+                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-slate-800/50 transition-all">
                                 <Linkedin size={20} className="text-white/20" />
                                 <input
                                     type="text"
@@ -108,7 +108,7 @@ export default function TeamOnboarding() {
 
                         <div>
                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] block mb-3">Project Theme</label>
-                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-purple-500/50 transition-all">
+                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 focus-within:border-slate-800/50 transition-all">
                                 <Lightbulb size={20} className="text-white/20" />
                                 <input
                                     type="text"
@@ -124,7 +124,7 @@ export default function TeamOnboarding() {
                     {/* Rules Section */}
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 backdrop-blur-md h-fit">
                         <h3 className="text-xl font-bold flex items-center gap-3 mb-6 italic">
-                            <FileText className="text-purple-400" />
+                            <FileText className="text-slate-900" />
                             Code of Conduct
                         </h3>
                         <div className="space-y-4 max-h-[300px] overflow-y-auto pr-4 custom-scrollbar mb-8">
@@ -136,7 +136,7 @@ export default function TeamOnboarding() {
                                 "Keep your work area clean and return distributed equipment after use."
                             ].map((rule, i) => (
                                 <div key={i} className="flex gap-4">
-                                    <span className="text-purple-500 font-bold">0{i + 1}.</span>
+                                    <span className="text-slate-900 font-bold">0{i + 1}.</span>
                                     <p className="text-xs text-white/60 leading-relaxed font-poppins">{rule}</p>
                                 </div>
                             ))}
@@ -147,7 +147,7 @@ export default function TeamOnboarding() {
                             className="flex items-center gap-4 cursor-pointer group select-none"
                         >
                             <div
-                                className={`w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center ${agreed ? 'bg-purple-600 border-purple-600 shadow-[0_0_15px_#9333ea]' : 'border-white/10 group-hover:border-purple-500/50'
+                                className={`w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center ${agreed ? 'bg-slate-900 border-slate-800 shadow-[0_0_15px_#9333ea]' : 'border-white/10 group-hover:border-slate-800/50'
                                     }`}
                             >
                                 {agreed && <CheckCircle2 size={16} className="text-white" />}

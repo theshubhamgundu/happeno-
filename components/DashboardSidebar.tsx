@@ -40,7 +40,7 @@ const SidebarItem = ({ href, icon: Icon, label, active, isCollapsed, onClick }: 
             whileHover={{ x: isCollapsed ? 0 : 5, scale: isCollapsed ? 1.1 : 1 }}
             whileTap={{ scale: 0.95 }}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
-                ? "bg-purple-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                ? "bg-slate-900 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)]"
                 : "text-white/60 hover:text-white hover:bg-white/5"
                 } ${isCollapsed ? "justify-center px-0" : ""}`}
             title={isCollapsed ? label : ""}
@@ -144,7 +144,7 @@ export const DashboardSidebar = ({ type, isOpen, onClose, isCollapsed, onToggleC
                     {/* Desktop Collapse Toggle */}
                     <button
                         onClick={onToggleCollapse}
-                        className="hidden md:flex absolute -right-3 top-12 w-6 h-6 bg-purple-600 rounded-full items-center justify-center text-white border border-white/20 shadow-lg hover:scale-110 transition-transform"
+                        className="hidden md:flex absolute -right-3 top-12 w-6 h-6 bg-slate-900 rounded-full items-center justify-center text-white border border-white/20 shadow-lg hover:scale-110 transition-transform"
                     >
                         <motion.div animate={{ rotate: isCollapsed ? 0 : 180 }}>
                             <ChevronRight size={14} />
@@ -172,9 +172,9 @@ export const DashboardSidebar = ({ type, isOpen, onClose, isCollapsed, onToggleC
                 </nav>
 
                 <div className="mt-auto space-y-2">
-                    <div className={`p-4 bg-white/5 rounded-2xl border border-white/10 mb-6 group cursor-pointer hover:border-purple-500/50 transition-all ${isCollapsed ? "px-0 flex justify-center border-none bg-transparent" : ""}`}>
+                    <div className={`p-4 bg-white/5 rounded-2xl border border-white/10 mb-6 group cursor-pointer hover:border-slate-800/50 transition-all ${isCollapsed ? "px-0 flex justify-center border-none bg-transparent" : ""}`}>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center shrink-0">
                                 <User size={20} />
                             </div>
                             {!isCollapsed && (

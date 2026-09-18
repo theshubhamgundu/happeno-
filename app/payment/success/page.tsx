@@ -77,7 +77,7 @@ const SuccessContent = () => {
 
                 <h2 className="text-3xl font-black italic uppercase italic tracking-tighter text-white mb-2">Registration Confirmed!</h2>
                 <p className="text-white/60 font-medium mb-6 leading-relaxed">
-                    Team <span className="text-purple-400 font-bold">{registration?.team_name || "Your team"}</span> is ready for war.
+                    Team <span className="text-slate-900 font-bold">{registration?.team_name || "Your team"}</span> is ready for war.
                 </p>
 
                 {registration?.team_id && (
@@ -152,7 +152,7 @@ export default function PaymentSuccessPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen bg-[#0B0114] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-slate-800 border-t-transparent rounded-full animate-spin" />
             </div>
         }>
             <SuccessContent />

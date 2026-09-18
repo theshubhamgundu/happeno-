@@ -272,7 +272,7 @@ const MobileNavBar: React.FC = () => {
 					relative
 					flex flex-col
 					rounded-3xl
-					bg-purple-500/500
+					bg-slate-900/500
 					backdrop-blur-[20px]
 					border border-white/20
 					shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
@@ -385,7 +385,7 @@ const MobileNavBar: React.FC = () => {
                         flex items-center justify-center
                         flex-shrink-0
                         rounded-2xl
-                        bg-purple-500/500
+                        bg-slate-900/500
                         transition-all duration-300 ease-out
                         active:scale-95
                         ${isOpen ? "w-10 h-10 self-end" : "w-14 h-14"}

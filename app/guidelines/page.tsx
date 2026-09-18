@@ -61,7 +61,7 @@ const DomainItem = ({ title, valid, invalid, desc }: { title: string, valid: str
                 </ul>
             </div>
             <div className="space-y-3">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#FFEE00]/70 border-b border-red-500/10 pb-2">Will Not Qualify</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#FFEE00]/70 border-b border-slate-800/10 pb-2">Will Not Qualify</p>
                 <ul className="space-y-2">
                     {invalid.map((item, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm opacity-60">
@@ -76,11 +76,11 @@ const DomainItem = ({ title, valid, invalid, desc }: { title: string, valid: str
 
 export default function GuidelinesPage() {
     return (
-        <div className="min-h-screen bg-[#0B0114] text-white font-sans selection:bg-purple-900 pb-40">
+        <div className="min-h-screen bg-[#0B0114] text-white font-sans selection:bg-slate-900 pb-40">
 
             {/* Header / Intro */}
             <div className="relative pt-32 pb-12 px-6 border-b border-white/10 overflow-hidden">
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-purple-500/5 to-transparent pointer-events-none" />
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-slate-900/5 to-transparent pointer-events-none" />
                 <div className="max-w-5xl mx-auto">
                     <FadeInView>
                         <div className="flex items-center gap-3 text-[#FFEE00] mb-4">
@@ -228,9 +228,9 @@ export default function GuidelinesPage() {
                         />
                     </div>
 
-                    <div className="mt-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex gap-3 items-center">
-                        <AlertCircle className="text-red-500" size={18} />
-                        <p className="text-xs text-red-500 font-bold uppercase tracking-widest italic">Projects that do not meet the technical bar may be deemed ineligible.</p>
+                    <div className="mt-8 p-4 bg-slate-900/10 border border-slate-800/20 rounded-xl flex gap-3 items-center">
+                        <AlertCircle className="text-slate-900" size={18} />
+                        <p className="text-xs text-slate-900 font-bold uppercase tracking-widest italic">Projects that do not meet the technical bar may be deemed ineligible.</p>
                     </div>
                 </Section>
 
@@ -285,7 +285,7 @@ export default function GuidelinesPage() {
                                 ))}
                             </div>
                         </div>
-                        <div className="bg-red-500/5 p-4 rounded-xl border border-red-500/10 text-xs text-[#FFEE00] leading-relaxed italic">
+                        <div className="bg-slate-900/5 p-4 rounded-xl border border-slate-800/10 text-xs text-[#FFEE00] leading-relaxed italic">
                             Internet access and workspace provided. Organizers are not responsible for hardware damage, theft, or data loss.
                         </div>
                     </div>

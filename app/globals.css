@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
 :root {
-    --foreground: #ffffff;
-    --background: linear-gradient(206deg, #4E0088 13.13%, #180029 86.33%);
+    --foreground: #0f172a;
+    --background: #ffffff;
     overflow-x: hidden;
 }
 
 html {
-    color-scheme: dark;
-    background: #0b0114;
+    color-scheme: light;
+    background: var(--background);
+    /* Add a subtle grid */
+    background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+    background-size: 40px 40px;
 }
 
 body,
@@ -45,24 +48,12 @@ html.lenis body {
     --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: linear-gradient(206deg, #4E0088 13.13%, #4E0088 13.33%);
-        --foreground: #ededed;
-    }
-}
+@media (prefers-color-scheme: dark) { :root { --background: #0f172a; --foreground: #f8fafc; } html { background-image: linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px); background-size: 40px 40px; } }
 
 body {
     background: var(--background);
     color: var(--foreground);
-    font-family:
-        var(--font-geist-sans),
-        system-ui,
-        -apple-system,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
+    font-family: var(--font-montserrat), var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
 
 .font-kanit {

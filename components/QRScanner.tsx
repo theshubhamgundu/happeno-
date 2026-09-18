@@ -101,16 +101,16 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
 
                 {/* Status Indicator Bar */}
                 <div className={`h-2 transition-all duration-500 ${scanState === 'success' ? 'bg-green-500 shadow-[0_0_20px_#22c55e]' :
-                    scanState === 'error' ? 'bg-red-500 shadow-[0_0_20px_#ef4444]' :
-                        'bg-purple-600 shadow-[0_0_20px_#9333ea]'
+                    scanState === 'error' ? 'bg-slate-900 shadow-[0_0_20px_#ef4444]' :
+                        'bg-slate-900 shadow-[0_0_20px_#9333ea]'
                     }`} />
 
                 {/* Header */}
                 <div className="p-6 sm:p-8 border-b border-white/5 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-4">
                         <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center border transition-all duration-500 ${scanState === 'success' ? 'bg-green-500/20 border-green-500/40 text-green-400' :
-                            scanState === 'error' ? 'bg-red-500/20 border-red-500/40 text-red-500' :
-                                'bg-purple-600/10 border-purple-500/20 text-purple-400'
+                            scanState === 'error' ? 'bg-slate-900/20 border-slate-800/40 text-slate-900' :
+                                'bg-slate-900/10 border-slate-800/20 text-slate-900'
                             }`}>
                             {scanState === 'success' ? <ShieldCheck size={20} className="sm:size-[24px]" /> :
                                 scanState === 'error' ? <ShieldAlert size={20} className="sm:size-[24px]" /> :
@@ -136,7 +136,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                 <div className="aspect-square bg-black relative flex items-center justify-center overflow-hidden">
                     {error ? (
                         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-10 text-center space-y-6 bg-[#0B0114]">
-                            <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20 text-red-500 mb-2">
+                            <div className="w-20 h-20 rounded-full bg-slate-900/10 flex items-center justify-center border border-slate-800/20 text-slate-900 mb-2">
                                 <ShieldAlert size={40} />
                             </div>
                             <div className="space-y-2">
@@ -172,8 +172,8 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                             {/* Scanning Box */}
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <div className={`w-64 h-64 border-2 rounded-[2.5rem] relative transition-all duration-500 ${scanState === 'success' ? 'border-green-500 scale-110' :
-                                    scanState === 'error' ? 'border-red-500 animate-shake' :
-                                        'border-purple-500/50'
+                                    scanState === 'error' ? 'border-slate-800 animate-shake' :
+                                        'border-slate-800/50'
                                     }`}>
                                     {/* Corner Accents */}
                                     <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-inherit rounded-tl-2xl" />
@@ -182,7 +182,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                                     <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-inherit rounded-br-2xl" />
 
                                     {scanState === 'scanning' && (
-                                        <div className="absolute top-0 left-0 w-full h-[2px] bg-purple-500 shadow-[0_0_15px_#9333ea] animate-scan" />
+                                        <div className="absolute top-0 left-0 w-full h-[2px] bg-slate-900 shadow-[0_0_15px_#9333ea] animate-scan" />
                                     )}
                                 </div>
                             </div>
@@ -190,7 +190,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                             {/* State Feedback Overlays */}
                             {scanState === 'scanning' && scanCooldown.current && (
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                    <Loader2 size={48} className="text-purple-500 animate-spin" />
+                                    <Loader2 size={48} className="text-slate-900 animate-spin" />
                                 </div>
                             )}
                         </div>
@@ -211,7 +211,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                             value={manualId}
                             onChange={(e) => setManualId(e.target.value)}
                             placeholder="VH-101"
-                            className="flex-grow bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm font-bold outline-none focus:border-purple-500 transition-all uppercase italic tracking-wider shadow-inner"
+                            className="flex-grow bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm font-bold outline-none focus:border-slate-800 transition-all uppercase italic tracking-wider shadow-inner"
                         />
                         <button
                             type="submit"

@@ -190,7 +190,7 @@ export default function JudgeDashboard() {
                     >
                         {/* Profile Summary — compact identity strip */}
                         {currentJudge && (
-                            <div className="mb-6 flex items-center gap-3 px-4 py-2.5 bg-white/5 border border-purple-500/15 rounded-2xl backdrop-blur-md">
+                            <div className="mb-6 flex items-center gap-3 px-4 py-2.5 bg-white/5 border border-slate-800/15 rounded-2xl backdrop-blur-md">
                                 {/* Live dot */}
                                 <span className="relative flex h-2 w-2 shrink-0">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
@@ -201,7 +201,7 @@ export default function JudgeDashboard() {
                                     {currentJudge.name}
                                 </span>
                                 {/* Specialization badge */}
-                                <span className="hidden sm:inline px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/20 text-[8px] font-black text-purple-300 uppercase tracking-widest whitespace-nowrap">
+                                <span className="hidden sm:inline px-2 py-0.5 rounded-full bg-slate-900/15 border border-slate-800/20 text-[8px] font-black text-slate-900 uppercase tracking-widest whitespace-nowrap">
                                     {currentJudge.specialization || "General"}
                                 </span>
                                 {/* Spacer */}
@@ -247,10 +247,10 @@ export default function JudgeDashboard() {
 
                             {/* Card 3: Pending */}
                             <div className="bg-white/5 border border-white/10 rounded-2xl md:rounded-[2.5rem] p-3 md:p-8 flex flex-col justify-center backdrop-blur-md relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-16 md:w-32 h-16 md:h-32 bg-orange-500/10 rounded-full blur-[30px] md:blur-[50px] translate-x-1/2 -translate-y-1/2" />
+                                <div className="absolute top-0 right-0 w-16 md:w-32 h-16 md:h-32 bg-slate-900/10 rounded-full blur-[30px] md:blur-[50px] translate-x-1/2 -translate-y-1/2" />
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-1 mb-1 md:mb-4">
-                                        <Clock className="text-orange-400" size={12} />
+                                        <Clock className="text-slate-900" size={12} />
                                         <span className="text-[8px] md:text-[10px] font-bold text-white/40 uppercase tracking-widest">Todo</span>
                                     </div>
                                     <div className="text-3xl md:text-5xl font-black italic text-white leading-none">{pendingCount}</div>
@@ -269,7 +269,7 @@ export default function JudgeDashboard() {
                                 placeholder="Search by Project ID or Name..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-[#0B0114] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold text-sm focus:outline-none focus:border-purple-500/50 transition-all placeholder:text-white/20 uppercase tracking-wide"
+                                className="w-full bg-[#0B0114] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold text-sm focus:outline-none focus:border-slate-800/50 transition-all placeholder:text-white/20 uppercase tracking-wide"
                             />
                         </div>
 
@@ -297,7 +297,7 @@ export default function JudgeDashboard() {
                                             key={project.id}
                                             className="group bg-white/5 border border-white/10 rounded-[2.5rem] p-6 md:p-8 hover:bg-white/[0.08] transition-all duration-300 flex flex-col md:flex-row items-center gap-8 shadow-xl"
                                         >
-                                            <div className="w-20 h-20 bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-[1.5rem] border border-white/10 flex items-center justify-center shrink-0">
+                                            <div className="w-20 h-20 bg-gradient-to-br from-slate-900/20 to-blue-600/20 rounded-[1.5rem] border border-white/10 flex items-center justify-center shrink-0">
                                                 <span className="text-3xl font-black text-white/80 italic">{(project.name || "?")[0]}</span>
                                             </div>
 
@@ -308,7 +308,7 @@ export default function JudgeDashboard() {
                                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mt-1.5 mb-2">
                                                     <span className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-[9px] font-black uppercase tracking-wider text-white/40 whitespace-nowrap">{project.teamId}</span>
                                                     {nextRound && (
-                                                        <span className="px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 rounded-md text-[9px] font-black uppercase tracking-wider text-purple-400 whitespace-nowrap">
+                                                        <span className="px-2 py-0.5 bg-slate-900/10 border border-slate-800/20 rounded-md text-[9px] font-black uppercase tracking-wider text-slate-900 whitespace-nowrap">
                                                             {nextRound.title}
                                                         </span>
                                                     )}
@@ -369,9 +369,9 @@ export default function JudgeDashboard() {
                                 <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                                 <span className="text-xs font-black uppercase tracking-widest">Back to Projects</span>
                             </button>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-                                <Target size={16} className="text-purple-400" />
-                                <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest">
+                            <div className="flex items-center gap-3 px-4 py-2 bg-slate-900/10 border border-slate-800/20 rounded-xl">
+                                <Target size={16} className="text-slate-900" />
+                                <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
                                     {evaluationRound.title} Evaluation Active
                                 </span>
                             </div>
@@ -402,7 +402,7 @@ export default function JudgeDashboard() {
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                                     <div>
                                         <div className="flex items-center gap-2 mb-4">
-                                            <Users size={16} className="text-purple-400" />
+                                            <Users size={16} className="text-slate-900" />
                                             <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Participants</span>
                                         </div>
                                         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
@@ -437,14 +437,14 @@ export default function JudgeDashboard() {
 
                         {/* Evaluation Form */}
                         <div className="bg-[#0B0114] border border-white/10 rounded-[2rem] md:rounded-[3.5rem] p-5 md:p-14 space-y-8 md:space-y-16 relative overflow-hidden shadow-2xl">
-                            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/10 to-transparent -translate-y-1/2" />
+                            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-800/10 to-transparent -translate-y-1/2" />
 
                             <div className="relative z-10 space-y-12">
                                 {evaluationRound.criteria.map((criterion: any, i: number) => (
                                     <div key={criterion.id} className="group">
                                         <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-8">
                                             {/* Number badge */}
-                                            <div className="w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-base md:text-2xl font-black text-white/20 group-hover:text-purple-500/40 group-hover:border-purple-500/20 transition-all shrink-0">
+                                            <div className="w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-base md:text-2xl font-black text-white/20 group-hover:text-slate-900/40 group-hover:border-slate-800/20 transition-all shrink-0">
                                                 {String(i + 1).padStart(2, '0')}
                                             </div>
                                             <div className="flex-1 min-w-0">
@@ -456,8 +456,8 @@ export default function JudgeDashboard() {
                                                     {/* Score Picker — segmented 5-button, no dropdown, no overflow */}
                                                     <div className="flex items-stretch gap-1.5 w-full">
                                                         {[
-                                                            { v: 1, l: "Poor", color: "hover:bg-red-500/20    hover:border-red-500/40    hover:text-red-300" },
-                                                            { v: 2, l: "Fair", color: "hover:bg-orange-500/20 hover:border-orange-500/40 hover:text-orange-300" },
+                                                            { v: 1, l: "Poor", color: "hover:bg-slate-800/20    hover:border-slate-800/40    hover:text-slate-900" },
+                                                            { v: 2, l: "Fair", color: "hover:bg-slate-800/20 hover:border-slate-800/40 hover:text-slate-900" },
                                                             { v: 3, l: "Avg", color: "hover:bg-yellow-500/20 hover:border-yellow-500/40 hover:text-yellow-300" },
                                                             { v: 4, l: "Good", color: "hover:bg-blue-500/20   hover:border-blue-500/40   hover:text-blue-300" },
                                                             { v: 5, l: "Best", color: "hover:bg-green-500/20  hover:border-green-500/40  hover:text-green-300" },
@@ -465,8 +465,8 @@ export default function JudgeDashboard() {
                                                             const selected = currentScores[criterion.id] === v;
                                                             const selectedColors = [
                                                                 "", // 0 unused
-                                                                "bg-red-500/20 border-red-500 text-red-300",
-                                                                "bg-orange-500/20 border-orange-500 text-orange-300",
+                                                                "bg-slate-900/20 border-slate-800 text-slate-900",
+                                                                "bg-slate-900/20 border-slate-800 text-slate-900",
                                                                 "bg-yellow-500/20 border-yellow-500 text-yellow-300",
                                                                 "bg-blue-500/20 border-blue-500 text-blue-300",
                                                                 "bg-green-500/20 border-green-500 text-green-300",
@@ -500,16 +500,16 @@ export default function JudgeDashboard() {
                             {/* Feedback Area */}
                             <div className="pt-16 border-t border-white/10">
                                 <div className="flex items-center gap-3 mb-8">
-                                    <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                                        <MessageSquare size={20} className="text-purple-400" />
+                                    <div className="p-3 rounded-xl bg-slate-900/10 border border-slate-800/20">
+                                        <MessageSquare size={20} className="text-slate-900" />
                                     </div>
-                                    <h4 className="text-3xl font-black italic uppercase tracking-tighter text-white">Additional Feedback <span className="text-red-500 text-sm normal-case font-bold ml-2">(Required)</span></h4>
+                                    <h4 className="text-3xl font-black italic uppercase tracking-tighter text-white">Additional Feedback <span className="text-slate-900 text-sm normal-case font-bold ml-2">(Required)</span></h4>
                                 </div>
                                 <textarea
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
                                     placeholder="Add constructive comments here..."
-                                    className="w-full h-32 md:h-48 bg-white/5 border-2 border-white/10 rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 text-sm md:text-xl font-medium text-white placeholder:text-white/10 focus:outline-none focus:border-purple-500/50 transition-all resize-none shadow-inner"
+                                    className="w-full h-32 md:h-48 bg-white/5 border-2 border-white/10 rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 text-sm md:text-xl font-medium text-white placeholder:text-white/10 focus:outline-none focus:border-slate-800/50 transition-all resize-none shadow-inner"
                                 />
                             </div>
 

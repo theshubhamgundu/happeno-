@@ -112,7 +112,7 @@ export default function AdminResults() {
                 <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
                     <Stat label="Registered teams" value={totals.total} />
                     <Stat label="Ranked teams" value={totals.ranked} accent="text-[#FFEE00]" />
-                    <Stat label="Awaiting evaluation" value={totals.pending} accent="text-orange-300" />
+                    <Stat label="Awaiting evaluation" value={totals.pending} accent="text-slate-900" />
                     <Stat label="All rounds complete" value={totals.complete} accent="text-emerald-300" />
                 </section>
 

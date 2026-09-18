@@ -100,6 +100,7 @@ export interface Project {
     name: string;
     team: string;
     track: string;
+    trackPreferences?: string[];
     problemStatement: string;
     proposedIdea?: string;
     techStack?: Record<string, string[]>;

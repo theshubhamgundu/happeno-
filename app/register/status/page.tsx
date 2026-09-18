@@ -22,7 +22,7 @@ function StatusContent() {
             className="max-w-md w-full bg-[#1A002E]/80 backdrop-blur-xl border-2 border-white/10 rounded-[40px] p-10 text-center shadow-2xl relative z-10"
         >
             <div className="absolute top-0 left-0 w-full h-2 rounded-t-[40px] overflow-hidden">
-                <div className={`h-full w-full ${isSuccess ? "bg-[#FFEE00]" : isFailed ? "bg-red-500" : "bg-orange-500"}`} />
+                <div className={`h-full w-full ${isSuccess ? "bg-[#FFEE00]" : isFailed ? "bg-slate-900" : "bg-slate-900"}`} />
             </div>
 
             {isSuccess ? (
@@ -44,11 +44,11 @@ function StatusContent() {
                 </>
             ) : isFailed ? (
                 <>
-                    <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
-                        <XCircle className="w-12 h-12 text-red-500" />
+                    <div className="w-24 h-24 bg-slate-900/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-800/20">
+                        <XCircle className="w-12 h-12 text-slate-900" />
                     </div>
                     <h2 className="text-white text-3xl font-kanit font-black mb-2 uppercase italic">PAYMENT FAILED</h2>
-                    <p className="text-red-500 font-bold text-sm tracking-widest mb-6">TRANSACTION ID: {transactionId}</p>
+                    <p className="text-slate-900 font-bold text-sm tracking-widest mb-6">TRANSACTION ID: {transactionId}</p>
                     <p className="text-white/70 mb-8 leading-relaxed">
                         Something went wrong with the payment. Don't worry, if any money was deducted, it will be refunded within 3-5 business days. Please try again.
                     </p>
@@ -66,8 +66,8 @@ function StatusContent() {
                 </>
             ) : (
                 <>
-                    <div className="w-24 h-24 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-orange-500/20">
-                        <AlertCircle className="w-12 h-12 text-orange-500" />
+                    <div className="w-24 h-24 bg-slate-900/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-800/20">
+                        <AlertCircle className="w-12 h-12 text-slate-900" />
                     </div>
                     <h2 className="text-white text-3xl font-kanit font-black mb-4 uppercase italic">SOMETHING WENT WRONG</h2>
                     <p className="text-white/70 mb-8 leading-relaxed">

@@ -146,7 +146,7 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
             <div className="mx-auto min-h-screen max-w-[1600px] overflow-hidden bg-[#faf9f7] lg:min-h-[calc(100vh-24px)] lg:rounded-2xl lg:border lg:border-white lg:shadow-[0_12px_36px_rgba(77,57,48,0.08)] lg:grid lg:grid-cols-[218px_minmax(0,1fr)]">
             <aside className="hidden lg:flex lg:flex-col lg:border-r lg:border-slate-200/80 lg:bg-white lg:p-3">
                 <Link href="/" className="flex items-center gap-2.5 rounded-xl px-2 py-2.5 transition hover:bg-slate-50">
-                    <div className="grid h-9 w-9 place-items-center rounded-lg bg-[#df6d59] text-base font-bold text-white shadow-sm">T</div>
+                    <div className="grid h-9 w-9 place-items-center rounded-lg bg-teal-600 text-base font-bold text-white shadow-sm">T</div>
                     <div>
                         <TricityMark compact className="text-lg" />
                         <p className="mt-1 text-[9px] font-bold uppercase tracking-[.19em] text-slate-400">Event management</p>
@@ -157,7 +157,7 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
                 <nav className="mt-2 space-y-1">
                     {menuItems[type].map((item: any) => {
                         const isActive = pathname === item.href;
-                        return <Link key={item.href} href={item.href} className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition ${isActive ? "bg-[#df6d59] text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}>
+                        return <Link key={item.href} href={item.href} className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition ${isActive ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}>
                             <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-[#c85847]"}`}><item.icon size={14} /></span>
                             <span>{item.label}</span>
                             {item.label === "Submissions" && isSubmissionCurrentlyLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
@@ -203,9 +203,9 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
             <AnimatePresence>
                 {isMobileMenuOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-slate-950/25 p-4 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
                     <motion.div initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -24, opacity: 0 }} onClick={(event) => event.stopPropagation()} className="flex h-full w-full max-w-[320px] flex-col rounded-2xl bg-white p-5 shadow-2xl">
-                        <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-[#df6d59] font-bold text-white">T</div><TricityMark compact className="text-xl" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500"><X size={21} /></button></div>
+                        <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600 font-bold text-white">T</div><TricityMark compact className="text-xl" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500"><X size={21} /></button></div>
                         <p className="mt-9 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Workspace</p>
-                        <nav className="mt-3 space-y-1">{menuItems[type].map((item: any) => <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${pathname === item.href ? "bg-[#df6d59] text-white" : "text-slate-600"}`}><item.icon size={18} />{item.label}</Link>)}</nav>
+                        <nav className="mt-3 space-y-1">{menuItems[type].map((item: any) => <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${pathname === item.href ? "bg-teal-600 text-white" : "text-slate-600"}`}><item.icon size={18} />{item.label}</Link>)}</nav>
                         <button onClick={logout} className="mt-auto flex items-center gap-2 rounded-xl bg-rose-50 px-3 py-3 text-sm font-semibold text-rose-600"><LogOut size={17} /> Sign out</button>
                     </motion.div>
                 </motion.div>}

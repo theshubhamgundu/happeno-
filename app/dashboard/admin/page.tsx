@@ -397,7 +397,7 @@ export default function AdminDashboard() {
         return (
             <DashboardLayout type="admin" title="Initializing Admin Grid...">
                 <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-slate-800 border-t-transparent rounded-full animate-spin" />
                 </div>
             </DashboardLayout>
         );
@@ -408,7 +408,7 @@ export default function AdminDashboard() {
             <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
                 <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(125deg,rgba(89,28,135,0.42),rgba(13,8,30,0.9)_48%,rgba(18,13,36,0.82))] p-6 md:p-8 shadow-2xl">
                     <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#FFEE00]/10 blur-3xl" />
-                    <div className="absolute bottom-0 left-1/3 h-40 w-80 rounded-full bg-purple-600/15 blur-3xl" />
+                    <div className="absolute bottom-0 left-1/3 h-40 w-80 rounded-full bg-slate-900/15 blur-3xl" />
                     <div className="relative flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
                         <div className="max-w-2xl">
                             <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#FFEE00]">
@@ -529,7 +529,7 @@ export default function AdminDashboard() {
                                 <div className="p-8">
                                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                                         <div className="flex items-center gap-6">
-                                            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-black bg-purple-600/20 text-purple-400">
+                                            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-black bg-slate-900/20 text-slate-900">
                                                 {team.team ? team.team[0] : "?"}
                                             </div>
                                             <div>
@@ -537,7 +537,7 @@ export default function AdminDashboard() {
                                                     <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{team.team}</h3>
                                                     <span className="text-[10px] font-black text-[#FFEE00] px-2 py-0.5 border border-[#FFEE00]/30 rounded bg-[#FFEE00]/5">{team.teamId}</span>
                                                     {team.status === 'PENDING' && (
-                                                        <span className="text-[8px] font-black bg-orange-500/20 text-orange-400 border border-orange-500/50 px-2 py-0.5 rounded uppercase tracking-widest animate-pulse">
+                                                        <span className="text-[8px] font-black bg-slate-900/20 text-slate-900 border border-slate-800/50 px-2 py-0.5 rounded uppercase tracking-widest animate-pulse">
                                                             Verification Pending
                                                         </span>
                                                     )}
@@ -577,7 +577,7 @@ export default function AdminDashboard() {
                                                     </div>
                                                     <button
                                                         onClick={() => handleVerifyPayment(team.transactionId || team.id)}
-                                                        className="px-4 py-3 rounded-xl bg-orange-500 text-white font-black uppercase italic text-[10px] tracking-widest shadow-lg hover:bg-orange-600 transition-all animate-pulse"
+                                                        className="px-4 py-3 rounded-xl bg-slate-900 text-white font-black uppercase italic text-[10px] tracking-widest shadow-lg hover:bg-slate-800 transition-all animate-pulse"
                                                     >
                                                         Verify Payment
                                                     </button>
@@ -649,8 +649,8 @@ export default function AdminDashboard() {
                                                             <div className="flex justify-between items-center pt-2 border-t border-white/5">
                                                                 <span className="text-[10px] text-white/40 font-bold uppercase tracking-tight">Room WiFi</span>
                                                                 <div className="text-right">
-                                                                    <div className="text-[9px] font-black text-purple-400 italic">SSID: {team.roomWifiSSID || "N/A"}</div>
-                                                                    <div className="text-[9px] font-black text-purple-400 italic">PASS: {team.roomWifiPass || "N/A"}</div>
+                                                                    <div className="text-[9px] font-black text-slate-900 italic">SSID: {team.roomWifiSSID || "N/A"}</div>
+                                                                    <div className="text-[9px] font-black text-slate-900 italic">PASS: {team.roomWifiPass || "N/A"}</div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -678,7 +678,7 @@ export default function AdminDashboard() {
                                                             </div>
                                                         </div>
                                                         {!team.password && (
-                                                            <p className="text-[9px] text-orange-400/70 font-bold uppercase tracking-wide">
+                                                            <p className="text-[9px] text-slate-900/70 font-bold uppercase tracking-wide">
                                                                 âš  Set a password in Supabase for this team to enable login.
                                                             </p>
                                                         )}
@@ -786,7 +786,7 @@ export default function AdminDashboard() {
                                     .map((judge) => (
                                         <div key={judge.id} className="flex items-center justify-between p-6 bg-white/5 border border-white/10 rounded-2xl group hover:bg-white/10 transition-all">
                                             <div className="flex items-center gap-6">
-                                                <div className="w-12 h-12 rounded-xl bg-purple-600/20 flex items-center justify-center text-purple-400"><ShieldCheck size={24} /></div>
+                                                <div className="w-12 h-12 rounded-xl bg-slate-900/20 flex items-center justify-center text-slate-900"><ShieldCheck size={24} /></div>
                                                 <div>
                                                     <div className="flex items-center gap-3">
                                                         <h4 className="text-lg font-black italic uppercase tracking-tight">{judge.name}</h4>
@@ -798,9 +798,9 @@ export default function AdminDashboard() {
                                             <div className="flex items-center gap-4">
                                                 <div className="text-right">
                                                     <span className="text-[9px] font-black text-white/20 uppercase block tracking-widest">Credentials</span>
-                                                    <code className="text-[10px] font-mono text-purple-400 font-black">PASS: {judge.password}</code>
+                                                    <code className="text-[10px] font-mono text-slate-900 font-black">PASS: {judge.password}</code>
                                                 </div>
-                                                <button onClick={() => removeJudge(judge.id)} className="p-3 rounded-xl bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"><Trash2 size={18} /></button>
+                                                <button onClick={() => removeJudge(judge.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
                                             </div>
                                         </div>
                                     ))
@@ -886,7 +886,7 @@ export default function AdminDashboard() {
                                                 <span className="text-[9px] font-black text-white/20 uppercase block tracking-widest">Credentials</span>
                                                 <code className="text-[10px] font-mono text-blue-400 font-black">PASS: {vol.password}</code>
                                             </div>
-                                            <button onClick={() => removeVolunteer(vol.id)} className="p-3 rounded-xl bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"><Trash2 size={18} /></button>
+                                            <button onClick={() => removeVolunteer(vol.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
                                         </div>
                                     </div>
                                 ))
@@ -961,12 +961,12 @@ export default function AdminDashboard() {
                                             <div key={net.id} className="relative p-6 bg-white/5 border border-white/10 rounded-[1.5rem] group hover:bg-white/[0.08] transition-all hover:border-white/20 overflow-hidden">
                                                 <div className="flex flex-col gap-4">
                                                     <div className="flex items-start justify-between">
-                                                        <div className="w-12 h-12 rounded-xl bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(147,51,234,0.15)]">
+                                                        <div className="w-12 h-12 rounded-xl bg-slate-900/20 flex items-center justify-center text-slate-900 border border-slate-800/20 shadow-[0_0_15px_rgba(147,51,234,0.15)]">
                                                             <Wifi size={20} />
                                                         </div>
                                                         <button
                                                             onClick={() => removeWifiNetwork(net.id)}
-                                                            className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white transform group-hover:scale-110 active:scale-95"
+                                                            className="w-8 h-8 rounded-lg bg-slate-900/10 text-slate-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white transform group-hover:scale-110 active:scale-95"
                                                         >
                                                             <Trash2 size={16} />
                                                         </button>
@@ -1057,7 +1057,7 @@ export default function AdminDashboard() {
                                                     <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center text-blue-400 border border-blue-500/20">
                                                         <MapPin size={20} />
                                                     </div>
-                                                    <button onClick={() => removeRoom(room.id)} className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white">
+                                                    <button onClick={() => removeRoom(room.id)} className="w-8 h-8 rounded-lg bg-slate-900/10 text-slate-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white">
                                                         <Trash2 size={16} />
                                                     </button>
                                                 </div>
@@ -1104,7 +1104,7 @@ export default function AdminDashboard() {
                             placeholder="Search registered team..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pl-14 text-white font-medium focus:outline-none focus:border-red-500/50 transition-all"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pl-14 text-white font-medium focus:outline-none focus:border-slate-800/50 transition-all"
                         />
                         <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-white/20" size={24} />
                     </div>
@@ -1195,12 +1195,12 @@ export default function AdminDashboard() {
 
 function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: number; icon: any; tone: "purple" | "amber" | "green" | "blue" | "orange" | "red" }) {
     const tones = {
-        purple: "bg-purple-500/15 text-purple-300 border-purple-400/20",
+        purple: "bg-slate-900/15 text-slate-900 border-slate-800/20",
         amber: "bg-amber-500/15 text-amber-300 border-amber-400/20",
         green: "bg-emerald-500/15 text-emerald-300 border-emerald-400/20",
         blue: "bg-sky-500/15 text-sky-300 border-sky-400/20",
-        orange: "bg-orange-500/15 text-orange-300 border-orange-400/20",
-        red: "bg-red-500/15 text-red-300 border-red-400/20",
+        orange: "bg-slate-900/15 text-slate-900 border-slate-800/20",
+        red: "bg-slate-900/15 text-slate-900 border-slate-800/20",
     };
 
     return (

@@ -12,8 +12,9 @@ export const DEMO_PROJECT: Project = {
     password: "demo-participant",
     name: "Civic Pulse",
     team: "Team Nova",
-    track: "Smart Cities",
-    problemStatement: "A real-time civic issue reporting platform that helps citizens, volunteers, and city teams coordinate faster responses.",
+    track: "",
+    trackPreferences: ["SaaSsum AI (IT & AI)", "Skill Tank (EdTech)", "Open Innovation"],
+    problemStatement: "",
     members: [
         { fullName: "Aarav Sharma", phone: "+91 98765 43210", department: "CSE" },
         { fullName: "Diya Reddy", phone: "+91 98765 43211", department: "AI & DS" },

@@ -31,7 +31,7 @@ const ROLES: { key: RoleOption; label: string; icon: typeof Users; color: string
         key: "judge",
         label: "Judge",
         icon: Gavel,
-        color: "from-amber-500 to-orange-400",
+        color: "from-amber-500 to-slate-800",
         glow: "bg-amber-500/20",
         desc: "Evaluate projects, score submissions & provide feedback"
     },
@@ -47,8 +47,8 @@ const ROLES: { key: RoleOption; label: string; icon: typeof Users; color: string
         key: "admin",
         label: "Admin",
         icon: Settings,
-        color: "from-purple-500 to-pink-400",
-        glow: "bg-purple-500/20",
+        color: "from-slate-900 to-slate-800",
+        glow: "bg-slate-900/20",
         desc: "Full control — manage registrations, judges & the event"
     },
 ];
@@ -76,7 +76,7 @@ export default function LoginPage() {
     if (isLoading || (user && user.role)) {
         return (
             <div className="min-h-screen bg-[#06000D] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-slate-800 border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -192,8 +192,8 @@ export default function LoginPage() {
         <main className="min-h-screen bg-[#06000D] flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Background glow */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-purple-600/10 blur-[160px] rounded-full" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-pink-600/10 blur-[160px] rounded-full" />
+                <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-slate-900/10 blur-[160px] rounded-full" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-slate-900/10 blur-[160px] rounded-full" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] bg-blue-600/5 blur-[120px] rounded-full" />
             </div>
 
@@ -335,9 +335,9 @@ export default function LoginPage() {
                                         <motion.div
                                             initial={{ opacity: 0, y: -4 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-center"
+                                            className="p-3 rounded-xl bg-slate-900/10 border border-slate-800/20 text-center"
                                         >
-                                            <p className="text-red-400 text-xs font-bold uppercase tracking-wide">{error}</p>
+                                            <p className="text-slate-900 text-xs font-bold uppercase tracking-wide">{error}</p>
                                         </motion.div>
                                     )}
 

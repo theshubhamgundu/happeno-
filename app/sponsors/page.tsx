@@ -47,7 +47,7 @@ export default function SponsorsPage() {
 									</div>
 								</div>
 
-								<h2 className="text-white text-2xl md:text-3xl font-bold font-kanit tracking-tight group-hover:text-purple-400 transition-colors text-center">
+								<h2 className="text-white text-2xl md:text-3xl font-bold font-kanit tracking-tight group-hover:text-slate-900 transition-colors text-center">
 									{sponsor.name}
 								</h2>
 							</Link>

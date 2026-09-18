@@ -180,7 +180,7 @@ export default function LiveScorePage() {
                             localStorage.removeItem("livescore_auth");
                             setIsAuthenticated(false);
                         }}
-                        className="bg-white border border-slate-300 hover:bg-red-50 hover:border-red-200 hover:text-red-500 p-2.5 rounded-lg transition-all shadow-sm flex items-center gap-2 text-xs font-bold uppercase tracking-wider"
+                        className="bg-white border border-slate-300 hover:bg-slate-800 hover:border-slate-800 hover:text-slate-900 p-2.5 rounded-lg transition-all shadow-sm flex items-center gap-2 text-xs font-bold uppercase tracking-wider"
                         title="Sign Out"
                     >
                         <LogOut size={16} /> Sign Out

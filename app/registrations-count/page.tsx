@@ -117,7 +117,7 @@ export default function RegistrationsCountPage() {
                                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all"
                                 />
                                 {error && (
-                                    <p className="text-red-500 text-xs font-medium mt-2 ml-1">
+                                    <p className="text-slate-900 text-xs font-medium mt-2 ml-1">
                                         {error}
                                     </p>
                                 )}
@@ -164,7 +164,7 @@ export default function RegistrationsCountPage() {
                         </button>
                         <button
                             onClick={handleLogout}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold rounded-lg transition-all border border-red-100"
+                            className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-900 text-xs font-bold rounded-lg transition-all border border-slate-800"
                         >
                             <LogOut size={14} />
                             Sign Out

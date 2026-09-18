@@ -78,7 +78,7 @@ export default function VolunteerDashboard() {
         return (
             <DashboardLayout type="volunteer" title="Ops Command">
                 <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-                    <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-10 h-10 border-4 border-slate-800 border-t-transparent rounded-full animate-spin" />
                     <p className="text-white/20 font-black uppercase italic text-[10px] tracking-widest text-center">Syncing Hub...</p>
                 </div>
             </DashboardLayout>
@@ -91,14 +91,14 @@ export default function VolunteerDashboard() {
             {/* Volunteer identity — mobile only (desktop shows name in navbar) */}
             {currentVolunteer && (
                 <div className="flex items-center gap-3 mb-4 lg:hidden">
-                    <div className="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center font-black italic text-purple-400 text-sm flex-shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-slate-900/20 border border-slate-800/30 flex items-center justify-center font-black italic text-slate-900 text-sm flex-shrink-0">
                         {currentVolunteer.name?.[0]?.toUpperCase() ?? "V"}
                     </div>
                     <div>
                         <p className="text-[8px] font-black text-white/25 uppercase tracking-[0.25em]">Logged in as</p>
                         <p className="text-sm font-black italic uppercase tracking-tight text-white leading-none">
                             {currentVolunteer.name}
-                            <span className="ml-2 text-[9px] font-bold normal-case not-italic text-purple-400/70 tracking-widest">
+                            <span className="ml-2 text-[9px] font-bold normal-case not-italic text-slate-900/70 tracking-widest">
                                 {currentVolunteer.generatedId}
                             </span>
                         </p>
@@ -111,13 +111,13 @@ export default function VolunteerDashboard() {
                 <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
                     <button
                         onClick={() => setActiveTab('roster')}
-                        className={`flex-1 rounded-md py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'roster' ? 'bg-[#df6d59] text-white shadow-sm' : 'text-slate-500'}`}
+                        className={`flex-1 rounded-md py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'roster' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-500'}`}
                     >
                         Squads
                     </button>
                     <button
                         onClick={() => setActiveTab('checkin')}
-                        className={`flex-1 rounded-md py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'checkin' ? 'bg-[#df6d59] text-white shadow-sm' : 'text-slate-500'}`}
+                        className={`flex-1 rounded-md py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'checkin' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-500'}`}
                     >
                         Scanner
                     </button>
@@ -137,8 +137,8 @@ export default function VolunteerDashboard() {
                         >
                             {/* Pulse dot */}
                             <span className="relative flex h-2 w-2 shrink-0">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-60" />
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500" />
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-900 opacity-60" />
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-900" />
                             </span>
 
                             {/* Label + contact */}
@@ -169,7 +169,7 @@ export default function VolunteerDashboard() {
                             placeholder="Find a squad..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white text-xs font-bold focus:outline-none focus:border-purple-500/50"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white text-xs font-bold focus:outline-none focus:border-slate-800/50"
                         />
                     </div>
 
@@ -181,7 +181,7 @@ export default function VolunteerDashboard() {
                                         <div className="space-y-1">
                                             <h3 className="text-xl font-black italic uppercase tracking-tight text-white leading-none">{team.name}</h3>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[9px] font-black text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded uppercase tracking-tighter">ID: {team.teamId}</span>
+                                                <span className="text-[9px] font-black text-slate-900 bg-slate-900/10 px-2 py-0.5 rounded uppercase tracking-tighter">ID: {team.teamId}</span>
                                                 {team.isCheckedIn && (
                                                     <span className="text-[8px] font-black text-green-500 uppercase tracking-widest flex items-center gap-1">
                                                         <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" /> Verified
@@ -189,7 +189,7 @@ export default function VolunteerDashboard() {
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="w-10 h-10 rounded-xl bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/20 font-black italic">
+                                        <div className="w-10 h-10 rounded-xl bg-slate-900/20 flex items-center justify-center text-slate-900 border border-slate-800/20 font-black italic">
                                             {team.name[0]}
                                         </div>
                                     </div>
@@ -198,7 +198,7 @@ export default function VolunteerDashboard() {
                                         <div className="bg-gradient-to-br from-white/[0.03] to-white/[0.01] p-3.5 rounded-2xl border border-white/10 shadow-inner">
                                             <span className="text-[7px] md:text-[8px] font-black text-white/30 uppercase tracking-[0.2em] block mb-1.5">Ops Location</span>
                                             <div className="flex items-center gap-2 text-white/90 font-black italic text-xs">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
+                                                <div className="w-1.5 h-1.5 rounded-full bg-slate-900 shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
                                                 {team.room || "TBD"}
                                             </div>
                                         </div>
@@ -230,7 +230,7 @@ export default function VolunteerDashboard() {
                     <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-[#fbe5df] text-[#c85847]"><QrCode size={24} /></div>
                     <h2 className="mt-3 text-base font-semibold text-slate-800">Entry scanner</h2>
                     <p className="mt-1 flex items-center justify-center gap-1.5 text-xs text-slate-500"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Ready to scan team passes</p>
-                    <button onClick={() => setShowScanner(true)} className="mt-5 w-full rounded-lg bg-[#df6d59] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#c85847]">Open scanner</button>
+                    <button onClick={() => setShowScanner(true)} className="mt-5 w-full rounded-lg bg-teal-600 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#c85847]">Open scanner</button>
                 </div>
             )}
 
@@ -249,16 +249,16 @@ export default function VolunteerDashboard() {
                             initial={{ y: "100%" }}
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
-                            className="relative w-full max-w-lg bg-[#0D0219] border-t-2 sm:border-2 border-purple-500/30 rounded-t-[2.5rem] sm:rounded-[3rem] p-8 pb-10 sm:p-10 shadow-2xl z-[210] overflow-hidden"
+                            className="relative w-full max-w-lg bg-[#0D0219] border-t-2 sm:border-2 border-slate-800/30 rounded-t-[2.5rem] sm:rounded-[3rem] p-8 pb-10 sm:p-10 shadow-2xl z-[210] overflow-hidden"
                         >
                             <div className="flex justify-between items-center mb-8">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-purple-600/20 flex items-center justify-center text-purple-400 font-black italic border border-purple-500/20">
+                                    <div className="w-12 h-12 rounded-2xl bg-slate-900/20 flex items-center justify-center text-slate-900 font-black italic border border-slate-800/20">
                                         {scannedTeam.name[0]}
                                     </div>
                                     <div>
                                         <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white leading-none">{scannedTeam.name}</h3>
-                                        <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest mt-1 block">ID: {scannedTeam.teamId}</span>
+                                        <span className="text-[9px] font-black text-slate-900 uppercase tracking-widest mt-1 block">ID: {scannedTeam.teamId}</span>
                                     </div>
                                 </div>
                                 <button onClick={() => setScannedTeam(null)} className="p-2 text-white/20">
@@ -272,7 +272,7 @@ export default function VolunteerDashboard() {
                                     <div className="grid grid-cols-1 gap-2">
                                         {scannedTeam.members.map((m: any, i) => (
                                             <div key={i} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                                                <div className="w-6 h-6 rounded-lg bg-black flex items-center justify-center text-[8px] font-black text-purple-400">
+                                                <div className="w-6 h-6 rounded-lg bg-black flex items-center justify-center text-[8px] font-black text-slate-900">
                                                     {i + 1}
                                                 </div>
                                                 <span className="font-bold text-white uppercase italic text-xs truncate">
@@ -284,13 +284,13 @@ export default function VolunteerDashboard() {
                                 </div>
 
                                 <div className="pt-4 space-y-4">
-                                    <div className={`p-5 rounded-2xl flex items-center gap-4 ${scannedTeam.isCheckedIn ? 'bg-green-500/10 border border-green-500/20' : 'bg-purple-500/5 border border-purple-500/20'}`}>
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${scannedTeam.isCheckedIn ? 'bg-green-500 text-white' : 'bg-purple-600 text-white'}`}>
+                                    <div className={`p-5 rounded-2xl flex items-center gap-4 ${scannedTeam.isCheckedIn ? 'bg-green-500/10 border border-green-500/20' : 'bg-slate-900/5 border border-slate-800/20'}`}>
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${scannedTeam.isCheckedIn ? 'bg-green-500 text-white' : 'bg-slate-900 text-white'}`}>
                                             {scannedTeam.isCheckedIn ? <CheckCircle2 size={24} /> : <Activity size={24} />}
                                         </div>
                                         <div>
                                             <span className="text-sm font-black uppercase italic text-white block">Status</span>
-                                            <span className={`text-[10px] font-bold uppercase tracking-widest ${scannedTeam.isCheckedIn ? 'text-green-500' : 'text-purple-400'}`}>
+                                            <span className={`text-[10px] font-bold uppercase tracking-widest ${scannedTeam.isCheckedIn ? 'text-green-500' : 'text-slate-900'}`}>
                                                 {scannedTeam.isCheckedIn ? 'Access Granted' : 'Awaiting Entry'}
                                             </span>
                                         </div>

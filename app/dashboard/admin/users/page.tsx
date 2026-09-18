@@ -134,8 +134,8 @@ export default function UsersManagement() {
         const COLORS = [
             { color: "text-cyan-400", border: "border-cyan-400/20", bg: "bg-cyan-400/10", glow: "rgba(0,200,255,0.15)", accent: "#00C8FF" },
             { color: "text-blue-400", border: "border-blue-400/20", bg: "bg-blue-400/10", glow: "rgba(0,100,255,0.15)", accent: "#0064FF" },
-            { color: "text-purple-400", border: "border-purple-400/20", bg: "bg-purple-400/10", glow: "rgba(186,69,232,0.15)", accent: "#BA45E8" },
-            { color: "text-pink-400", border: "border-pink-400/20", bg: "bg-pink-400/10", glow: "rgba(236,72,153,0.15)", accent: "#EC4899" },
+            { color: "text-slate-900", border: "border-slate-800/20", bg: "bg-slate-900/10", glow: "rgba(186,69,232,0.15)", accent: "#BA45E8" },
+            { color: "text-slate-900", border: "border-slate-800/20", bg: "bg-slate-900/10", glow: "rgba(236,72,153,0.15)", accent: "#EC4899" },
             { color: "text-green-400", border: "border-green-400/20", bg: "bg-green-400/10", glow: "rgba(34,197,94,0.15)", accent: "#22C55E" },
         ];
 
@@ -153,7 +153,7 @@ export default function UsersManagement() {
         return (
             <DashboardLayout type="admin" title="Operational Surveillance">
                 <div className="h-[80vh] flex flex-col items-center justify-center space-y-4">
-                    <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-slate-800 border-t-transparent rounded-full animate-spin" />
                     <p className="text-white/40 font-kanit font-bold uppercase tracking-widest animate-pulse">Syncing User Directory...</p>
                 </div>
             </DashboardLayout>
@@ -301,7 +301,7 @@ export default function UsersManagement() {
                         <select
                             value={filterYear}
                             onChange={(e) => setFilterYear(e.target.value)}
-                            className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold uppercase text-xs outline-none focus:border-purple-500 transition-all cursor-pointer appearance-none min-w-[160px]"
+                            className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold uppercase text-xs outline-none focus:border-slate-800 transition-all cursor-pointer appearance-none min-w-[160px]"
                         >
                             <option value="All Years">All Years</option>
                             <option value="1st Year">1st Year</option>
@@ -337,7 +337,7 @@ export default function UsersManagement() {
                                         >
                                             <td className="p-8">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center text-white font-black italic border border-white/10">
+                                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-900/20 to-blue-500/20 flex items-center justify-center text-white font-black italic border border-white/10">
                                                         {user.fullName?.[0] || '?'}
                                                     </div>
                                                     <div>
@@ -353,7 +353,7 @@ export default function UsersManagement() {
                                                         <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded text-[9px] font-black uppercase tracking-tighter border border-blue-500/20">
                                                             {user.year || 'N/A'}
                                                         </span>
-                                                        <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 rounded text-[9px] font-black uppercase tracking-tighter border border-purple-500/20">
+                                                        <span className="px-2 py-0.5 bg-slate-900/10 text-slate-900 rounded text-[9px] font-black uppercase tracking-tighter border border-slate-800/20">
                                                             {user.department || 'GEN'}
                                                         </span>
                                                     </div>

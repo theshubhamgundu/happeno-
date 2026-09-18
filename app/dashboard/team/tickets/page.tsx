@@ -25,7 +25,7 @@ export default function TeamTickets() {
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">{ticket.id}</span>
-                                        <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${ticket.category === 'Technical' ? 'bg-blue-500/10 text-blue-400' : 'bg-orange-500/10 text-orange-400'}`}>
+                                        <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${ticket.category === 'Technical' ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-900/10 text-slate-900'}`}>
                                             {ticket.category}
                                         </div>
                                     </div>
@@ -34,8 +34,8 @@ export default function TeamTickets() {
 
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-bold group-hover:text-white transition-colors capitalize italic">{ticket.title}</h3>
-                                    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border ${ticket.status === 'Resolved' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'}`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${ticket.status === 'Resolved' ? 'bg-green-500' : 'bg-purple-500 animate-pulse'}`} />
+                                    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border ${ticket.status === 'Resolved' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-slate-900/10 text-slate-900 border-slate-800/20'}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${ticket.status === 'Resolved' ? 'bg-green-500' : 'bg-slate-900 animate-pulse'}`} />
                                         <span className="text-[10px] font-bold uppercase tracking-widest">{ticket.status}</span>
                                     </div>
                                 </div>
@@ -69,7 +69,7 @@ export default function TeamTickets() {
                                 "Close ticket once resolved"
                             ].map((step, i) => (
                                 <li key={i} className="flex gap-3 text-xs text-white/40 font-medium italic">
-                                    <span className="text-purple-500">•</span>
+                                    <span className="text-slate-900">•</span>
                                     {step}
                                 </li>
                             ))}

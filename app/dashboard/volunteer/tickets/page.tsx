@@ -42,7 +42,7 @@ export default function VolunteerTickets() {
                     <button
                         key={f}
                         onClick={() => setFilter(f as any)}
-                        className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-white/10 ${filter === f ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]' : 'bg-white/5 text-white/40 hover:bg-white/10'
+                        className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-white/10 ${filter === f ? 'bg-slate-900 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]' : 'bg-white/5 text-white/40 hover:bg-white/10'
                             }`}
                     >
                         {f === 'all' ? 'Active Queue' : f}
@@ -53,19 +53,19 @@ export default function VolunteerTickets() {
             <div className="grid grid-cols-1 gap-6">
                 {filteredTickets.length > 0 ? (
                     filteredTickets.map((ticket) => (
-                        <div key={ticket.id} className="bg-white/5 border border-white/10 rounded-[2rem] p-6 backdrop-blur-md relative group hover:border-purple-500/30 transition-all">
+                        <div key={ticket.id} className="bg-white/5 border border-white/10 rounded-[2rem] p-6 backdrop-blur-md relative group hover:border-slate-800/30 transition-all">
                             <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
                                 <div className="space-y-4 flex-grow">
                                     <div className="flex items-center gap-3">
                                         <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{ticket.id}</span>
-                                        <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${ticket.priority === 'critical' ? 'bg-red-500/10 text-red-500' :
+                                        <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${ticket.priority === 'critical' ? 'bg-slate-900/10 text-slate-900' :
                                                 ticket.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-500' :
                                                     'bg-blue-500/10 text-blue-500'
                                             }`}>
                                             {ticket.priority}
                                         </div>
                                         {ticket.status === 'assigned' && (
-                                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-purple-500/10 text-purple-400 rounded text-[10px] font-bold uppercase tracking-widest">
+                                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-900/10 text-slate-900 rounded text-[10px] font-bold uppercase tracking-widest">
                                                 <User size={10} />
                                                 Assigned: {ticket.assignee}
                                             </div>
