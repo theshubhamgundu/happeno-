@@ -95,7 +95,7 @@ export default function UsersManagement() {
     <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#1a1a8c;color:#fff;
         padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:Arial,sans-serif;">
         <span style="font-weight:700;font-size:13px;">ðŸ“‹ TRI-CITY AI HACKATHON â€” Hacker Directory (${rows.length} participants)</span>
-        <button onclick="window.print()" style="background:#FFEE00;color:#000;border:none;padding:8px 22px;
+        <button onclick="window.print()" style="background:#14b8a6;color:#000;border:none;padding:8px 22px;
             border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">ðŸ–¨ï¸ Print / Save as PDF</button>
     </div>
     <div style="padding:18px 24px;margin-top:50px;">
@@ -166,11 +166,11 @@ export default function UsersManagement() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-white/40 hover:text-[#FFEE00] transition-colors font-bold text-xs uppercase tracking-widest mb-4">
+                        <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-white/40 hover:text-[#14b8a6] transition-colors font-bold text-xs uppercase tracking-widest mb-4">
                             <ArrowLeft size={14} /> Back to Dashboard
                         </Link>
                         <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-white leading-none">
-                            Hacker <span className="text-[#FFEE00]">Directory</span>
+                            Hacker <span className="text-[#14b8a6]">Directory</span>
                         </h1>
                         <p className="text-white/40 font-bold uppercase tracking-[0.2em] mt-4 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -181,7 +181,7 @@ export default function UsersManagement() {
                     <div className="flex gap-4">
                         <button
                             onClick={handleExportCSV}
-                            className="p-4 rounded-2xl bg-[#FFEE00] text-black border border-[#FFEE00]/20 hover:scale-[1.02] active:scale-95 transition-all shadow-xl flex items-center gap-2 font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(255,238,0,0.2)]"
+                            className="p-4 rounded-2xl bg-[#14b8a6] text-black border border-[#14b8a6]/20 hover:scale-[1.02] active:scale-95 transition-all shadow-xl flex items-center gap-2 font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(20,184,166,0.2)]"
                         >
                             <Download size={16} /> Export CSV
                         </button>
@@ -199,12 +199,12 @@ export default function UsersManagement() {
                         <div className="hidden md:flex items-center gap-6">
                             <div className="text-right">
                                 <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Total Entries</p>
-                                <p className="text-3xl font-black italic text-[#FFEE00] tracking-tighter">{projects.length}</p>
+                                <p className="text-3xl font-black italic text-[#14b8a6] tracking-tighter">{projects.length}</p>
                             </div>
                             <div className="w-px h-10 bg-white/10" />
                             <div className="text-right">
                                 <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Total Participants</p>
-                                <p className="text-3xl font-black italic text-[#FFEE00] tracking-tighter">{allUsers.length}</p>
+                                <p className="text-3xl font-black italic text-[#14b8a6] tracking-tighter">{allUsers.length}</p>
                             </div>
                         </div>
                     </div>
@@ -275,11 +275,11 @@ export default function UsersManagement() {
                     <div className="md:hidden mt-6 flex gap-4">
                         <div className="flex-1 bg-black/20 rounded-2xl p-4 border border-white/5 text-center">
                             <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Total Entries</p>
-                            <p className="text-3xl font-black italic text-[#FFEE00]">{projects.length}</p>
+                            <p className="text-3xl font-black italic text-[#14b8a6]">{projects.length}</p>
                         </div>
                         <div className="flex-1 bg-black/20 rounded-2xl p-4 border border-white/5 text-center">
                             <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Total Participants</p>
-                            <p className="text-3xl font-black italic text-[#FFEE00]">{allUsers.length}</p>
+                            <p className="text-3xl font-black italic text-[#14b8a6]">{allUsers.length}</p>
                         </div>
                     </div>
                 </div>
@@ -287,13 +287,13 @@ export default function UsersManagement() {
                 {/* Filters & Search */}
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
                     <div className="relative flex-grow group w-full">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#FFEE00] transition-colors" size={20} />
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#14b8a6] transition-colors" size={20} />
                         <input
                             type="text"
                             placeholder="SEARCH BY HACKER, EMAIL, OR COLLEGE..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-[2rem] py-5 pl-16 pr-8 text-white font-bold italic uppercase outline-none focus:border-[#FFEE00] focus:bg-white/10 transition-all placeholder:text-white/10 tracking-widest text-sm"
+                            className="w-full bg-white/5 border border-white/10 rounded-[2rem] py-5 pl-16 pr-8 text-white font-bold italic uppercase outline-none focus:border-[#14b8a6] focus:bg-white/10 transition-all placeholder:text-white/10 tracking-widest text-sm"
                         />
                     </div>
 
@@ -341,7 +341,7 @@ export default function UsersManagement() {
                                                         {user.fullName?.[0] || '?'}
                                                     </div>
                                                     <div>
-                                                        <p className="text-white font-black italic uppercase tracking-tight group-hover:text-[#FFEE00] transition-colors">{user.fullName || 'Unknown User'}</p>
+                                                        <p className="text-white font-black italic uppercase tracking-tight group-hover:text-[#14b8a6] transition-colors">{user.fullName || 'Unknown User'}</p>
                                                         <p className="text-[10px] text-white/30 font-bold uppercase tracking-wider mt-0.5">{user.email || 'NO_EMAIL'}</p>
                                                     </div>
                                                 </div>
@@ -362,7 +362,7 @@ export default function UsersManagement() {
                                             <td className="p-8">
                                                 <div className="space-y-1">
                                                     <p className="text-white font-black italic uppercase text-xs tracking-tight">{user.teamName}</p>
-                                                    <p className="text-[9px] text-[#FFEE00]/60 font-bold uppercase tracking-widest">{user.teamId}</p>
+                                                    <p className="text-[9px] text-[#14b8a6]/60 font-bold uppercase tracking-widest">{user.teamId}</p>
                                                 </div>
                                             </td>
                                             <td className="p-8">

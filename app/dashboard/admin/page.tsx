@@ -68,6 +68,11 @@ export default function AdminDashboard() {
     const [emergencyForm, setEmergencyForm] = useState({ name: "", phone: "" });
     const [isEditingEmergency, setIsEditingEmergency] = useState(false);
     const [visiblePasswords, setVisiblePasswords] = useState<Set<any>>(new Set());
+    const [showMergeModal, setShowMergeModal] = useState(false);
+    const [selectedMergeTeams, setSelectedMergeTeams] = useState<string[]>([]);
+    const [mergeTeamName, setMergeTeamName] = useState("");
+    const [isMerging, setIsMerging] = useState(false);
+    const [mergeSearchQuery, setMergeSearchQuery] = useState("");
     
     // Pagination state for scalability
     const [currentPage, setCurrentPage] = useState(1);
@@ -95,6 +100,43 @@ export default function AdminDashboard() {
             })
             .catch(err => console.error('Password backfill failed:', err));
     }, [projects, isLoading]);
+
+    const handleMergeTeams = async () => {
+        if (selectedMergeTeams.length < 2) {
+            toast.error("Please select at least 2 teams to merge.");
+            return;
+        }
+        if (!mergeTeamName.trim()) {
+            toast.error("Please enter a name for the new merged team.");
+            return;
+        }
+        setIsMerging(true);
+        try {
+            const res = await fetch('/api/admin/merge-teams', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sourceTeamIds: selectedMergeTeams,
+                    newTeamName: mergeTeamName
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success(data.message);
+                setShowMergeModal(false);
+                setSelectedMergeTeams([]);
+                setMergeTeamName("");
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                toast.error(data.error || "Failed to merge teams");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("An error occurred during merge");
+        } finally {
+            setIsMerging(false);
+        }
+    };
 
     const togglePasswordVisibility = (teamId: any, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -338,7 +380,7 @@ export default function AdminDashboard() {
     <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#1a1a8c;color:#fff;
         padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:Arial,sans-serif;">
         <span style="font-weight:700;font-size:13px;">ðŸ“‹ TRI-CITY AI HACKATHON â€” ${title} (${rows.length} records)</span>
-        <button onclick="window.print()" style="background:#FFEE00;color:#000;border:none;padding:8px 22px;
+        <button onclick="window.print()" style="background:#14b8a6;color:#000;border:none;padding:8px 22px;
             border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">ðŸ–¨ï¸ Print / Save as PDF</button>
     </div>
     <div style="padding:18px 24px;margin-top:50px;">
@@ -407,11 +449,11 @@ export default function AdminDashboard() {
         <DashboardLayout type="admin" title="Admin workspace">
             <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
                 <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(125deg,rgba(89,28,135,0.42),rgba(13,8,30,0.9)_48%,rgba(18,13,36,0.82))] p-6 md:p-8 shadow-2xl">
-                    <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#FFEE00]/10 blur-3xl" />
+                    <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#14b8a6]/10 blur-3xl" />
                     <div className="absolute bottom-0 left-1/3 h-40 w-80 rounded-full bg-slate-900/15 blur-3xl" />
                     <div className="relative flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
                         <div className="max-w-2xl">
-                            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#FFEE00]">
+                            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#14b8a6]">
                                 <Activity size={14} /> Operations overview
                             </div>
                             <h1 className="font-kanit text-3xl font-black italic uppercase tracking-tight text-white md:text-5xl">TRICITY control room</h1>
@@ -421,7 +463,7 @@ export default function AdminDashboard() {
                             <button onClick={toggleCertificatesEnabled} className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black uppercase tracking-wider transition hover:-translate-y-0.5 ${isCertificatesEnabled ? 'bg-green-500 text-white shadow-[0_8px_24px_rgba(34,197,94,0.3)]' : 'bg-white/10 text-white/50 hover:bg-white/20'}`}>
                                 <Download size={16} /> {isCertificatesEnabled ? "Certificates: Enabled" : "Certificates: Disabled"}
                             </button>
-                            <button onClick={() => setActiveTab("teams")} className="inline-flex items-center gap-2 rounded-xl bg-[#FFEE00] px-5 py-3 text-xs font-black uppercase tracking-wider text-black transition hover:-translate-y-0.5 hover:bg-white">
+                            <button onClick={() => setActiveTab("teams")} className="inline-flex items-center gap-2 rounded-xl bg-[#14b8a6] px-5 py-3 text-xs font-black uppercase tracking-wider text-black transition hover:-translate-y-0.5 hover:bg-white">
                                 <Users size={16} /> View teams
                             </button>
                         </div>
@@ -451,7 +493,7 @@ export default function AdminDashboard() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
                         className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === tab.id
-                            ? 'bg-[#FFEE00] text-black shadow-[0_8px_24px_rgba(255,238,0,0.18)]'
+                            ? 'bg-[#14b8a6] text-black shadow-[0_8px_24px_rgba(20,184,166,0.18)]'
                             : 'text-white/50 hover:bg-white/8 hover:text-white'
                             }`}
                     >
@@ -470,7 +512,7 @@ export default function AdminDashboard() {
                             <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Registration entries</h2>
                             <p className="mt-1 text-xs text-white/45">Search, verify payments, assign logistics, or open a participant's complete record.</p>
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-[#FFEE00]" /> {filteredTeams.length} shown</div>
+                        <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-[#14b8a6]" /> {filteredTeams.length} shown</div>
                     </div>
                     <div className="flex items-center gap-3 flex-wrap">
                         <div className="relative flex-grow">
@@ -482,21 +524,29 @@ export default function AdminDashboard() {
                                     setSearchQuery(e.target.value);
                                     setCurrentPage(1);
                                 }}
-                            className="h-14 w-full rounded-xl border border-white/10 bg-[#0B0114]/60 py-3 pl-12 pr-4 text-sm font-medium text-white outline-none transition-all placeholder:text-white/25 focus:border-[#FFEE00]/70 focus:ring-2 focus:ring-[#FFEE00]/10"
+                            className="h-14 w-full rounded-xl border border-white/10 bg-[#0B0114]/60 py-3 pl-12 pr-4 text-sm font-medium text-white outline-none transition-all placeholder:text-white/25 focus:border-[#14b8a6]/70 focus:ring-2 focus:ring-[#14b8a6]/10"
                             />
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={19} />
                         </div>
                         <div className="flex h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4">
                             <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Total</span>
-                            <span className="text-xl font-black italic text-[#FFEE00]">{projects.length}</span>
+                            <span className="text-xl font-black italic text-[#14b8a6]">{projects.length}</span>
                         </div>
                         <button
                             onClick={handleExportTeams}
-                            className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-[10px] font-black uppercase tracking-wider text-white transition hover:border-[#FFEE00]/50 hover:text-[#FFEE00]"
+                            className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-[10px] font-black uppercase tracking-wider text-white transition hover:border-[#14b8a6]/50 hover:text-[#14b8a6]"
                         >
                             <Download size={18} /> Export
                         </button>
                         
+                        {/* Merge Teams */}
+                        <button
+                            onClick={() => setShowMergeModal(true)}
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-blue-400 transition hover:border-blue-500/70 hover:bg-blue-500/30"
+                        >
+                            <Users size={18} /> Merge Teams
+                        </button>
+
                         {/* CSV Import */}
                         <input
                             type="file"
@@ -535,7 +585,7 @@ export default function AdminDashboard() {
                                             <div>
                                                 <div className="flex items-center flex-wrap gap-2">
                                                     <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{team.team}</h3>
-                                                    <span className="text-[10px] font-black text-[#FFEE00] px-2 py-0.5 border border-[#FFEE00]/30 rounded bg-[#FFEE00]/5">{team.teamId}</span>
+                                                    <span className="text-[10px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{team.teamId}</span>
                                                     {team.status === 'PENDING' && (
                                                         <span className="text-[8px] font-black bg-slate-900/20 text-slate-900 border border-slate-800/50 px-2 py-0.5 rounded uppercase tracking-widest animate-pulse">
                                                             Verification Pending
@@ -571,7 +621,7 @@ export default function AdminDashboard() {
                                         <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
                                             {team.status === 'PENDING' && (
                                                 <div className="flex items-center gap-2">
-                                                    <div className="bg-[#FFEE00]/10 border border-[#FFEE00] px-3 py-2 rounded-lg text-xs font-mono text-[#FFEE00] flex flex-col">
+                                                    <div className="bg-[#14b8a6]/10 border border-[#14b8a6] px-3 py-2 rounded-lg text-xs font-mono text-[#14b8a6] flex flex-col">
                                                         <span className="text-[8px] opacity-70 uppercase">Transaction ID</span>
                                                         <span className="font-bold">{team.transactionId || team.id}</span>
                                                     </div>
@@ -585,7 +635,7 @@ export default function AdminDashboard() {
                                             )}
 
                                             <div className="flex items-center gap-4">
-                                                <button onClick={() => handleOpenLogistics(team)} className="px-6 py-3 rounded-xl bg-[#FFEE00] text-black font-black uppercase italic text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">Assign Logistics</button>
+                                                <button onClick={() => handleOpenLogistics(team)} className="px-6 py-3 rounded-xl bg-[#14b8a6] text-black font-black uppercase italic text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">Assign Logistics</button>
                                             </div>
                                         </div>
                                     </div>
@@ -725,7 +775,7 @@ export default function AdminDashboard() {
                             <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Add Official Judge</h3>
                             <button
                                 onClick={handleExportJudges}
-                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#FFEE00] hover:border-[#FFEE00]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
+                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
                             >
                                 <Download size={18} /> Export Judges CSV
                             </button>
@@ -734,7 +784,7 @@ export default function AdminDashboard() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Full Name</label>
                                 <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00]"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
                                     value={newJudge.name}
                                     placeholder="e.g. Dr. Smith"
                                     onChange={(e) => setNewJudge({ ...newJudge, name: e.target.value })}
@@ -743,7 +793,7 @@ export default function AdminDashboard() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Specialization Domain</label>
                                 <input
-                                    className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00] transition-colors"
+                                    className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] transition-colors"
                                     value={newJudge.specialization}
                                     placeholder="e.g. General"
                                     onChange={(e) => setNewJudge({ ...newJudge, specialization: e.target.value })}
@@ -757,7 +807,7 @@ export default function AdminDashboard() {
                                             setNewJudge({ name: "", specialization: "" });
                                         }
                                     }}
-                                    className="w-full py-4 rounded-2xl bg-[#FFEE00] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
+                                    className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
                                 >
                                     <Plus size={18} /> Add Judicial POC
                                 </button>
@@ -790,7 +840,7 @@ export default function AdminDashboard() {
                                                 <div>
                                                     <div className="flex items-center gap-3">
                                                         <h4 className="text-lg font-black italic uppercase tracking-tight">{judge.name}</h4>
-                                                        <span className="text-[9px] font-black text-[#FFEE00] px-2 py-0.5 border border-[#FFEE00]/30 rounded bg-[#FFEE00]/5">{judge.generatedId}</span>
+                                                        <span className="text-[9px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{judge.generatedId}</span>
                                                     </div>
                                                     <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{judge.specialization}</p>
                                                 </div>
@@ -818,7 +868,7 @@ export default function AdminDashboard() {
                             <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Assign Station Volunteer</h3>
                             <button
                                 onClick={handleExportVolunteers}
-                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#FFEE00] hover:border-[#FFEE00]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
+                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
                             >
                                 <Download size={18} /> Export Volunteers
                             </button>
@@ -856,7 +906,7 @@ export default function AdminDashboard() {
                                             setNewVolunteer({ name: "", phone: "", role: "" });
                                         }
                                     }}
-                                    className="w-full py-4 rounded-2xl bg-[#FFEE00] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2"
+                                    className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2"
                                 >
                                     <Plus size={18} /> Register Staff
                                 </button>
@@ -901,10 +951,10 @@ export default function AdminDashboard() {
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
                         <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#FFEE00]">WiFi Network Management</h3>
+                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">WiFi Network Management</h3>
                             <button
                                 onClick={handleExportWifi}
-                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#FFEE00] hover:border-[#FFEE00]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
+                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
                             >
                                 <Download size={18} /> Export WiFi CSV
                             </button>
@@ -915,7 +965,7 @@ export default function AdminDashboard() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Network Name (SSID)</label>
                                 <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00] transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] transition-colors"
                                     value={newWifi.ssid}
                                     placeholder="e.g. tricity-Guest"
                                     onChange={(e) => setNewWifi({ ...newWifi, ssid: e.target.value })}
@@ -924,7 +974,7 @@ export default function AdminDashboard() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Password</label>
                                 <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00] transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] transition-colors"
                                     value={newWifi.pass}
                                     placeholder="e.g. securePass123"
                                     onChange={(e) => setNewWifi({ ...newWifi, pass: e.target.value })}
@@ -940,7 +990,7 @@ export default function AdminDashboard() {
                                             toast.error("Please fill in both SSID and Password");
                                         }
                                     }}
-                                    className="w-full py-4 rounded-2xl bg-[#FFEE00] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,238,0,0.3)] hover:shadow-[0_0_30px_rgba(255,238,0,0.5)]"
+                                    className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(20,184,166,0.3)] hover:shadow-[0_0_30px_rgba(20,184,166,0.5)]"
                                 >
                                     <Plus size={18} /> Add Network
                                 </button>
@@ -975,7 +1025,7 @@ export default function AdminDashboard() {
                                                         <h4 className="text-lg font-black italic uppercase tracking-tighter text-white truncate" title={net.ssid}>{net.ssid}</h4>
                                                         <div className="flex items-center gap-2 mt-2">
                                                             <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">Key:</span>
-                                                            <code className="text-[10px] font-mono text-[#FFEE00] font-bold bg-[#FFEE00]/10 px-2 py-1 rounded border border-[#FFEE00]/20 truncate">{net.pass}</code>
+                                                            <code className="text-[10px] font-mono text-[#14b8a6] font-bold bg-[#14b8a6]/10 px-2 py-1 rounded border border-[#14b8a6]/20 truncate">{net.pass}</code>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -995,12 +1045,12 @@ export default function AdminDashboard() {
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
                         <div className="flex justify-between items-center mb-8">
                             <div>
-                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#FFEE00]">Room directory</h3>
+                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">Room directory</h3>
                                 <p className="mt-1 text-xs text-white/40">Create rooms and record their available capacity or facilities.</p>
                             </div>
                             <button
                                 onClick={handleExportRooms}
-                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#FFEE00] hover:border-[#FFEE00]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
+                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
                             >
                                 <Download size={18} /> Export Rooms CSV
                             </button>
@@ -1011,7 +1061,7 @@ export default function AdminDashboard() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Room Name / Number</label>
                                 <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00] transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] transition-colors"
                                     value={newRoom.name}
                                     placeholder="e.g. LAB 101"
                                     onChange={(e) => setNewRoom({ ...newRoom, name: e.target.value })}
@@ -1020,7 +1070,7 @@ export default function AdminDashboard() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Capacity / Info</label>
                                 <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00] transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] transition-colors"
                                     value={newRoom.capacity}
                                     placeholder="e.g. 50 pax or Projector Available"
                                     onChange={(e) => setNewRoom({ ...newRoom, capacity: e.target.value })}
@@ -1036,7 +1086,7 @@ export default function AdminDashboard() {
                                             toast.error("Please fill in both Name and Capacity info");
                                         }
                                     }}
-                                    className="w-full py-4 rounded-2xl bg-[#FFEE00] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
+                                    className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
                                 >
                                     <Plus size={18} /> Add Room
                                 </button>
@@ -1146,12 +1196,12 @@ export default function AdminDashboard() {
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 lg:p-12">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowLogisticsModal(false)} className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
                         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-[#0B0114] border border-white/10 rounded-[3rem] p-8 lg:p-12 max-w-xl w-full relative z-10 text-white">
-                            <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-8 text-[#FFEE00]">Deploy Team Logistics</h3>
+                            <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-8 text-[#14b8a6]">Deploy Team Logistics</h3>
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Assigned Room</label>
-                                        <select className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00] appearance-none" value={localLogistics.room} onChange={(e) => setLocalLogistics({ ...localLogistics, room: e.target.value })}>
+                                        <select className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] appearance-none" value={localLogistics.room} onChange={(e) => setLocalLogistics({ ...localLogistics, room: e.target.value })}>
                                             <option value="">Select Room</option>
                                             {rooms.map(room => (<option key={room.id} value={room.name}>{room.name} ({room.capacity})</option>))}
                                             <option value="custom">Custom...</option>
@@ -1160,7 +1210,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Assign Coordinator</label>
-                                        <select className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00] appearance-none" value={localLogistics.volunteer_name} onChange={(e) => { const v = volunteers.find(v => v.name === e.target.value); setLocalLogistics({ ...localLogistics, volunteer_name: e.target.value, volunteer_phone: v?.phone || "" }); }}>
+                                        <select className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] appearance-none" value={localLogistics.volunteer_name} onChange={(e) => { const v = volunteers.find(v => v.name === e.target.value); setLocalLogistics({ ...localLogistics, volunteer_name: e.target.value, volunteer_phone: v?.phone || "" }); }}>
                                             <option value="">Select Volunteer</option>
                                             {volunteers.map(vol => (<option key={vol.id} value={vol.name}>{vol.name} ({vol.role})</option>))}
                                         </select>
@@ -1169,7 +1219,7 @@ export default function AdminDashboard() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Select WiFi Network</label>
-                                        <select className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#FFEE00] appearance-none" value={localLogistics.roomWifiSSID} onChange={(e) => { const n = wifiNetworks.find(n => n.ssid === e.target.value); setLocalLogistics({ ...localLogistics, roomWifiSSID: n?.ssid || e.target.value, roomWifiPass: n?.pass || "" }); }}>
+                                        <select className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] appearance-none" value={localLogistics.roomWifiSSID} onChange={(e) => { const n = wifiNetworks.find(n => n.ssid === e.target.value); setLocalLogistics({ ...localLogistics, roomWifiSSID: n?.ssid || e.target.value, roomWifiPass: n?.pass || "" }); }}>
                                             <option value="">Select WiFi</option>
                                             {wifiNetworks.map(net => (<option key={net.id} value={net.ssid}>{net.ssid}</option>))}
                                         </select>
@@ -1181,8 +1231,68 @@ export default function AdminDashboard() {
                                 </div>
                                 <div className="pt-8 grid grid-cols-2 gap-4">
                                     <button onClick={() => setShowLogisticsModal(false)} className="py-4 rounded-2xl border border-white/10 font-black uppercase italic text-xs tracking-widest">Abort</button>
-                                    <button onClick={handleSaveLogistics} className="py-4 rounded-2xl bg-[#FFEE00] text-black font-black uppercase italic text-xs tracking-widest shadow-lg active:scale-95 transition-all">Deploy Station Data</button>
+                                    <button onClick={handleSaveLogistics} className="py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic text-xs tracking-widest shadow-lg active:scale-95 transition-all">Deploy Station Data</button>
                                 </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {showMergeModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-xl max-h-[85vh] overflow-y-auto bg-[#0B0114] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
+                            <div className="flex items-center justify-between mb-8">
+                                <div>
+                                    <h3 className="text-3xl font-black italic uppercase text-white tracking-tighter">Merge Teams</h3>
+                                    <p className="text-xs text-white/50 font-bold uppercase tracking-widest mt-2">Combine Solo/Duo Registrations</p>
+                                </div>
+                                <button onClick={() => setShowMergeModal(false)} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                                    <Trash2 size={20} className="text-white/50" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">New Team Name</label>
+                                    <input value={mergeTeamName} onChange={(e) => setMergeTeamName(e.target.value)} placeholder="e.g. The Innovators" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Search Teams to Merge</label>
+                                    <div className="relative">
+                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+                                        <input value={mergeSearchQuery} onChange={(e) => setMergeSearchQuery(e.target.value)} placeholder="Search by name, ID, or captain..." className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white outline-none focus:border-[#14b8a6]" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Select Teams ({selectedMergeTeams.length} selected)</label>
+                                    <div className="bg-black/30 border border-white/5 rounded-2xl p-2 h-64 overflow-y-auto space-y-1">
+                                        {projects.filter(p => !mergeSearchQuery || p.team.toLowerCase().includes(mergeSearchQuery.toLowerCase()) || p.teamId?.toLowerCase().includes(mergeSearchQuery.toLowerCase()) || p.captain?.toLowerCase().includes(mergeSearchQuery.toLowerCase())).map(team => (
+                                            <label key={team.id} className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl cursor-pointer border border-transparent hover:border-white/5 transition-colors">
+                                                <input type="checkbox" checked={selectedMergeTeams.includes(team.id.toString())} onChange={(e) => {
+                                                    if (e.target.checked) setSelectedMergeTeams([...selectedMergeTeams, team.id.toString()]);
+                                                    else setSelectedMergeTeams(selectedMergeTeams.filter(id => id !== team.id.toString()));
+                                                }} className="w-4 h-4 rounded bg-black border-white/20 text-[#14b8a6] focus:ring-[#14b8a6] focus:ring-offset-black" />
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-bold text-white truncate">{team.team}</span>
+                                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-white/50">{team.teamId}</span>
+                                                    </div>
+                                                    <div className="text-[10px] text-white/40 truncate">{team.captain} • {team.members?.length || 0} member(s)</div>
+                                                </div>
+                                            </label>
+                                        ))}
+                                        {projects.length === 0 && <div className="p-4 text-center text-white/40 text-xs">No teams found</div>}
+                                    </div>
+                                </div>
+
+                                <button onClick={handleMergeTeams} disabled={isMerging || selectedMergeTeams.length < 2 || !mergeTeamName} className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic text-sm tracking-widest shadow-[0_0_20px_rgba(20,184,166,0.2)] hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 transition-all flex items-center justify-center gap-2">
+                                    {isMerging ? <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : <Users size={18} />}
+                                    {isMerging ? "Merging Teams..." : "Confirm Merge"}
+                                </button>
                             </div>
                         </motion.div>
                     </div>

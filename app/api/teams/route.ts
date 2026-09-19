@@ -11,7 +11,8 @@ export async function GET(req: Request) {
 
         let query = supabase
             .from('registrations')
-            .select('*');
+            .select('*')
+            .neq('status', 'MERGED');
 
         if (teamId) {
             query = query.ilike('team_id', teamId);
