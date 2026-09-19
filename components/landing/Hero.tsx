@@ -32,16 +32,16 @@ function CountdownTimer() {
   ];
 
   return (
-    <div className="flex justify-center gap-3 sm:gap-6">
+    <div className="flex justify-center gap-2 sm:gap-3 md:gap-6">
       {units.map((u) => (
         <div
           key={u.label}
-          className="flex flex-col items-center bg-white border border-gray-200 rounded-lg px-4 py-3 min-w-[72px] sm:min-w-[90px] shadow-sm"
+          className="flex flex-col items-center bg-white border border-gray-200 rounded-lg px-3 py-2.5 sm:px-4 sm:py-3 min-w-[60px] sm:min-w-[72px] md:min-w-[90px] shadow-sm"
         >
-          <span className="font-mono text-2xl sm:text-3xl font-bold text-[#0f172a] tabular-nums">
+          <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold text-[#0f172a] tabular-nums">
             {String(u.value).padStart(2, '0')}
           </span>
-          <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 mt-0.5">
+          <span className="font-mono text-[9px] sm:text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mt-0.5">
             {u.label}
           </span>
         </div>
@@ -54,7 +54,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[90vh] pt-32 pb-24 flex items-center justify-center bg-gradient-to-b from-[#F8F9FA] via-white to-white overflow-hidden"
+      className="relative min-h-[100svh] pt-24 pb-16 sm:pt-32 sm:pb-24 flex items-center justify-center bg-gradient-to-b from-[#F8F9FA] via-white to-white overflow-hidden"
     >
       {/* Subtle grid pattern */}
       <div
@@ -65,17 +65,18 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      <div className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto">
         {/* Date & Location Badge */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full border border-teal-200 bg-teal-50 text-teal-900"
+          className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-3 sm:px-4 py-1.5 rounded-full border border-teal-200 bg-teal-50 text-teal-900"
         >
-          <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
-          <span className="font-mono text-xs tracking-wider uppercase font-medium">
-            October 10–11, 2026 · Warangal | Hanamkonda | Kazipet
+          <span className="w-2 h-2 shrink-0 rounded-full bg-teal-600 animate-pulse" />
+          <span className="font-mono text-[10px] sm:text-xs tracking-wider uppercase font-medium text-center leading-snug">
+            <span className="sm:hidden">Oct 10–11, 2026 · Warangal</span>
+            <span className="hidden sm:inline">October 10–11, 2026 · Warangal | Hanamkonda | Kazipet</span>
           </span>
         </motion.div>
 
@@ -84,10 +85,10 @@ export default function Hero() {
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15 }}
-          className="font-display font-extrabold text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] tracking-tight text-[#0f172a] mb-6"
+          className="font-display font-extrabold text-[2.5rem] sm:text-6xl md:text-7xl lg:text-8xl leading-[1.08] tracking-tight text-[#0f172a] mb-4 sm:mb-6"
         >
           Tri-City Hackathon
-          <span className="block text-2xl sm:text-3xl md:text-4xl font-semibold text-[#0f766e] tracking-normal mt-2">
+          <span className="block text-lg sm:text-3xl md:text-4xl font-semibold text-[#0f766e] tracking-normal mt-1 sm:mt-2">
             Warangal · Hanamkonda · Kazipet
           </span>
         </motion.h1>
@@ -97,7 +98,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="font-body text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="font-body text-sm sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2 sm:px-0"
         >
           24 hours of innovation across Telangana&apos;s historic tri-cities. Connecting student
           creators, developers, and industry mentors across{' '}
@@ -111,7 +112,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mb-10"
+          className="mb-8 sm:mb-10"
         >
           <CountdownTimer />
         </motion.div>
@@ -121,7 +122,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4 sm:px-0"
         >
           <a href="/login" className="btn-primary w-full sm:w-auto">
             {/* User / Login Icon */}
@@ -145,7 +146,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.7 }}
-          className="mt-16 pt-12 border-t border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-6"
+          className="mt-10 pt-8 sm:mt-16 sm:pt-12 border-t border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"
         >
           {[
             { value: '1000+', label: 'Participants' },
@@ -154,10 +155,10 @@ export default function Hero() {
             { value: '3', label: 'Grand Finale' },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
-              <div className="font-display font-extrabold text-2xl sm:text-3xl text-[#0f172a]">
+              <div className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-[#0f172a]">
                 {stat.value}
               </div>
-              <div className="font-mono text-xs uppercase tracking-wider text-gray-500 mt-1">
+              <div className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-gray-500 mt-1">
                 {stat.label}
               </div>
             </div>

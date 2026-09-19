@@ -1,43 +1,52 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 
 export default function Loading() {
     return (
-        <div className="fixed inset-0 z-[9999] bg-[#0B0114] flex flex-col items-center justify-center">
-            <div className="relative">
-                {/* Animated Glow Rings */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#FFEE00]/20 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[#62009B]/30 rounded-full blur-[100px] animate-pulse delay-700" />
+        <div className="fixed inset-0 z-[9999] bg-gradient-to-b from-[#F8F9FA] via-white to-white flex flex-col items-center justify-center">
+            {/* Subtle grid pattern — same as hero */}
+            <div
+                className="absolute inset-0 opacity-[0.035] pointer-events-none"
+                style={{
+                    backgroundImage: `linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)`,
+                    backgroundSize: '40px 40px',
+                }}
+            />
 
-                {/* Logo Container */}
-                <div className="relative animate-bounce duration-[2000ms]">
-                    <span className="font-kanit font-black italic text-5xl text-[#FFEE00] drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">T</span>
+            <div className="relative z-10 flex flex-col items-center">
+                {/* Spinner */}
+                <div className="relative mb-8">
+                    {/* Outer ring */}
+                    <div className="w-16 h-16 rounded-full border-2 border-gray-200" />
+                    {/* Spinning arc */}
+                    <div className="absolute inset-0 w-16 h-16 rounded-full border-2 border-transparent border-t-[#0f766e] animate-spin" />
+                    {/* Center logo mark */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-md bg-[#0f172a] flex items-center justify-center text-white font-display font-extrabold text-[10px] shadow-sm">
+                            TC
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            {/* Progress Text */}
-            <div className="mt-8 flex flex-col items-center gap-2">
-                <h2 className="text-white font-kanit font-black text-xl uppercase italic tracking-widest animate-pulse">
-                    Initializing <span className="text-[#FFEE00]">TRI-CITY AI HACKATHON</span>
+                {/* Title */}
+                <h2 className="font-display font-bold text-lg sm:text-xl tracking-tight text-[#0f172a] mb-2 text-center">
+                    Tri-City Hackathon
                 </h2>
-                <div className="flex gap-1.5">
-                    <div className="w-1.5 h-1.5 bg-[#FFEE00] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                    <div className="w-1.5 h-1.5 bg-[#FFEE00] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                    <div className="w-1.5 h-1.5 bg-[#FFEE00] rounded-full animate-bounce" />
-                </div>
-            </div>
 
-            {/* Background Texture */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <Image
-                    src="/main_page_bg.svg"
-                    alt=""
-                    fill
-                    className="object-cover"
-                />
+                {/* Subtitle */}
+                <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-gray-500 mb-6">
+                    Warangal · Hanamkonda · Kazipet
+                </p>
+
+                {/* Loading dots */}
+                <div className="flex gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-[#0f766e] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <div className="w-1.5 h-1.5 bg-[#0f766e] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <div className="w-1.5 h-1.5 bg-[#0f766e] rounded-full animate-bounce" />
+                </div>
             </div>
         </div>
     );
 }
+
