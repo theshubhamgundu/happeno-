@@ -460,3 +460,203 @@ input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s;
     background-color: transparent !important;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Landing Page Styles (Tri-City Hackathon)
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ───── Base ───── */
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #0f766e #F8F9FA;
+}
+
+::selection {
+  background: rgba(15, 118, 110, 0.2);
+  color: #0f766e;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F8F9FA;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0f766e;
+  border-radius: 3px;
+}
+
+/* ───── Professional Section Border Divider ───── */
+.section-divider-line {
+  height: 1px;
+  background: #E5E7EB;
+  width: 100%;
+}
+
+/* ───── Clean Professional Card ───── */
+.pro-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.pro-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+}
+
+/* ───── Primary Button (Login / CTA) ───── */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-syne), sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: #0f172a;
+  border: 1px solid #0f172a;
+  border-radius: 6px;
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.12);
+  transition: all 0.25s ease;
+}
+
+.btn-primary:hover {
+  background: #0f766e;
+  border-color: #0f766e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 118, 110, 0.25);
+}
+
+/* ───── Secondary / Ghost Button ───── */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-syne), sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-ghost:hover {
+  border-color: #0f172a;
+  color: #0f172a;
+  background: #F9FAFB;
+}
+
+/* ───── Lightbox Modal ───── */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.lightbox-overlay img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* ───── Infinite Marquee ───── */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ───── Skeleton Shimmer Effect ───── */
+.skeleton-shimmer {
+  position: relative;
+  background: #E5E7EB;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-sweep 1.6s infinite ease-in-out;
+}
+
+@keyframes skeleton-sweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ───── Landing Page Fonts ───── */
+.font-display {
+  font-family: var(--font-syne), sans-serif;
+}
+
+.font-body {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.font-mono {
+  font-family: var(--font-space-mono), monospace;
+}
+
+/* ───── Gallery hover scale animation ───── */
+@keyframes scale-108 {
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.group-hover\:scale-108 {
+  transition: transform 0.7s ease-out;
+}
+
+.group:hover .group-hover\:scale-108 {
+  transform: scale(1.08);
+}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Kanit, Poppins, Montserrat } from "next/font/google";
+import { Geist, Geist_Mono, Kanit, Poppins, Montserrat, DM_Sans, Syne, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ViewTransitions } from 'next-view-transitions'
 import SmoothScroll from "@/components/SmoothScroll";
@@ -30,6 +30,26 @@ const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
   weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  weight: ["400", "500", "600", "700"],
+});
+
+// Landing page display font
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-syne",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+// Landing page mono font
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  variable: "--font-space-mono",
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -72,7 +92,7 @@ export default function RootLayout({
           <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${montserrat.variable} ${poppins.className} antialiased overflow-x-hidden bg-white text-slate-900`}
+          className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${montserrat.variable} ${dmSans.variable} ${syne.variable} ${spaceMono.variable} ${poppins.className} antialiased overflow-x-hidden bg-white text-slate-900`}
         >
           <AuthProvider>
             <HackathonProvider>

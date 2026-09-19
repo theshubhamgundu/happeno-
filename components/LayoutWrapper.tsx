@@ -19,8 +19,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
     const isDashboard = pathname?.startsWith("/dashboard");
     const isLogin = pathname === "/login";
+    const isLandingPage = pathname === "/";
 
-    const isSpecialPage = isDashboard || isLogin || pathname === "/registrations-count" || pathname === "/livescore";
+    const isSpecialPage = isDashboard || isLogin || isLandingPage || pathname === "/registrations-count" || pathname === "/livescore";
 
     if (isSpecialPage) {
         return <>{children}</>;
