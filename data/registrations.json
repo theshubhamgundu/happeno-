@@ -12,7 +12,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-0",
+    "password": "FH4ZZM"
   },
   {
     "teamName": "Ruhan",
@@ -35,7 +37,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-1",
+    "password": "W9M6UB"
   },
   {
     "teamName": "Individual",
@@ -50,7 +54,9 @@
         "year": "1st Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-2",
+    "password": "XUJ6Z2"
   },
   {
     "teamName": "Individual",
@@ -65,7 +71,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-3",
+    "password": "VDX63J"
   },
   {
     "teamName": "Individual",
@@ -80,7 +88,9 @@
         "year": "1st Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-4",
+    "password": "N5KCGQ"
   },
   {
     "teamName": "TECH FUSION",
@@ -119,7 +129,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-5",
+    "password": "WHT2A9"
   },
   {
     "teamName": "100X engineers",
@@ -142,7 +154,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-6",
+    "password": "HTMSW9"
   },
   {
     "teamName": "Tech Titans",
@@ -181,7 +195,9 @@
         "year": "4th Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-7",
+    "password": "8QXBVP"
   },
   {
     "teamName": "HackTwins",
@@ -204,7 +220,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-8",
+    "password": "YMZ77H"
   },
   {
     "teamName": "Habeeba and group",
@@ -243,7 +261,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-9",
+    "password": "E6UHSH"
   },
   {
     "teamName": "Quantum coders",
@@ -282,7 +302,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-10",
+    "password": "ECLPE4"
   },
   {
     "teamName": "Individual",
@@ -297,7 +319,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-11",
+    "password": "ZT5H62"
   },
   {
     "teamName": "Hackamole",
@@ -336,7 +360,9 @@
         "year": "2nd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-12",
+    "password": "36V5C3"
   },
   {
     "teamName": "Individual",
@@ -351,7 +377,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-13",
+    "password": "8M57PC"
   },
   {
     "teamName": "Tech Titians",
@@ -390,7 +418,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-14",
+    "password": "5A8BLM"
   },
   {
     "teamName": "Individual",
@@ -405,7 +435,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-15",
+    "password": "46EFXZ"
   },
   {
     "teamName": "Tech Titans",
@@ -428,7 +460,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-16",
+    "password": "RESSRP"
   },
   {
     "teamName": "Individual",
@@ -443,7 +477,9 @@
         "year": "4th Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-17",
+    "password": "NLFS2L"
   },
   {
     "teamName": "Innovation duo",
@@ -466,7 +502,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-18",
+    "password": "CXV394"
   },
   {
     "teamName": "TEAM LOOPFLOW",
@@ -489,7 +527,9 @@
         "year": "4th Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-19",
+    "password": "P85D4Y"
   },
   {
     "teamName": "AI CATALYST",
@@ -512,7 +552,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-20",
+    "password": "GD5E5V"
   },
   {
     "teamName": "Individual",
@@ -527,7 +569,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-21",
+    "password": "Y72EMJ"
   },
   {
     "teamName": "code cru",
@@ -566,7 +610,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-22",
+    "password": "LKMBNX"
   },
   {
     "teamName": "Individual",
@@ -581,7 +627,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-23",
+    "password": "4DHMMM"
   },
   {
     "teamName": "Torch Bearers",
@@ -620,7 +668,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-24",
+    "password": "PUTSZR"
   },
   {
     "teamName": "Individual",
@@ -635,7 +685,9 @@
         "year": "1st Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-25",
+    "password": "397EEW"
   },
   {
     "teamName": "EINSTEINS",
@@ -658,7 +710,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-26",
+    "password": "DBN346"
   },
   {
     "teamName": "Code vibers",
@@ -697,7 +751,9 @@
         "year": "1st Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-27",
+    "password": "D3MUP6"
   },
   {
     "teamName": "AI Innovators",
@@ -736,7 +792,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-28",
+    "password": "BGDZFV"
   },
   {
     "teamName": "Individual",
@@ -751,7 +809,9 @@
         "year": "1st Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-29",
+    "password": "TBKLWX"
   },
   {
     "teamName": "Individual",
@@ -766,7 +826,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-30",
+    "password": "VLX5WN"
   },
   {
     "teamName": "Individual",
@@ -781,7 +843,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-31",
+    "password": "2N988Z"
   },
   {
     "teamName": "Millennium Falcon",
@@ -804,7 +868,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-32",
+    "password": "TBAXUD"
   },
   {
     "teamName": "Thunderbolt",
@@ -843,7 +909,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-33",
+    "password": "M766CC"
   },
   {
     "teamName": "Individual",
@@ -858,7 +926,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-34",
+    "password": "LM9KM2"
   },
   {
     "teamName": "Lock Smiths",
@@ -897,7 +967,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-35",
+    "password": "6AFSJC"
   },
   {
     "teamName": "Plot Twist",
@@ -920,7 +992,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-36",
+    "password": "FZ3MST"
   },
   {
     "teamName": "Individual",
@@ -935,7 +1009,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-37",
+    "password": "KWCGTD"
   },
   {
     "teamName": "avengers",
@@ -974,7 +1050,9 @@
         "year": "1st Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-38",
+    "password": "936P5M"
   },
   {
     "teamName": "Shouryaanga",
@@ -1013,7 +1091,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-39",
+    "password": "YK53F4"
   },
   {
     "teamName": "Ctrl Freaks",
@@ -1052,7 +1132,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-40",
+    "password": "NXMY42"
   },
   {
     "teamName": "NextGenMinds",
@@ -1091,7 +1173,9 @@
         "year": "4th Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-41",
+    "password": "P6RG3N"
   },
   {
     "teamName": "Individual",
@@ -1106,7 +1190,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-42",
+    "password": "EVEF9E"
   },
   {
     "teamName": "KaizenX",
@@ -1129,7 +1215,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-43",
+    "password": "UQ2AK5"
   },
   {
     "teamName": "Individual",
@@ -1144,7 +1232,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-44",
+    "password": "ZAZWGE"
   },
   {
     "teamName": "Individual",
@@ -1159,7 +1249,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-45",
+    "password": "VE3QPH"
   },
   {
     "teamName": "Team Spark",
@@ -1198,7 +1290,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-46",
+    "password": "Y58U7V"
   },
   {
     "teamName": "Individual",
@@ -1213,7 +1307,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-47",
+    "password": "D2C6C6"
   },
   {
     "teamName": "GRIDHACK",
@@ -1252,7 +1348,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-48",
+    "password": "8W4VMY"
   },
   {
     "teamName": "Dilamma minds",
@@ -1291,7 +1389,9 @@
         "year": "1st Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-49",
+    "password": "7DNAAW"
   },
   {
     "teamName": "Individual",
@@ -1306,7 +1406,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-50",
+    "password": "XBM7VN"
   },
   {
     "teamName": "Tech Titans",
@@ -1345,7 +1447,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-51",
+    "password": "JVS4ZE"
   },
   {
     "teamName": "Individual",
@@ -1360,7 +1464,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-52",
+    "password": "U2YFQR"
   },
   {
     "teamName": "TEAM VISHWAKARMA",
@@ -1399,7 +1505,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-53",
+    "password": "ZWPMZ3"
   },
   {
     "teamName": "QuadraTech",
@@ -1438,7 +1546,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-54",
+    "password": "6NURMY"
   },
   {
     "teamName": "NovaPair",
@@ -1461,7 +1571,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-55",
+    "password": "SMQN2B"
   },
   {
     "teamName": "Brute Force",
@@ -1500,7 +1612,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-56",
+    "password": "4MGS6F"
   },
   {
     "teamName": "Garuda",
@@ -1539,7 +1653,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-57",
+    "password": "KZG9AS"
   },
   {
     "teamName": "DYNAMO SAVIOURS",
@@ -1578,7 +1694,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-58",
+    "password": "Q8CBXL"
   },
   {
     "teamName": "Individual",
@@ -1593,7 +1711,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-59",
+    "password": "MCJA5Z"
   },
   {
     "teamName": "Individual",
@@ -1608,7 +1728,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-60",
+    "password": "XEJSNP"
   },
   {
     "teamName": "TFI BOYS",
@@ -1647,7 +1769,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-61",
+    "password": "PFCLVM"
   },
   {
     "teamName": "TriTech Titans",
@@ -1686,7 +1810,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-62",
+    "password": "UNXFDY"
   },
   {
     "teamName": "Individual",
@@ -1701,7 +1827,9 @@
         "year": "2nd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-63",
+    "password": "ZUR4ZE"
   },
   {
     "teamName": "Glitchcore",
@@ -1740,7 +1868,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-64",
+    "password": "MVDFLR"
   },
   {
     "teamName": "Synaptech",
@@ -1779,7 +1909,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-65",
+    "password": "HJQBBD"
   },
   {
     "teamName": "Individual",
@@ -1794,7 +1926,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-66",
+    "password": "7Z5MUJ"
   },
   {
     "teamName": "R3D RISERS",
@@ -1833,7 +1967,9 @@
         "year": "2nd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-67",
+    "password": "PFPMFH"
   },
   {
     "teamName": "Evox",
@@ -1872,7 +2008,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-68",
+    "password": "MYYPY8"
   },
   {
     "teamName": "VYBE",
@@ -1911,7 +2049,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-69",
+    "password": "B9TEG6"
   },
   {
     "teamName": "AVV-ASTRA",
@@ -1934,7 +2074,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-70",
+    "password": "LXSTC7"
   },
   {
     "teamName": "EGG SALAD",
@@ -1973,7 +2115,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-71",
+    "password": "BE42WL"
   },
   {
     "teamName": "Individual",
@@ -1988,7 +2132,9 @@
         "year": "2nd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-72",
+    "password": "H6ADCV"
   },
   {
     "teamName": "Not Our Team",
@@ -2011,7 +2157,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-73",
+    "password": "6SY7EP"
   },
   {
     "teamName": "InfynAI",
@@ -2034,7 +2182,9 @@
         "year": "3rd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-74",
+    "password": "DK66EJ"
   },
   {
     "teamName": "BEST OF FOUR",
@@ -2073,7 +2223,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-75",
+    "password": "4DWNED"
   },
   {
     "teamName": "Eureka Spark",
@@ -2112,7 +2264,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-76",
+    "password": "KAWPFZ"
   },
   {
     "teamName": "TEAM HYDRA",
@@ -2151,7 +2305,9 @@
         "year": "1st Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-77",
+    "password": "255LDK"
   },
   {
     "teamName": "Individual",
@@ -2166,7 +2322,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-78",
+    "password": "2JKY9B"
   },
   {
     "teamName": "Tech Titans",
@@ -2189,7 +2347,9 @@
         "year": "2nd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-79",
+    "password": "JNL5BH"
   },
   {
     "teamName": "AVVS-ASTRA",
@@ -2212,7 +2372,9 @@
         "year": "1st Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-80",
+    "password": "DS9LBB"
   },
   {
     "teamName": "Individual",
@@ -2227,7 +2389,9 @@
         "year": "4th Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-81",
+    "password": "62UAX5"
   },
   {
     "teamName": "4-Bit Ninjas",
@@ -2266,7 +2430,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-82",
+    "password": "NHXRNS"
   },
   {
     "teamName": "QuadCore",
@@ -2305,7 +2471,9 @@
         "year": "1st Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-83",
+    "password": "HYHZNP"
   },
   {
     "teamName": "DATA SIRENSMI",
@@ -2344,7 +2512,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-84",
+    "password": "FGNVFS"
   },
   {
     "teamName": "QuadraVision",
@@ -2383,7 +2553,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-85",
+    "password": "QJFGME"
   },
   {
     "teamName": "TEAM TECHNO",
@@ -2422,7 +2594,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-86",
+    "password": "U3FCJ5"
   },
   {
     "teamName": "Chathur",
@@ -2461,7 +2635,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-87",
+    "password": "MEMV6W"
   },
   {
     "teamName": "MindMesh",
@@ -2500,7 +2676,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-88",
+    "password": "6SR343"
   },
   {
     "teamName": "Binary brains",
@@ -2539,7 +2717,9 @@
         "year": "3rd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-89",
+    "password": "6WKBE3"
   },
   {
     "teamName": "Morphosis",
@@ -2562,7 +2742,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-90",
+    "password": "TR9783"
   },
   {
     "teamName": "Beyond Algorithms",
@@ -2601,7 +2783,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-91",
+    "password": "E47FPK"
   },
   {
     "teamName": "QuadX",
@@ -2640,7 +2824,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-92",
+    "password": "YVGBBE"
   },
   {
     "teamName": "Nexora",
@@ -2679,7 +2865,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-93",
+    "password": "SS8U3B"
   },
   {
     "teamName": "KITSAURA",
@@ -2718,7 +2906,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-94",
+    "password": "RFGHDS"
   },
   {
     "teamName": "ByteBrain",
@@ -2757,7 +2947,9 @@
         "year": "1st Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-95",
+    "password": "JHZCSG"
   },
   {
     "teamName": "Individual",
@@ -2772,7 +2964,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-96",
+    "password": "73S8SL"
   },
   {
     "teamName": "Solution Squad",
@@ -2811,7 +3005,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-97",
+    "password": "HGHCDE"
   },
   {
     "teamName": "Carlos",
@@ -2834,7 +3030,9 @@
         "year": "1st Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-98",
+    "password": "Q3SHR4"
   },
   {
     "teamName": "Tech sparks",
@@ -2873,7 +3071,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-99",
+    "password": "WKBMGY"
   },
   {
     "teamName": "NO SLEEP, JUST CODE",
@@ -2904,7 +3104,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-100",
+    "password": "AH7WWT"
   },
   {
     "teamName": "Quadruples",
@@ -2943,7 +3145,9 @@
         "year": "4th Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-101",
+    "password": "Z8J5XU"
   },
   {
     "teamName": "Nexora",
@@ -2982,7 +3186,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-102",
+    "password": "7B8CBX"
   },
   {
     "teamName": "AVERON",
@@ -3005,7 +3211,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-103",
+    "password": "TC8NWG"
   },
   {
     "teamName": "Team Nexus",
@@ -3028,7 +3236,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-104",
+    "password": "K9EYCX"
   },
   {
     "teamName": "Talla padmavathi",
@@ -3067,7 +3277,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-105",
+    "password": "BY8D6Z"
   },
   {
     "teamName": "KINGSLAYER",
@@ -3106,7 +3318,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-106",
+    "password": "EYJJR7"
   },
   {
     "teamName": "NEXORA",
@@ -3145,7 +3359,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-107",
+    "password": "T7FJ6A"
   },
   {
     "teamName": "Next Horizon",
@@ -3184,7 +3400,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-108",
+    "password": "QXEHLX"
   },
   {
     "teamName": "Think Together",
@@ -3223,7 +3441,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-109",
+    "password": "BTFK39"
   },
   {
     "teamName": "Bug Busters",
@@ -3262,7 +3482,9 @@
         "year": "1st Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-110",
+    "password": "QRBXLJ"
   },
   {
     "teamName": "Hack Smiths",
@@ -3301,7 +3523,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-111",
+    "password": "LTFXM7"
   },
   {
     "teamName": "ByteBloom",
@@ -3340,7 +3564,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-112",
+    "password": "KT6HDT"
   },
   {
     "teamName": "INNOVATEX",
@@ -3379,7 +3605,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-113",
+    "password": "4CEUA7"
   },
   {
     "teamName": "Visionary Minds",
@@ -3418,7 +3646,9 @@
         "year": "4th Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-114",
+    "password": "FLS8ZL"
   },
   {
     "teamName": "NovaX",
@@ -3457,7 +3687,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-115",
+    "password": "EE4ZC7"
   },
   {
     "teamName": "TeamVaranasi",
@@ -3496,7 +3728,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-116",
+    "password": "7QMYU6"
   },
   {
     "teamName": "EduNova",
@@ -3519,7 +3753,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-117",
+    "password": "UHP5YQ"
   },
   {
     "teamName": "Echo",
@@ -3558,7 +3794,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-118",
+    "password": "8YS2T9"
   },
   {
     "teamName": "EUREKA",
@@ -3581,7 +3819,9 @@
         "year": "1st Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-119",
+    "password": "A6WAKM"
   },
   {
     "teamName": "Team Cyber nova",
@@ -3620,7 +3860,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-120",
+    "password": "2FSZRF"
   },
   {
     "teamName": "Nexus",
@@ -3659,7 +3901,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-121",
+    "password": "H3BY2K"
   },
   {
     "teamName": "UTTISHTHA",
@@ -3698,7 +3942,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-122",
+    "password": "KUBS3A"
   },
   {
     "teamName": "Individual",
@@ -3713,7 +3959,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-123",
+    "password": "2Y33R2"
   },
   {
     "teamName": "CodeX",
@@ -3752,7 +4000,9 @@
         "year": "1st Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-124",
+    "password": "NFG6J6"
   },
   {
     "teamName": "Lumora",
@@ -3775,7 +4025,9 @@
         "year": "1st Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-125",
+    "password": "Q8JPJ8"
   },
   {
     "teamName": "DivaBytes",
@@ -3814,7 +4066,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-126",
+    "password": "GYMEY2"
   },
   {
     "teamName": "Axon pulse",
@@ -3853,7 +4107,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-127",
+    "password": "V44T5J"
   },
   {
     "teamName": "Individual",
@@ -3868,7 +4124,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-128",
+    "password": "DRZ7QG"
   },
   {
     "teamName": "Neural trio",
@@ -3891,7 +4149,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-129",
+    "password": "79GTWL"
   },
   {
     "teamName": "Individual",
@@ -3906,7 +4166,9 @@
         "year": "3rd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-130",
+    "password": "G7DHEH"
   },
   {
     "teamName": "ARHA",
@@ -3945,7 +4207,9 @@
         "year": "1st Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-131",
+    "password": "NY9VEH"
   },
   {
     "teamName": "Siri",
@@ -3968,7 +4232,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-132",
+    "password": "HEY2NC"
   },
   {
     "teamName": "Individual",
@@ -3983,7 +4249,9 @@
         "year": "2nd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-133",
+    "password": "ZES5M5"
   },
   {
     "teamName": "Frost Logic SaaS",
@@ -4022,7 +4290,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-134",
+    "password": "4PVFZG"
   },
   {
     "teamName": "Innovara",
@@ -4045,7 +4315,9 @@
         "year": "1st Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-135",
+    "password": "BBUDYW"
   },
   {
     "teamName": "Individual",
@@ -4060,7 +4332,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-136",
+    "password": "KT5JCW"
   },
   {
     "teamName": "Apex",
@@ -4099,7 +4373,9 @@
         "year": "1st Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-137",
+    "password": "YDW9EX"
   },
   {
     "teamName": "Individual",
@@ -4114,7 +4390,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-138",
+    "password": "3SNRSX"
   },
   {
     "teamName": "Alien_Force",
@@ -4153,7 +4431,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-139",
+    "password": "SGUE4M"
   },
   {
     "teamName": "NexGen",
@@ -4192,7 +4472,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-140",
+    "password": "7RXJDF"
   },
   {
     "teamName": "STARS",
@@ -4215,7 +4497,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-141",
+    "password": "ZLVHXV"
   },
   {
     "teamName": "Binary Beasts",
@@ -4254,7 +4538,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-142",
+    "password": "2DF8TQ"
   },
   {
     "teamName": "CODE_3",
@@ -4277,7 +4563,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-143",
+    "password": "LFFXEL"
   },
   {
     "teamName": "TwinSpark",
@@ -4300,7 +4588,9 @@
         "year": "4th Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-144",
+    "password": "YUA66W"
   },
   {
     "teamName": "Individual",
@@ -4315,7 +4605,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-145",
+    "password": "5XHMZV"
   },
   {
     "teamName": "Neural force",
@@ -4354,7 +4646,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-146",
+    "password": "D6VU89"
   },
   {
     "teamName": "Plot twist",
@@ -4377,7 +4671,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-147",
+    "password": "NBKWAM"
   },
   {
     "teamName": "Tech Titans",
@@ -4416,7 +4712,9 @@
         "year": "3rd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-148",
+    "password": "LC9LSW"
   },
   {
     "teamName": "Techora squad",
@@ -4455,7 +4753,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-149",
+    "password": "4NENHR"
   },
   {
     "teamName": "Vertex",
@@ -4478,7 +4778,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-150",
+    "password": "ABWM2K"
   },
   {
     "teamName": "Individual",
@@ -4493,7 +4795,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-151",
+    "password": "M6VD9G"
   },
   {
     "teamName": "Error404",
@@ -4516,7 +4820,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-152",
+    "password": "3D89P2"
   },
   {
     "teamName": "Innovengers",
@@ -4555,7 +4861,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-153",
+    "password": "2A2K94"
   },
   {
     "teamName": "VisionX",
@@ -4594,7 +4902,9 @@
         "year": "2nd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-154",
+    "password": "KBLG4E"
   },
   {
     "teamName": "Onenightmarvels",
@@ -4633,7 +4943,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-155",
+    "password": "Z8MNCC"
   },
   {
     "teamName": "Individual",
@@ -4648,7 +4960,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-156",
+    "password": "7F2EQG"
   },
   {
     "teamName": "Tech4",
@@ -4687,7 +5001,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-157",
+    "password": "55WVL7"
   },
   {
     "teamName": "Fourbidden Code",
@@ -4726,7 +5042,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-158",
+    "password": "MWGVZP"
   },
   {
     "teamName": "MINDX",
@@ -4749,7 +5067,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-159",
+    "password": "XLG6N7"
   },
   {
     "teamName": "Hackzen",
@@ -4772,7 +5092,9 @@
         "year": "2nd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-160",
+    "password": "2G29YE"
   },
   {
     "teamName": "Idea squad",
@@ -4811,7 +5133,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-161",
+    "password": "72PK9P"
   },
   {
     "teamName": "Team Spark",
@@ -4850,7 +5174,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-162",
+    "password": "VBJJ24"
   },
   {
     "teamName": "NOVA",
@@ -4889,7 +5215,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-163",
+    "password": "GE8VNY"
   },
   {
     "teamName": "Nirvana",
@@ -4928,7 +5256,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-164",
+    "password": "VAC9NR"
   },
   {
     "teamName": "Team spark",
@@ -4967,7 +5297,9 @@
         "year": "3rd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-165",
+    "password": "ZLY2KZ"
   },
   {
     "teamName": "Freddy's Eveil",
@@ -4990,7 +5322,9 @@
         "year": "1st Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-166",
+    "password": "TB4GYW"
   },
   {
     "teamName": "TetraCore",
@@ -5029,7 +5363,9 @@
         "year": "3rd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-167",
+    "password": "PD6R9D"
   },
   {
     "teamName": "Squadron",
@@ -5068,7 +5404,9 @@
         "year": "1st Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-168",
+    "password": "APA6QB"
   },
   {
     "teamName": "Ajay and group",
@@ -5107,7 +5445,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-169",
+    "password": "B4EXWK"
   },
   {
     "teamName": "Individual",
@@ -5122,7 +5462,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-170",
+    "password": "3GAV4T"
   },
   {
     "teamName": "Meghana and group",
@@ -5145,7 +5487,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-171",
+    "password": "4PA9WG"
   },
   {
     "teamName": "Obito",
@@ -5168,7 +5512,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-172",
+    "password": "EME2BM"
   },
   {
     "teamName": "Team NOVA",
@@ -5207,7 +5553,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-173",
+    "password": "J5ZNYJ"
   },
   {
     "teamName": "Individual",
@@ -5222,7 +5570,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-174",
+    "password": "AEEJ4G"
   },
   {
     "teamName": "Team Cholas",
@@ -5261,7 +5611,9 @@
         "year": "2nd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-175",
+    "password": "KYZHM3"
   },
   {
     "teamName": "Logic league",
@@ -5300,7 +5652,9 @@
         "year": "1st Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-176",
+    "password": "BNZT6Q"
   },
   {
     "teamName": "Individual",
@@ -5315,7 +5669,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-177",
+    "password": "54GQNZ"
   },
   {
     "teamName": "Individual",
@@ -5330,7 +5686,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-178",
+    "password": "S2THTQ"
   },
   {
     "teamName": "Pesaru.spandana",
@@ -5353,7 +5711,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-179",
+    "password": "7YNCE8"
   },
   {
     "teamName": "QUBRIX",
@@ -5392,7 +5752,9 @@
         "year": "1st Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-180",
+    "password": "CV3VZ2"
   },
   {
     "teamName": "Kshtej team",
@@ -5415,7 +5777,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-181",
+    "password": "6G96PR"
   },
   {
     "teamName": "Individual",
@@ -5430,7 +5794,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-182",
+    "password": "3Q5SAQ"
   },
   {
     "teamName": "Git Push and Pray",
@@ -5469,7 +5835,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-183",
+    "password": "CQRZLV"
   },
   {
     "teamName": "Individual",
@@ -5484,7 +5852,9 @@
         "year": "4th Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-184",
+    "password": "UP9RNH"
   },
   {
     "teamName": "Individual",
@@ -5499,7 +5869,9 @@
         "year": "4th Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-185",
+    "password": "RJ843C"
   },
   {
     "teamName": "GSX",
@@ -5538,7 +5910,9 @@
         "year": "1st Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-186",
+    "password": "P9SKG7"
   },
   {
     "teamName": "ByteBloom",
@@ -5561,7 +5935,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-187",
+    "password": "SBFBMU"
   },
   {
     "teamName": "ThinkForge",
@@ -5600,7 +5976,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-188",
+    "password": "LRUN3T"
   },
   {
     "teamName": "Individual",
@@ -5615,7 +5993,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-189",
+    "password": "UFZJZM"
   },
   {
     "teamName": "GHTS innovators",
@@ -5654,7 +6034,9 @@
         "year": "3rd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-190",
+    "password": "RWAWSJ"
   },
   {
     "teamName": "Nexora",
@@ -5693,7 +6075,9 @@
         "year": "1st Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-191",
+    "password": "RQ4UVT"
   },
   {
     "teamName": "Hacker SquadX",
@@ -5732,7 +6116,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-192",
+    "password": "4KCHGU"
   },
   {
     "teamName": "Individual",
@@ -5747,7 +6133,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-193",
+    "password": "63GZBN"
   },
   {
     "teamName": "Hack Titans",
@@ -5786,7 +6174,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-194",
+    "password": "UPSXXT"
   },
   {
     "teamName": "DualCore",
@@ -5809,7 +6199,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-195",
+    "password": "UBQR49"
   },
   {
     "teamName": "Binary_Bond",
@@ -5832,7 +6224,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-196",
+    "password": "QE3Z57"
   },
   {
     "teamName": "ByteBrains",
@@ -5871,7 +6265,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-197",
+    "password": "QLS87B"
   },
   {
     "teamName": "CODESTROM",
@@ -5894,7 +6290,9 @@
         "year": "4th Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-198",
+    "password": "CWQDMM"
   },
   {
     "teamName": "Individual",
@@ -5909,7 +6307,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-199",
+    "password": "TW2GFT"
   },
   {
     "teamName": "Individual",
@@ -5924,7 +6324,9 @@
         "year": "1st Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-200",
+    "password": "YUHDXH"
   },
   {
     "teamName": "Tattva",
@@ -5963,7 +6365,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-201",
+    "password": "CRX53G"
   },
   {
     "teamName": "Team BGSKS",
@@ -6002,7 +6406,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-202",
+    "password": "8C5DZV"
   },
   {
     "teamName": "Code & cosmos",
@@ -6025,7 +6431,9 @@
         "year": "4th Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-203",
+    "password": "NP3Z2K"
   },
   {
     "teamName": "Individual",
@@ -6040,7 +6448,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-204",
+    "password": "48HVS9"
   },
   {
     "teamName": "Individual",
@@ -6055,7 +6465,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-205",
+    "password": "V46ANQ"
   },
   {
     "teamName": "Trio",
@@ -6094,7 +6506,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-206",
+    "password": "3EGF7B"
   },
   {
     "teamName": "Individual",
@@ -6109,7 +6523,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-207",
+    "password": "U7X2WP"
   },
   {
     "teamName": "ITians",
@@ -6148,7 +6564,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-208",
+    "password": "5MAFET"
   },
   {
     "teamName": "The Tyrant",
@@ -6187,7 +6605,9 @@
         "year": "2nd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-209",
+    "password": "XA4FVJ"
   },
   {
     "teamName": "TEEN TITANS",
@@ -6226,7 +6646,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-210",
+    "password": "P6CRDY"
   },
   {
     "teamName": "Hack Attack",
@@ -6265,7 +6687,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-211",
+    "password": "GM6PEJ"
   },
   {
     "teamName": "HackHive",
@@ -6288,7 +6712,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-212",
+    "password": "CPAFKA"
   },
   {
     "teamName": "GenX",
@@ -6327,7 +6753,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-213",
+    "password": "DZ6MZB"
   },
   {
     "teamName": "Chai And Deploy",
@@ -6366,7 +6794,9 @@
         "year": "2nd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-214",
+    "password": "TGPGWF"
   },
   {
     "teamName": "Catalyst",
@@ -6405,7 +6835,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-215",
+    "password": "KTERPX"
   },
   {
     "teamName": "CodeNexa",
@@ -6444,7 +6876,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-216",
+    "password": "C3BK2L"
   },
   {
     "teamName": "Binary Brains",
@@ -6483,7 +6917,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-217",
+    "password": "EVNTRR"
   },
   {
     "teamName": "Individual",
@@ -6498,7 +6934,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-218",
+    "password": "QX9GA7"
   },
   {
     "teamName": "Code - Alpha",
@@ -6521,7 +6959,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-219",
+    "password": "HQHB43"
   },
   {
     "teamName": "Individual",
@@ -6536,7 +6976,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-220",
+    "password": "8ZXT3E"
   },
   {
     "teamName": "digitalcoders",
@@ -6575,7 +7017,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-221",
+    "password": "VLABVE"
   },
   {
     "teamName": "SQUAD ZERO",
@@ -6614,7 +7058,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-222",
+    "password": "KM69TN"
   },
   {
     "teamName": "Creative Minds",
@@ -6653,7 +7099,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-223",
+    "password": "RBLX9J"
   },
   {
     "teamName": "Espada",
@@ -6676,7 +7124,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-224",
+    "password": "JVKTEP"
   },
   {
     "teamName": "FourByte",
@@ -6715,7 +7165,9 @@
         "year": "3rd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-225",
+    "password": "DJW4N6"
   },
   {
     "teamName": "ByteStorm",
@@ -6754,7 +7206,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-226",
+    "password": "HLKZL4"
   },
   {
     "teamName": "Deep thinkers",
@@ -6793,7 +7247,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-227",
+    "password": "JF9MHH"
   },
   {
     "teamName": "Vyoma",
@@ -6832,7 +7288,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-228",
+    "password": "2C82Z8"
   },
   {
     "teamName": "AXIOM",
@@ -6871,7 +7329,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-229",
+    "password": "TEF6N2"
   },
   {
     "teamName": "CODE404!",
@@ -6910,7 +7370,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-230",
+    "password": "EM6R5B"
   },
   {
     "teamName": "Team vector",
@@ -6949,7 +7411,9 @@
         "year": "2nd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-231",
+    "password": "MK29ZT"
   },
   {
     "teamName": "Team 3 Headaches",
@@ -6988,7 +7452,9 @@
         "year": "3rd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-232",
+    "password": "9CDE5T"
   },
   {
     "teamName": "Individual",
@@ -7003,7 +7469,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-233",
+    "password": "XSFBKQ"
   },
   {
     "teamName": "Mind forge",
@@ -7042,7 +7510,9 @@
         "year": "1st Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-234",
+    "password": "JQEVPE"
   },
   {
     "teamName": "BTS(Brain tech squad)",
@@ -7065,7 +7535,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-235",
+    "password": "2MQPDP"
   },
   {
     "teamName": "Individual",
@@ -7080,7 +7552,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-236",
+    "password": "S9SYPB"
   },
   {
     "teamName": "Individual",
@@ -7095,7 +7569,9 @@
         "year": "4th Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-237",
+    "password": "6CSFXE"
   },
   {
     "teamName": "Individual",
@@ -7110,7 +7586,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-238",
+    "password": "RECKK2"
   },
   {
     "teamName": "Individual",
@@ -7125,7 +7603,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-239",
+    "password": "93H8UY"
   },
   {
     "teamName": "Individual",
@@ -7140,7 +7620,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-240",
+    "password": "9FNNBX"
   },
   {
     "teamName": "Prabha",
@@ -7163,7 +7645,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-241",
+    "password": "K2YVWY"
   },
   {
     "teamName": "SKILLPILOT",
@@ -7202,7 +7686,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-242",
+    "password": "7H8MG8"
   },
   {
     "teamName": "Individual",
@@ -7217,7 +7703,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-243",
+    "password": "YHKV65"
   },
   {
     "teamName": "Nexora",
@@ -7256,7 +7744,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-244",
+    "password": "PBFMYS"
   },
   {
     "teamName": "Ascend",
@@ -7295,7 +7785,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-245",
+    "password": "4GLN9M"
   },
   {
     "teamName": "Ram Charan and team",
@@ -7334,7 +7826,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-246",
+    "password": "SKGQMV"
   },
   {
     "teamName": "Tech developers",
@@ -7373,7 +7867,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-247",
+    "password": "6UEZYW"
   },
   {
     "teamName": "Ai squad",
@@ -7412,7 +7908,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-248",
+    "password": "DLWSYZ"
   },
   {
     "teamName": "Congnitwo",
@@ -7435,7 +7933,9 @@
         "year": "3rd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-249",
+    "password": "EQT3PF"
   },
   {
     "teamName": "Individual",
@@ -7450,7 +7950,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-250",
+    "password": "YQRS9Y"
   },
   {
     "teamName": "Byteforce",
@@ -7489,7 +7991,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-251",
+    "password": "SVTJQZ"
   },
   {
     "teamName": "Individual",
@@ -7504,7 +8008,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-252",
+    "password": "9RQDE9"
   },
   {
     "teamName": "Individual",
@@ -7519,7 +8025,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-253",
+    "password": "GQFUYX"
   },
   {
     "teamName": "Error",
@@ -7558,7 +8066,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-254",
+    "password": "G2E62D"
   },
   {
     "teamName": "Techwave",
@@ -7581,7 +8091,9 @@
         "year": "3rd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-255",
+    "password": "9XK6AN"
   },
   {
     "teamName": "HachHer4",
@@ -7620,7 +8132,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-256",
+    "password": "6PGHP4"
   },
   {
     "teamName": "Debug Dynasty",
@@ -7643,7 +8157,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-257",
+    "password": "PFKTKA"
   },
   {
     "teamName": "OG",
@@ -7682,7 +8198,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-258",
+    "password": "7KTGUK"
   },
   {
     "teamName": "Vision4",
@@ -7721,7 +8239,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-259",
+    "password": "VNM35J"
   },
   {
     "teamName": "Individual",
@@ -7736,7 +8256,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-260",
+    "password": "6A9QGV"
   },
   {
     "teamName": "DevOps Duo",
@@ -7759,7 +8281,9 @@
         "year": "3rd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-261",
+    "password": "8GQF4S"
   },
   {
     "teamName": "Individual",
@@ -7774,7 +8298,9 @@
         "year": "4th Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-262",
+    "password": "WQ8Q2G"
   },
   {
     "teamName": "The innovators",
@@ -7813,7 +8339,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-263",
+    "password": "LU978A"
   },
   {
     "teamName": "CodeCrafters",
@@ -7852,7 +8380,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-264",
+    "password": "622CAD"
   },
   {
     "teamName": "AUREX",
@@ -7891,7 +8421,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-265",
+    "password": "WMYFZY"
   },
   {
     "teamName": "The fourth",
@@ -7930,7 +8462,9 @@
         "year": "2nd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-266",
+    "password": "W29SXS"
   },
   {
     "teamName": "Team Subhash",
@@ -7969,7 +8503,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-267",
+    "password": "3HT2EL"
   },
   {
     "teamName": "Null pointers",
@@ -7992,7 +8528,9 @@
         "year": "3rd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-268",
+    "password": "U7XAYE"
   },
   {
     "teamName": "Syntax At Night",
@@ -8031,7 +8569,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-269",
+    "password": "HZTRB7"
   },
   {
     "teamName": "Logic Loop",
@@ -8070,7 +8610,9 @@
         "year": "1st Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-270",
+    "password": "7NWSUG"
   },
   {
     "teamName": "Tri Spark",
@@ -8109,7 +8651,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-271",
+    "password": "9GLV7N"
   },
   {
     "teamName": "Vision Spark",
@@ -8148,7 +8692,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-272",
+    "password": "9KWMHP"
   },
   {
     "teamName": "Dot Race",
@@ -8187,7 +8733,9 @@
         "year": "1st Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-273",
+    "password": "MPCCMQ"
   },
   {
     "teamName": "GOODFELLAS",
@@ -8226,7 +8774,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-274",
+    "password": "FPZCJH"
   },
   {
     "teamName": "CodeMinds",
@@ -8265,7 +8815,9 @@
         "year": "2nd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-275",
+    "password": "Y32VH7"
   },
   {
     "teamName": "Froniter",
@@ -8304,7 +8856,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-276",
+    "password": "JZGDPN"
   },
   {
     "teamName": "TEAM CLOVER",
@@ -8343,7 +8897,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-277",
+    "password": "EUNW49"
   },
   {
     "teamName": "Individual",
@@ -8358,7 +8914,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-278",
+    "password": "K9PQZE"
   },
   {
     "teamName": "Individual",
@@ -8373,7 +8931,9 @@
         "year": "3rd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-279",
+    "password": "7EEEC8"
   },
   {
     "teamName": "Nexora",
@@ -8412,7 +8972,9 @@
         "year": "2nd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-280",
+    "password": "AAHT7V"
   },
   {
     "teamName": "TEAM NEXTVISION",
@@ -8451,7 +9013,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-281",
+    "password": "NMH8YP"
   },
   {
     "teamName": "TEAM APEX",
@@ -8490,7 +9054,9 @@
         "year": "3rd Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-282",
+    "password": "U2BAG8"
   },
   {
     "teamName": "INCEPTION.EXE",
@@ -8513,7 +9079,9 @@
         "year": "1st Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-283",
+    "password": "XZ2Q4K"
   },
   {
     "teamName": "KITSW WARRIOR",
@@ -8552,7 +9120,9 @@
         "year": "2nd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-284",
+    "password": "LE5EZS"
   },
   {
     "teamName": "Baddies alert ??",
@@ -8591,7 +9161,9 @@
         "year": "3rd Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-285",
+    "password": "UY7X24"
   },
   {
     "teamName": "TECH TITANS",
@@ -8630,7 +9202,9 @@
         "year": "4th Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-286",
+    "password": "6DJ65H"
   },
   {
     "teamName": "MindSpark",
@@ -8669,7 +9243,9 @@
         "year": "1st Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-287",
+    "password": "RA866B"
   },
   {
     "teamName": "Individual",
@@ -8684,7 +9260,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-288",
+    "password": "PQNQV3"
   },
   {
     "teamName": "Individual",
@@ -8699,7 +9277,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-289",
+    "password": "KVENBV"
   },
   {
     "teamName": "Peruka. Tejaswini",
@@ -8722,7 +9302,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-290",
+    "password": "H3EDYV"
   },
   {
     "teamName": "Runtime Rebels",
@@ -8745,7 +9327,9 @@
         "year": "4th Year",
         "department": "IT"
       }
-    ]
+    ],
+    "teamId": "LOCAL-291",
+    "password": "GGSCGS"
   },
   {
     "teamName": "Individual",
@@ -8760,7 +9344,9 @@
         "year": "1st Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-292",
+    "password": "QPHKL4"
   },
   {
     "teamName": "Innov4",
@@ -8799,7 +9385,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-293",
+    "password": "MVB43D"
   },
   {
     "teamName": "Tech Titans",
@@ -8838,7 +9426,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-294",
+    "password": "VE58NZ"
   },
   {
     "teamName": "TECHMINDS",
@@ -8877,7 +9467,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-295",
+    "password": "L7H4H9"
   },
   {
     "teamName": "MindSpark",
@@ -8932,7 +9524,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-296",
+    "password": "5AK35X"
   },
   {
     "teamName": "TELAVIV KIRKERS",
@@ -8955,7 +9549,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-297",
+    "password": "T9HPDX"
   },
   {
     "teamName": "PROJECT 67",
@@ -8994,7 +9590,9 @@
         "year": "1st Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-298",
+    "password": "Q2T2N5"
   },
   {
     "teamName": "Code Titans",
@@ -9033,7 +9631,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-299",
+    "password": "VNXY9Z"
   },
   {
     "teamName": "NEXAS",
@@ -9072,7 +9672,9 @@
         "year": "4th Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-300",
+    "password": "XNFTH3"
   },
   {
     "teamName": "CodeNxt",
@@ -9111,7 +9713,9 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-301",
+    "password": "SV7424"
   },
   {
     "teamName": "Team SVD",
@@ -9150,7 +9754,9 @@
         "year": "2nd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-302",
+    "password": "3PKADV"
   },
   {
     "teamName": "Cognova",
@@ -9189,7 +9795,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-303",
+    "password": "N5CVKM"
   },
   {
     "teamName": "Individual",
@@ -9204,7 +9812,9 @@
         "year": "3rd Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-304",
+    "password": "QSQTJ6"
   },
   {
     "teamName": "SKS",
@@ -9227,7 +9837,9 @@
         "year": "4th Year",
         "department": "CSM (AI&ML)"
       }
-    ]
+    ],
+    "teamId": "LOCAL-305",
+    "password": "FBGGX9"
   },
   {
     "teamName": "ARIX",
@@ -9266,7 +9878,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-306",
+    "password": "W8TSEL"
   },
   {
     "teamName": "Individual",
@@ -9281,7 +9895,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-307",
+    "password": "M6PMSG"
   },
   {
     "teamName": "Team RK",
@@ -9320,7 +9936,9 @@
         "year": "2nd Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-308",
+    "password": "M6JWEK"
   },
   {
     "teamName": "VQ",
@@ -9343,7 +9961,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-309",
+    "password": "F733AV"
   },
   {
     "teamName": "CRACKERS",
@@ -9366,7 +9986,9 @@
         "year": "3rd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-310",
+    "password": "65P88A"
   },
   {
     "teamName": "Byte force",
@@ -9405,7 +10027,9 @@
         "year": "4th Year",
         "department": "MECH"
       }
-    ]
+    ],
+    "teamId": "LOCAL-311",
+    "password": "WW9CSH"
   },
   {
     "teamName": "TEAM S4UL",
@@ -9444,7 +10068,9 @@
         "year": "1st Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-312",
+    "password": "6FSQLQ"
   },
   {
     "teamName": "Individual",
@@ -9459,7 +10085,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-313",
+    "password": "XG2TNA"
   },
   {
     "teamName": "Tech Titans",
@@ -9482,7 +10110,9 @@
         "year": "4th Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-314",
+    "password": "ZNWQAR"
   },
   {
     "teamName": "Individual",
@@ -9497,7 +10127,9 @@
         "year": "3rd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-315",
+    "password": "SATRJD"
   },
   {
     "teamName": "Individual",
@@ -9512,7 +10144,9 @@
         "year": "1st Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-316",
+    "password": "HA32T6"
   },
   {
     "teamName": "Saha",
@@ -9551,7 +10185,9 @@
         "year": "4th Year",
         "department": "CIVIL"
       }
-    ]
+    ],
+    "teamId": "LOCAL-317",
+    "password": "XKYYMA"
   },
   {
     "teamName": "TechTitans",
@@ -9590,7 +10226,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-318",
+    "password": "U2WEX2"
   },
   {
     "teamName": "Teen Titans Go!",
@@ -9629,7 +10267,9 @@
         "year": "3rd Year",
         "department": "ECE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-319",
+    "password": "NQDNPT"
   },
   {
     "teamName": "NEXGEN",
@@ -9652,7 +10292,9 @@
         "year": "2nd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-320",
+    "password": "5U9NXQ"
   },
   {
     "teamName": "Raijin",
@@ -9691,7 +10333,9 @@
         "year": "2nd Year",
         "department": "CSD"
       }
-    ]
+    ],
+    "teamId": "LOCAL-321",
+    "password": "6D7GY9"
   },
   {
     "teamName": "Synaptic Four",
@@ -9730,7 +10374,9 @@
         "year": "2nd Year",
         "department": "CSE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-322",
+    "password": "RR3387"
   },
   {
     "teamName": "DIYA",
@@ -9753,6 +10399,8 @@
         "year": "3rd Year",
         "department": "EEE"
       }
-    ]
+    ],
+    "teamId": "LOCAL-323",
+    "password": "NDK44W"
   }
 ]

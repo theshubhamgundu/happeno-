@@ -24,7 +24,7 @@ export async function GET(req: Request) {
                     captainMobile: t.participants?.[0]?.phone || "",
                     college: t.participants?.[0]?.college || "",
                     teamId: t.teamId || `LOCAL-${index}`,
-                    password: "",
+                    password: t.password || "",
                     members: t.participants || [],
                     status: "REGISTERED",
                     problemStatement: t.problemStatement || "",
