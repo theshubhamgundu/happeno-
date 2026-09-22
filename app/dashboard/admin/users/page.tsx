@@ -8,15 +8,13 @@ import {
     Phone,
     ArrowLeft,
     Download,
-    Bot,
-    ShieldHalf,
-    Blocks,
     ChevronRight,
+    ChevronDown,
     Edit,
     X,
     Save
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, Fragment } from "react";
 import { useHackathon, Project, Member } from "@/context/HackathonContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -35,6 +33,7 @@ export default function UsersManagement() {
     const [editFormData, setEditFormData] = useState<Partial<UserListItem>>({});
     const [searchQuery, setSearchQuery] = useState("");
     const [filterYear, setFilterYear] = useState<string>("All Years");
+    const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null);
 
     const allUsers = useMemo(() => {
         const users: UserListItem[] = [];
@@ -56,24 +55,50 @@ export default function UsersManagement() {
         return users;
     }, [projects]);
 
-    const filteredUsers = useMemo(() => {
-        return allUsers.filter(user => {
+    const filteredProjects = useMemo(() => {
+        return projects.filter(project => {
             const matchesSearch =
-                (user.fullName?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-                (user.email?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (user.college?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (user.teamName?.toLowerCase() || "").includes(searchQuery.toLowerCase());
+                (project.team?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+                (project.track?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+                project.members.some(m => {
+                    const memberObj = typeof m === 'string' ? { fullName: m } : m;
+                    return (memberObj.fullName?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+                           (memberObj.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+                           (memberObj.college?.toLowerCase() || "").includes(searchQuery.toLowerCase());
+                });
 
-            const matchesYear = filterYear === "All Years" || user.year === filterYear;
+            const matchesYear = filterYear === "All Years" || project.members.some(m => {
+                const memberObj = typeof m === 'string' ? { fullName: m } : m;
+                return memberObj.year === filterYear;
+            });
 
             return matchesSearch && matchesYear;
         });
-    }, [allUsers, searchQuery, filterYear]);
+    }, [projects, searchQuery, filterYear]);
+
+    const filteredUsersForExport = useMemo(() => {
+        const users: UserListItem[] = [];
+        filteredProjects.forEach(project => {
+            project.members.forEach(member => {
+                const memberObj = typeof member === 'string'
+                    ? { fullName: member }
+                    : member;
+                users.push({
+                    ...memberObj,
+                    teamName: project.team,
+                    teamId: project.teamId || "N/A",
+                    track: project.track || "TBD",
+                    isTrackSelected: !!project.track
+                });
+            });
+        });
+        return users;
+    }, [filteredProjects]);
 
     const handleExportCSV = () => {
         const now = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
         const headers = ["Full Name", "Email", "Phone", "College", "Year", "Department", "Team Name", "Team ID", "Track", "Status"];
-        const rows = filteredUsers.map(user => [
+        const rows = filteredUsersForExport.map(user => [
             user.fullName, user.email || "N/A", user.phone || "N/A", user.college || "N/A",
             user.year || "N/A", user.department || "N/A", user.teamName, user.teamId,
             user.track, "Registered"
@@ -193,101 +218,7 @@ export default function UsersManagement() {
                     </div>
                 </div>
 
-                {/* Domain Breakdown */}
-                <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-10 backdrop-blur-md overflow-hidden">
-                    {/* Section Header */}
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h2 className="text-xl font-black italic uppercase tracking-tighter text-white">Domain Breakdown</h2>
-                            <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">Live registration data by track</p>
-                        </div>
-                        <div className="hidden md:flex items-center gap-6">
-                            <div className="text-right">
-                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Total Entries</p>
-                                <p className="text-3xl font-black italic text-[#14b8a6] tracking-tighter">{projects.length}</p>
-                            </div>
-                            <div className="w-px h-10 bg-white/10" />
-                            <div className="text-right">
-                                <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Total Participants</p>
-                                <p className="text-3xl font-black italic text-[#14b8a6] tracking-tighter">{allUsers.length}</p>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Domain Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        {domainStats.map((domain: any, i: number) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 12 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: i * 0.08, duration: 0.3 }}
-                                className={`relative rounded-[2rem] p-6 border ${domain.border} overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-default`}
-                                style={{ background: domain.glow }}
-                            >
-                                {/* Glow blob */}
-                                <div
-                                    className="absolute -top-6 -right-6 w-32 h-32 rounded-full blur-[50px] opacity-30 group-hover:opacity-60 transition-opacity"
-                                    style={{ backgroundColor: domain.accent }}
-                                />
-
-                                {/* Icon + short label */}
-                                <div className="flex items-start justify-between mb-5 relative z-10">
-                                    <div className={`p-3 rounded-2xl ${domain.bg} border ${domain.border}`}>
-                                        <domain.icon className={domain.color} size={22} />
-                                    </div>
-                                    <ChevronRight className="text-white/10 group-hover:text-white/30 transition-colors" size={18} />
-                                </div>
-
-                                {/* Track name */}
-                                <div className="relative z-10 mb-5">
-                                    <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${domain.color} mb-1`}>Track {i + 1}</p>
-                                    <h3 className="text-sm font-black italic uppercase tracking-tight text-white leading-tight">{domain.short}</h3>
-                                </div>
-
-                                {/* Stats Row */}
-                                <div className="relative z-10 flex items-stretch gap-3">
-                                    <div className="flex-1 bg-black/20 rounded-2xl p-4 border border-white/5">
-                                        <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Teams</p>
-                                        <p className={`text-3xl font-black italic ${domain.color} tracking-tighter leading-none`}>{domain.teams}</p>
-                                    </div>
-                                    <div className="flex-1 bg-black/20 rounded-2xl p-4 border border-white/5">
-                                        <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Participants</p>
-                                        <p className={`text-3xl font-black italic ${domain.color} tracking-tighter leading-none`}>{domain.participants}</p>
-                                    </div>
-                                </div>
-
-                                {/* Fill bar */}
-                                <div className="relative z-10 mt-4">
-                                    <div className="h-1 rounded-full bg-white/5 overflow-hidden">
-                                        <div
-                                            className="h-full rounded-full transition-all duration-700"
-                                            style={{
-                                                width: projects.length > 0 ? `${(domain.teams / projects.length) * 100}%` : '0%',
-                                                backgroundColor: domain.accent
-                                            }}
-                                        />
-                                    </div>
-                                    <p className="text-[9px] font-bold text-white/20 mt-1.5 text-right">
-                                        {projects.length > 0 ? Math.round((domain.teams / projects.length) * 100) : 0}% of total teams
-                                    </p>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-
-                    {/* Mobile totals (shown only on mobile) */}
-                    <div className="md:hidden mt-6 flex gap-4">
-                        <div className="flex-1 bg-black/20 rounded-2xl p-4 border border-white/5 text-center">
-                            <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Total Entries</p>
-                            <p className="text-3xl font-black italic text-[#14b8a6]">{projects.length}</p>
-                        </div>
-                        <div className="flex-1 bg-black/20 rounded-2xl p-4 border border-white/5 text-center">
-                            <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Total Participants</p>
-                            <p className="text-3xl font-black italic text-[#14b8a6]">{allUsers.length}</p>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Filters & Search */}
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
@@ -323,83 +254,136 @@ export default function UsersManagement() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b border-white/10 bg-white/[0.02]">
-                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Hacker Profile</th>
-                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] hidden lg:table-cell">Collegiate Info</th>
-                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Deployment Team</th>
+                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Team Name & Track</th>
+                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Members</th>
                                     <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Status</th>
-                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Actions</th>
+                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 <AnimatePresence mode="popLayout">
-                                    {filteredUsers.map((user: UserListItem, idx: number) => (
-                                        <motion.tr
-                                            key={`${user.email}-${idx}`}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="group hover:bg-white/[0.03] transition-colors"
-                                        >
-                                            <td className="p-8">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-900/20 to-blue-500/20 flex items-center justify-center text-white font-black italic border border-white/10">
-                                                        {user.fullName?.[0] || '?'}
+                                    {filteredProjects.map((project: Project, idx: number) => {
+                                        const isExpanded = expandedTeamId === project.id;
+                                        
+                                        return (
+                                        <Fragment key={`${project.id}-${idx}`}>
+                                            <motion.tr
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                className={`group hover:bg-white/[0.03] transition-colors cursor-pointer ${isExpanded ? 'bg-white/[0.02]' : ''}`}
+                                                onClick={() => setExpandedTeamId(isExpanded ? null : project.id)}
+                                            >
+                                                <td className="p-8">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-900/20 to-[#14b8a6]/20 flex items-center justify-center text-[#14b8a6] font-black border border-white/10">
+                                                            <Users size={20} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-white font-black italic uppercase tracking-tight group-hover:text-[#14b8a6] transition-colors text-lg">{project.team || 'Unknown Team'}</p>
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <span className="text-[10px] text-[#14b8a6]/60 font-bold uppercase tracking-widest">{project.teamId}</span>
+                                                                <span className="w-1 h-1 rounded-full bg-white/20" />
+                                                                <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{project.track || 'TBD'}</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="text-white font-black italic uppercase tracking-tight group-hover:text-[#14b8a6] transition-colors">{user.fullName || 'Unknown User'}</p>
-                                                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-wider mt-0.5">{user.email || 'NO_EMAIL'}</p>
+                                                </td>
+                                                <td className="p-8">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex -space-x-3">
+                                                            {project.members.slice(0, 4).map((m, i) => (
+                                                                <div key={i} className="w-8 h-8 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold text-white z-[4-i]">
+                                                                    {(typeof m === 'string' ? m : m.fullName)?.[0] || '?'}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-xs font-bold text-white/40">{project.members.length} Members</span>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="p-8 hidden lg:table-cell">
-                                                <div className="space-y-1">
-                                                    <p className="text-white/60 font-bold text-xs uppercase tracking-wide truncate max-w-[200px]">{user.college || 'PRIVATE_ORIGIN'}</p>
-                                                    <div className="flex gap-2">
-                                                        <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded text-[9px] font-black uppercase tracking-tighter border border-blue-500/20">
-                                                            {user.year || 'N/A'}
-                                                        </span>
-                                                        <span className="px-2 py-0.5 bg-slate-900/10 text-slate-900 rounded text-[9px] font-black uppercase tracking-tighter border border-slate-800/20">
-                                                            {user.department || 'GEN'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="p-8">
-                                                <div className="space-y-1">
-                                                    <p className="text-white font-black italic uppercase text-xs tracking-tight">{user.teamName}</p>
-                                                    <p className="text-[9px] text-[#14b8a6]/60 font-bold uppercase tracking-widest">{user.teamId}</p>
-                                                </div>
-                                            </td>
-                                            <td className="p-8">
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.1em] bg-green-500/10 text-green-400 border border-green-500/30">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                                                    REGISTERED
-                                                </span>
-                                            </td>
-                                            <td className="p-8">
-                                                <div className="flex gap-2">
+                                                </td>
+                                                <td className="p-8">
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.1em] bg-green-500/10 text-green-400 border border-green-500/30">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                                                        {project.status || 'REGISTERED'}
+                                                    </span>
+                                                </td>
+                                                <td className="p-8 text-right">
                                                     <button 
-                                                        onClick={() => {
-                                                            setEditingParticipant(user);
-                                                            setEditFormData(user);
-                                                        }}
-                                                        className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-[#14b8a6]/60 hover:text-[#14b8a6] hover:bg-white/10 transition-all"
-                                                        title="Edit Participant"
+                                                        className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 group-hover:text-white transition-all inline-flex items-center justify-center"
                                                     >
-                                                        <Edit size={14} />
+                                                        {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                                                     </button>
-                                                    <button className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all">
-                                                        <Mail size={14} />
-                                                    </button>
-                                                    <button className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all">
-                                                        <Phone size={14} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </motion.tr>
-                                    ))}
+                                                </td>
+                                            </motion.tr>
+                                            
+                                            <AnimatePresence>
+                                                {isExpanded && (
+                                                    <motion.tr
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: 1, height: 'auto' }}
+                                                        exit={{ opacity: 0, height: 0 }}
+                                                        className="bg-black/40 border-b border-white/5"
+                                                    >
+                                                        <td colSpan={4} className="p-0">
+                                                            <div className="p-8 pl-24 space-y-4">
+                                                                <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">Team Participants</p>
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                    {project.members.map((member, mIdx) => {
+                                                                        const m = typeof member === 'string' ? { fullName: member } as Member : member;
+                                                                        return (
+                                                                            <div key={mIdx} className="bg-white/5 border border-white/5 rounded-2xl p-5 flex items-start justify-between group/member hover:bg-white/10 transition-colors">
+                                                                                <div className="flex gap-4">
+                                                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-900/40 to-blue-500/20 flex items-center justify-center text-white font-black italic border border-white/5">
+                                                                                        {m.fullName?.[0] || '?'}
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <p className="text-sm font-black italic uppercase tracking-tight text-white">{m.fullName || 'Unknown'}</p>
+                                                                                        <div className="flex items-center gap-2 mt-1">
+                                                                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">{m.email || 'NO_EMAIL'}</p>
+                                                                                            <span className="w-1 h-1 rounded-full bg-white/20" />
+                                                                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">{m.phone || 'NO_PHONE'}</p>
+                                                                                        </div>
+                                                                                        <div className="flex items-center gap-2 mt-3">
+                                                                                            <span className="text-[9px] text-blue-400 font-bold uppercase tracking-widest">{m.college || 'Unknown College'}</span>
+                                                                                            <span className="px-2 py-0.5 bg-white/5 rounded text-[8px] font-bold text-white/50">{m.year || 'N/A'}</span>
+                                                                                            <span className="px-2 py-0.5 bg-white/5 rounded text-[8px] font-bold text-white/50">{m.department || 'N/A'}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="flex flex-col gap-2 opacity-0 group-hover/member:opacity-100 transition-opacity">
+                                                                                    <button 
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            const userObj = {
+                                                                                                ...m,
+                                                                                                teamName: project.team,
+                                                                                                teamId: project.teamId || "N/A",
+                                                                                                track: project.track || "TBD",
+                                                                                                isTrackSelected: !!project.track
+                                                                                            };
+                                                                                            setEditingParticipant(userObj as UserListItem);
+                                                                                            setEditFormData(userObj);
+                                                                                        }}
+                                                                                        className="p-2 rounded-lg bg-white/5 text-[#14b8a6]/60 hover:text-[#14b8a6] hover:bg-[#14b8a6]/10 transition-colors"
+                                                                                        title="Edit Participant"
+                                                                                    >
+                                                                                        <Edit size={12} />
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </motion.tr>
+                                                )}
+                                            </AnimatePresence>
+                                        </Fragment>
+                                        );
+                                    })}
                                 </AnimatePresence>
-                                {filteredUsers.length === 0 && (
+                                {filteredProjects.length === 0 && (
                                     <tr>
                                         <td colSpan={5} className="p-20 text-center">
                                             <div className="flex flex-col items-center opacity-20">

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
+import fs from 'fs';
+import path from 'path';
 
 // Cache responses at the edge for 60 seconds to prevent DB spikes during high traffic
 export const revalidate = 60;
@@ -8,6 +10,50 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const teamId = searchParams.get('teamId');
+
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            const dataPath = path.join(process.cwd(), 'data', 'registrations.json');
+            if (fs.existsSync(dataPath)) {
+                const localData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+                let teams = localData.map((t: any, index: number) => ({
+                    id: t.teamId || `LOCAL-${index}`,
+                    name: t.teamName || "Unknown Team",
+                    team: t.teamName || "Unknown Team",
+                    track: t.track || "",
+                    captain: t.participants?.[0]?.fullName || "N/A",
+                    captainMobile: t.participants?.[0]?.phone || "",
+                    college: t.participants?.[0]?.college || "",
+                    teamId: t.teamId || `LOCAL-${index}`,
+                    password: "",
+                    members: t.participants || [],
+                    status: "REGISTERED",
+                    problemStatement: t.problemStatement || "",
+                    proposedIdea: "",
+                    techStack: {},
+                    isPSLocked: false,
+                    isPILocked: false,
+                    isTSLocked: false,
+                    trackPreferences: [],
+                    room: "",
+                    roomWifiSSID: "",
+                    roomWifiPass: "",
+                    coordinator: { name: "", phone: "", assigned_judge: "", assigned_judge_2: "" },
+                    submission: { github: "", presentation: "", demo: "", deployment: "", isFinal: false },
+                    roundScores: {},
+                    roundDetailedScores: {},
+                    roundComments: {},
+                    isCheckedIn: false,
+                    createdAt: new Date().toISOString(),
+                    completedAt: null
+                }));
+
+                if (teamId) {
+                    teams = teams.filter((t: any) => (t.teamId || '').toLowerCase().includes(teamId.toLowerCase()));
+                }
+                
+                return NextResponse.json(teams);
+            }
+        }
 
         let query = supabase
             .from('registrations')
