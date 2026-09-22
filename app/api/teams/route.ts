@@ -16,14 +16,14 @@ export async function GET(req: Request) {
             if (fs.existsSync(dataPath)) {
                 const localData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
                 let teams = localData.map((t: any, index: number) => ({
-                    id: t.teamId || `LOCAL-${index}`,
+                    id: t.teamId || `TRI-${String(index + 1).padStart(3, '0')}`,
                     name: t.teamName || "Unknown Team",
                     team: t.teamName || "Unknown Team",
                     track: t.track || "",
                     captain: t.participants?.[0]?.fullName || "N/A",
                     captainMobile: t.participants?.[0]?.phone || "",
                     college: t.participants?.[0]?.college || "",
-                    teamId: t.teamId || `LOCAL-${index}`,
+                    teamId: t.teamId || `TRI-${String(index + 1).padStart(3, '0')}`,
                     password: t.password || "",
                     members: t.participants || [],
                     status: "REGISTERED",

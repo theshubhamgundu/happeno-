@@ -24,7 +24,7 @@ export async function GET(req: Request) {
             if (fs.existsSync(dataPath)) {
                 const localData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
                 const team = localData.find((t: any, index: number) => 
-                    (t.teamId === teamId || `LOCAL-${index}` === teamId) && t.password === password
+                    (t.teamId === teamId || `TRI-${String(index + 1).padStart(3, '0')}` === teamId) && t.password === password
                 );
 
                 if (!team) {
@@ -93,7 +93,7 @@ export async function GET(req: Request) {
 export async function PATCH(req: Request) {
     try {
         const body = await req.json();
-        const { teamId, password, teamName, captain, captainMobile, college, email, members } = body;
+        const { teamId, password, teamName, track, captain, captainMobile, college, email, members } = body;
 
         if (!teamId || !password) {
             return NextResponse.json(
@@ -107,7 +107,7 @@ export async function PATCH(req: Request) {
             if (fs.existsSync(dataPath)) {
                 const localData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
                 const teamIndex = localData.findIndex((t: any, index: number) => 
-                    (t.teamId === teamId || `LOCAL-${index}` === teamId) && t.password === password
+                    (t.teamId === teamId || `TRI-${String(index + 1).padStart(3, '0')}` === teamId) && t.password === password
                 );
 
                 if (teamIndex === -1) {
@@ -116,6 +116,7 @@ export async function PATCH(req: Request) {
 
                 // Update fields
                 if (teamName !== undefined) localData[teamIndex].teamName = teamName;
+                if (track !== undefined) localData[teamIndex].track = track;
                 if (members !== undefined) localData[teamIndex].participants = members;
                 
                 fs.writeFileSync(dataPath, JSON.stringify(localData, null, 2), 'utf8');
@@ -140,6 +141,7 @@ export async function PATCH(req: Request) {
         // Build the update payload — only participant-editable fields
         const updateData: any = {};
         if (teamName !== undefined) updateData.team_name = teamName;
+        if (track !== undefined) updateData.track = track;
         if (captain !== undefined) updateData.captain = captain;
         if (captainMobile !== undefined) updateData.captain_mobile = captainMobile;
         if (college !== undefined) updateData.college = college;

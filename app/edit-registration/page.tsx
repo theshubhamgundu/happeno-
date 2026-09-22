@@ -9,6 +9,16 @@ import {
     AlertCircle, Eye, EyeOff, Loader2, KeyRound, ShieldCheck
 } from "lucide-react";
 
+const AVAILABLE_TRACKS = [
+    "SaaSum AI",
+    "Maceco",
+    "Tobofu",
+    "Promtal",
+    "Skill Tank",
+    "Vriddhi",
+    "Open Innovation"
+];
+
 interface MemberData {
     fullName: string;
     email: string;
@@ -91,6 +101,27 @@ function EditRegistrationContent() {
         setEditedTeam({ ...editedTeam, members: newMembers });
     };
 
+    const handleTrackToggle = (trackName: string) => {
+        if (!editedTeam) return;
+        const currentTracks = editedTeam.track ? editedTeam.track.split(',').map(t => t.trim()).filter(Boolean) : [];
+        
+        if (currentTracks.includes(trackName)) {
+            setEditedTeam({
+                ...editedTeam,
+                track: currentTracks.filter(t => t !== trackName).join(', ')
+            });
+        } else {
+            if (currentTracks.length < 3) {
+                setEditedTeam({
+                    ...editedTeam,
+                    track: [...currentTracks, trackName].join(', ')
+                });
+            } else {
+                toast.error("You can select a maximum of 3 tracks.");
+            }
+        }
+    };
+
     const handleSave = async () => {
         if (!editedTeam || !team) return;
 
@@ -103,6 +134,7 @@ function EditRegistrationContent() {
                     teamId: team.teamId,
                     password: savedPassword,
                     teamName: editedTeam.teamName,
+                    track: editedTeam.track,
                     captain: editedTeam.members[0]?.fullName || editedTeam.captain,
                     captainMobile: editedTeam.members[0]?.phone || editedTeam.captainMobile,
                     college: editedTeam.members[0]?.college || editedTeam.college,
@@ -189,7 +221,7 @@ function EditRegistrationContent() {
                                     </label>
                                     <input
                                         type="text"
-                                        placeholder="e.g. HB26-V9GA"
+                                        placeholder="e.g. TRI26002"
                                         value={teamIdInput}
                                         onChange={(e) => { setTeamIdInput(e.target.value); setAuthError(""); }}
                                         onKeyDown={(e) => e.key === "Enter" && handleLookup()}
@@ -383,13 +415,57 @@ function EditRegistrationContent() {
                                 <CheckCircle2 size={12} />
                                 {team.status}
                             </span>
-                            {team.track && (
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-teal-50 text-teal-700 text-xs font-display font-bold uppercase tracking-wider border border-teal-200">
-                                    {team.track}
-                                </span>
-                            )}
                         </div>
                     </div>
+                </motion.div>
+
+                {/* Tracks Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.08 }}
+                    className="pro-card rounded-xl p-6 bg-white border border-gray-200 mb-6"
+                >
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-display font-bold text-lg text-[#0f172a]">Selected Tracks</h3>
+                            <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded-md">Max 3</span>
+                        </div>
+                    </div>
+                    
+                    {isEditing ? (
+                        <div className="flex flex-wrap gap-2">
+                            {AVAILABLE_TRACKS.map(track => {
+                                const currentTracks = editedTeam?.track ? editedTeam.track.split(',').map(t => t.trim()).filter(Boolean) : [];
+                                const isSelected = currentTracks.includes(track);
+                                return (
+                                    <button
+                                        key={track}
+                                        onClick={() => handleTrackToggle(track)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-display font-bold uppercase tracking-wider border transition-all ${
+                                            isSelected
+                                                ? 'bg-teal-50 text-teal-700 border-teal-500'
+                                                : 'bg-white text-gray-500 border-gray-200 hover:border-teal-300'
+                                        }`}
+                                    >
+                                        {track}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="flex flex-wrap gap-2">
+                            {(team.track ? team.track.split(',').map(t => t.trim()).filter(Boolean) : []).length > 0 ? (
+                                (team.track ? team.track.split(',').map(t => t.trim()).filter(Boolean) : []).map(track => (
+                                    <span key={track} className="px-3 py-1.5 rounded-full bg-teal-50 text-teal-700 text-xs font-display font-bold uppercase tracking-wider border border-teal-200">
+                                        {track}
+                                    </span>
+                                ))
+                            ) : (
+                                <span className="text-sm font-body text-gray-400 italic">No tracks selected</span>
+                            )}
+                        </div>
+                    )}
                 </motion.div>
 
                 {/* Members */}

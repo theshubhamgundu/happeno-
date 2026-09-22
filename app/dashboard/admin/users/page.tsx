@@ -27,6 +27,15 @@ interface UserListItem extends Member {
     isTrackSelected: boolean;
 }
 
+const AVATAR_GRADIENTS = [
+    "bg-gradient-to-br from-[#14b8a6] to-teal-700 border-slate-900 text-white shadow-md",
+    "bg-gradient-to-br from-indigo-500 to-purple-700 border-slate-900 text-white shadow-md",
+    "bg-gradient-to-br from-blue-500 to-cyan-600 border-slate-900 text-white shadow-md",
+    "bg-gradient-to-br from-rose-500 to-pink-600 border-slate-900 text-white shadow-md",
+    "bg-gradient-to-br from-violet-500 to-fuchsia-600 border-slate-900 text-white shadow-md",
+    "bg-gradient-to-br from-emerald-500 to-green-600 border-slate-900 text-white shadow-md",
+];
+
 export default function UsersManagement() {
     const { projects, isLoading, updateMemberDetails } = useHackathon();
     const [editingParticipant, setEditingParticipant] = useState<UserListItem | null>(null);
@@ -291,14 +300,14 @@ export default function UsersManagement() {
                                                 </td>
                                                 <td className="p-8">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="flex -space-x-3">
+                                                        <div className="flex -space-x-2.5">
                                                             {project.members.slice(0, 4).map((m, i) => (
-                                                                <div key={i} className="w-8 h-8 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold text-white z-[4-i]">
-                                                                    {(typeof m === 'string' ? m : m.fullName)?.[0] || '?'}
+                                                                <div key={i} className={`w-8 h-8 rounded-full ${AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} border-2 flex items-center justify-center text-[11px] font-black text-white z-[${4 - i}]`}>
+                                                                    {(typeof m === 'string' ? m : m.fullName)?.[0]?.toUpperCase() || '?'}
                                                                 </div>
                                                             ))}
                                                         </div>
-                                                        <span className="text-xs font-bold text-white/40">{project.members.length} Members</span>
+                                                        <span className="text-xs font-bold text-white/60">{project.members.length} Members</span>
                                                     </div>
                                                 </td>
                                                 <td className="p-8">
@@ -333,8 +342,8 @@ export default function UsersManagement() {
                                                                         return (
                                                                             <div key={mIdx} className="bg-white/5 border border-white/5 rounded-2xl p-5 flex items-start justify-between group/member hover:bg-white/10 transition-colors">
                                                                                 <div className="flex gap-4">
-                                                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-900/40 to-blue-500/20 flex items-center justify-center text-white font-black italic border border-white/5">
-                                                                                        {m.fullName?.[0] || '?'}
+                                                                                    <div className={`w-10 h-10 rounded-full ${AVATAR_GRADIENTS[mIdx % AVATAR_GRADIENTS.length]} flex items-center justify-center text-white font-black text-sm border border-white/20 shadow-md`}>
+                                                                                        {m.fullName?.[0]?.toUpperCase() || '?'}
                                                                                     </div>
                                                                                     <div>
                                                                                         <p className="text-sm font-black italic uppercase tracking-tight text-white">{m.fullName || 'Unknown'}</p>

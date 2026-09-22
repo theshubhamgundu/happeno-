@@ -13,7 +13,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-0",
+    "teamId": "TRI26002",
     "password": "FH4ZZM"
   },
   {
@@ -38,7 +38,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-1",
+    "teamId": "TRI26004",
     "password": "W9M6UB"
   },
   {
@@ -55,7 +55,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-2",
+    "teamId": "TRI26005",
     "password": "XUJ6Z2"
   },
   {
@@ -72,7 +72,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-3",
+    "teamId": "TRI26008",
     "password": "VDX63J"
   },
   {
@@ -89,7 +89,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-4",
+    "teamId": "TRI26009",
     "password": "N5KCGQ"
   },
   {
@@ -130,7 +130,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-5",
+    "teamId": "TRI26010",
     "password": "WHT2A9"
   },
   {
@@ -155,7 +155,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-6",
+    "teamId": "TRI26012",
     "password": "HTMSW9"
   },
   {
@@ -196,7 +196,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-7",
+    "teamId": "TRI26015",
     "password": "8QXBVP"
   },
   {
@@ -221,7 +221,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-8",
+    "teamId": "TRI26016",
     "password": "YMZ77H"
   },
   {
@@ -262,7 +262,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-9",
+    "teamId": "TRI26017",
     "password": "E6UHSH"
   },
   {
@@ -303,7 +303,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-10",
+    "teamId": "TRI26020",
     "password": "ECLPE4"
   },
   {
@@ -320,7 +320,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-11",
+    "teamId": "TRI26022",
     "password": "ZT5H62"
   },
   {
@@ -361,7 +361,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-12",
+    "teamId": "TRI26023",
     "password": "36V5C3"
   },
   {
@@ -378,7 +378,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-13",
+    "teamId": "TRI26024",
     "password": "8M57PC"
   },
   {
@@ -419,7 +419,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-14",
+    "teamId": "TRI26026",
     "password": "5A8BLM"
   },
   {
@@ -461,7 +461,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-16",
+    "teamId": "TRI26031",
     "password": "RESSRP"
   },
   {
@@ -478,7 +478,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-17",
+    "teamId": "TRI26032",
     "password": "NLFS2L"
   },
   {
@@ -503,7 +503,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-18",
+    "teamId": "TRI26033",
     "password": "CXV394"
   },
   {
@@ -528,7 +528,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-19",
+    "teamId": "TRI26034",
     "password": "P85D4Y"
   },
   {
@@ -553,7 +553,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-20",
+    "teamId": "TRI26036",
     "password": "GD5E5V"
   },
   {
@@ -570,7 +570,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-21",
+    "teamId": "TRI26037",
     "password": "Y72EMJ"
   },
   {
@@ -611,7 +611,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-22",
+    "teamId": "TRI26039",
     "password": "LKMBNX"
   },
   {
@@ -628,7 +628,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-23",
+    "teamId": "TRI26040",
     "password": "4DHMMM"
   },
   {
@@ -669,7 +669,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-24",
+    "teamId": "TRI26041",
     "password": "PUTSZR"
   },
   {
@@ -686,12 +686,12 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-25",
+    "teamId": "TRI26043",
     "password": "397EEW"
   },
   {
     "teamName": "EINSTEINS",
-    "track": "Vriddhi, Maceco",
+    "track": "Vriddhi, Maceco, Tobofu",
     "problemStatement": "",
     "participants": [
       {
@@ -711,7 +711,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-26",
+    "teamId": "TRI26044",
     "password": "DBN346"
   },
   {
@@ -752,7 +752,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-27",
+    "teamId": "TRI26045",
     "password": "D3MUP6"
   },
   {
@@ -793,7 +793,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-28",
+    "teamId": "TRI26046",
     "password": "BGDZFV"
   },
   {
@@ -810,7 +810,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-29",
+    "teamId": "TRI26047",
     "password": "TBKLWX"
   },
   {
@@ -827,7 +827,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-30",
+    "teamId": "TRI26048",
     "password": "VLX5WN"
   },
   {
@@ -844,7 +844,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-31",
+    "teamId": "TRI26049",
     "password": "2N988Z"
   },
   {
@@ -869,7 +869,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-32",
+    "teamId": "TRI26050",
     "password": "TBAXUD"
   },
   {
@@ -910,7 +910,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-33",
+    "teamId": "TRI26051",
     "password": "M766CC"
   },
   {
@@ -927,7 +927,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-34",
+    "teamId": "TRI26052",
     "password": "LM9KM2"
   },
   {
@@ -968,7 +968,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-35",
+    "teamId": "TRI26053",
     "password": "6AFSJC"
   },
   {
@@ -993,7 +993,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-36",
+    "teamId": "TRI26055",
     "password": "FZ3MST"
   },
   {
@@ -1010,7 +1010,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-37",
+    "teamId": "TRI26057",
     "password": "KWCGTD"
   },
   {
@@ -1051,7 +1051,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-38",
+    "teamId": "TRI26058",
     "password": "936P5M"
   },
   {
@@ -1092,7 +1092,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-39",
+    "teamId": "TRI26059",
     "password": "YK53F4"
   },
   {
@@ -1133,7 +1133,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-40",
+    "teamId": "TRI26061",
     "password": "NXMY42"
   },
   {
@@ -1174,7 +1174,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-41",
+    "teamId": "TRI26062",
     "password": "P6RG3N"
   },
   {
@@ -1191,7 +1191,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-42",
+    "teamId": "TRI26063",
     "password": "EVEF9E"
   },
   {
@@ -1216,7 +1216,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-43",
+    "teamId": "TRI26064",
     "password": "UQ2AK5"
   },
   {
@@ -1233,7 +1233,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-44",
+    "teamId": "TRI26065",
     "password": "ZAZWGE"
   },
   {
@@ -1250,7 +1250,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-45",
+    "teamId": "TRI26066",
     "password": "VE3QPH"
   },
   {
@@ -1291,7 +1291,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-46",
+    "teamId": "TRI26068",
     "password": "Y58U7V"
   },
   {
@@ -1308,7 +1308,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-47",
+    "teamId": "TRI26070",
     "password": "D2C6C6"
   },
   {
@@ -1349,7 +1349,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-48",
+    "teamId": "TRI26071",
     "password": "8W4VMY"
   },
   {
@@ -1390,7 +1390,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-49",
+    "teamId": "TRI26072",
     "password": "7DNAAW"
   },
   {
@@ -1407,7 +1407,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-50",
+    "teamId": "TRI26075",
     "password": "XBM7VN"
   },
   {
@@ -1448,7 +1448,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-51",
+    "teamId": "TRI26076",
     "password": "JVS4ZE"
   },
   {
@@ -1465,7 +1465,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-52",
+    "teamId": "TRI26074",
     "password": "U2YFQR"
   },
   {
@@ -1506,7 +1506,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-53",
+    "teamId": "TRI26077",
     "password": "ZWPMZ3"
   },
   {
@@ -1547,7 +1547,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-54",
+    "teamId": "TRI26078",
     "password": "6NURMY"
   },
   {
@@ -1572,7 +1572,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-55",
+    "teamId": "TRI26079",
     "password": "SMQN2B"
   },
   {
@@ -1613,7 +1613,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-56",
+    "teamId": "TRI26080",
     "password": "4MGS6F"
   },
   {
@@ -1654,7 +1654,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-57",
+    "teamId": "TRI26081",
     "password": "KZG9AS"
   },
   {
@@ -1695,7 +1695,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-58",
+    "teamId": "TRI26083",
     "password": "Q8CBXL"
   },
   {
@@ -1712,7 +1712,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-59",
+    "teamId": "TRI26084",
     "password": "MCJA5Z"
   },
   {
@@ -1729,7 +1729,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-60",
+    "teamId": "TRI26085",
     "password": "XEJSNP"
   },
   {
@@ -1770,7 +1770,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-61",
+    "teamId": "TRI26086",
     "password": "PFCLVM"
   },
   {
@@ -1811,7 +1811,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-62",
+    "teamId": "TRI26087",
     "password": "UNXFDY"
   },
   {
@@ -1828,7 +1828,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-63",
+    "teamId": "TRI26088",
     "password": "ZUR4ZE"
   },
   {
@@ -1869,7 +1869,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-64",
+    "teamId": "TRI26090",
     "password": "MVDFLR"
   },
   {
@@ -1910,7 +1910,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-65",
+    "teamId": "TRI26092",
     "password": "HJQBBD"
   },
   {
@@ -1927,7 +1927,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-66",
+    "teamId": "TRI26093",
     "password": "7Z5MUJ"
   },
   {
@@ -1968,7 +1968,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-67",
+    "teamId": "TRI26094",
     "password": "PFPMFH"
   },
   {
@@ -2009,7 +2009,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-68",
+    "teamId": "TRI26095",
     "password": "MYYPY8"
   },
   {
@@ -2050,7 +2050,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-69",
+    "teamId": "TRI26096",
     "password": "B9TEG6"
   },
   {
@@ -2075,7 +2075,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-70",
+    "teamId": "TRI26098",
     "password": "LXSTC7"
   },
   {
@@ -2116,7 +2116,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-71",
+    "teamId": "TRI26099",
     "password": "BE42WL"
   },
   {
@@ -2158,7 +2158,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-73",
+    "teamId": "TRI26102",
     "password": "6SY7EP"
   },
   {
@@ -2183,7 +2183,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-74",
+    "teamId": "TRI26101",
     "password": "DK66EJ"
   },
   {
@@ -2224,7 +2224,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-75",
+    "teamId": "TRI26104",
     "password": "4DWNED"
   },
   {
@@ -2265,7 +2265,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-76",
+    "teamId": "TRI26106",
     "password": "KAWPFZ"
   },
   {
@@ -2306,7 +2306,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-77",
+    "teamId": "TRI26107",
     "password": "255LDK"
   },
   {
@@ -2323,7 +2323,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-78",
+    "teamId": "TRI26105",
     "password": "2JKY9B"
   },
   {
@@ -2348,7 +2348,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-79",
+    "teamId": "TRI26109",
     "password": "JNL5BH"
   },
   {
@@ -2373,7 +2373,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-80",
+    "teamId": "TRI26110",
     "password": "DS9LBB"
   },
   {
@@ -2390,7 +2390,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-81",
+    "teamId": "TRI26112",
     "password": "62UAX5"
   },
   {
@@ -2431,7 +2431,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-82",
+    "teamId": "TRI26113",
     "password": "NHXRNS"
   },
   {
@@ -2472,7 +2472,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-83",
+    "teamId": "TRI26114",
     "password": "HYHZNP"
   },
   {
@@ -2513,7 +2513,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-84",
+    "teamId": "TRI26116",
     "password": "FGNVFS"
   },
   {
@@ -2554,7 +2554,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-85",
+    "teamId": "TRI26117",
     "password": "QJFGME"
   },
   {
@@ -2595,7 +2595,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-86",
+    "teamId": "TRI26118",
     "password": "U3FCJ5"
   },
   {
@@ -2636,7 +2636,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-87",
+    "teamId": "TRI26119",
     "password": "MEMV6W"
   },
   {
@@ -2677,7 +2677,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-88",
+    "teamId": "TRI26121",
     "password": "6SR343"
   },
   {
@@ -2718,7 +2718,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-89",
+    "teamId": "TRI26122",
     "password": "6WKBE3"
   },
   {
@@ -2743,7 +2743,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-90",
+    "teamId": "TRI26115",
     "password": "TR9783"
   },
   {
@@ -2784,7 +2784,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-91",
+    "teamId": "TRI26125",
     "password": "E47FPK"
   },
   {
@@ -2825,7 +2825,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-92",
+    "teamId": "TRI26126",
     "password": "YVGBBE"
   },
   {
@@ -2866,7 +2866,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-93",
+    "teamId": "TRI26128",
     "password": "SS8U3B"
   },
   {
@@ -2907,7 +2907,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-94",
+    "teamId": "TRI26129",
     "password": "RFGHDS"
   },
   {
@@ -2948,7 +2948,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-95",
+    "teamId": "TRI26130",
     "password": "JHZCSG"
   },
   {
@@ -2965,7 +2965,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-96",
+    "teamId": "TRI26131",
     "password": "73S8SL"
   },
   {
@@ -3006,7 +3006,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-97",
+    "teamId": "TRI26132",
     "password": "HGHCDE"
   },
   {
@@ -3031,7 +3031,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-98",
+    "teamId": "TRI26134",
     "password": "Q3SHR4"
   },
   {
@@ -3072,7 +3072,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-99",
+    "teamId": "TRI26133",
     "password": "WKBMGY"
   },
   {
@@ -3146,7 +3146,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-101",
+    "teamId": "TRI26136",
     "password": "Z8J5XU"
   },
   {
@@ -3187,7 +3187,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-102",
+    "teamId": "TRI26138",
     "password": "7B8CBX"
   },
   {
@@ -3212,7 +3212,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-103",
+    "teamId": "TRI26139",
     "password": "TC8NWG"
   },
   {
@@ -3237,7 +3237,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-104",
+    "teamId": "TRI26140",
     "password": "K9EYCX"
   },
   {
@@ -3278,7 +3278,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-105",
+    "teamId": "TRI26141",
     "password": "BY8D6Z"
   },
   {
@@ -3319,7 +3319,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-106",
+    "teamId": "TRI26143",
     "password": "EYJJR7"
   },
   {
@@ -3360,7 +3360,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-107",
+    "teamId": "TRI26144",
     "password": "T7FJ6A"
   },
   {
@@ -3401,7 +3401,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-108",
+    "teamId": "TRI26145",
     "password": "QXEHLX"
   },
   {
@@ -3442,7 +3442,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-109",
+    "teamId": "TRI26146",
     "password": "BTFK39"
   },
   {
@@ -3483,7 +3483,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-110",
+    "teamId": "TRI26147",
     "password": "QRBXLJ"
   },
   {
@@ -3524,7 +3524,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-111",
+    "teamId": "TRI26148",
     "password": "LTFXM7"
   },
   {
@@ -3565,7 +3565,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-112",
+    "teamId": "TRI26149",
     "password": "KT6HDT"
   },
   {
@@ -3606,7 +3606,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-113",
+    "teamId": "TRI26151",
     "password": "4CEUA7"
   },
   {
@@ -3647,7 +3647,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-114",
+    "teamId": "TRI26150",
     "password": "FLS8ZL"
   },
   {
@@ -3688,7 +3688,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-115",
+    "teamId": "TRI26152",
     "password": "EE4ZC7"
   },
   {
@@ -3729,7 +3729,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-116",
+    "teamId": "TRI26153",
     "password": "7QMYU6"
   },
   {
@@ -3754,7 +3754,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-117",
+    "teamId": "TRI26154",
     "password": "UHP5YQ"
   },
   {
@@ -3795,7 +3795,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-118",
+    "teamId": "TRI26155",
     "password": "8YS2T9"
   },
   {
@@ -3820,7 +3820,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-119",
+    "teamId": "TRI26156",
     "password": "A6WAKM"
   },
   {
@@ -3861,7 +3861,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-120",
+    "teamId": "TRI26158",
     "password": "2FSZRF"
   },
   {
@@ -3902,7 +3902,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-121",
+    "teamId": "TRI26159",
     "password": "H3BY2K"
   },
   {
@@ -3943,7 +3943,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-122",
+    "teamId": "TRI26160",
     "password": "KUBS3A"
   },
   {
@@ -3960,7 +3960,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-123",
+    "teamId": "TRI26161",
     "password": "2Y33R2"
   },
   {
@@ -4001,7 +4001,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-124",
+    "teamId": "TRI26162",
     "password": "NFG6J6"
   },
   {
@@ -4026,7 +4026,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-125",
+    "teamId": "TRI26164",
     "password": "Q8JPJ8"
   },
   {
@@ -4067,7 +4067,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-126",
+    "teamId": "TRI26165",
     "password": "GYMEY2"
   },
   {
@@ -4108,7 +4108,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-127",
+    "teamId": "TRI26166",
     "password": "V44T5J"
   },
   {
@@ -4125,7 +4125,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-128",
+    "teamId": "TRI26167",
     "password": "DRZ7QG"
   },
   {
@@ -4150,7 +4150,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-129",
+    "teamId": "TRI26169",
     "password": "79GTWL"
   },
   {
@@ -4167,7 +4167,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-130",
+    "teamId": "TRI26170",
     "password": "G7DHEH"
   },
   {
@@ -4208,7 +4208,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-131",
+    "teamId": "TRI26171",
     "password": "NY9VEH"
   },
   {
@@ -4233,7 +4233,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-132",
+    "teamId": "TRI26172",
     "password": "HEY2NC"
   },
   {
@@ -4250,7 +4250,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-133",
+    "teamId": "TRI26173",
     "password": "ZES5M5"
   },
   {
@@ -4291,7 +4291,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-134",
+    "teamId": "TRI26174",
     "password": "4PVFZG"
   },
   {
@@ -4316,7 +4316,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-135",
+    "teamId": "TRI26175",
     "password": "BBUDYW"
   },
   {
@@ -4333,7 +4333,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-136",
+    "teamId": "TRI26177",
     "password": "KT5JCW"
   },
   {
@@ -4374,7 +4374,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-137",
+    "teamId": "TRI26178",
     "password": "YDW9EX"
   },
   {
@@ -4391,7 +4391,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-138",
+    "teamId": "TRI26180",
     "password": "3SNRSX"
   },
   {
@@ -4432,7 +4432,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-139",
+    "teamId": "TRI26181",
     "password": "SGUE4M"
   },
   {
@@ -4473,7 +4473,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-140",
+    "teamId": "TRI26183",
     "password": "7RXJDF"
   },
   {
@@ -4498,7 +4498,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-141",
+    "teamId": "TRI26184",
     "password": "ZLVHXV"
   },
   {
@@ -4539,7 +4539,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-142",
+    "teamId": "TRI26187",
     "password": "2DF8TQ"
   },
   {
@@ -4564,7 +4564,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-143",
+    "teamId": "TRI26188",
     "password": "LFFXEL"
   },
   {
@@ -4589,7 +4589,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-144",
+    "teamId": "TRI26189",
     "password": "YUA66W"
   },
   {
@@ -4606,7 +4606,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-145",
+    "teamId": "TRI26190",
     "password": "5XHMZV"
   },
   {
@@ -4647,7 +4647,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-146",
+    "teamId": "TRI26192",
     "password": "D6VU89"
   },
   {
@@ -4672,7 +4672,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-147",
+    "teamId": "TRI26191",
     "password": "NBKWAM"
   },
   {
@@ -4713,7 +4713,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-148",
+    "teamId": "TRI26193",
     "password": "LC9LSW"
   },
   {
@@ -4754,7 +4754,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-149",
+    "teamId": "TRI26194",
     "password": "4NENHR"
   },
   {
@@ -4779,7 +4779,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-150",
+    "teamId": "TRI26195",
     "password": "ABWM2K"
   },
   {
@@ -4796,7 +4796,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-151",
+    "teamId": "TRI26197",
     "password": "M6VD9G"
   },
   {
@@ -4821,7 +4821,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-152",
+    "teamId": "TRI26198",
     "password": "3D89P2"
   },
   {
@@ -4862,7 +4862,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-153",
+    "teamId": "TRI26200",
     "password": "2A2K94"
   },
   {
@@ -4903,7 +4903,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-154",
+    "teamId": "TRI26202",
     "password": "KBLG4E"
   },
   {
@@ -4944,7 +4944,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-155",
+    "teamId": "TRI26203",
     "password": "Z8MNCC"
   },
   {
@@ -4961,7 +4961,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-156",
+    "teamId": "TRI26201",
     "password": "7F2EQG"
   },
   {
@@ -5002,7 +5002,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-157",
+    "teamId": "TRI26206",
     "password": "55WVL7"
   },
   {
@@ -5043,7 +5043,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-158",
+    "teamId": "TRI26205",
     "password": "MWGVZP"
   },
   {
@@ -5068,7 +5068,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-159",
+    "teamId": "TRI26204",
     "password": "XLG6N7"
   },
   {
@@ -5093,7 +5093,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-160",
+    "teamId": "TRI26208",
     "password": "2G29YE"
   },
   {
@@ -5134,7 +5134,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-161",
+    "teamId": "TRI26210",
     "password": "72PK9P"
   },
   {
@@ -5175,7 +5175,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-162",
+    "teamId": "TRI26209",
     "password": "VBJJ24"
   },
   {
@@ -5216,7 +5216,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-163",
+    "teamId": "TRI26212",
     "password": "GE8VNY"
   },
   {
@@ -5257,7 +5257,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-164",
+    "teamId": "TRI26214",
     "password": "VAC9NR"
   },
   {
@@ -5298,7 +5298,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-165",
+    "teamId": "TRI26215",
     "password": "ZLY2KZ"
   },
   {
@@ -5323,7 +5323,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-166",
+    "teamId": "TRI26217",
     "password": "TB4GYW"
   },
   {
@@ -5364,7 +5364,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-167",
+    "teamId": "TRI26218",
     "password": "PD6R9D"
   },
   {
@@ -5405,7 +5405,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-168",
+    "teamId": "TRI26220",
     "password": "APA6QB"
   },
   {
@@ -5446,7 +5446,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-169",
+    "teamId": "TRI26222",
     "password": "B4EXWK"
   },
   {
@@ -5463,7 +5463,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-170",
+    "teamId": "TRI26221",
     "password": "3GAV4T"
   },
   {
@@ -5488,7 +5488,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-171",
+    "teamId": "TRI26223",
     "password": "4PA9WG"
   },
   {
@@ -5513,7 +5513,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-172",
+    "teamId": "TRI26225",
     "password": "EME2BM"
   },
   {
@@ -5554,7 +5554,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-173",
+    "teamId": "TRI26228",
     "password": "J5ZNYJ"
   },
   {
@@ -5571,7 +5571,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-174",
+    "teamId": "TRI26227",
     "password": "AEEJ4G"
   },
   {
@@ -5612,7 +5612,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-175",
+    "teamId": "TRI26231",
     "password": "KYZHM3"
   },
   {
@@ -5653,7 +5653,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-176",
+    "teamId": "TRI26229",
     "password": "BNZT6Q"
   },
   {
@@ -5670,7 +5670,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-177",
+    "teamId": "TRI26230",
     "password": "54GQNZ"
   },
   {
@@ -5712,7 +5712,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-179",
+    "teamId": "TRI26232",
     "password": "7YNCE8"
   },
   {
@@ -5753,7 +5753,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-180",
+    "teamId": "TRI26235",
     "password": "CV3VZ2"
   },
   {
@@ -5778,7 +5778,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-181",
+    "teamId": "TRI26234",
     "password": "6G96PR"
   },
   {
@@ -5795,7 +5795,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-182",
+    "teamId": "TRI26236",
     "password": "3Q5SAQ"
   },
   {
@@ -5836,7 +5836,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-183",
+    "teamId": "TRI26238",
     "password": "CQRZLV"
   },
   {
@@ -5853,7 +5853,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-184",
+    "teamId": "TRI26237",
     "password": "UP9RNH"
   },
   {
@@ -5870,7 +5870,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-185",
+    "teamId": "TRI26233",
     "password": "RJ843C"
   },
   {
@@ -5911,7 +5911,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-186",
+    "teamId": "TRI26241",
     "password": "P9SKG7"
   },
   {
@@ -5936,7 +5936,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-187",
+    "teamId": "TRI26242",
     "password": "SBFBMU"
   },
   {
@@ -5977,7 +5977,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-188",
+    "teamId": "TRI26244",
     "password": "LRUN3T"
   },
   {
@@ -5994,7 +5994,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-189",
+    "teamId": "TRI26245",
     "password": "UFZJZM"
   },
   {
@@ -6035,7 +6035,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-190",
+    "teamId": "TRI26248",
     "password": "RWAWSJ"
   },
   {
@@ -6076,7 +6076,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-191",
+    "teamId": "TRI26249",
     "password": "RQ4UVT"
   },
   {
@@ -6117,7 +6117,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-192",
+    "teamId": "TRI26250",
     "password": "4KCHGU"
   },
   {
@@ -6134,7 +6134,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-193",
+    "teamId": "TRI26247",
     "password": "63GZBN"
   },
   {
@@ -6175,7 +6175,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-194",
+    "teamId": "TRI26251",
     "password": "UPSXXT"
   },
   {
@@ -6200,7 +6200,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-195",
+    "teamId": "TRI26243",
     "password": "UBQR49"
   },
   {
@@ -6225,7 +6225,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-196",
+    "teamId": "TRI26252",
     "password": "QE3Z57"
   },
   {
@@ -6266,7 +6266,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-197",
+    "teamId": "TRI26253",
     "password": "QLS87B"
   },
   {
@@ -6291,7 +6291,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-198",
+    "teamId": "TRI26254",
     "password": "CWQDMM"
   },
   {
@@ -6308,7 +6308,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-199",
+    "teamId": "TRI26255",
     "password": "TW2GFT"
   },
   {
@@ -6325,7 +6325,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-200",
+    "teamId": "TRI26226",
     "password": "YUHDXH"
   },
   {
@@ -6366,7 +6366,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-201",
+    "teamId": "TRI26256",
     "password": "CRX53G"
   },
   {
@@ -6407,7 +6407,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-202",
+    "teamId": "TRI26257",
     "password": "8C5DZV"
   },
   {
@@ -6432,7 +6432,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-203",
+    "teamId": "TRI26258",
     "password": "NP3Z2K"
   },
   {
@@ -6449,7 +6449,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-204",
+    "teamId": "TRI26259",
     "password": "48HVS9"
   },
   {
@@ -6466,7 +6466,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-205",
+    "teamId": "TRI26260",
     "password": "V46ANQ"
   },
   {
@@ -6507,7 +6507,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-206",
+    "teamId": "TRI26262",
     "password": "3EGF7B"
   },
   {
@@ -6524,7 +6524,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-207",
+    "teamId": "TRI26261",
     "password": "U7X2WP"
   },
   {
@@ -6565,7 +6565,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-208",
+    "teamId": "TRI26263",
     "password": "5MAFET"
   },
   {
@@ -6606,7 +6606,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-209",
+    "teamId": "TRI26264",
     "password": "XA4FVJ"
   },
   {
@@ -6647,7 +6647,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-210",
+    "teamId": "TRI26265",
     "password": "P6CRDY"
   },
   {
@@ -6688,7 +6688,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-211",
+    "teamId": "TRI26266",
     "password": "GM6PEJ"
   },
   {
@@ -6713,7 +6713,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-212",
+    "teamId": "TRI26267",
     "password": "CPAFKA"
   },
   {
@@ -6754,7 +6754,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-213",
+    "teamId": "TRI26268",
     "password": "DZ6MZB"
   },
   {
@@ -6795,7 +6795,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-214",
+    "teamId": "TRI26269",
     "password": "TGPGWF"
   },
   {
@@ -6836,7 +6836,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-215",
+    "teamId": "TRI26270",
     "password": "KTERPX"
   },
   {
@@ -6877,7 +6877,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-216",
+    "teamId": "TRI26271",
     "password": "C3BK2L"
   },
   {
@@ -6918,7 +6918,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-217",
+    "teamId": "TRI26273",
     "password": "EVNTRR"
   },
   {
@@ -6935,7 +6935,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-218",
+    "teamId": "TRI26275",
     "password": "QX9GA7"
   },
   {
@@ -6960,7 +6960,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-219",
+    "teamId": "TRI26276",
     "password": "HQHB43"
   },
   {
@@ -6977,7 +6977,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-220",
+    "teamId": "TRI26277",
     "password": "8ZXT3E"
   },
   {
@@ -7018,7 +7018,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-221",
+    "teamId": "TRI26279",
     "password": "VLABVE"
   },
   {
@@ -7059,7 +7059,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-222",
+    "teamId": "TRI26274",
     "password": "KM69TN"
   },
   {
@@ -7100,7 +7100,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-223",
+    "teamId": "TRI26280",
     "password": "RBLX9J"
   },
   {
@@ -7125,7 +7125,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-224",
+    "teamId": "TRI26278",
     "password": "JVKTEP"
   },
   {
@@ -7166,7 +7166,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-225",
+    "teamId": "TRI26282",
     "password": "DJW4N6"
   },
   {
@@ -7207,7 +7207,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-226",
+    "teamId": "TRI26284",
     "password": "HLKZL4"
   },
   {
@@ -7248,7 +7248,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-227",
+    "teamId": "TRI26283",
     "password": "JF9MHH"
   },
   {
@@ -7289,7 +7289,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-228",
+    "teamId": "TRI26285",
     "password": "2C82Z8"
   },
   {
@@ -7330,7 +7330,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-229",
+    "teamId": "TRI26286",
     "password": "TEF6N2"
   },
   {
@@ -7371,7 +7371,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-230",
+    "teamId": "TRI26288",
     "password": "EM6R5B"
   },
   {
@@ -7412,7 +7412,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-231",
+    "teamId": "TRI26289",
     "password": "MK29ZT"
   },
   {
@@ -7453,7 +7453,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-232",
+    "teamId": "TRI26290",
     "password": "9CDE5T"
   },
   {
@@ -7470,7 +7470,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-233",
+    "teamId": "TRI26291",
     "password": "XSFBKQ"
   },
   {
@@ -7511,7 +7511,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-234",
+    "teamId": "TRI26298",
     "password": "JQEVPE"
   },
   {
@@ -7536,7 +7536,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-235",
+    "teamId": "TRI26300",
     "password": "2MQPDP"
   },
   {
@@ -7553,7 +7553,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-236",
+    "teamId": "TRI26303",
     "password": "S9SYPB"
   },
   {
@@ -7570,7 +7570,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-237",
+    "teamId": "TRI26302",
     "password": "6CSFXE"
   },
   {
@@ -7587,7 +7587,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-238",
+    "teamId": "TRI26304",
     "password": "RECKK2"
   },
   {
@@ -7604,7 +7604,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-239",
+    "teamId": "TRI26306",
     "password": "93H8UY"
   },
   {
@@ -7621,7 +7621,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-240",
+    "teamId": "TRI26308",
     "password": "9FNNBX"
   },
   {
@@ -7646,7 +7646,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-241",
+    "teamId": "TRI26309",
     "password": "K2YVWY"
   },
   {
@@ -7687,7 +7687,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-242",
+    "teamId": "TRI26310",
     "password": "7H8MG8"
   },
   {
@@ -7704,7 +7704,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-243",
+    "teamId": "TRI26311",
     "password": "YHKV65"
   },
   {
@@ -7745,7 +7745,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-244",
+    "teamId": "TRI26312",
     "password": "PBFMYS"
   },
   {
@@ -7786,7 +7786,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-245",
+    "teamId": "TRI26316",
     "password": "4GLN9M"
   },
   {
@@ -7827,7 +7827,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-246",
+    "teamId": "TRI26317",
     "password": "SKGQMV"
   },
   {
@@ -7868,7 +7868,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-247",
+    "teamId": "TRI26318",
     "password": "6UEZYW"
   },
   {
@@ -7909,7 +7909,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-248",
+    "teamId": "TRI26320",
     "password": "DLWSYZ"
   },
   {
@@ -7934,7 +7934,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-249",
+    "teamId": "TRI26321",
     "password": "EQT3PF"
   },
   {
@@ -7951,7 +7951,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-250",
+    "teamId": "TRI26326",
     "password": "YQRS9Y"
   },
   {
@@ -7992,7 +7992,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-251",
+    "teamId": "TRI26327",
     "password": "SVTJQZ"
   },
   {
@@ -8009,7 +8009,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-252",
+    "teamId": "TRI26328",
     "password": "9RQDE9"
   },
   {
@@ -8026,7 +8026,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-253",
+    "teamId": "TRI26329",
     "password": "GQFUYX"
   },
   {
@@ -8067,7 +8067,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-254",
+    "teamId": "TRI26332",
     "password": "G2E62D"
   },
   {
@@ -8092,7 +8092,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-255",
+    "teamId": "TRI26333",
     "password": "9XK6AN"
   },
   {
@@ -8133,7 +8133,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-256",
+    "teamId": "TRI26334",
     "password": "6PGHP4"
   },
   {
@@ -8158,7 +8158,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-257",
+    "teamId": "TRI26335",
     "password": "PFKTKA"
   },
   {
@@ -8199,7 +8199,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-258",
+    "teamId": "TRI26336",
     "password": "7KTGUK"
   },
   {
@@ -8240,7 +8240,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-259",
+    "teamId": "TRI26337",
     "password": "VNM35J"
   },
   {
@@ -8257,7 +8257,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-260",
+    "teamId": "TRI26338",
     "password": "6A9QGV"
   },
   {
@@ -8282,7 +8282,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-261",
+    "teamId": "TRI26340",
     "password": "8GQF4S"
   },
   {
@@ -8299,7 +8299,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-262",
+    "teamId": "TRI26341",
     "password": "WQ8Q2G"
   },
   {
@@ -8340,7 +8340,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-263",
+    "teamId": "TRI26343",
     "password": "LU978A"
   },
   {
@@ -8381,7 +8381,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-264",
+    "teamId": "TRI26344",
     "password": "622CAD"
   },
   {
@@ -8422,7 +8422,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-265",
+    "teamId": "TRI26342",
     "password": "WMYFZY"
   },
   {
@@ -8463,7 +8463,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-266",
+    "teamId": "TRI26346",
     "password": "W29SXS"
   },
   {
@@ -8504,7 +8504,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-267",
+    "teamId": "TRI26347",
     "password": "3HT2EL"
   },
   {
@@ -8529,7 +8529,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-268",
+    "teamId": "TRI26348",
     "password": "U7XAYE"
   },
   {
@@ -8570,7 +8570,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-269",
+    "teamId": "TRI26349",
     "password": "HZTRB7"
   },
   {
@@ -8611,7 +8611,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-270",
+    "teamId": "TRI26350",
     "password": "7NWSUG"
   },
   {
@@ -8652,7 +8652,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-271",
+    "teamId": "TRI26352",
     "password": "9GLV7N"
   },
   {
@@ -8693,7 +8693,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-272",
+    "teamId": "TRI26353",
     "password": "9KWMHP"
   },
   {
@@ -8734,7 +8734,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-273",
+    "teamId": "TRI26355",
     "password": "MPCCMQ"
   },
   {
@@ -8775,7 +8775,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-274",
+    "teamId": "TRI26356",
     "password": "FPZCJH"
   },
   {
@@ -8816,7 +8816,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-275",
+    "teamId": "TRI26358",
     "password": "Y32VH7"
   },
   {
@@ -8857,7 +8857,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-276",
+    "teamId": "TRI26359",
     "password": "JZGDPN"
   },
   {
@@ -8898,7 +8898,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-277",
+    "teamId": "TRI26361",
     "password": "EUNW49"
   },
   {
@@ -8915,7 +8915,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-278",
+    "teamId": "TRI26362",
     "password": "K9PQZE"
   },
   {
@@ -8932,7 +8932,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-279",
+    "teamId": "TRI26364",
     "password": "7EEEC8"
   },
   {
@@ -8973,7 +8973,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-280",
+    "teamId": "TRI26365",
     "password": "AAHT7V"
   },
   {
@@ -9014,7 +9014,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-281",
+    "teamId": "TRI26367",
     "password": "NMH8YP"
   },
   {
@@ -9055,7 +9055,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-282",
+    "teamId": "TRI26368",
     "password": "U2BAG8"
   },
   {
@@ -9080,7 +9080,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-283",
+    "teamId": "TRI26369",
     "password": "XZ2Q4K"
   },
   {
@@ -9121,7 +9121,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-284",
+    "teamId": "TRI26372",
     "password": "LE5EZS"
   },
   {
@@ -9162,7 +9162,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-285",
+    "teamId": "TRI26374",
     "password": "UY7X24"
   },
   {
@@ -9203,7 +9203,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-286",
+    "teamId": "TRI26373",
     "password": "6DJ65H"
   },
   {
@@ -9244,7 +9244,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-287",
+    "teamId": "TRI26376",
     "password": "RA866B"
   },
   {
@@ -9261,7 +9261,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-288",
+    "teamId": "TRI26377",
     "password": "PQNQV3"
   },
   {
@@ -9278,7 +9278,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-289",
+    "teamId": "TRI26378",
     "password": "KVENBV"
   },
   {
@@ -9303,7 +9303,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-290",
+    "teamId": "TRI26379",
     "password": "H3EDYV"
   },
   {
@@ -9328,7 +9328,7 @@
         "department": "IT"
       }
     ],
-    "teamId": "LOCAL-291",
+    "teamId": "TRI26380",
     "password": "GGSCGS"
   },
   {
@@ -9345,7 +9345,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-292",
+    "teamId": "TRI26381",
     "password": "QPHKL4"
   },
   {
@@ -9386,7 +9386,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-293",
+    "teamId": "TRI26383",
     "password": "MVB43D"
   },
   {
@@ -9427,7 +9427,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-294",
+    "teamId": "TRI26384",
     "password": "VE58NZ"
   },
   {
@@ -9468,7 +9468,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-295",
+    "teamId": "TRI26385",
     "password": "L7H4H9"
   },
   {
@@ -9525,7 +9525,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-296",
+    "teamId": "TRI26387",
     "password": "5AK35X"
   },
   {
@@ -9550,7 +9550,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-297",
+    "teamId": "TRI26389",
     "password": "T9HPDX"
   },
   {
@@ -9591,7 +9591,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-298",
+    "teamId": "TRI26391",
     "password": "Q2T2N5"
   },
   {
@@ -9632,7 +9632,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-299",
+    "teamId": "TRI26392",
     "password": "VNXY9Z"
   },
   {
@@ -9673,7 +9673,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-300",
+    "teamId": "TRI26394",
     "password": "XNFTH3"
   },
   {
@@ -9714,7 +9714,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-301",
+    "teamId": "TRI26395",
     "password": "SV7424"
   },
   {
@@ -9755,7 +9755,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-302",
+    "teamId": "TRI26397",
     "password": "3PKADV"
   },
   {
@@ -9796,7 +9796,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-303",
+    "teamId": "TRI26398",
     "password": "N5CVKM"
   },
   {
@@ -9813,7 +9813,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-304",
+    "teamId": "TRI26399",
     "password": "QSQTJ6"
   },
   {
@@ -9838,7 +9838,7 @@
         "department": "CSM (AI&ML)"
       }
     ],
-    "teamId": "LOCAL-305",
+    "teamId": "TRI26400",
     "password": "FBGGX9"
   },
   {
@@ -9879,7 +9879,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-306",
+    "teamId": "TRI26401",
     "password": "W8TSEL"
   },
   {
@@ -9896,7 +9896,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-307",
+    "teamId": "TRI26402",
     "password": "M6PMSG"
   },
   {
@@ -9937,7 +9937,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-308",
+    "teamId": "TRI26427",
     "password": "M6JWEK"
   },
   {
@@ -9962,7 +9962,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-309",
+    "teamId": "TRI26420",
     "password": "F733AV"
   },
   {
@@ -9987,7 +9987,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-310",
+    "teamId": "TRI26428",
     "password": "65P88A"
   },
   {
@@ -10028,7 +10028,7 @@
         "department": "MECH"
       }
     ],
-    "teamId": "LOCAL-311",
+    "teamId": "TRI26417",
     "password": "WW9CSH"
   },
   {
@@ -10069,7 +10069,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-312",
+    "teamId": "TRI26426",
     "password": "6FSQLQ"
   },
   {
@@ -10086,7 +10086,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-313",
+    "teamId": "TRI26409",
     "password": "XG2TNA"
   },
   {
@@ -10111,7 +10111,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-314",
+    "teamId": "TRI26408",
     "password": "ZNWQAR"
   },
   {
@@ -10128,7 +10128,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-315",
+    "teamId": "TRI26405",
     "password": "SATRJD"
   },
   {
@@ -10145,7 +10145,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-316",
+    "teamId": "TRI26410",
     "password": "HA32T6"
   },
   {
@@ -10186,7 +10186,7 @@
         "department": "CIVIL"
       }
     ],
-    "teamId": "LOCAL-317",
+    "teamId": "TRI26412",
     "password": "XKYYMA"
   },
   {
@@ -10227,7 +10227,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-318",
+    "teamId": "TRI26414",
     "password": "U2WEX2"
   },
   {
@@ -10268,7 +10268,7 @@
         "department": "ECE"
       }
     ],
-    "teamId": "LOCAL-319",
+    "teamId": "TRI26415",
     "password": "NQDNPT"
   },
   {
@@ -10293,7 +10293,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-320",
+    "teamId": "TRI26419",
     "password": "5U9NXQ"
   },
   {
@@ -10334,7 +10334,7 @@
         "department": "CSD"
       }
     ],
-    "teamId": "LOCAL-321",
+    "teamId": "TRI26423",
     "password": "6D7GY9"
   },
   {
@@ -10375,7 +10375,7 @@
         "department": "CSE"
       }
     ],
-    "teamId": "LOCAL-322",
+    "teamId": "TRI26425",
     "password": "RR3387"
   },
   {
@@ -10400,7 +10400,7 @@
         "department": "EEE"
       }
     ],
-    "teamId": "LOCAL-323",
+    "teamId": "TRI26430",
     "password": "NDK44W"
   }
 ]
