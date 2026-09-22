@@ -11,7 +11,10 @@ import {
     Bot,
     ShieldHalf,
     Blocks,
-    ChevronRight
+    ChevronRight,
+    Edit,
+    X,
+    Save
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useHackathon, Project, Member } from "@/context/HackathonContext";
@@ -27,7 +30,9 @@ interface UserListItem extends Member {
 }
 
 export default function UsersManagement() {
-    const { projects, isLoading } = useHackathon();
+    const { projects, isLoading, updateMemberDetails } = useHackathon();
+    const [editingParticipant, setEditingParticipant] = useState<UserListItem | null>(null);
+    const [editFormData, setEditFormData] = useState<Partial<UserListItem>>({});
     const [searchQuery, setSearchQuery] = useState("");
     const [filterYear, setFilterYear] = useState<string>("All Years");
 
@@ -373,6 +378,16 @@ export default function UsersManagement() {
                                             </td>
                                             <td className="p-8">
                                                 <div className="flex gap-2">
+                                                    <button 
+                                                        onClick={() => {
+                                                            setEditingParticipant(user);
+                                                            setEditFormData(user);
+                                                        }}
+                                                        className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-[#14b8a6]/60 hover:text-[#14b8a6] hover:bg-white/10 transition-all"
+                                                        title="Edit Participant"
+                                                    >
+                                                        <Edit size={14} />
+                                                    </button>
                                                     <button className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all">
                                                         <Mail size={14} />
                                                     </button>
@@ -400,6 +415,123 @@ export default function UsersManagement() {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Modal */}
+            <AnimatePresence>
+                {editingParticipant && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            className="bg-white p-8 rounded-[1rem] shadow-2xl max-w-lg w-full relative"
+                        >
+                            <button
+                                onClick={() => setEditingParticipant(null)}
+                                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                            
+                            <h2 className="text-xl font-bold uppercase tracking-wide text-gray-800 mb-6">
+                                EDIT <span className="text-[#14b8a6]">PARTICIPANT</span>
+                            </h2>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Full Name</label>
+                                    <input 
+                                        type="text" 
+                                        value={editFormData.fullName || ''}
+                                        onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
+                                        className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Email</label>
+                                    <input 
+                                        type="email" 
+                                        value={editFormData.email || ''}
+                                        onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                                        className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Phone</label>
+                                    <input 
+                                        type="text" 
+                                        value={editFormData.phone || ''}
+                                        onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                                        className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">College</label>
+                                    <input 
+                                        type="text" 
+                                        value={editFormData.college || ''}
+                                        onChange={(e) => setEditFormData({ ...editFormData, college: e.target.value })}
+                                        className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
+                                    />
+                                </div>
+                                <div className="flex gap-4">
+                                    <div className="flex-1">
+                                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Year</label>
+                                        <input 
+                                            type="text" 
+                                            value={editFormData.year || ''}
+                                            onChange={(e) => setEditFormData({ ...editFormData, year: e.target.value })}
+                                            className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Department</label>
+                                        <input 
+                                            type="text" 
+                                            value={editFormData.department || ''}
+                                            onChange={(e) => setEditFormData({ ...editFormData, department: e.target.value })}
+                                            className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-8 flex justify-end gap-4">
+                                <button 
+                                    onClick={() => setEditingParticipant(null)}
+                                    className="px-6 py-2.5 rounded-full bg-gray-200 text-black font-bold uppercase text-[11px] tracking-widest hover:bg-gray-300 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        const projectId = projects.find(p => p.team === editingParticipant.teamName)?.id;
+                                        if (projectId && editingParticipant.email) {
+                                            updateMemberDetails(projectId, editingParticipant.email, {
+                                                fullName: editFormData.fullName || '',
+                                                email: editFormData.email,
+                                                phone: editFormData.phone,
+                                                college: editFormData.college,
+                                                year: editFormData.year,
+                                                department: editFormData.department
+                                            });
+                                        }
+                                        setEditingParticipant(null);
+                                    }}
+                                    className="px-6 py-2.5 rounded-full bg-[#14b8a6] text-black font-bold uppercase text-[11px] tracking-widest hover:bg-[#0d9488] transition-colors flex items-center gap-2"
+                                >
+                                    <Save size={14} /> Save Changes
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </DashboardLayout>
     );
 }

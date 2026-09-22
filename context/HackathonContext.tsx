@@ -80,6 +80,7 @@ interface HackathonContextType {
     volunteers: Volunteer[];
     addVolunteer: (volunteer: { name: string, phone: string, role: string }) => void;
     removeVolunteer: (id: string) => void;
+    updateMemberDetails: (projectId: any, oldMemberEmail: string, updatedMemberData: Member) => void;
 }
 
 export interface Member {
@@ -760,6 +761,37 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         setProjects(updatedProjects);
     };
 
+    const updateMemberDetails = async (projectId: any, oldMemberEmail: string, updatedMemberData: Member) => {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+
+        const newMembers = project.members.map(member => {
+            const memberObj = typeof member === 'string' ? { fullName: member } : member;
+            if (memberObj.email === oldMemberEmail) {
+                return { ...memberObj, ...updatedMemberData };
+            }
+            return memberObj;
+        });
+
+        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, members: newMembers } : p));
+
+        try {
+            const response = await fetch('/api/teams', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId, members: newMembers })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update member');
+            }
+            toast.success("Participant details updated!");
+        } catch (err: any) {
+            console.error("Failed to update participant details:", err);
+            toast.error(`Sync failed: ${err.message}`);
+        }
+    };
+
     return (
         <HackathonContext.Provider
             value={{
@@ -796,7 +828,8 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 addVolunteer,
                 removeVolunteer,
                 roundConfigs,
-                updateRoundTime
+                updateRoundTime,
+                updateMemberDetails
             }}
         >
             {children}

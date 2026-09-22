@@ -77,11 +77,12 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
     try {
-        const { id, problemStatement, proposedIdea, techStack, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, room, volunteer_name, volunteer_phone, roomWifiSSID, roomWifiPass, assigned_judge, assigned_judge_2 } = await req.json();
+        const { id, problemStatement, proposedIdea, techStack, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, room, volunteer_name, volunteer_phone, roomWifiSSID, roomWifiPass, assigned_judge, assigned_judge_2, members } = await req.json();
 
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
         const updateData: any = {};
+        if (members !== undefined) updateData.members = members;
 
         // Participant-owned fields — fetch current raw_data to merge lock flags
         const isParticipantUpdate = problemStatement !== undefined || proposedIdea !== undefined || techStack !== undefined;
