@@ -94,8 +94,8 @@ export default function AdminDashboard() {
         if (isLoading) return; // Wait until data is loaded
         if (backfillRan.current) return; // Only run once per session
         if (projects.length === 0) return;
-        // Old format: VH26-TEAMNAME-101 (no '@')
-        // New format: RA-AN-PR@VH26-101 (has '@')
+        // Old format: TRI-TEAMNAME-101 (no '@')
+        // New format: RA-AN-PR@TRI-101 (has '@')
         const needsUpdate = projects.some(p => !p.password || !p.password.includes('@'));
         if (!needsUpdate) return; // All passwords already in new format
         backfillRan.current = true;

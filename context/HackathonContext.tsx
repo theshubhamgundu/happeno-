@@ -679,7 +679,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     const addJudge = async (judgeData: { name: string, specialization: string }) => {
         const id = Math.random().toString(36).substr(2, 9);
         const nextNumber = 101 + judges.length;
-        const generatedId = `VHJ-${nextNumber}`;
+        const generatedId = `TRJ-${nextNumber}`;
         const password = `${nextNumber}@tricity`;
 
         const newJudge: Judge = {
@@ -734,7 +734,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     const addVolunteer = async (volunteerData: { name: string, phone: string, role: string }) => {
         const id = Math.random().toString(36).substr(2, 9);
         const nextNumber = 101 + volunteers.length;
-        const generatedId = `VHV-${nextNumber}`;
+        const generatedId = `TRV-${nextNumber}`;
         const password = `${nextNumber}@tricity`;
 
         const newVol: Volunteer = {

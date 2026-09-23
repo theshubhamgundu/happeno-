@@ -1,8 +1,8 @@
-# TRI-CITY AI HACKATHON - Premium Hackathon Platform ðŸš€
+# TRI-CITY AI HACKATHON - Premium Hackathon Platform 🚀
 
 TRI-CITY AI HACKATHON is a state-of-the-art hackathon management platform designed for a premium user experience. It features a seamless registration flow, dynamic payment processing, and comprehensive dashboards for participants, judges, and administrators.
 
-## âœ¨ Features
+## ✨ Features
 
 - **Advanced Registration Flow**: 3-step process (Details â†’ UPI Payment â†’ UTR Verification).
 - **Dynamic Identity System**: Automated sequential Team ID generation (`TRICITY_101`).

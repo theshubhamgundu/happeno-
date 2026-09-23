@@ -3,9 +3,9 @@ import { teamSupabase as supabase } from '@/lib/supabase';
 
 /**
  * Password formula: first 2 UPPERCASE letters of each member's name joined with "-"
- * then @VH26-[TEAM_NUMBER]
+ * then @TRI-[TEAM_NUMBER]
  * Example: members ["Rahul Verma", "Ankit Kumar", "Priya Nair"], team 101
- *          â†’ RA-AN-PR@VH26-101
+ *          → RA-AN-PR@TRI-101
  */
 function generatePasswordFromMembers(members: any[], teamNum: number): string {
     const initials = members
@@ -16,7 +16,7 @@ function generatePasswordFromMembers(members: any[], teamNum: number): string {
         .filter(Boolean)
         .join('-');
 
-    return `${initials}@VH26-${teamNum}`;
+    return `${initials}@TRI-${teamNum}`;
 }
 
 export async function POST(req: Request) {
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { teamName, domain, members, userTransactionId, teamId } = body;
 
-        console.log("ðŸš€ Registering Team (Draft):", { team: teamName, track: domain, orderId: userTransactionId, teamId });
+        console.log("🚀 Registering Team (Draft):", { team: teamName, track: domain, orderId: userTransactionId, teamId });
 
         if (!teamName || !domain || !members || !userTransactionId || !teamId) {
             return NextResponse.json({ success: false, message: "Missing required fields (including Team ID and Transaction ID)" }, { status: 400 });
@@ -60,11 +60,11 @@ export async function POST(req: Request) {
         }
 
         const nextTeamId = `TRICITY_${nextNum}`;
-        console.log(`ðŸ†” Server Generated Team ID: ${nextTeamId}`);
+        console.log(`🆔 Server Generated Team ID: ${nextTeamId}`);
 
         // Generate unique password from members' initials
         const password = generatePasswordFromMembers(members, nextNum);
-        console.log(`ðŸ”‘ Generated Password: ${password}`);
+        console.log(`🔑 Generated Password: ${password}`);
 
         // Save registration as PENDING verification
         const { error: sbError } = await supabase
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
             ]);
 
         if (sbError) {
-            console.error("âŒ Failed to save to Supabase:", sbError);
+            console.error("❌ Failed to save to Supabase:", sbError);
             return NextResponse.json({
                 success: false,
                 message: "Database save failed",
@@ -105,7 +105,7 @@ export async function POST(req: Request) {
         });
 
     } catch (error: any) {
-        console.error('âŒ Registration Error:', error);
+        console.error('❌ Registration Error:', error);
         return NextResponse.json({
             success: false,
             message: "Registration failed",

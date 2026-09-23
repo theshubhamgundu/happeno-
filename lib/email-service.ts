@@ -7,7 +7,7 @@ import sharp from 'sharp';
 
 export async function verifyAndSendTicket(transactionId: string) {
     try {
-        console.log(`ðŸš€ Automated verification for: ${transactionId}`);
+        console.log(`🚀 Automated verification for: ${transactionId}`);
 
         // 1. Update Status to COMPLETED
         const { data: registration, error: sbError } = await supabase
@@ -18,17 +18,17 @@ export async function verifyAndSendTicket(transactionId: string) {
             .single();
 
         if (sbError || !registration) {
-            console.error("âŒ Supabase Update Error:", sbError || "No registration found");
+            console.error("❌ Supabase Update Error:", sbError || "No registration found");
             return { success: false, message: "Registration not found" };
         }
 
-        console.log(`âœ… Registration found for team: ${registration.team_name}`);
+        console.log(`✅ Registration found for team: ${registration.team_name}`);
 
         // 2. Extract Captain's Email
         let captainEmail = registration.email || registration.captain_email || "";
 
         if (!captainEmail) {
-            console.log("ðŸ” Email missing from main column, checking members array...");
+            console.log("🔍 Email missing from main column, checking members array...");
             try {
                 const members = typeof registration.members === 'string'
                     ? JSON.parse(registration.members)
@@ -38,20 +38,20 @@ export async function verifyAndSendTicket(transactionId: string) {
                     captainEmail = members[0].email || members[0].Email || "";
                 }
             } catch (e) {
-                console.error("âŒ Error parsing members for email:", e);
+                console.error("❌ Error parsing members for email:", e);
             }
         }
 
-        console.log(`ðŸ“§ Target Email: ${captainEmail}`);
+        console.log(`📧 Target Email: ${captainEmail}`);
 
         if (!process.env.RESEND_API_KEY) {
-            console.error("âŒ RESEND_API_KEY is missing!");
+            console.error("❌ RESEND_API_KEY is missing!");
             return { success: false, message: "Resend API key missing" };
         }
 
         // 3. Send Confirmation Email with Ticket Attachment
         if (captainEmail && process.env.RESEND_API_KEY) {
-            console.log("ðŸŽ¨ Starting Ticket Generation...");
+            console.log("🎨 Starting Ticket Generation...");
             const resend = new Resend(process.env.RESEND_API_KEY);
 
             const qrBuffer = await QRCode.toBuffer(registration.team_id, {
@@ -64,10 +64,10 @@ export async function verifyAndSendTicket(transactionId: string) {
             });
 
             const templatePath = path.join(process.cwd(), 'public', 'ticket-template.png');
-            console.log(`ðŸ–¼ï¸ Loading template from: ${templatePath}`);
+            console.log(`🖼️ Loading template from: ${templatePath}`);
 
             if (!fs.existsSync(templatePath)) {
-                console.error("âŒ Ticket template NOT FOUND at path:", templatePath);
+                console.error("❌ Ticket template NOT FOUND at path:", templatePath);
                 return { success: false, message: "Ticket template missing", error: "File not found" };
             }
 
@@ -80,7 +80,7 @@ export async function verifyAndSendTicket(transactionId: string) {
                 </svg>
             `);
 
-            console.log("ðŸ§© Compositing ticket image...");
+            console.log("🧩 Compositing ticket image...");
             const ticketBuffer = await sharp(templateBuffer)
                 .composite([
                     {
@@ -97,11 +97,11 @@ export async function verifyAndSendTicket(transactionId: string) {
                 .png()
                 .toBuffer();
 
-            console.log("ðŸ“¨ Sending email via Resend...");
+            console.log("📨 Sending email via Resend...");
             const { data, error: resendError } = await resend.emails.send({
                 from: 'TRI-CITY AI HACKATHON <admin@tricity.online>',
                 to: captainEmail,
-                subject: `Registration Confirmed: See you at TRI-CITY AI HACKATHON ðŸš€`,
+                subject: `Registration Confirmed: See you at TRI-CITY AI HACKATHON 🚀`,
                 attachments: [
                     {
                         filename: `tricity_Ticket_${registration.team_id}.png`,
@@ -163,18 +163,18 @@ export async function verifyAndSendTicket(transactionId: string) {
             });
 
             if (resendError) {
-                console.error("âŒ Resend API Error:", resendError);
+                console.error("❌ Resend API Error:", resendError);
                 return { success: false, message: "Email failed", error: resendError };
             }
 
-            console.log(`âœ¨ Email sent successfully to ${captainEmail}! ID: ${data?.id}`);
+            console.log(`✨ Email sent successfully to ${captainEmail}! ID: ${data?.id}`);
             return { success: true, team: registration.team_name, error: null };
         }
 
         return { success: false, message: "Email not sent (Missing data or API key)", error: null };
 
     } catch (error: any) {
-        console.error('âŒ Verification Service Error:', error);
+        console.error('❌ Verification Service Error:', error);
         return { success: false, message: "Service error", error: error.message || error };
     }
 }
