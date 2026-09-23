@@ -45,6 +45,11 @@ interface Volunteer {
     role: string;
 }
 
+export interface MemberMealSlot {
+    claimedAt: string | null;
+    claimedBy?: string;
+}
+
 interface HackathonContextType {
     hackathonStartDate: string;
     updateHackathonStartDate: (date: string) => void;
@@ -66,13 +71,15 @@ interface HackathonContextType {
     toggleRoundLock: () => void;
     isCertificatesEnabled: boolean;
     toggleCertificatesEnabled: () => void;
+    enabledMeals: string[];
+    updateEnabledMeals: (meals: string[]) => Promise<void>;
     roundConfigs: typeof STATIC_ROUNDS_CONFIG;
     updateRoundTime: (roundId: string, hour: number, minute: number, dayOffset: number) => void;
     projects: Project[];
     isLoading: boolean;
     updateProjectScore: (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>) => void;
     updateTeamLogistics: (projectId: any, data: { room?: string, volunteer_name?: string, volunteer_phone?: string, roomWifiSSID?: string, roomWifiPass?: string, assigned_judge?: string, assigned_judge_2?: string }) => void;
-    checkInTeam: (projectId: any) => void;
+    checkInTeam: (projectId: any) => Promise<void>;
     registerTeam: (teamData: Omit<Project, 'id' | 'roundScores'>) => void;
     judges: Judge[];
     addJudge: (judge: { name: string, specialization: string }) => void;
@@ -81,6 +88,10 @@ interface HackathonContextType {
     addVolunteer: (volunteer: { name: string, phone: string, role: string }) => void;
     removeVolunteer: (id: string) => void;
     updateMemberDetails: (projectId: any, oldMemberEmail: string, updatedMemberData: Member) => void;
+    claimMemberMeal: (projectId: any, memberId: string, mealKey: string, volunteerId?: string) => Promise<{ status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN'; claimedAt?: string; claimedBy?: string; mealName?: string; }>;
+    resetMemberMeal: (projectId: any, memberId: string, mealKey: string) => Promise<void>;
+    bulkAssignMealPlan: (projectIds: any[], mealKeys: string[], included: boolean) => Promise<void>;
+    toggleMealAccess: (projectId: any, mealKey: string, included: boolean) => Promise<void>;
 }
 
 export interface Member {
@@ -116,6 +127,8 @@ export interface Project {
     roundDetailedScores?: Record<string, Record<string, Record<string, number>>>; // roundId -> judgeId -> criterionId -> score
     roundComments?: Record<string, Record<string, string | null>>; // roundId -> judgeId -> comment
     isCheckedIn?: boolean;
+    checkedInAt?: string | null;
+    memberMealState?: Record<string, Record<string, MemberMealSlot>>; // memberId -> mealKey -> slot
     room?: string;
     roomWifiSSID?: string;
     roomWifiPass?: string;
@@ -173,6 +186,9 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     // Certificates Enabled
     const [isCertificatesEnabled, setIsCertificatesEnabled] = useState(false);
 
+    // Enabled Meals
+    const [enabledMeals, setEnabledMeals] = useState<string[]>([]);
+
     // Dynamic Round Configs
     const [roundConfigs, setRoundConfigs] = useState(STATIC_ROUNDS_CONFIG);
 
@@ -204,6 +220,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                     if (dbSettings.is_submission_locked !== undefined) setIsSubmissionLocked(dbSettings.is_submission_locked);
                     if (dbSettings.is_round_lock_enabled !== undefined) setIsRoundLockEnabled(dbSettings.is_round_lock_enabled);
                     if (dbSettings.is_certificates_enabled !== undefined) setIsCertificatesEnabled(dbSettings.is_certificates_enabled);
+                    if (dbSettings.enabled_meals !== undefined) setEnabledMeals(dbSettings.enabled_meals);
                     if (dbSettings.released_rounds) setReleasedRounds(dbSettings.released_rounds);
                     if (dbSettings.round_configs) {
                         // Merge static criteria with dynamic times
@@ -497,6 +514,21 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
+    const updateEnabledMeals = async (meals: string[]) => {
+        setEnabledMeals(meals);
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'enabled_meals', value: meals })
+            });
+            toast.success("Meal settings updated");
+        } catch (err) {
+            console.error("Failed to update enabled meals:", err);
+            toast.error("Settings sync failed");
+        }
+    };
+
     const updateProjectScore = async (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>) => {
         let newScores: any = {};
         let newComments: any = {};
@@ -629,12 +661,13 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const checkInTeam = async (projectId: any) => {
-        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, isCheckedIn: true } : p));
+        const now = new Date().toISOString();
+        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, isCheckedIn: true, checkedInAt: now } : p));
         try {
             await fetch('/api/teams', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: projectId, isCheckedIn: true })
+                body: JSON.stringify({ id: projectId, isCheckedIn: true, checkedInAt: now })
             });
             toast.success("Team Checked In!");
         } catch (err) {
@@ -792,6 +825,186 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const claimMemberMeal = async (projectId: any, memberId: string, mealKey: string, volunteerId?: string): Promise<{ status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN'; claimedAt?: string; claimedBy?: string; mealName?: string; }> => {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return { status: 'NOT_INCLUDED' };
+
+        if (!project.checkedInAt) {
+            return { status: 'NEEDS_CHECKIN' };
+        }
+
+        const memberMealState = project.memberMealState || {};
+        const memberSlots = memberMealState[memberId] || {};
+        const slot = memberSlots[mealKey];
+
+        if (slot?.claimedAt) {
+            return { status: 'ALREADY_CLAIMED', claimedAt: slot.claimedAt, claimedBy: slot.claimedBy, mealName: mealKey };
+        }
+
+        const now = new Date().toISOString();
+        const updatedSlot: MemberMealSlot = {
+            claimedAt: now,
+            claimedBy: volunteerId || "Volunteer"
+        };
+
+        const updatedMemberMealState = {
+            ...memberMealState,
+            [memberId]: {
+                ...memberSlots,
+                [mealKey]: updatedSlot
+            }
+        };
+
+        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, memberMealState: updatedMemberMealState } : p));
+
+        try {
+            await fetch('/api/teams', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId, memberMealState: updatedMemberMealState })
+            });
+        } catch (err) {
+            console.error("Failed to sync member meal claim:", err);
+        }
+
+        return { status: 'PERMITTED', claimedAt: now, claimedBy: volunteerId || "Volunteer", mealName: mealKey };
+    };
+
+    const resetMemberMeal = async (projectId: any, memberId: string, mealKey: string) => {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+        
+        const memberMealState = project.memberMealState || {};
+        const memberSlots = memberMealState[memberId] || {};
+        
+        const updatedMemberSlots = { ...memberSlots };
+        delete updatedMemberSlots[mealKey];
+
+        const updatedMemberMealState = {
+            ...memberMealState,
+            [memberId]: updatedMemberSlots
+        };
+
+        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, memberMealState: updatedMemberMealState } : p));
+
+        try {
+            await fetch('/api/teams', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId, memberMealState: updatedMemberMealState })
+            });
+            toast.success("Meal claim reset!");
+        } catch (err) {
+            console.error("Failed to reset member meal:", err);
+            toast.error("Failed to sync meal reset");
+        }
+    };
+
+    const bulkAssignMealPlan = async (projectIds: any[], mealKeys: string[], included: boolean) => {
+        try {
+            // Call the bulk-meals API endpoint
+            const response = await fetch('/api/admin/bulk-meals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    projectIds, 
+                    mealKeys, 
+                    included,
+                    operation: 'bulk_assign'
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to assign meal plan');
+            }
+
+            // Update local state to reflect changes
+            setProjects(prev => prev.map(project => {
+                if (projectIds.includes(project.id)) {
+                    const updatedMemberMealState = project.memberMealState || {};
+                    
+                    // Ensure all members have meal slots for the selected meals
+                    project.members.forEach((member, index) => {
+                        const memberId = typeof member === 'string' 
+                            ? `member_${index}` 
+                            : member.email || `member_${index}`;
+                        
+                        if (!updatedMemberMealState[memberId]) {
+                            updatedMemberMealState[memberId] = {};
+                        }
+
+                        mealKeys.forEach(mealKey => {
+                            if (included) {
+                                // Initialize meal slot if it doesn't exist
+                                if (!updatedMemberMealState[memberId][mealKey]) {
+                                    updatedMemberMealState[memberId][mealKey] = {
+                                        claimedAt: null
+                                    };
+                                }
+                            } else {
+                                // Remove meal access
+                                delete updatedMemberMealState[memberId][mealKey];
+                            }
+                        });
+                    });
+
+                    return { ...project, memberMealState: updatedMemberMealState };
+                }
+                return project;
+            }));
+
+            toast.success(`Meal plan ${included ? 'assigned to' : 'removed from'} ${projectIds.length} teams`);
+        } catch (err: any) {
+            console.error("Bulk meal assign failed:", err);
+            toast.error(`Bulk assign failed: ${err.message}`);
+            throw err;
+        }
+    };
+
+    const toggleMealAccess = async (projectId: any, mealKey: string, included: boolean) => {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+
+        const updatedMemberMealState = { ...project.memberMealState || {} };
+
+        // Apply to all members of the team
+        project.members.forEach((member, index) => {
+            const memberId = typeof member === 'string' 
+                ? `member_${index}` 
+                : member.email || `member_${index}`;
+            
+            if (!updatedMemberMealState[memberId]) {
+                updatedMemberMealState[memberId] = {};
+            }
+
+            if (included) {
+                // Add meal access if not exists
+                if (!updatedMemberMealState[memberId][mealKey]) {
+                    updatedMemberMealState[memberId][mealKey] = { claimedAt: null };
+                }
+            } else {
+                // Remove meal access
+                delete updatedMemberMealState[memberId][mealKey];
+            }
+        });
+
+        // Update local state
+        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, memberMealState: updatedMemberMealState } : p));
+
+        try {
+            await fetch('/api/teams', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId, memberMealState: updatedMemberMealState })
+            });
+            toast.success(`Meal access ${included ? 'granted' : 'removed'} for ${project.name}`);
+        } catch (err) {
+            console.error("Failed to toggle meal access:", err);
+            toast.error("Failed to update meal access");
+        }
+    };
+
     return (
         <HackathonContext.Provider
             value={{
@@ -815,6 +1028,8 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 toggleRoundLock,
                 isCertificatesEnabled,
                 toggleCertificatesEnabled,
+                enabledMeals,
+                updateEnabledMeals,
                 projects,
                 isLoading,
                 updateProjectScore,
@@ -829,7 +1044,11 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 removeVolunteer,
                 roundConfigs,
                 updateRoundTime,
-                updateMemberDetails
+                updateMemberDetails,
+                claimMemberMeal,
+                resetMemberMeal,
+                bulkAssignMealPlan,
+                toggleMealAccess
             }}
         >
             {children}

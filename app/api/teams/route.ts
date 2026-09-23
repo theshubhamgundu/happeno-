@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
 import fs from 'fs';
 import path from 'path';
+import { getDefaultMealAccess } from '@/lib/meals';
 
 // Cache responses at the edge for 60 seconds to prevent DB spikes during high traffic
 export const revalidate = 60;
@@ -43,6 +44,8 @@ export async function GET(req: Request) {
                     roundDetailedScores: {},
                     roundComments: {},
                     isCheckedIn: false,
+                    checkedInAt: null,
+                    memberMealState: t.memberMealState || {},
                     createdAt: new Date().toISOString(),
                     completedAt: null
                 }));
@@ -110,6 +113,8 @@ export async function GET(req: Request) {
             roundDetailedScores: r.round_detailed_scores || {},
             roundComments: r.round_comments || {},
             isCheckedIn: r.is_checked_in || false,
+            checkedInAt: r.raw_data?.checkedInAt || null,
+            memberMealState: r.raw_data?.memberMealState || {},
             createdAt: r.created_at,
             completedAt: r.completed_at
         }));
@@ -123,7 +128,7 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
     try {
-        const { id, problemStatement, proposedIdea, techStack, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, room, volunteer_name, volunteer_phone, roomWifiSSID, roomWifiPass, assigned_judge, assigned_judge_2, members } = await req.json();
+        const { id, problemStatement, proposedIdea, techStack, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, checkedInAt, room, volunteer_name, volunteer_phone, roomWifiSSID, roomWifiPass, assigned_judge, assigned_judge_2, members, memberMealState } = await req.json();
 
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
@@ -152,6 +157,22 @@ export async function PATCH(req: Request) {
                 rawData.ts_locked = true;
             }
             updateData.raw_data = rawData;
+        }
+
+        // Fetch raw_data for new properties if it's not already fetched
+        if (!isParticipantUpdate && (checkedInAt !== undefined || memberMealState !== undefined)) {
+            const { data: existing } = await supabase
+                .from('registrations')
+                .select('raw_data')
+                .or(`transaction_id.eq."${id}",team_id.eq."${id}"`)
+                .single();
+            const rawData = existing?.raw_data || {};
+            if (checkedInAt !== undefined) rawData.checkedInAt = checkedInAt;
+            if (memberMealState !== undefined) rawData.memberMealState = memberMealState;
+            updateData.raw_data = rawData;
+        } else if (isParticipantUpdate && (checkedInAt !== undefined || memberMealState !== undefined)) {
+            if (checkedInAt !== undefined) updateData.raw_data.checkedInAt = checkedInAt;
+            if (memberMealState !== undefined) updateData.raw_data.memberMealState = memberMealState;
         }
 
         if (roundScores !== undefined) updateData.round_scores = roundScores;

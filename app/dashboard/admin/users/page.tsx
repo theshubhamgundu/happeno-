@@ -12,13 +12,16 @@ import {
     ChevronDown,
     Edit,
     X,
-    Save
+    Save,
+    Coffee,
+    Check
 } from "lucide-react";
 import { useState, useMemo, Fragment } from "react";
 import { useHackathon, Project, Member } from "@/context/HackathonContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { EVENT_MEALS } from "@/lib/meals";
 
 interface UserListItem extends Member {
     teamName: string;
@@ -37,7 +40,7 @@ const AVATAR_GRADIENTS = [
 ];
 
 export default function UsersManagement() {
-    const { projects, isLoading, updateMemberDetails } = useHackathon();
+    const { projects, isLoading, updateMemberDetails, toggleMealAccess } = useHackathon();
     const [editingParticipant, setEditingParticipant] = useState<UserListItem | null>(null);
     const [editFormData, setEditFormData] = useState<Partial<UserListItem>>({});
     const [searchQuery, setSearchQuery] = useState("");
@@ -382,6 +385,56 @@ export default function UsersManagement() {
                                                                             </div>
                                                                         );
                                                                     })}
+                                                                </div>
+
+                                                                {/* Meal Pass Toggle Section */}
+                                                                <div className="mt-8 border-t border-white/10 pt-6">
+                                                                    <div className="flex items-center gap-3 mb-4">
+                                                                        <Coffee size={16} className="text-amber-500" />
+                                                                        <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Food & Snack Passes</p>
+                                                                    </div>
+                                                                    <div className="flex flex-wrap gap-3">
+                                                                        {EVENT_MEALS.map((meal) => {
+                                                                            // Check if ANY member has access to this meal (we'll treat it as team-wide access for this UI)
+                                                                            const memberStates = project.memberMealState || {};
+                                                                            const hasAnyAccess = Object.values(memberStates).some(memberSlots => !!memberSlots[meal.key]);
+                                                                            const hasAnyClaimed = Object.values(memberStates).some(memberSlots => !!memberSlots[meal.key]?.claimedAt);
+                                                                            
+                                                                            const isIncluded = hasAnyAccess;
+                                                                            const isClaimed = hasAnyClaimed;
+                                                                            
+                                                                            return (
+                                                                                <div key={meal.key} className={`flex items-center gap-3 p-3 rounded-xl border ${isIncluded ? 'bg-amber-500/10 border-amber-500/30' : 'bg-white/5 border-white/10'} transition-colors`}>
+                                                                                    <div className="flex flex-col">
+                                                                                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">{meal.shortLabel}</span>
+                                                                                        {isClaimed ? (
+                                                                                            <span className="text-[8px] font-bold text-green-400 uppercase">Claimed</span>
+                                                                                        ) : isIncluded ? (
+                                                                                            <span className="text-[8px] font-bold text-amber-500 uppercase">Pending</span>
+                                                                                        ) : (
+                                                                                            <span className="text-[8px] font-bold text-white/30 uppercase">No Access</span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            toggleMealAccess(project.id, meal.key, !isIncluded);
+                                                                                        }}
+                                                                                        disabled={isClaimed}
+                                                                                        className={`w-10 h-6 rounded-full p-1 transition-colors flex ${isIncluded ? 'bg-amber-500 justify-end' : 'bg-white/20 justify-start'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:ring-2 hover:ring-white/20'}`}
+                                                                                    >
+                                                                                        <motion.div 
+                                                                                            layout 
+                                                                                            className="w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm"
+                                                                                        >
+                                                                                            {isIncluded && <Check size={10} className="text-amber-600" />}
+                                                                                        </motion.div>
+                                                                                    </button>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </td>

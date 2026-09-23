@@ -28,11 +28,14 @@ import {
     Clock3,
     ClipboardList,
     ArrowUpRight,
-    Activity
+    Activity,
+    Coffee,
+    X
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useHackathon, Project } from "@/context/HackathonContext";
+import { EVENT_MEALS } from "@/lib/meals";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Papa from "papaparse";
@@ -57,10 +60,13 @@ export default function AdminDashboard() {
         emergencyContact,
         updateEmergencyContact,
         isCertificatesEnabled,
-        toggleCertificatesEnabled
+        toggleCertificatesEnabled,
+        enabledMeals,
+        updateEnabledMeals,
+        bulkAssignMealPlan
     } = useHackathon();
 
-    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'wifi' | 'rooms'>('teams');
+    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'wifi' | 'rooms' | 'settings'>('teams');
     const [searchQuery, setSearchQuery] = useState("");
     const [showLogisticsModal, setShowLogisticsModal] = useState(false);
     const [selectedTeam, setSelectedTeam] = useState<Project | null>(null);
@@ -73,6 +79,10 @@ export default function AdminDashboard() {
     const [mergeTeamName, setMergeTeamName] = useState("");
     const [isMerging, setIsMerging] = useState(false);
     const [mergeSearchQuery, setMergeSearchQuery] = useState("");
+
+    const [showBulkMealModal, setShowBulkMealModal] = useState(false);
+    const [selectedBulkMeals, setSelectedBulkMeals] = useState<string[]>([]);
+    const [isBulkAssigning, setIsBulkAssigning] = useState(false);
     
     // Pagination state for scalability
     const [currentPage, setCurrentPage] = useState(1);
@@ -146,6 +156,22 @@ export default function AdminDashboard() {
             else next.add(teamId);
             return next;
         });
+    };
+
+    const handleBulkMealAssign = async () => {
+        if (selectedBulkMeals.length === 0) {
+            toast.error("Please select at least one meal to assign.");
+            return;
+        }
+        setIsBulkAssigning(true);
+        try {
+            const allProjectIds = projects.map(p => p.id);
+            await bulkAssignMealPlan(allProjectIds, selectedBulkMeals, true);
+            setShowBulkMealModal(false);
+            setSelectedBulkMeals([]);
+        } finally {
+            setIsBulkAssigning(false);
+        }
     };
 
     const [newJudge, setNewJudge] = useState({ name: "", specialization: "" });
@@ -241,12 +267,27 @@ export default function AdminDashboard() {
         const pending = projects.filter(project => project.status === "PENDING");
         const assigned = projects.filter(project => Boolean(project.room));
 
+        let totalMealsClaimed = 0;
+        let totalMealsIncluded = 0;
+        projects.forEach(p => {
+            if (p.memberMealState) {
+                Object.values(p.memberMealState).forEach(memberSlots => {
+                    Object.values(memberSlots).forEach(slot => {
+                        totalMealsIncluded++; // Each slot represents an included meal
+                        if (slot.claimedAt) totalMealsClaimed++;
+                    });
+                });
+            }
+        });
+
         return {
             total: projects.length,
             pending: pending.length,
             active: projects.length,
             assigned: assigned.length,
             unassigned: projects.length - assigned.length,
+            mealsClaimed: totalMealsClaimed,
+            mealsIncluded: totalMealsIncluded
         };
     }, [projects]);
 
@@ -475,7 +516,7 @@ export default function AdminDashboard() {
                     <MetricCard label="Awaiting review" value={dashboardStats.pending} icon={Clock3} tone="amber" />
                     <MetricCard label="Participating entries" value={dashboardStats.active} icon={CheckCircle2} tone="green" />
                     <MetricCard label="Room assigned" value={dashboardStats.assigned} icon={MapPin} tone="blue" />
-                    <MetricCard label="Need a room" value={dashboardStats.unassigned} icon={ClipboardList} tone="orange" />
+                    <MetricCard label="Meals claim rate" value={dashboardStats.mealsIncluded > 0 ? `${Math.round((dashboardStats.mealsClaimed / dashboardStats.mealsIncluded) * 100)}%` : "0%"} icon={Coffee} tone="red" />
                 </section>
 
             {/* Navigation Tabs */}
@@ -487,7 +528,8 @@ export default function AdminDashboard() {
                     { id: 'judges', label: 'Judges', icon: ShieldCheck },
                     { id: 'volunteers', label: 'Volunteers', icon: Phone },
                     { id: 'wifi', label: 'WiFi', icon: Wifi },
-                    { id: 'rooms', label: 'Rooms', icon: MapPin }
+                    { id: 'rooms', label: 'Rooms', icon: MapPin },
+                    { id: 'settings', label: 'Meals', icon: Coffee }
                 ].map((tab: { id: string, label: string, icon: any }) => (
                     <button
                         key={tab.id}
@@ -566,6 +608,14 @@ export default function AdminDashboard() {
                                 <Upload size={18} />
                             )}
                             {isImporting ? 'Importing...' : 'Import CSV'}
+                        </button>
+                        
+                        {/* Bulk Meals Button */}
+                        <button
+                            onClick={() => setShowBulkMealModal(true)}
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-amber-400 transition hover:border-amber-500/70 hover:bg-amber-500/30"
+                        >
+                            <Coffee size={18} /> Bulk Meal Assign
                         </button>
                     </div>
 
@@ -1128,6 +1178,93 @@ export default function AdminDashboard() {
                 </div>
             )}
 
+            {/* Settings Tab - Meal Management */}
+            {activeTab === 'settings' && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
+                        <div className="flex justify-between items-center mb-8">
+                            <div>
+                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">Meal Settings</h3>
+                                <p className="mt-1 text-xs text-white/40">Configure which meals are active for the event. Only enabled meals can be claimed by participants.</p>
+                            </div>
+                        </div>
+
+                        {/* Enabled Meals Configuration */}
+                        <div className="space-y-6 mb-8">
+                            <div>
+                                <h4 className="text-lg font-black text-white mb-4 uppercase tracking-tight">Available Meals</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {EVENT_MEALS.map((meal) => (
+                                        <label key={meal.key} className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all">
+                                            <input
+                                                type="checkbox"
+                                                checked={enabledMeals.includes(meal.key)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        updateEnabledMeals([...enabledMeals, meal.key]);
+                                                    } else {
+                                                        updateEnabledMeals(enabledMeals.filter(k => k !== meal.key));
+                                                    }
+                                                }}
+                                                className="w-5 h-5 rounded border-white/20 bg-black/50 text-[#14b8a6] focus:ring-[#14b8a6]"
+                                            />
+                                            <div className="flex-1">
+                                                <div className="text-white font-black text-sm">{meal.dayLabel} - {meal.mealLabel}</div>
+                                                <div className="text-white/50 text-xs font-bold">{meal.shortLabel}</div>
+                                            </div>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Quick Actions */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => updateEnabledMeals(EVENT_MEALS.map(m => m.key))}
+                                    className="px-4 py-3 rounded-xl bg-[#14b8a6]/20 border border-[#14b8a6]/40 text-[#14b8a6] font-black uppercase text-xs tracking-widest hover:bg-[#14b8a6]/30 transition-all"
+                                >
+                                    Enable All
+                                </button>
+                                <button
+                                    onClick={() => updateEnabledMeals([])}
+                                    className="px-4 py-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 font-black uppercase text-xs tracking-widest hover:bg-red-500/30 transition-all"
+                                >
+                                    Disable All
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Meal Statistics */}
+                        <div className="border-t border-white/10 pt-8">
+                            <h4 className="text-lg font-black text-white mb-4 uppercase tracking-tight">Meal Claim Statistics</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {enabledMeals.map((mealKey) => {
+                                    const meal = EVENT_MEALS.find(m => m.key === mealKey);
+                                    const totalClaims = projects.reduce((sum, p) => {
+                                        const mms = p.memberMealState || {};
+                                        return sum + Object.values(mms).filter(memberSlots => 
+                                            memberSlots[mealKey]?.claimedAt
+                                        ).length;
+                                    }, 0);
+                                    
+                                    const totalMembers = projects.reduce((sum, p) => sum + (p.members?.length || 0), 0);
+                                    
+                                    return (
+                                        <div key={mealKey} className="p-4 bg-white/5 border border-white/10 rounded-2xl">
+                                            <div className="text-white font-black text-sm mb-1">{meal?.shortLabel || mealKey}</div>
+                                            <div className="text-[#14b8a6] text-2xl font-black">{totalClaims}</div>
+                                            <div className="text-white/50 text-xs">
+                                                of {totalMembers} participants ({totalMembers > 0 ? Math.round((totalClaims / totalMembers) * 100) : 0}%)
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Reserved panel intentionally disabled. */}
             {false && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -1298,12 +1435,58 @@ export default function AdminDashboard() {
                     </div>
                 )}
             </AnimatePresence>
+            
+            <AnimatePresence>
+                {showBulkMealModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-xl max-h-[85vh] overflow-y-auto bg-[#0B0114] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
+                            <div className="flex justify-between items-start mb-6">
+                                <div>
+                                    <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">Bulk Meal Assign</h2>
+                                    <p className="text-xs text-white/50 font-bold uppercase tracking-widest mt-2">Grant access for selected meals to all active teams.</p>
+                                </div>
+                                <button onClick={() => setShowBulkMealModal(false)} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                                    <X size={20} className="text-white/50" />
+                                </button>
+                            </div>
+                            <div className="space-y-4">
+                                {EVENT_MEALS.map((meal) => (
+                                    <label key={meal.key} className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-colors">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedBulkMeals.includes(meal.key)}
+                                            onChange={(e) => {
+                                                if (e.target.checked) setSelectedBulkMeals(prev => [...prev, meal.key]);
+                                                else setSelectedBulkMeals(prev => prev.filter(k => k !== meal.key));
+                                            }}
+                                            className="w-5 h-5 rounded border-white/20 bg-black/50 text-[#14b8a6] focus:ring-[#14b8a6]"
+                                        />
+                                        <div>
+                                            <div className="font-bold text-white uppercase text-sm tracking-wider">{meal.mealLabel}</div>
+                                            <div className="text-[10px] text-white/40 uppercase tracking-widest">{meal.dayLabel}</div>
+                                        </div>
+                                    </label>
+                                ))}
+                            </div>
+                            <div className="mt-8">
+                                <button
+                                    onClick={handleBulkMealAssign}
+                                    disabled={isBulkAssigning || selectedBulkMeals.length === 0}
+                                    className="w-full py-4 rounded-xl font-black uppercase italic tracking-widest transition-all bg-[#14b8a6] text-black hover:bg-[#14b8a6]/80 disabled:opacity-50"
+                                >
+                                    {isBulkAssigning ? 'ASSIGNING...' : `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ALL`}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
             </div>
         </DashboardLayout>
     );
 }
 
-function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: number; icon: any; tone: "purple" | "amber" | "green" | "blue" | "orange" | "red" }) {
+function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: number | string; icon: any; tone: "purple" | "amber" | "green" | "blue" | "orange" | "red" }) {
     const tones = {
         purple: "bg-slate-900/15 text-slate-900 border-slate-800/20",
         amber: "bg-amber-500/15 text-amber-300 border-amber-400/20",
