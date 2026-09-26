@@ -7,7 +7,7 @@ import {
     Users, Gavel, HandHelping, Settings
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { supabase, teamSupabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DEMO_JUDGE, DEMO_TEAM_ID, DEMO_VOLUNTEER } from "@/lib/demo-data";
@@ -129,18 +129,18 @@ export default function LoginPage() {
             }
 
             if (selectedRole === "participant") {
-                const { data: teamData } = await teamSupabase
-                    .from('registrations')
-                    .select('team_id, team_name, password')
-                    .ilike('team_id', id)
-                    .eq('password', pass)
-                    .maybeSingle();
+                const response = await fetch('/api/auth/team', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ teamId: id, password: pass })
+                });
+                const teamData = await response.json();
 
-                if (teamData) {
+                if (response.ok && teamData.success) {
                     setDetectedRole("Participant");
-                    login('team', { teamId: teamData.team_id, name: teamData.team_name });
+                    login('team', { teamId: teamData.teamId, name: teamData.teamName });
                 } else {
-                    setError("Invalid Participant ID or Password");
+                    setError(teamData.error || "Invalid Participant ID or Password");
                 }
                 return;
             }

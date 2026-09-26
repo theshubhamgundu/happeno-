@@ -43,6 +43,8 @@ export const TRACKS = [
     "Open Innovation"
 ];
 
+export const MAX_TEAM_MEMBERS = 4;
+
 export const PROBLEM_STATEMENTS: Record<string, string[]> = {
     "SaaSsum AI (IT & AI)": [
         "Build an AI-driven automated ticketing system.",

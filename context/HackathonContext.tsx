@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 import { STATIC_ROUNDS_CONFIG } from "@/lib/constants";
+import { MAX_TEAM_MEMBERS } from "@/lib/constants";
 import { DEMO_JUDGE, DEMO_PROJECT, DEMO_VOLUNTEER, isDemoSession } from "@/lib/demo-data";
 
 interface EmergencyContact {
@@ -87,7 +88,10 @@ interface HackathonContextType {
     volunteers: Volunteer[];
     addVolunteer: (volunteer: { name: string, phone: string, role: string }) => void;
     removeVolunteer: (id: string) => void;
-    updateMemberDetails: (projectId: any, oldMemberEmail: string, updatedMemberData: Member) => void;
+    updateMemberDetails: (projectId: any, memberIndex: number, updatedMemberData: Member) => Promise<boolean>;
+    removeTeamMember: (projectId: any, memberIndex: number) => Promise<boolean>;
+    addTeamMember: (projectId: any, memberData: Member) => Promise<boolean>;
+    transferTeamMembers: (projectId: any, selections: { sourceTeamId: string; memberIndex: number }[]) => Promise<boolean>;
     claimMemberMeal: (projectId: any, memberId: string, mealKey: string, volunteerId?: string) => Promise<{ status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN'; claimedAt?: string; claimedBy?: string; mealName?: string; }>;
     resetMemberMeal: (projectId: any, memberId: string, mealKey: string) => Promise<void>;
     bulkAssignMealPlan: (projectIds: any[], mealKeys: string[], included: boolean) => Promise<void>;
@@ -244,7 +248,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         const fetchServerTeams = async (isBackground = false) => {
             // Demo sessions must never depend on the registrations table. This
             // keeps the dashboards usable when development credentials are absent.
-            if (isDemoSession(user)) {
+            if (user?.role !== 'admin' && isDemoSession(user)) {
                 if (mountedRef.current) setProjects([DEMO_PROJECT]);
                 return;
             }
@@ -265,7 +269,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 }
             } catch (err) {
                 if (!isBackground) console.error("Failed to sync teams from server:", err);
-                if (isDemoSession(user) && mountedRef.current) setProjects([DEMO_PROJECT]);
+                if (user?.role !== 'admin' && isDemoSession(user) && mountedRef.current) setProjects([DEMO_PROJECT]);
             }
         };
 
@@ -794,34 +798,173 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         setProjects(updatedProjects);
     };
 
-    const updateMemberDetails = async (projectId: any, oldMemberEmail: string, updatedMemberData: Member) => {
+    const updateMemberDetails = async (projectId: any, memberIndex: number, updatedMemberData: Member): Promise<boolean> => {
         const project = projects.find(p => p.id === projectId);
-        if (!project) return;
+        if (!project || !project.members[memberIndex]) return false;
 
-        const newMembers = project.members.map(member => {
+        const oldMember = project.members[memberIndex];
+        const oldEmail = typeof oldMember === 'string' ? '' : oldMember.email || '';
+        const newMembers = project.members.map((member, index) => {
+            if (index !== memberIndex) return member;
             const memberObj = typeof member === 'string' ? { fullName: member } : member;
-            if (memberObj.email === oldMemberEmail) {
-                return { ...memberObj, ...updatedMemberData };
-            }
-            return memberObj;
+            return { ...memberObj, ...updatedMemberData };
         });
-
-        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, members: newMembers } : p));
+        const memberMealState = { ...project.memberMealState };
+        const newEmail = updatedMemberData.email || '';
+        if (oldEmail && oldEmail !== newEmail) {
+            if (newEmail && memberMealState[oldEmail]) memberMealState[newEmail] = memberMealState[oldEmail];
+            delete memberMealState[oldEmail];
+        }
+        const firstMember = newMembers[0];
+        const firstMemberDetails = typeof firstMember === 'string' ? null : firstMember;
 
         try {
             const response = await fetch('/api/teams', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: projectId, members: newMembers })
+                body: JSON.stringify({ id: projectId, members: newMembers, memberMealState })
             });
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to update member');
             }
+            setProjects(prev => prev.map(p => p.id === projectId ? {
+                ...p,
+                members: newMembers,
+                memberMealState,
+                captain: firstMemberDetails?.fullName || (typeof firstMember === 'string' ? firstMember : p.captain),
+                captainMobile: firstMemberDetails?.phone || p.captainMobile,
+                college: firstMemberDetails?.college || p.college
+            } : p));
             toast.success("Participant details updated!");
+            return true;
         } catch (err: any) {
             console.error("Failed to update participant details:", err);
             toast.error(`Sync failed: ${err.message}`);
+            return false;
+        }
+    };
+
+    const removeTeamMember = async (projectId: any, memberIndex: number): Promise<boolean> => {
+        const project = projects.find(p => p.id === projectId);
+        if (!project || !project.members[memberIndex]) return false;
+        if (project.members.length <= 1) {
+            toast.error("A team must keep at least one participant.");
+            return false;
+        }
+
+        const removedMember = project.members[memberIndex];
+        const removedEmail = typeof removedMember === 'string' ? '' : removedMember.email || '';
+        const members = project.members.filter((_, index) => index !== memberIndex);
+        const memberMealState = { ...project.memberMealState };
+        if (removedEmail) delete memberMealState[removedEmail];
+        const firstMember = members[0];
+        const firstMemberDetails = typeof firstMember === 'string' ? null : firstMember;
+
+        try {
+            const response = await fetch('/api/teams', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId, members, memberMealState })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to remove participant');
+            }
+            setProjects(prev => prev.map(p => p.id === projectId ? {
+                ...p,
+                members,
+                memberMealState,
+                captain: firstMemberDetails?.fullName || (typeof firstMember === 'string' ? firstMember : p.captain),
+                captainMobile: firstMemberDetails?.phone || p.captainMobile,
+                college: firstMemberDetails?.college || p.college
+            } : p));
+            toast.success("Participant removed from team.");
+            return true;
+        } catch (err: any) {
+            console.error("Failed to remove participant:", err);
+            toast.error(`Sync failed: ${err.message}`);
+            return false;
+        }
+    };
+
+    const addTeamMember = async (projectId: any, memberData: Member): Promise<boolean> => {
+        const project = projects.find(p => p.id === projectId);
+        const fullName = memberData.fullName.trim();
+        if (!project || !fullName) {
+            toast.error('Participant name is required.');
+            return false;
+        }
+        if (project.members.length >= MAX_TEAM_MEMBERS) {
+            toast.error(`Teams are limited to ${MAX_TEAM_MEMBERS} participants.`);
+            return false;
+        }
+
+        const newMember: Member = {
+            fullName,
+            email: memberData.email?.trim() || '',
+            phone: memberData.phone?.trim() || '',
+            college: memberData.college?.trim() || '',
+            year: memberData.year?.trim() || '',
+            department: memberData.department?.trim() || ''
+        };
+        const members = [...project.members, newMember];
+
+        try {
+            const response = await fetch('/api/teams', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId, members })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to add participant');
+            }
+            setProjects(prev => prev.map(p => p.id === projectId ? { ...p, members } : p));
+            toast.success('Participant added to team.');
+            return true;
+        } catch (err: any) {
+            console.error('Failed to add participant:', err);
+            toast.error(`Sync failed: ${err.message}`);
+            return false;
+        }
+    };
+
+    const transferTeamMembers = async (
+        projectId: any,
+        selections: { sourceTeamId: string; memberIndex: number }[]
+    ): Promise<boolean> => {
+        const target = projects.find(project => project.id === projectId);
+        if (!target || !selections.length) return false;
+        if (target.members.length + selections.length > MAX_TEAM_MEMBERS) {
+            toast.error(`Teams are limited to ${MAX_TEAM_MEMBERS} participants.`);
+            return false;
+        }
+
+        try {
+            const response = await fetch('/api/teams', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId, transferMembers: selections })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Failed to move participants');
+
+            const changedTeams = [result.targetTeam, ...result.updatedSourceTeams];
+            const changedById = new Map(changedTeams.map(team => [String(team.teamId || team.id), team]));
+            const removedIds = new Set(result.removedTeamIds as string[]);
+            setProjects(previous => previous.flatMap(project => {
+                const teamId = String(project.teamId || project.id);
+                if (removedIds.has(teamId)) return [];
+                const changed = changedById.get(teamId);
+                return changed ? [changed] : [project];
+            }));
+            toast.success(`Moved ${selections.length} participant${selections.length === 1 ? '' : 's'} to ${target.team}.`);
+            return true;
+        } catch (error) {
+            console.error('Failed to move existing participants:', error);
+            toast.error(error instanceof Error ? error.message : 'Failed to move participants.');
+            return false;
         }
     };
 
@@ -1045,6 +1188,9 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 roundConfigs,
                 updateRoundTime,
                 updateMemberDetails,
+                removeTeamMember,
+                addTeamMember,
+                transferTeamMembers,
                 claimMemberMeal,
                 resetMemberMeal,
                 bulkAssignMealPlan,

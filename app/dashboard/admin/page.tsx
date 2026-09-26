@@ -79,6 +79,7 @@ export default function AdminDashboard() {
     const [mergeTeamName, setMergeTeamName] = useState("");
     const [isMerging, setIsMerging] = useState(false);
     const [mergeSearchQuery, setMergeSearchQuery] = useState("");
+    const [mergeResult, setMergeResult] = useState<{ teamId: string; teamName: string; password: string; memberCount: number } | null>(null);
 
     const [showBulkMealModal, setShowBulkMealModal] = useState(false);
     const [selectedBulkMeals, setSelectedBulkMeals] = useState<string[]>([]);
@@ -136,7 +137,12 @@ export default function AdminDashboard() {
                 setShowMergeModal(false);
                 setSelectedMergeTeams([]);
                 setMergeTeamName("");
-                setTimeout(() => window.location.reload(), 1500);
+                setMergeResult({
+                    teamId: data.newTeamId,
+                    teamName: data.newTeamName,
+                    password: data.newPassword,
+                    memberCount: data.memberCount
+                });
             } else {
                 toast.error(data.error || "Failed to merge teams");
             }
@@ -307,9 +313,48 @@ export default function AdminDashboard() {
             skipEmptyLines: true,
             complete: async (results) => {
                 try {
-                    const rows = results.data as any[];
-                    // Map generic headers to our expected JSON
-                    const registrations = rows.map((row) => {
+                    const rows = results.data as Record<string, string>[];
+                    const hasRegistrationIds = rows.some(row => row['Registration ID']?.trim());
+                    const registrations = hasRegistrationIds
+                        ? Array.from(rows.reduce((groups, row) => {
+                            const teamId = row['Registration ID']?.trim();
+                            if (!teamId) return groups;
+
+                            const participant = {
+                                fullName: row['Name']?.trim() || '',
+                                email: row['Email']?.trim() || '',
+                                phone: row['Phone Number']?.trim() || '',
+                                college: row['College']?.trim() || '',
+                                year: row['Year']?.trim() || '',
+                                department: row['Department']?.trim() || ''
+                            };
+                            if (!participant.fullName && !participant.email) return groups;
+
+                            const registration = groups.get(teamId) || {
+                                teamId,
+                                teamName: row['Team Name']?.trim() || '',
+                                track: row['Selected Tracks']?.trim() || 'General',
+                                participants: [] as { participant: typeof participant; isLeader: boolean }[]
+                            };
+                            registration.participants.push({
+                                participant,
+                                isLeader: row['Role']?.trim().toLowerCase() === 'team leader'
+                            });
+                            groups.set(teamId, registration);
+                            return groups;
+                        }, new Map<string, { teamId: string; teamName: string; track: string; participants: { participant: { fullName: string; email: string; phone: string; college: string; year: string; department: string }; isLeader: boolean }[] }>()).values())
+                            .map(registration => {
+                                registration.participants.sort((a, b) => Number(b.isLeader) - Number(a.isLeader));
+                                const participants = registration.participants.map(entry => entry.participant);
+                                return {
+                                    ...registration,
+                                    participants,
+                                    teamName: registration.teamName.toLowerCase() === 'individual'
+                                        ? participants[0]?.fullName || registration.teamName
+                                        : registration.teamName
+                                };
+                            })
+                        : rows.map((row) => {
                         const participants = [];
                         
                         // Leader
@@ -366,15 +411,7 @@ export default function AdminDashboard() {
                     
                     if (!importData.success) throw new Error(importData.error || 'Import failed');
 
-                    toast.loading(`Generating credentials for imported teams...`, { id: loadingToast });
-
-                    // 2. Generate Passwords & Team IDs
-                    const pwdRes = await fetch('/api/admin/generate-passwords', { method: 'POST' });
-                    const pwdData = await pwdRes.json();
-
-                    if (!pwdData.success) throw new Error(pwdData.error || 'Credential generation failed');
-
-                    toast.success(`Successfully imported ${importData.imported} teams and generated credentials!`, { id: loadingToast });
+                    toast.success(`Successfully imported ${importData.imported} teams!`, { id: loadingToast });
                     
                     // Reload page to fetch new data
                     setTimeout(() => window.location.reload(), 2000);
@@ -779,7 +816,7 @@ export default function AdminDashboard() {
                                                         </div>
                                                         {!team.password && (
                                                             <p className="text-[9px] text-slate-900/70 font-bold uppercase tracking-wide">
-                                                                âš  Set a password in Supabase for this team to enable login.
+                                                                Login credentials are not available for this team.
                                                             </p>
                                                         )}
                                                     </div>
@@ -1431,6 +1468,31 @@ export default function AdminDashboard() {
                                     {isMerging ? "Merging Teams..." : "Confirm Merge"}
                                 </button>
                             </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {mergeResult && (
+                    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+                        <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0B0114] p-7 shadow-2xl">
+                            <div className="mb-6">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14b8a6]">Merge complete</p>
+                                <h3 className="mt-2 text-2xl font-black uppercase text-white">{mergeResult.teamName}</h3>
+                                <p className="mt-1 text-sm text-white/50">{mergeResult.memberCount} members can use these participant credentials.</p>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Team ID</p>
+                                    <p className="mt-2 select-all font-mono text-lg font-bold text-white">{mergeResult.teamId}</p>
+                                </div>
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Password</p>
+                                    <p className="mt-2 select-all break-all font-mono text-lg font-bold text-[#14b8a6]">{mergeResult.password}</p>
+                                </div>
+                            </div>
+                            <button onClick={() => { setMergeResult(null); window.location.reload(); }} className="mt-6 w-full rounded-xl bg-[#14b8a6] py-3 text-sm font-black uppercase tracking-wider text-black transition hover:bg-white">Done</button>
                         </motion.div>
                     </div>
                 )}

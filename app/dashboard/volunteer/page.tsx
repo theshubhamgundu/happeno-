@@ -45,13 +45,11 @@ export default function VolunteerDashboard() {
     }, [volunteers, user]);
 
     const assignedTeams = useMemo(() => {
-        if (!currentVolunteer) return [];
         return projects.filter(p =>
-            p.coordinator?.name === currentVolunteer.name &&
-            (p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.teamId?.toLowerCase().includes(searchQuery.toLowerCase()))
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.teamId?.toLowerCase().includes(searchQuery.toLowerCase())
         );
-    }, [projects, searchQuery, currentVolunteer]);
+    }, [projects, searchQuery]);
 
     const handleScan = (data: string) => {
         // Start async processing but return synchronously

@@ -39,6 +39,7 @@ export async function POST(req: Request) {
 
             return {
                 team_name: teamName,
+                team_id: reg.teamId || null,
                 track: reg.track || 'TBD',
                 problem_statement: reg.problemStatement || '',
                 college: captain.college || '',
@@ -47,14 +48,13 @@ export async function POST(req: Request) {
                 email: captain.email || '',
                 members: participants, // array of objects
                 entry_type: entry_type,
-                status: 'PENDING',
                 raw_data: reg // Keep full payload
             };
         });
 
         const { data, error } = await supabase
             .from('registrations')
-            .insert(toInsert)
+            .upsert(toInsert, { onConflict: 'team_id' })
             .select('transaction_id, entry_type, team_name');
 
         if (error) {

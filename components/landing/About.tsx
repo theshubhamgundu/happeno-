@@ -8,16 +8,19 @@ const CITIES = [
     name: 'Warangal',
     tag: 'Historical & Cultural Capital',
     desc: 'The historic heart of Kakatiya heritage, bringing together passionate engineers, innovative thinkers, and researchers.',
+    bgImage: '/images/hanamkonda.jpg'
   },
   {
     name: 'Hanamkonda',
     tag: 'Education & Commercial Hub',
     desc: 'The educational powerhouse with premier institutes fostering young minds in deep tech, software development, and design.',
+    bgImage: '/images/warangal.jpeg'
   },
   {
     name: 'Kazipet',
     tag: 'Connectivity & Logistics Core',
     desc: 'The key junction connecting Telangana to the nation, representing infrastructure, systems integration, and IoT networks.',
+    bgImage: '/images/kazipet.webp'
   },
 ];
 
@@ -91,19 +94,31 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {CITIES.map((city, i) => (
             <FadeIn key={city.name} delay={0.2 + i * 0.1}>
-              <div className="pro-card rounded-xl p-8 h-full flex flex-col justify-between bg-white border border-gray-200 hover:border-teal-600 transition-all duration-300">
-                <div>
-                  <div className="inline-block px-3 py-1 rounded text-[11px] font-mono font-medium tracking-wide uppercase bg-teal-50 text-[#0f766e] mb-4">
+              <div 
+                className="pro-card rounded-xl p-8 h-full flex flex-col justify-between border border-gray-200 hover:border-teal-600 transition-all duration-300 relative overflow-hidden group"
+                style={{
+                  backgroundImage: `url(${city.bgImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              >
+                {/* Black overlay for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/75 group-hover:from-black/60 group-hover:via-black/50 group-hover:to-black/65 transition-all duration-300" />
+                
+                {/* Content */}
+                <div className="relative z-10">
+                  <div className="inline-block px-3 py-1 rounded text-[11px] font-mono font-medium tracking-wide uppercase bg-teal-500/80 text-white mb-4 backdrop-blur-sm">
                     {city.tag}
                   </div>
-                  <h3 className="font-display font-bold text-2xl text-[#0f172a] mb-3">
+                  <h3 className="font-display font-bold text-2xl text-white mb-3 drop-shadow-lg">
                     {city.name}
                   </h3>
-                  <p className="font-body text-sm text-gray-600 leading-relaxed">{city.desc}</p>
+                  <p className="font-body text-sm text-gray-200 leading-relaxed drop-shadow-md">{city.desc}</p>
                 </div>
-                <div className="pt-6 mt-6 border-t border-gray-100 flex items-center justify-between text-xs font-mono text-gray-500">
+                <div className="pt-6 mt-6 border-t border-white/20 flex items-center justify-between text-xs font-mono text-gray-300 relative z-10">
                   <span>Telangana</span>
-                  <span className="text-[#0f766e] font-semibold">Tri-City Hub</span>
+                  <span className="text-teal-400 font-semibold">Tri-City Hub</span>
                 </div>
               </div>
             </FadeIn>

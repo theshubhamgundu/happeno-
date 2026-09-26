@@ -14,7 +14,10 @@ import {
     X,
     Save,
     Coffee,
-    Check
+    Check,
+    Trash2,
+    Plus,
+    Loader2
 } from "lucide-react";
 import { useState, useMemo, Fragment } from "react";
 import { useHackathon, Project, Member } from "@/context/HackathonContext";
@@ -22,12 +25,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { EVENT_MEALS } from "@/lib/meals";
+import { MAX_TEAM_MEMBERS } from "@/lib/constants";
 
 interface UserListItem extends Member {
     teamName: string;
     teamId: string;
     track: string;
     isTrackSelected: boolean;
+}
+
+interface ExistingMemberChoice {
+    sourceTeamId: string;
+    sourceTeamName: string;
+    memberIndex: number;
+    member: Member;
 }
 
 const AVATAR_GRADIENTS = [
@@ -40,12 +51,55 @@ const AVATAR_GRADIENTS = [
 ];
 
 export default function UsersManagement() {
-    const { projects, isLoading, updateMemberDetails, toggleMealAccess } = useHackathon();
+    const { projects, isLoading, updateMemberDetails, removeTeamMember, addTeamMember, transferTeamMembers, toggleMealAccess } = useHackathon();
     const [editingParticipant, setEditingParticipant] = useState<UserListItem | null>(null);
+    const [editingLocation, setEditingLocation] = useState<{ teamId: string; memberIndex: number } | null>(null);
     const [editFormData, setEditFormData] = useState<Partial<UserListItem>>({});
+    const [addingToTeam, setAddingToTeam] = useState<Project | null>(null);
+    const [newMemberForm, setNewMemberForm] = useState<Member>({ fullName: '' });
+    const [isAddingMember, setIsAddingMember] = useState(false);
+    const [addParticipantMode, setAddParticipantMode] = useState<'manual' | 'existing'>('manual');
+    const [existingMemberQuery, setExistingMemberQuery] = useState('');
+    const [selectedExistingMembers, setSelectedExistingMembers] = useState<{ sourceTeamId: string; memberIndex: number }[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [filterYear, setFilterYear] = useState<string>("All Years");
     const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null);
+
+    const handleAddParticipant = async () => {
+        if (!addingToTeam) return;
+        if (addParticipantMode === 'manual' && !newMemberForm.fullName.trim()) return;
+        if (addParticipantMode === 'existing' && !selectedExistingMembers.length) return;
+
+        setIsAddingMember(true);
+        const added = addParticipantMode === 'manual'
+            ? await addTeamMember(addingToTeam.id, newMemberForm)
+            : await transferTeamMembers(addingToTeam.id, selectedExistingMembers);
+        setIsAddingMember(false);
+        if (added) {
+            setAddingToTeam(null);
+            setNewMemberForm({ fullName: '' });
+            setSelectedExistingMembers([]);
+            setExistingMemberQuery('');
+        }
+    };
+
+    const existingMemberChoices = useMemo<ExistingMemberChoice[]>(() => {
+        if (!addingToTeam) return [];
+        const query = existingMemberQuery.trim().toLowerCase();
+        return projects.flatMap(project => {
+            if (String(project.id) === String(addingToTeam.id)) return [];
+            const sourceTeamId = String(project.teamId || project.id);
+            return project.members.flatMap((entry, memberIndex) => {
+                const member = typeof entry === 'string' ? { fullName: entry } : entry;
+                const searchable = [member.fullName, member.email, member.phone, project.team, project.teamId]
+                    .filter(Boolean)
+                    .join(' ')
+                    .toLowerCase();
+                if (query && !searchable.includes(query)) return [];
+                return [{ sourceTeamId, sourceTeamName: project.team, memberIndex, member }];
+            });
+        });
+    }, [projects, addingToTeam, existingMemberQuery]);
 
     const allUsers = useMemo(() => {
         const users: UserListItem[] = [];
@@ -338,7 +392,24 @@ export default function UsersManagement() {
                                                     >
                                                         <td colSpan={4} className="p-0">
                                                             <div className="p-8 pl-24 space-y-4">
-                                                                <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">Team Participants</p>
+                                                                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                                                    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Team Participants ({project.members.length}/{MAX_TEAM_MEMBERS})</p>
+                                                                    <button
+                                                                        onClick={(event) => {
+                                                                            event.stopPropagation();
+                                                                            setNewMemberForm({ fullName: '' });
+                                                                            setAddParticipantMode('manual');
+                                                                            setExistingMemberQuery('');
+                                                                            setSelectedExistingMembers([]);
+                                                                            setAddingToTeam(project);
+                                                                        }}
+                                                                        disabled={project.members.length >= MAX_TEAM_MEMBERS}
+                                                                        title={project.members.length >= MAX_TEAM_MEMBERS ? `Teams are limited to ${MAX_TEAM_MEMBERS} participants` : 'Add participant'}
+                                                                        className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#5eead4] bg-[#14b8a6] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[#062d2a] shadow-md shadow-black/20 transition hover:bg-[#5eead4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:border-white/20 disabled:bg-white/10 disabled:text-white/40 disabled:shadow-none"
+                                                                    >
+                                                                        <Plus size={16} strokeWidth={3} /> {project.members.length >= MAX_TEAM_MEMBERS ? 'Team full' : 'Add participant'}
+                                                                    </button>
+                                                                </div>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                     {project.members.map((member, mIdx) => {
                                                                         const m = typeof member === 'string' ? { fullName: member } as Member : member;
@@ -362,7 +433,7 @@ export default function UsersManagement() {
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div className="flex flex-col gap-2 opacity-0 group-hover/member:opacity-100 transition-opacity">
+                                                                                <div className="flex gap-2 opacity-100 md:flex-col md:opacity-0 md:group-hover/member:opacity-100 transition-opacity">
                                                                                     <button 
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
@@ -375,11 +446,24 @@ export default function UsersManagement() {
                                                                                             };
                                                                                             setEditingParticipant(userObj as UserListItem);
                                                                                             setEditFormData(userObj);
+                                                                                            setEditingLocation({ teamId: String(project.id), memberIndex: mIdx });
                                                                                         }}
                                                                                         className="p-2 rounded-lg bg-white/5 text-[#14b8a6]/60 hover:text-[#14b8a6] hover:bg-[#14b8a6]/10 transition-colors"
                                                                                         title="Edit Participant"
                                                                                     >
                                                                                         <Edit size={12} />
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            if (project.members.length <= 1 || !window.confirm(`Remove ${m.fullName || 'this participant'} from ${project.team}?`)) return;
+                                                                                            void removeTeamMember(project.id, mIdx);
+                                                                                        }}
+                                                                                        disabled={project.members.length <= 1}
+                                                                                        className="p-2 rounded-lg bg-white/5 text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+                                                                                        title={project.members.length <= 1 ? 'A team must have at least one participant' : 'Remove Participant'}
+                                                                                    >
+                                                                                        <Trash2 size={12} />
                                                                                     </button>
                                                                                 </div>
                                                                             </div>
@@ -477,8 +561,8 @@ export default function UsersManagement() {
                             exit={{ scale: 0.95, opacity: 0 }}
                             className="bg-white p-8 rounded-[1rem] shadow-2xl max-w-lg w-full relative"
                         >
-                            <button
-                                onClick={() => setEditingParticipant(null)}
+                                <button
+                                onClick={() => { setEditingParticipant(null); setEditingLocation(null); }}
                                 className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
                             >
                                 <X size={20} />
@@ -549,16 +633,15 @@ export default function UsersManagement() {
                             
                             <div className="mt-8 flex justify-end gap-4">
                                 <button 
-                                    onClick={() => setEditingParticipant(null)}
+                                    onClick={() => { setEditingParticipant(null); setEditingLocation(null); }}
                                     className="px-6 py-2.5 rounded-full bg-gray-200 text-black font-bold uppercase text-[11px] tracking-widest hover:bg-gray-300 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button 
-                                    onClick={() => {
-                                        const projectId = projects.find(p => p.team === editingParticipant.teamName)?.id;
-                                        if (projectId && editingParticipant.email) {
-                                            updateMemberDetails(projectId, editingParticipant.email, {
+                                    onClick={async () => {
+                                        if (editingLocation) {
+                                            const saved = await updateMemberDetails(editingLocation.teamId, editingLocation.memberIndex, {
                                                 fullName: editFormData.fullName || '',
                                                 email: editFormData.email,
                                                 phone: editFormData.phone,
@@ -566,12 +649,145 @@ export default function UsersManagement() {
                                                 year: editFormData.year,
                                                 department: editFormData.department
                                             });
+                                            if (saved) {
+                                                setEditingParticipant(null);
+                                                setEditingLocation(null);
+                                            }
                                         }
-                                        setEditingParticipant(null);
                                     }}
                                     className="px-6 py-2.5 rounded-full bg-[#14b8a6] text-black font-bold uppercase text-[11px] tracking-widest hover:bg-[#0d9488] transition-colors flex items-center gap-2"
                                 >
                                     <Save size={14} /> Save Changes
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {addingToTeam && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.96, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.96, opacity: 0 }}
+                            className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl md:p-8"
+                        >
+                            <button
+                                onClick={() => setAddingToTeam(null)}
+                                className="absolute right-5 top-5 text-gray-400 transition-colors hover:text-gray-700"
+                                aria-label="Close add participant form"
+                            >
+                                <X size={20} />
+                            </button>
+                            <h2 className="mb-1 text-xl font-bold uppercase tracking-wide text-gray-800">
+                                Add <span className="text-[#14b8a6]">Participant</span>
+                            </h2>
+                            <p className="mb-6 text-xs text-gray-500">Adding to {addingToTeam.team} ({addingToTeam.teamId})</p>
+                            <div className="mb-5 grid grid-cols-2 rounded-xl border border-gray-200 bg-gray-100 p-1">
+                                <button
+                                    onClick={() => setAddParticipantMode('manual')}
+                                    className={`rounded-lg px-3 py-2.5 text-xs font-bold transition ${addParticipantMode === 'manual' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                                >
+                                    Manual entry
+                                </button>
+                                <button
+                                    onClick={() => setAddParticipantMode('existing')}
+                                    className={`rounded-lg px-3 py-2.5 text-xs font-bold transition ${addParticipantMode === 'existing' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                                >
+                                    Existing member
+                                </button>
+                            </div>
+
+                            {addParticipantMode === 'manual' ? (
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    {([
+                                        ['fullName', 'Full Name', 'text'],
+                                        ['email', 'Email', 'email'],
+                                        ['phone', 'Phone', 'tel'],
+                                        ['college', 'College', 'text'],
+                                        ['year', 'Year', 'text'],
+                                        ['department', 'Department', 'text']
+                                    ] as const).map(([field, label, type]) => (
+                                        <label key={field} className="space-y-1.5">
+                                            <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500">{label}{field === 'fullName' ? ' *' : ''}</span>
+                                            <input
+                                                type={type}
+                                                required={field === 'fullName'}
+                                                value={newMemberForm[field] || ''}
+                                                onChange={event => setNewMemberForm(current => ({ ...current, [field]: event.target.value }))}
+                                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-900 outline-none transition focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                                            />
+                                        </label>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <p className="text-xs font-semibold text-gray-600">Move an existing person from another team.</p>
+                                        <span className="shrink-0 rounded-full bg-teal-50 px-2.5 py-1 text-[10px] font-bold text-teal-800">
+                                            {selectedExistingMembers.length}/{MAX_TEAM_MEMBERS - addingToTeam.members.length} selected
+                                        </span>
+                                    </div>
+                                    <input
+                                        type="search"
+                                        value={existingMemberQuery}
+                                        onChange={event => setExistingMemberQuery(event.target.value)}
+                                        placeholder="Search name, email, team, or ID"
+                                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                                    />
+                                    <div className="max-h-64 space-y-2 overflow-y-auto rounded-xl border border-gray-200 bg-gray-50 p-2">
+                                        {existingMemberChoices.map(choice => {
+                                            const choiceKey = `${choice.sourceTeamId}:${choice.memberIndex}`;
+                                            const isSelected = selectedExistingMembers.some(selection => `${selection.sourceTeamId}:${selection.memberIndex}` === choiceKey);
+                                            const atSelectionLimit = selectedExistingMembers.length >= MAX_TEAM_MEMBERS - addingToTeam.members.length;
+                                            return (
+                                                <label key={choiceKey} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${isSelected ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white hover:border-gray-300'} ${!isSelected && atSelectionLimit ? 'cursor-not-allowed opacity-50' : ''}`}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        disabled={!isSelected && atSelectionLimit}
+                                                        onChange={event => setSelectedExistingMembers(current => event.target.checked
+                                                            ? [...current, { sourceTeamId: choice.sourceTeamId, memberIndex: choice.memberIndex }]
+                                                            : current.filter(selection => `${selection.sourceTeamId}:${selection.memberIndex}` !== choiceKey)
+                                                        )}
+                                                        className="mt-0.5 h-4 w-4 accent-teal-700"
+                                                    />
+                                                    <span className="min-w-0 flex-1">
+                                                        <span className="block truncate text-sm font-bold text-gray-900">{choice.member.fullName || 'Unnamed participant'}</span>
+                                                        <span className="mt-0.5 block truncate text-xs text-gray-500">{choice.member.email || choice.member.phone || 'No contact details'}</span>
+                                                        <span className="mt-1 block truncate text-[10px] font-semibold uppercase tracking-wide text-teal-800">From {choice.sourceTeamName} · {choice.sourceTeamId}</span>
+                                                    </span>
+                                                </label>
+                                            );
+                                        })}
+                                        {!existingMemberChoices.length && (
+                                            <p className="px-3 py-8 text-center text-sm text-gray-500">No participants found on other teams.</p>
+                                        )}
+                                    </div>
+                                    <p className="text-[11px] leading-relaxed text-gray-500">Selected people will be removed from their current teams. An empty source team will be removed from the active directory.</p>
+                                </div>
+                            )}
+                            <div className="mt-7 flex justify-end gap-3">
+                                <button
+                                    onClick={() => setAddingToTeam(null)}
+                                    className="rounded-lg bg-gray-100 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-700 transition hover:bg-gray-200"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleAddParticipant}
+                                    disabled={isAddingMember || (addParticipantMode === 'manual' ? !newMemberForm.fullName.trim() : !selectedExistingMembers.length)}
+                                    className="inline-flex items-center gap-2 rounded-lg bg-[#14b8a6] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-black transition hover:bg-[#0d9488] disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {isAddingMember ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                    {isAddingMember ? 'Saving...' : addParticipantMode === 'manual' ? 'Add Participant' : 'Move Selected'}
                                 </button>
                             </div>
                         </motion.div>

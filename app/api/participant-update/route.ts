@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
 import fs from 'fs';
 import path from 'path';
+import { getLocalTeams, updateLocalTeam } from '@/lib/local-team-store';
 
 const useLocalDb = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const dataPath = path.join(process.cwd(), 'data', 'registrations.json');
@@ -18,6 +19,40 @@ export async function GET(req: Request) {
                 { error: 'Team ID and password are required' },
                 { status: 400 }
             );
+        }
+
+        const localTeam = getLocalTeams().find(team =>
+            team.teamId?.toLowerCase() === teamId.toLowerCase() && team.password === password
+        );
+        if (localTeam) {
+            const members = (localTeam.members || []).map(member => typeof member === 'string'
+                ? { fullName: member, email: '', phone: '', college: '', year: '', department: '' }
+                : {
+                    fullName: member.fullName || '',
+                    email: member.email || '',
+                    phone: member.phone || '',
+                    college: member.college || '',
+                    year: member.year || '',
+                    department: member.department || ''
+                }
+            );
+            const captain = members[0];
+            return NextResponse.json({
+                success: true,
+                team: {
+                    teamId: localTeam.teamId,
+                    teamName: localTeam.team,
+                    track: localTeam.track || '',
+                    captain: localTeam.captain || captain?.fullName || '',
+                    captainMobile: localTeam.captainMobile || captain?.phone || '',
+                    college: localTeam.college || captain?.college || '',
+                    email: captain?.email || '',
+                    members,
+                    status: localTeam.status || 'REGISTERED',
+                    problemStatement: localTeam.problemStatement || '',
+                    createdAt: new Date().toISOString()
+                }
+            });
         }
 
         if (useLocalDb) {
@@ -100,6 +135,24 @@ export async function PATCH(req: Request) {
                 { error: 'Team ID and password are required for verification' },
                 { status: 400 }
             );
+        }
+
+        const localTeam = getLocalTeams().find(team =>
+            team.teamId?.toLowerCase() === String(teamId).toLowerCase() && team.password === password
+        );
+        if (localTeam) {
+            const updated = updateLocalTeam(String(teamId), String(password), {
+                team: teamName,
+                track,
+                captain,
+                captainMobile,
+                college,
+                members
+            });
+            if (!updated) {
+                return NextResponse.json({ error: 'Authentication failed. Invalid Team ID or Password.' }, { status: 403 });
+            }
+            return NextResponse.json({ success: true, message: 'Details updated successfully!' });
         }
 
         // Re-verify credentials before allowing update
