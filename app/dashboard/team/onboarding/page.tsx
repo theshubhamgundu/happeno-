@@ -45,7 +45,7 @@ export default function TeamOnboarding() {
             <div className="max-w-4xl mx-auto pb-20">
                 <div className="mb-12">
                     <h2 className="text-3xl font-black italic uppercase tracking-tighter mb-4">Complete your Profile</h2>
-                    <p className="text-white/40 font-medium">Please provide accurate information for verification and certificate generation.</p>
+                    <p className="text-white/40 font-medium">Please provide accurate information so organizers can coordinate your team.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">

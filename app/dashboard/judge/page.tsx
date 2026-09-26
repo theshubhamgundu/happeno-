@@ -30,8 +30,10 @@ import { useHackathon, Project } from "@/context/HackathonContext";
 import { useAuth } from "@/context/AuthContext";
 import { STATIC_ROUNDS_CONFIG } from "@/lib/constants";
 
+const MAX_JUDGE_EVALUATIONS_PER_ROUND = 2;
+
 export default function JudgeDashboard() {
-    const { hackathonStartDate, projects, updateProjectScore, judges, isRoundLockEnabled, roundConfigs } = useHackathon();
+    const { hackathonStartDate, projects, updateProjectScore, judges, isRoundLockEnabled, roundConfigs, isLoading } = useHackathon();
     const { user } = useAuth();
     const [searchQuery, setSearchQuery] = useState("");
     const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -77,7 +79,7 @@ export default function JudgeDashboard() {
                 const scores = p.roundScores?.[r.id] || {};
                 const judgeAlreadyScored = scores[currentJudge.generatedId] !== undefined;
                 const totalScores = Object.keys(scores).length;
-                return judgeAlreadyScored || totalScores >= 1;
+                return judgeAlreadyScored || totalScores >= MAX_JUDGE_EVALUATIONS_PER_ROUND;
             });
         }).length;
     }, [activeProjects, judgingRounds, currentJudge]);
@@ -94,10 +96,7 @@ export default function JudgeDashboard() {
             const matchesTeam = (p.team || "").toLowerCase().includes(query);
             const matchesTrack = (p.track || "").toLowerCase().includes(query);
             const matchesId = (p.teamId || "").toLowerCase().includes(query);
-            const isNumeric = /^\d+$/.test(query);
-            const matchesPrefixId = isNumeric && (p.teamId || "").toLowerCase().includes(`vh-${query}`);
-
-            return matchesName || matchesTeam || matchesTrack || matchesId || matchesPrefixId;
+            return matchesName || matchesTeam || matchesTrack || matchesId;
         });
     }, [activeProjects, searchQuery]);
 
@@ -113,7 +112,7 @@ export default function JudgeDashboard() {
             const scores = project.roundScores?.[r.id] || {};
             const judgeAlreadyScored = scores[currentJudge.generatedId] !== undefined;
             const totalScores = Object.keys(scores).length;
-            return !judgeAlreadyScored && totalScores < 1;
+            return !judgeAlreadyScored && totalScores < MAX_JUDGE_EVALUATIONS_PER_ROUND;
         });
 
         if (!nextRound) {
@@ -140,22 +139,25 @@ export default function JudgeDashboard() {
         }));
     };
 
-    const handleScoreSubmit = () => {
+    const handleScoreSubmit = async () => {
         if (!activeProject || !evaluationRound || !currentJudge) return;
         const values = Object.values(currentScores);
+        if (values.length !== evaluationRound.criteria.length || values.some(value => value < 1 || value > 10) || !comment.trim()) {
+            toast.error("Score every criterion from 1 to 10 and add feedback before submitting.");
+            return;
+        }
         const total = values.reduce((a, b) => a + b, 0);
-        const average = total / evaluationRound.criteria.length;
 
         // Final check for 2-judge limit before updating
         const existingScores = activeProject.roundScores?.[evaluationRound.id] || {};
         const isSelfUpdate = existingScores[currentJudge.generatedId] !== undefined;
-        if (!isSelfUpdate && Object.keys(existingScores).length >= 1) {
+        if (!isSelfUpdate && Object.keys(existingScores).length >= MAX_JUDGE_EVALUATIONS_PER_ROUND) {
             toast.error("This entry already has an evaluation for this round.");
             setActiveProject(null);
             return;
         }
 
-        updateProjectScore(
+        const saved = await updateProjectScore(
             activeProject.id,
             evaluationRound.id,
             currentJudge.generatedId,
@@ -163,6 +165,10 @@ export default function JudgeDashboard() {
             comment,
             currentScores
         );
+        if (!saved) {
+            toast.error("Evaluation could not be saved. Please try again.");
+            return;
+        }
         toast.success(`Evaluation submitted: ${activeProject.name}`);
 
         setActiveProject(null);
@@ -177,6 +183,18 @@ export default function JudgeDashboard() {
             ? `Judge: ${currentJudge.name}`
             : "Judge Dashboard";
 
+    if (isLoading) {
+        return (
+            <DashboardLayout type="judge" title="Loading judging pool">
+                <div className="grid min-h-[320px] place-items-center">
+                    <div className="text-center">
+                        <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-[#FFEE00] border-t-transparent" />
+                        <p className="mt-4 text-xs font-semibold text-white/50">Loading all teams and evaluation data</p>
+                    </div>
+                </div>
+            </DashboardLayout>
+        );
+    }
 
     return (
         <DashboardLayout type="judge" title={dashboardTitle}>
@@ -200,27 +218,14 @@ export default function JudgeDashboard() {
                                 <span className="font-black italic uppercase tracking-tighter text-white text-sm leading-none truncate">
                                     {currentJudge.name}
                                 </span>
-                                {/* Specialization badge */}
-                                <span className="hidden sm:inline px-2 py-0.5 rounded-full bg-slate-900/15 border border-slate-800/20 text-[8px] font-black text-slate-900 uppercase tracking-widest whitespace-nowrap">
-                                    {currentJudge.specialization || "General"}
-                                </span>
-                                {/* Spacer */}
-                                <div className="flex-1" />
-                                {/* ID chip */}
-                                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#FFEE00]/10 border border-[#FFEE00]/25 rounded-lg">
-                                    <div className="w-1 h-1 rounded-full bg-[#FFEE00] animate-pulse" />
-                                    <code className="text-[11px] font-mono font-black text-[#FFEE00] tracking-widest whitespace-nowrap">
-                                        {currentJudge.generatedId}
-                                    </code>
-                                </div>
                             </div>
                         )}
 
 
                         {/* Stats Grid — always 3 cols, compact on mobile */}
-                        <div className="grid grid-cols-3 gap-2 md:gap-6 mb-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8">
                             {/* Card 1: Active */}
-                            <div className="bg-[#FFEE00] border-2 md:border-4 border-black rounded-2xl md:rounded-[2.5rem] p-3 md:p-8 flex flex-col justify-between shadow-[4px_4px_0_#9333ea] md:shadow-[8px_8px_0_#9333ea] relative group">
+                            <div className="bg-[#FFEE00] border-2 md:border-4 border-black rounded-2xl md:rounded-[2.5rem] p-4 md:p-8 flex flex-col justify-between shadow-[4px_4px_0_#9333ea] md:shadow-[8px_8px_0_#9333ea] relative group">
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-1 mb-1">
                                         <Users size={12} className="text-black md:hidden" />
@@ -233,7 +238,7 @@ export default function JudgeDashboard() {
                             </div>
 
                             {/* Card 2: Completed */}
-                            <div className="bg-white/5 border border-white/10 rounded-2xl md:rounded-[2.5rem] p-3 md:p-8 flex flex-col justify-center backdrop-blur-md relative overflow-hidden">
+                            <div className="bg-white/5 border border-white/10 rounded-2xl md:rounded-[2.5rem] p-4 md:p-8 flex flex-col justify-center backdrop-blur-md relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-16 md:w-32 h-16 md:h-32 bg-green-500/10 rounded-full blur-[30px] md:blur-[50px] translate-x-1/2 -translate-y-1/2" />
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-1 mb-1 md:mb-4">
@@ -246,7 +251,7 @@ export default function JudgeDashboard() {
                             </div>
 
                             {/* Card 3: Pending */}
-                            <div className="bg-white/5 border border-white/10 rounded-2xl md:rounded-[2.5rem] p-3 md:p-8 flex flex-col justify-center backdrop-blur-md relative overflow-hidden">
+                            <div className="bg-white/5 border border-white/10 rounded-2xl md:rounded-[2.5rem] p-4 md:p-8 flex flex-col justify-center backdrop-blur-md relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-16 md:w-32 h-16 md:h-32 bg-slate-900/10 rounded-full blur-[30px] md:blur-[50px] translate-x-1/2 -translate-y-1/2" />
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-1 mb-1 md:mb-4">
@@ -260,7 +265,7 @@ export default function JudgeDashboard() {
                         </div>
 
                         {/* Search */}
-                        <div className="mb-8 relative max-w-lg">
+                        <div className="mb-6 md:mb-8 relative w-full max-w-lg">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <Search className="text-white/30" size={18} />
                             </div>
@@ -286,7 +291,7 @@ export default function JudgeDashboard() {
                                         const scores = project.roundScores?.[r.id] || {};
                                         const judgeAlreadyScored = scores[currentJudge?.generatedId || ""] !== undefined;
                                         const totalScores = Object.keys(scores).length;
-                                        return !judgeAlreadyScored && totalScores < 2;
+                                        return !judgeAlreadyScored && totalScores < MAX_JUDGE_EVALUATIONS_PER_ROUND;
                                     });
                                     const isFullyEvaluated = !nextRound;
                                     const currentRoundDisplay = nextRound || judgingRounds[judgingRounds.length - 1];
@@ -295,17 +300,17 @@ export default function JudgeDashboard() {
                                         <motion.div
                                             layoutId={`project-${project.id}`}
                                             key={project.id}
-                                            className="group bg-white/5 border border-white/10 rounded-[2.5rem] p-6 md:p-8 hover:bg-white/[0.08] transition-all duration-300 flex flex-col md:flex-row items-center gap-8 shadow-xl"
+                                            className="group bg-white/5 border border-white/10 rounded-2xl md:rounded-[2.5rem] p-4 sm:p-6 md:p-8 hover:bg-white/[0.08] transition-all duration-300 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 md:gap-8 shadow-xl"
                                         >
-                                            <div className="w-20 h-20 bg-gradient-to-br from-slate-900/20 to-blue-600/20 rounded-[1.5rem] border border-white/10 flex items-center justify-center shrink-0">
-                                                <span className="text-3xl font-black text-white/80 italic">{(project.name || "?")[0]}</span>
+                                            <div className="w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br from-slate-900/20 to-blue-600/20 rounded-xl sm:rounded-[1.5rem] border border-white/10 flex items-center justify-center shrink-0">
+                                                <span className="text-2xl sm:text-3xl font-black text-white/80 italic">{(project.name || "?")[0]}</span>
                                             </div>
 
-                                            <div className="flex-grow text-center md:text-left min-w-0">
+                                            <div className="flex-grow text-left min-w-0">
                                                 {/* Title */}
-                                                <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-white leading-tight truncate">{project.name}</h3>
+                                                <h3 className="text-lg sm:text-xl md:text-2xl font-black italic uppercase tracking-tighter text-white leading-tight break-words">{project.name}</h3>
                                                 {/* ID + Badge row — wraps cleanly */}
-                                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mt-1.5 mb-2">
+                                                <div className="flex flex-wrap items-center gap-1.5 mt-1.5 mb-2">
                                                     <span className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-[9px] font-black uppercase tracking-wider text-white/40 whitespace-nowrap">{project.teamId}</span>
                                                     {nextRound && (
                                                         <span className="px-2 py-0.5 bg-slate-900/10 border border-slate-800/20 rounded-md text-[9px] font-black uppercase tracking-wider text-slate-900 whitespace-nowrap">
@@ -313,12 +318,12 @@ export default function JudgeDashboard() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-[11px] font-bold text-white/30 uppercase tracking-widest flex items-center justify-center md:justify-start gap-1.5 truncate">
+                                                <p className="text-[11px] font-bold text-white/30 uppercase tracking-widest flex items-center gap-1.5 break-words">
                                                     <Users size={11} /> {project.team}
                                                 </p>
                                             </div>
 
-                                            <div className="flex items-center gap-4 shrink-0 w-full md:w-auto">
+                                                <div className="flex items-center gap-4 shrink-0 w-full sm:w-auto">
                                                 {isFullyEvaluated ? (
                                                     <div className="h-14 w-full md:w-auto px-8 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center md:justify-start gap-3">
                                                         <div className="flex flex-col items-center md:items-end">
@@ -361,15 +366,15 @@ export default function JudgeDashboard() {
                         className="space-y-8"
                     >
                         {/* Header & Navigation */}
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
                             <button
                                 onClick={() => setActiveProject(null)}
-                                className="flex items-center gap-2 text-white/40 hover:text-white transition-colors group"
+                                className="flex items-center gap-2 self-start text-white/40 hover:text-white transition-colors group"
                             >
                                 <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                                 <span className="text-xs font-black uppercase tracking-widest">Back to Projects</span>
                             </button>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-slate-900/10 border border-slate-800/20 rounded-xl">
+                            <div className="flex max-w-full flex-wrap items-center gap-2 px-3 py-2 bg-slate-900/10 border border-slate-800/20 rounded-xl">
                                 <Target size={16} className="text-slate-900" />
                                 <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
                                     {evaluationRound.title} Evaluation Active
@@ -378,7 +383,7 @@ export default function JudgeDashboard() {
                         </div>
 
                         {/* Project Information Card */}
-                        <div className="bg-white/5 border border-white/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 relative overflow-hidden shadow-2xl">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl md:rounded-[3rem] p-4 sm:p-6 md:p-12 relative overflow-hidden shadow-2xl">
                             <div className="absolute top-0 right-0 w-96 h-96 bg-[#FFEE00]/5 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2" />
 
                             <div className="relative z-10 space-y-8 md:space-y-10">
@@ -389,10 +394,10 @@ export default function JudgeDashboard() {
                                         </div>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h2 className="text-2xl md:text-5xl font-black italic uppercase tracking-tighter text-white leading-none truncate md:whitespace-normal">
+                                        <h2 className="text-2xl sm:text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-white leading-tight break-words">
                                             {activeProject.name}
                                         </h2>
-                                        <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
+                                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2">
                                             <span className="text-[9px] md:text-xs font-bold text-[#FFEE00] uppercase tracking-widest bg-[#FFEE00]/10 px-2 py-0.5 rounded border border-[#FFEE00]/20">ID: {activeProject.teamId}</span>
                                             <span className="text-[9px] md:text-xs font-bold text-white/30 uppercase tracking-widest">Active Pool</span>
                                         </div>
@@ -405,7 +410,7 @@ export default function JudgeDashboard() {
                                             <Users size={16} className="text-slate-900" />
                                             <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Participants</span>
                                         </div>
-                                        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2">
                                             {activeProject.members?.map((member: any, i: number) => {
                                                 const displayName = typeof member === 'string' ? member : member.fullName;
                                                 const isCaptain = displayName === activeProject.captain;
@@ -436,10 +441,10 @@ export default function JudgeDashboard() {
                         </div>
 
                         {/* Evaluation Form */}
-                        <div className="bg-[#0B0114] border border-white/10 rounded-[2rem] md:rounded-[3.5rem] p-5 md:p-14 space-y-8 md:space-y-16 relative overflow-hidden shadow-2xl">
+                        <div className="bg-[#0B0114] border border-white/10 rounded-2xl md:rounded-[3.5rem] p-4 sm:p-5 md:p-14 space-y-8 md:space-y-16 relative overflow-hidden shadow-2xl">
                             <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-800/10 to-transparent -translate-y-1/2" />
 
-                            <div className="relative z-10 space-y-12">
+                            <div className="relative z-10 space-y-8 md:space-y-12">
                                 {evaluationRound.criteria.map((criterion: any, i: number) => (
                                     <div key={criterion.id} className="group">
                                         <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-8">
@@ -453,36 +458,39 @@ export default function JudgeDashboard() {
                                                         <h4 className="text-lg md:text-2xl font-black italic uppercase tracking-tight text-white mb-1">{criterion.label}</h4>
                                                         <p className="text-white/40 text-xs md:text-sm leading-relaxed">{criterion.desc}</p>
                                                     </div>
-                                                    {/* Score Picker — segmented 5-button, no dropdown, no overflow */}
-                                                    <div className="flex items-stretch gap-1.5 w-full">
-                                                        {[
-                                                            { v: 1, l: "Poor", color: "hover:bg-slate-800/20    hover:border-slate-800/40    hover:text-slate-900" },
-                                                            { v: 2, l: "Fair", color: "hover:bg-slate-800/20 hover:border-slate-800/40 hover:text-slate-900" },
-                                                            { v: 3, l: "Avg", color: "hover:bg-yellow-500/20 hover:border-yellow-500/40 hover:text-yellow-300" },
-                                                            { v: 4, l: "Good", color: "hover:bg-blue-500/20   hover:border-blue-500/40   hover:text-blue-300" },
-                                                            { v: 5, l: "Best", color: "hover:bg-green-500/20  hover:border-green-500/40  hover:text-green-300" },
-                                                        ].map(({ v, l, color }) => {
+                                                    {/* Score Picker — ten scores in a compact, touch-friendly grid */}
+                                                    <div className="grid w-full grid-cols-5 gap-1.5">
+                                                        {Array.from({ length: 10 }, (_, index) => index + 1).map(v => {
                                                             const selected = currentScores[criterion.id] === v;
-                                                            const selectedColors = [
-                                                                "", // 0 unused
-                                                                "bg-slate-900/20 border-slate-800 text-slate-900",
-                                                                "bg-slate-900/20 border-slate-800 text-slate-900",
-                                                                "bg-yellow-500/20 border-yellow-500 text-yellow-300",
-                                                                "bg-blue-500/20 border-blue-500 text-blue-300",
-                                                                "bg-green-500/20 border-green-500 text-green-300",
-                                                            ];
+                                                            const selectedColor = v <= 3
+                                                                ? "bg-slate-900/20 border-slate-800 text-slate-900"
+                                                                : v <= 6
+                                                                    ? "bg-yellow-500/20 border-yellow-500 text-yellow-300"
+                                                                    : v <= 8
+                                                                        ? "bg-blue-500/20 border-blue-500 text-blue-300"
+                                                                        : "bg-green-500/20 border-green-500 text-green-300";
+                                                            const hoverColor = v <= 3
+                                                                ? "hover:bg-slate-800/20 hover:border-slate-800/40 hover:text-slate-900"
+                                                                : v <= 6
+                                                                    ? "hover:bg-yellow-500/20 hover:border-yellow-500/40 hover:text-yellow-300"
+                                                                    : v <= 8
+                                                                        ? "hover:bg-blue-500/20 hover:border-blue-500/40 hover:text-blue-300"
+                                                                        : "hover:bg-green-500/20 hover:border-green-500/40 hover:text-green-300";
+                                                            const label = v === 1 ? "Poor" : v === 5 ? "Fair" : v === 8 ? "Good" : v === 10 ? "Best" : "";
                                                             return (
                                                                 <button
                                                                     key={v}
                                                                     type="button"
+                                                                    aria-label={`Score ${v} out of 10${label ? `, ${label}` : ""}`}
+                                                                    aria-pressed={selected}
                                                                     onClick={() => handleScoreChange(criterion.id, v)}
-                                                                    className={`flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 transition-all active:scale-95 ${selected
-                                                                        ? selectedColors[v]
-                                                                        : `bg-white/5 border-white/10 text-white/30 ${color}`
+                                                                    className={`flex min-h-12 flex-col items-center justify-center rounded-xl border-2 px-1 py-2 transition-all active:scale-95 ${selected
+                                                                        ? selectedColor
+                                                                        : `bg-white/5 border-white/10 text-white/30 ${hoverColor}`
                                                                         }`}
                                                                 >
                                                                     <span className="text-base md:text-xl font-black leading-none">{v}</span>
-                                                                    <span className="text-[8px] font-bold uppercase tracking-wider mt-0.5 leading-none">{l}</span>
+                                                                    {label && <span className="mt-0.5 text-[7px] font-bold uppercase leading-none tracking-wide">{label}</span>}
                                                                 </button>
                                                             );
                                                         })}
@@ -498,12 +506,12 @@ export default function JudgeDashboard() {
                             </div>
 
                             {/* Feedback Area */}
-                            <div className="pt-16 border-t border-white/10">
+                            <div className="pt-8 md:pt-16 border-t border-white/10">
                                 <div className="flex items-center gap-3 mb-8">
                                     <div className="p-3 rounded-xl bg-slate-900/10 border border-slate-800/20">
                                         <MessageSquare size={20} className="text-slate-900" />
                                     </div>
-                                    <h4 className="text-3xl font-black italic uppercase tracking-tighter text-white">Additional Feedback <span className="text-slate-900 text-sm normal-case font-bold ml-2">(Required)</span></h4>
+                                    <h4 className="text-xl sm:text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-white">Additional Feedback <span className="text-slate-900 text-xs sm:text-sm normal-case font-bold ml-1 sm:ml-2">(Required)</span></h4>
                                 </div>
                                 <textarea
                                     value={comment}
@@ -514,17 +522,17 @@ export default function JudgeDashboard() {
                             </div>
 
                             {/* Action Console */}
-                            <div className="pt-10 flex flex-col md:flex-row items-center justify-end gap-4 md:gap-8">
+                            <div className="pt-6 md:pt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 md:gap-8">
                                 <button
                                     onClick={() => setActiveProject(null)}
-                                    className="w-full md:w-auto h-16 px-10 rounded-2xl font-black uppercase tracking-[0.2em] text-white/40 hover:text-white hover:bg-white/5 transition-all text-xs"
+                                    className="w-full sm:w-auto h-12 md:h-16 px-6 sm:px-10 rounded-xl md:rounded-2xl font-black uppercase tracking-[0.2em] text-white/40 hover:text-white hover:bg-white/5 transition-all text-xs"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleScoreSubmit}
                                     disabled={Object.keys(currentScores).length < evaluationRound.criteria.length || !comment.trim()}
-                                    className="w-full md:w-auto h-14 md:h-16 px-12 md:px-16 bg-[#FFEE00] hover:bg-[#E6D600] text-black font-black uppercase tracking-[0.2em] rounded-xl md:rounded-2xl transition-all shadow-[0_4px_0_#9333ea] md:shadow-[0_6px_0_#9333ea] active:shadow-none active:translate-y-1 disabled:opacity-30 disabled:grayscale disabled:pointer-events-none group"
+                                    className="w-full sm:w-auto h-12 md:h-16 px-6 sm:px-12 md:px-16 bg-[#FFEE00] hover:bg-[#E6D600] text-black font-black uppercase tracking-[0.12em] sm:tracking-[0.2em] rounded-xl md:rounded-2xl transition-all shadow-[0_4px_0_#9333ea] md:shadow-[0_6px_0_#9333ea] active:shadow-none active:translate-y-1 disabled:opacity-30 disabled:grayscale disabled:pointer-events-none group"
                                 >
                                     <span className="flex items-center justify-center gap-2">
                                         Submit Evaluation <CheckCircle2 size={18} />

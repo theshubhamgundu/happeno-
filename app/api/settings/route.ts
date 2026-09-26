@@ -20,12 +20,8 @@ export async function GET() {
                 const defaultSettings = {
                     start_date: "2026-02-27",
                     emergency_contact: { name: "Event Coordinator", phone: "+1-555-0123" },
-                    wifi_details: { ssid: "EventWiFi", pass: "password123" },
-                    wifi_networks: [],
-                    rooms: [],
                     is_submission_locked: false,
                     is_round_lock_enabled: true,
-                    is_certificates_enabled: false,
                     enabled_meals: ["day1_breakfast", "day1_lunch", "day1_dinner", "day2_breakfast", "day2_lunch"],
                     released_rounds: [],
                     round_configs: []

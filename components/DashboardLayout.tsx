@@ -5,11 +5,19 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
     Menu, X, LogOut, User, LayoutDashboard, Award,
-    BarChart3, Users, GanttChartSquare, ChevronDown, QrCode, Lock
+    BarChart3, Users, GanttChartSquare, ChevronRight, QrCode, Lock,
+    ShieldCheck, Phone, Coffee
 } from "lucide-react";
 import Link from "next/link";
 import { useHackathon } from "@/context/HackathonContext";
 import { DEMO_PROJECT, DEMO_TEAM_ID } from "@/lib/demo-data";
+
+const adminOperationItems = [
+    { href: "/dashboard/admin#entries", section: "entries", icon: Users, label: "Entries" },
+    { href: "/dashboard/admin#judges", section: "judges", icon: ShieldCheck, label: "Judges" },
+    { href: "/dashboard/admin#volunteers", section: "volunteers", icon: Phone, label: "Volunteers" },
+    { href: "/dashboard/admin#meals", section: "meals", icon: Coffee, label: "Meals" },
+];
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -22,12 +30,21 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
     const router = useRouter();
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [activeAdminSection, setActiveAdminSection] = useState("entries");
     const { hackathonStartDate, projects, isSubmissionLocked } = useHackathon();
     const [timeLeft, setTimeLeft] = useState("00:00:00");
     const [hasStarted, setHasStarted] = useState(false);
     const [progress, setProgress] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
     const [isSubmissionCurrentlyLocked, setIsSubmissionCurrentlyLocked] = useState(false);
+
+    useEffect(() => {
+        const syncAdminSection = () => setActiveAdminSection(window.location.hash.slice(1) || "entries");
+        syncAdminSection();
+        window.addEventListener("hashchange", syncAdminSection);
+        return () => window.removeEventListener("hashchange", syncAdminSection);
+    }, [pathname]);
 
     const displayName = useMemo(() => {
         if (type === 'team') {
@@ -143,34 +160,64 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
 
     return (
         <div className={`dashboard-app dashboard-${type} min-h-screen bg-[#f1eeeb] p-0 text-slate-900 lg:p-3`}>
-            <div className="mx-auto min-h-screen max-w-[1600px] overflow-hidden bg-[#faf9f7] lg:min-h-[calc(100vh-24px)] lg:rounded-2xl lg:border lg:border-white lg:shadow-[0_12px_36px_rgba(77,57,48,0.08)] lg:grid lg:grid-cols-[218px_minmax(0,1fr)]">
-            <aside className="hidden lg:flex lg:flex-col lg:border-r lg:border-slate-200/80 lg:bg-white lg:p-3">
-                <Link href="/" className="flex items-center gap-2.5 rounded-xl px-2 py-2.5 transition hover:bg-slate-50">
+            <div className={`mx-auto min-h-screen max-w-[1600px] overflow-hidden bg-[#faf9f7] lg:min-h-[calc(100vh-24px)] lg:rounded-2xl lg:border lg:border-white lg:shadow-[0_12px_36px_rgba(77,57,48,0.08)] lg:grid ${isSidebarCollapsed ? "lg:grid-cols-[68px_minmax(0,1fr)]" : "lg:grid-cols-[218px_minmax(0,1fr)]"}`}>
+            <aside className={`hidden lg:flex lg:flex-col lg:border-r lg:border-slate-200/80 lg:bg-white ${isSidebarCollapsed ? "lg:p-2" : "lg:p-3"}`}>
+                <div className={`flex items-center ${isSidebarCollapsed ? "flex-col gap-2" : "justify-between"}`}>
+                <Link href="/" aria-label="TriCity home" className={`flex items-center gap-2.5 rounded-xl px-2 py-2.5 transition hover:bg-slate-50 ${isSidebarCollapsed ? "justify-center" : ""}`}>
                     <div className="grid h-9 w-9 place-items-center rounded-lg bg-teal-600 text-base font-bold text-white shadow-sm">T</div>
-                    <div>
+                    {!isSidebarCollapsed && <div>
                         <TricityMark compact className="text-lg" />
                         <p className="mt-1 text-[9px] font-bold uppercase tracking-[.19em] text-slate-400">Event management</p>
-                    </div>
+                    </div>}
                 </Link>
+                <button
+                    type="button"
+                    onClick={() => setIsSidebarCollapsed(collapsed => !collapsed)}
+                    aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                >
+                    <ChevronRight size={17} className={`transition-transform ${isSidebarCollapsed ? "" : "rotate-180"}`} />
+                </button>
+                </div>
 
-                <div className="mt-6 px-3 text-[9px] font-bold uppercase tracking-[.18em] text-slate-400">Navigation</div>
-                <nav className="mt-2 space-y-1">
+                {!isSidebarCollapsed && <div className="mt-6 px-3 text-[9px] font-bold uppercase tracking-[.18em] text-slate-400">Navigation</div>}
+                <nav className={`mt-2 space-y-1 ${isSidebarCollapsed ? "mt-5" : ""}`}>
                     {menuItems[type].map((item: any) => {
                         const isActive = pathname === item.href;
-                        return <Link key={item.href} href={item.href} className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition ${isActive ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}>
+                        return <Link key={item.href} href={item.href} title={isSidebarCollapsed ? item.label : undefined} aria-label={isSidebarCollapsed ? item.label : undefined} className={`group flex items-center gap-2.5 rounded-lg py-2 text-xs font-semibold transition ${isSidebarCollapsed ? "justify-center px-2" : "px-2.5"} ${isActive ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}>
                             <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-[#c85847]"}`}><item.icon size={14} /></span>
-                            <span>{item.label}</span>
-                            {item.label === "Submissions" && isSubmissionCurrentlyLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
+                            {!isSidebarCollapsed && <span>{item.label}</span>}
+                            {!isSidebarCollapsed && item.label === "Submissions" && isSubmissionCurrentlyLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
                         </Link>;
                     })}
                 </nav>
 
-                <div className="mt-auto rounded-2xl border border-slate-200 bg-[#fafafa] p-3">
-                    <div className="flex items-center gap-3">
+                {type === "admin" && <div className="mt-5">
+                    {!isSidebarCollapsed && <div className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[.16em] text-slate-400">Manage event operations</div>}
+                    <nav className="space-y-1" aria-label="Manage event operations">
+                        {adminOperationItems.map(item => {
+                            const isActive = pathname === "/dashboard/admin" && activeAdminSection === item.section;
+                            return <Link
+                                key={item.section}
+                                href={item.href}
+                                onClick={() => window.dispatchEvent(new CustomEvent("admin-section-change", { detail: item.section }))}
+                                title={isSidebarCollapsed ? item.label : undefined}
+                                aria-label={isSidebarCollapsed ? item.label : undefined}
+                                className={`group flex items-center gap-2.5 rounded-lg py-2 text-xs font-semibold transition ${isSidebarCollapsed ? "justify-center px-2" : "ml-2 px-2.5"} ${isActive ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}
+                            >
+                                <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-[#c85847]"}`}><item.icon size={14} /></span>
+                                {!isSidebarCollapsed && <span>{item.label}</span>}
+                            </Link>;
+                        })}
+                    </nav>
+                </div>}
+
+                <div className={`mt-auto rounded-2xl border border-slate-200 bg-[#fafafa] ${isSidebarCollapsed ? "p-1.5" : "p-3"}`}>
+                    <div className={`flex items-center gap-3 ${isSidebarCollapsed ? "justify-center" : ""}`}>
                         <div className="grid h-9 w-9 place-items-center rounded-full bg-[#fbe5df] text-[#c85847]"><User size={17} /></div>
-                        <div className="min-w-0"><p className="truncate text-sm font-bold text-slate-800">{displayName}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{type} access</p></div>
+                        {!isSidebarCollapsed && <div className="min-w-0"><p className="truncate text-sm font-bold text-slate-800">{displayName}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{type} access</p></div>}
                     </div>
-                    <button onClick={logout} className="mt-3 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs font-semibold text-slate-500 transition hover:bg-white hover:text-rose-600"><LogOut size={15} /> Sign out</button>
                 </div>
             </aside>
 
@@ -186,6 +233,15 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
                             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{isFinished ? "Event ended" : hasStarted ? "Time remaining" : "Starts"}</p>
                             <p className={`mt-0.5 font-mono text-sm font-bold ${isFinished ? "text-rose-600" : hasStarted ? "text-emerald-600" : "text-[#c85847]"}`}>{timeLeft}</p>
                         </div>
+                        <button
+                            onClick={logout}
+                            aria-label="Sign out"
+                            title="Sign out"
+                            className="flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-200 px-2 text-xs font-semibold text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 sm:px-3"
+                        >
+                            <LogOut size={15} />
+                            <span className="hidden sm:inline">Sign out</span>
+                        </button>
                         <div className="grid h-9 w-9 place-items-center rounded-full bg-[#fbe5df] text-[#c85847]"><User size={17} /></div>
                     </div>
                 </header>
@@ -206,7 +262,12 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
                         <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600 font-bold text-white">T</div><TricityMark compact className="text-xl" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500"><X size={21} /></button></div>
                         <p className="mt-9 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Workspace</p>
                         <nav className="mt-3 space-y-1">{menuItems[type].map((item: any) => <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${pathname === item.href ? "bg-teal-600 text-white" : "text-slate-600"}`}><item.icon size={18} />{item.label}</Link>)}</nav>
-                        <button onClick={logout} className="mt-auto flex items-center gap-2 rounded-xl bg-rose-50 px-3 py-3 text-sm font-semibold text-rose-600"><LogOut size={17} /> Sign out</button>
+                        {type === "admin" && <div className="mt-6">
+                            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Manage event operations</p>
+                            <nav className="space-y-1" aria-label="Manage event operations">
+                                {adminOperationItems.map(item => <Link key={item.section} href={item.href} onClick={() => { window.dispatchEvent(new CustomEvent("admin-section-change", { detail: item.section })); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${pathname === "/dashboard/admin" && activeAdminSection === item.section ? "bg-teal-600 text-white" : "text-slate-600"}`}><item.icon size={18} />{item.label}</Link>)}
+                            </nav>
+                        </div>}
                     </motion.div>
                 </motion.div>}
             </AnimatePresence>

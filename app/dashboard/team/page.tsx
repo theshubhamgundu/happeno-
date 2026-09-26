@@ -2,14 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, CheckCircle2, Edit3, MapPin, Save, Users, Wifi, FolderKanban, Presentation, Download } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
 import { DEMO_PROJECT, DEMO_TEAM_ID } from "@/lib/demo-data";
 import { TRACKS, PROBLEM_STATEMENTS } from "@/lib/constants";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { toast } from "sonner";
 
 
@@ -145,11 +143,13 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
 }
 
 export default function TeamDashboard() {
-    const { projects, isLoading, isSubmissionLocked, isCertificatesEnabled } = useHackathon();
+    const { projects, isLoading, isSubmissionLocked } = useHackathon();
     const { user } = useAuth();
     
     const [proposedIdea, setProposedIdea] = useState("");
     const [techStack, setTechStack] = useState<Record<string, string[]>>({ Frontend: [], Backend: [], Database: [], Auth: [] });
+    const [otherTechEnabled, setOtherTechEnabled] = useState<Record<string, boolean>>({});
+    const [otherTechInput, setOtherTechInput] = useState<Record<string, string>>({});
     
     // Local state for locked track/ps to avoid reload breaking demo state
     const [localTrack, setLocalTrack] = useState<string | null>(null);
@@ -158,7 +158,6 @@ export default function TeamDashboard() {
     const [editingPI, setEditingPI] = useState(false);
     const [editingTS, setEditingTS] = useState(false);
     
-    const [generatingCert, setGeneratingCert] = useState<string | null>(null);
     const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || (user?.teamId === DEMO_TEAM_ID ? DEMO_PROJECT : null), [projects, user]);
 
     // Lock state comes from the DB via the API — not guessed from data presence
@@ -169,9 +168,34 @@ export default function TeamDashboard() {
     useEffect(() => { 
         if (team) {
             if (!editingPI) setProposedIdea(team.proposedIdea || "Add a concise proposed idea to keep your team aligned.");
-            if (!editingTS) setTechStack(team.techStack || { Frontend: [], Backend: [], Database: [], Auth: [] });
+            if (!editingTS) {
+                const savedTechStack = team.techStack || { Frontend: [], Backend: [], Database: [], Auth: [] };
+                setTechStack(savedTechStack);
+                const customEntries = Object.fromEntries(Object.entries(TECH_CATEGORIES).map(([category, availableTechs]) => {
+                    const selectedTechs = savedTechStack[category] || [];
+                    const customTechs = selectedTechs.filter(tech => tech !== "Other" && !availableTechs.includes(tech));
+                    return [category, customTechs.join(", ")];
+                }));
+                setOtherTechInput(customEntries);
+                setOtherTechEnabled(Object.fromEntries(Object.entries(TECH_CATEGORIES).map(([category]) => [
+                    category,
+                    Boolean(customEntries[category]) || savedTechStack[category]?.includes("Other") || false
+                ])));
+            }
         }
     }, [team, editingPI, editingTS]);
+
+    const saveTechStack = () => {
+        const updatedTechStack = Object.fromEntries(Object.entries(TECH_CATEGORIES).map(([category, availableTechs]) => {
+            const selectedBuiltIns = (techStack[category] || []).filter(tech => availableTechs.includes(tech));
+            const customTechs = otherTechEnabled[category]
+                ? (otherTechInput[category] || "").split(",").map(tech => tech.trim()).filter(Boolean)
+                : [];
+            return [category, Array.from(new Set([...selectedBuiltIns, ...customTechs]))];
+        }));
+        setTechStack(updatedTechStack);
+        saveField('techStack', updatedTechStack, setEditingTS);
+    };
 
     const saveField = (field: string, value: any, setEditingState: (val: boolean) => void) => {
         toast.custom((id) => (
@@ -216,33 +240,6 @@ export default function TeamDashboard() {
         ), { duration: Infinity, position: 'top-center' });
     };
 
-    const downloadCertificate = async (member: { name: string, role: string, detail: string }) => {
-        setGeneratingCert(member.name);
-        try {
-            const certElement = document.getElementById("certificate-template");
-            if (!certElement) return;
-            
-            const nameElement = document.getElementById("cert-name");
-            if (nameElement) nameElement.innerText = member.name;
-            
-            const canvas = await html2canvas(certElement, { scale: 2, useCORS: true });
-            const imgData = canvas.toDataURL("image/png");
-            
-            const pdf = new jsPDF({
-                orientation: "landscape",
-                unit: "px",
-                format: [canvas.width, canvas.height]
-            });
-            
-            pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-            pdf.save(`Certificate_${member.name.replace(/\s+/g, '_')}.pdf`);
-        } catch (error) {
-            console.error("Failed to generate certificate", error);
-        } finally {
-            setGeneratingCert(null);
-        }
-    };
-
     if (isLoading) return <DashboardLayout type="team" title="Your project"><div className="grid min-h-[420px] place-items-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#df6d59] border-t-transparent" /></div></DashboardLayout>;
     if (!team) return <DashboardLayout type="team" title="Your project"><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><h2 className="text-lg font-semibold">No team is linked to this account</h2><p className="mt-2 text-sm text-slate-500">Please complete registration or contact the event team.</p></div></DashboardLayout>;
 
@@ -273,14 +270,10 @@ export default function TeamDashboard() {
                         <Link href="/dashboard/team/submissions" className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 px-3 py-2 text-xs font-semibold text-white hover:bg-teal-700 transition"><ArrowUpRight size={14} /> Submission</Link>
                     </div>
                 </div>
-                <div className="flex-1 grid grid-cols-3 divide-x divide-slate-100">
+                <div className="flex-1 grid grid-cols-2 divide-x divide-slate-100">
                     <div className="p-4 flex flex-col justify-center">
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><FolderKanban size={12}/> Track</p>
                         <p className="text-sm font-medium text-slate-900 truncate">{actualTrack || "Not selected"}</p>
-                    </div>
-                    <div className="p-4 flex flex-col justify-center">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><MapPin size={12}/> Workspace</p>
-                        <p className="text-sm font-medium text-slate-900 truncate">{team.room || "Pending"}</p>
                     </div>
                     <div className="p-4 flex flex-col justify-center">
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><CheckCircle2 size={12}/> Status</p>
@@ -310,7 +303,7 @@ export default function TeamDashboard() {
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-sm font-bold text-slate-800">Tech Stack</h3>
                             {!isSubmissionLocked && !isTSLocked && (
-                                <button onClick={() => editingTS ? saveField('techStack', techStack, setEditingTS) : setEditingTS(true)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${editingTS ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+                                <button onClick={() => editingTS ? saveTechStack() : setEditingTS(true)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${editingTS ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
                                     {editingTS ? <Save size={12} /> : <Edit3 size={12} />} {editingTS ? "Save" : "Edit"}
                                 </button>
                             )}
@@ -334,6 +327,24 @@ export default function TeamDashboard() {
                                                     </label>
                                                 );
                                             })}
+                                            <label className={`cursor-pointer inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium border transition-colors ${otherTechEnabled[category] ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-teal-500"}`}>
+                                                <input
+                                                    type="checkbox"
+                                                    className="hidden"
+                                                    checked={Boolean(otherTechEnabled[category])}
+                                                    onChange={(event) => setOtherTechEnabled({ ...otherTechEnabled, [category]: event.target.checked })}
+                                                />
+                                                Other
+                                            </label>
+                                            {otherTechEnabled[category] && (
+                                                <input
+                                                    type="text"
+                                                    value={otherTechInput[category] || ""}
+                                                    onChange={(event) => setOtherTechInput({ ...otherTechInput, [category]: event.target.value })}
+                                                    placeholder={`Enter other ${category.toLowerCase()} technology`}
+                                                    className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-teal-500"
+                                                />
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="flex flex-wrap gap-1.5">
@@ -380,7 +391,7 @@ export default function TeamDashboard() {
                     </section>
                 </div>
 
-                {/* Column 3 (Right): Team & Venue Network */}
+                {/* Column 3 (Right): Team roster */}
                 <div className="lg:col-span-3 flex flex-col gap-4">
                     {/* Team Members */}
                     <section className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -398,66 +409,16 @@ export default function TeamDashboard() {
                                             <p className="text-[10px] text-slate-500 truncate">{member.role} · {member.detail}</p>
                                         </div>
                                     </div>
-                                    {isCertificatesEnabled && (
-                                        <button onClick={() => downloadCertificate(member)} disabled={generatingCert === member.name} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-teal-50 hover:text-teal-600 transition-colors disabled:opacity-50" title="Download Certificate">
-                                            {generatingCert === member.name ? <div className="h-3 w-3 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" /> : <Download size={14} />}
-                                        </button>
-                                    )}
                                 </div>
                             ))}
                         </div>
                     </section>
 
-                    {/* Venue Network */}
-                    <section className="rounded-2xl border border-teal-100 bg-teal-50 p-4 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 text-teal-600"><Wifi size={48}/></div>
-                        <div className="relative z-10 flex items-start gap-3">
-                            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white shadow-sm text-teal-600"><Wifi size={14} /></span>
-                            <div>
-                                <p className="text-xs font-bold text-teal-900 mb-0.5">Venue Network</p>
-                                <p className="text-[10px] leading-relaxed text-teal-700 max-w-[140px]">
-                                    {team.roomWifiSSID ? `Connect to ${team.roomWifiSSID}` : "Network credentials will appear when your workspace is assigned."}
-                                </p>
-                            </div>
-                        </div>
-                    </section>
                 </div>
 
             </div>
         </div>
 
-        {/* Hidden Certificate Template */}
-        <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
-            <div id="certificate-template" className="w-[1123px] h-[794px] bg-white relative overflow-hidden flex flex-col items-center justify-center font-sans border-[12px] border-double border-[#df6d59] p-16">
-                <div className="absolute top-0 left-0 w-64 h-64 bg-teal-600 opacity-10 rounded-br-full"></div>
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-slate-900 opacity-10 rounded-tl-full"></div>
-                
-                <h1 className="text-6xl font-black tracking-widest text-slate-900 mb-4 uppercase">Certificate of Participation</h1>
-                <div className="w-32 h-1 bg-teal-600 mb-12"></div>
-                
-                <p className="text-2xl text-slate-500 font-medium tracking-wide mb-6">This is to certify that</p>
-                <h2 id="cert-name" className="text-5xl font-bold text-[#df6d59] mb-6 border-b-2 border-slate-200 pb-2 px-12 italic">Participant Name</h2>
-                
-                <p className="text-xl text-slate-600 max-w-2xl text-center leading-relaxed mb-12">
-                    has successfully participated in the <span className="font-bold text-slate-800">Tricity AI Hackathon</span> as a part of team <span className="font-bold text-[#df6d59]">{team.team}</span>{team.track && <span> in the <span className="font-bold text-slate-800">{team.track}</span> track</span>}.
-                </p>
-                
-                <div className="flex w-full justify-between mt-16 px-32">
-                    <div className="flex flex-col items-center">
-                        <div className="w-48 border-b border-slate-400 mb-2"></div>
-                        <p className="text-sm font-bold text-slate-700 uppercase tracking-wider">Event Organizer</p>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <div className="w-48 border-b border-slate-400 mb-2"></div>
-                        <p className="text-sm font-bold text-slate-700 uppercase tracking-wider">Technical Director</p>
-                    </div>
-                </div>
-                
-                <div className="absolute bottom-12 text-sm text-slate-400 font-medium tracking-widest">
-                    TRICITY AI HACKATHON · 2024
-                </div>
-            </div>
-        </div>
     </DashboardLayout>;
 }
 

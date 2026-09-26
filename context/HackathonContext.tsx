@@ -12,23 +12,6 @@ interface EmergencyContact {
     phone: string;
 }
 
-interface WifiDetails {
-    ssid: string;
-    pass: string;
-}
-
-interface WifiNetwork {
-    id: string;
-    ssid: string;
-    pass: string;
-}
-
-interface Room {
-    id: string;
-    name: string;
-    capacity: string;
-}
-
 interface Judge {
     id: string;
     generatedId: string;
@@ -56,30 +39,19 @@ interface HackathonContextType {
     updateHackathonStartDate: (date: string) => void;
     emergencyContact: EmergencyContact;
     updateEmergencyContact: (details: EmergencyContact) => void;
-    wifiDetails: WifiDetails;
-    updateWifiDetails: (details: WifiDetails) => void;
-    wifiNetworks: WifiNetwork[];
-    addWifiNetwork: (network: { ssid: string, pass: string }) => void;
-    removeWifiNetwork: (id: string) => void;
-    rooms: Room[];
-    addRoom: (room: { name: string, capacity: string }) => void;
-    removeRoom: (id: string) => void;
     releasedRounds: string[];
     toggleRoundRelease: (round: string) => void;
     isSubmissionLocked: boolean;
     toggleSubmissionLock: () => void;
     isRoundLockEnabled: boolean;
     toggleRoundLock: () => void;
-    isCertificatesEnabled: boolean;
-    toggleCertificatesEnabled: () => void;
     enabledMeals: string[];
     updateEnabledMeals: (meals: string[]) => Promise<void>;
     roundConfigs: typeof STATIC_ROUNDS_CONFIG;
     updateRoundTime: (roundId: string, hour: number, minute: number, dayOffset: number) => void;
     projects: Project[];
     isLoading: boolean;
-    updateProjectScore: (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>) => void;
-    updateTeamLogistics: (projectId: any, data: { room?: string, volunteer_name?: string, volunteer_phone?: string, roomWifiSSID?: string, roomWifiPass?: string, assigned_judge?: string, assigned_judge_2?: string }) => void;
+    updateProjectScore: (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>) => Promise<boolean>;
     checkInTeam: (projectId: any) => Promise<void>;
     registerTeam: (teamData: Omit<Project, 'id' | 'roundScores'>) => void;
     judges: Judge[];
@@ -166,18 +138,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         phone: "..."
     });
 
-    // Default WiFi Details
-    const [wifiDetails, setWifiDetails] = useState<WifiDetails>({
-        ssid: "Loading...",
-        pass: "..."
-    });
-
-    // WiFi Networks List
-    const [wifiNetworks, setWifiNetworks] = useState<WifiNetwork[]>([]);
-
-    // Rooms List
-    const [rooms, setRooms] = useState<Room[]>([]);
-
     // Default Released Rounds
     const [releasedRounds, setReleasedRounds] = useState<string[]>([]);
 
@@ -186,9 +146,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
 
     // Round Lock (Time Based)
     const [isRoundLockEnabled, setIsRoundLockEnabled] = useState(true);
-
-    // Certificates Enabled
-    const [isCertificatesEnabled, setIsCertificatesEnabled] = useState(false);
 
     // Enabled Meals
     const [enabledMeals, setEnabledMeals] = useState<string[]>([]);
@@ -217,13 +174,9 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 if (response.ok && mountedRef.current) {
                     const dbSettings = await response.json();
                     if (dbSettings.start_date) setHackathonStartDate(dbSettings.start_date);
-                    if (dbSettings.wifi_details) setWifiDetails(dbSettings.wifi_details);
-                    if (dbSettings.wifi_networks) setWifiNetworks(dbSettings.wifi_networks);
-                    if (dbSettings.rooms) setRooms(dbSettings.rooms);
                     if (dbSettings.emergency_contact) setEmergencyContact(dbSettings.emergency_contact);
                     if (dbSettings.is_submission_locked !== undefined) setIsSubmissionLocked(dbSettings.is_submission_locked);
                     if (dbSettings.is_round_lock_enabled !== undefined) setIsRoundLockEnabled(dbSettings.is_round_lock_enabled);
-                    if (dbSettings.is_certificates_enabled !== undefined) setIsCertificatesEnabled(dbSettings.is_certificates_enabled);
                     if (dbSettings.enabled_meals !== undefined) setEnabledMeals(dbSettings.enabled_meals);
                     if (dbSettings.released_rounds) setReleasedRounds(dbSettings.released_rounds);
                     if (dbSettings.round_configs) {
@@ -370,11 +323,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 }
             }
 
-            const savedWifiNetworks = localStorage.getItem('hackathon_wifi_networks');
-            if (savedWifiNetworks && wifiNetworks.length === 0) setWifiNetworks(JSON.parse(savedWifiNetworks));
-            const savedRooms = localStorage.getItem('hackathon_rooms');
-            if (savedRooms && rooms.length === 0) setRooms(JSON.parse(savedRooms));
-
             setIsLoading(false);
         };
         initFetch();
@@ -412,80 +360,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
-    const updateWifiDetails = async (details: WifiDetails) => {
-        setWifiDetails(details);
-        await fetch('/api/settings', {
-            method: 'POST',
-            body: JSON.stringify({ key: 'wifi_details', value: details })
-        });
-    };
-
-    const addWifiNetwork = async (network: { ssid: string, pass: string }) => {
-        const id = Math.random().toString(36).substr(2, 9);
-        const newNetwork = { ...network, id };
-        const updated = [...wifiNetworks, newNetwork];
-        setWifiNetworks(updated);
-
-        // Save to LocalStorage
-        localStorage.setItem('hackathon_wifi_networks', JSON.stringify(updated));
-
-        // Save to DB
-        // Fetch current settings first to append or just overwrite if structure is simple
-        // Here we just overwrite the 'wifi_networks' key
-        await fetch('/api/settings', {
-            method: 'POST',
-            body: JSON.stringify({ key: 'wifi_networks', value: updated })
-        });
-        toast.success(`WiFi Network Added: ${network.ssid}`);
-    };
-
-    const removeWifiNetwork = async (id: string) => {
-        const updated = wifiNetworks.filter(n => n.id !== id);
-        setWifiNetworks(updated);
-
-        // Save to LocalStorage
-        localStorage.setItem('hackathon_wifi_networks', JSON.stringify(updated));
-
-        // Save to DB
-        await fetch('/api/settings', {
-            method: 'POST',
-            body: JSON.stringify({ key: 'wifi_networks', value: updated })
-        });
-        toast.success("WiFi Network Removed");
-    };
-
-    const addRoom = async (room: { name: string, capacity: string }) => {
-        const id = Math.random().toString(36).substr(2, 9);
-        const newRoom = { ...room, id };
-        const updated = [...rooms, newRoom];
-        setRooms(updated);
-
-        // Save to LocalStorage
-        localStorage.setItem('hackathon_rooms', JSON.stringify(updated));
-
-        // Save to DB
-        await fetch('/api/settings', {
-            method: 'POST',
-            body: JSON.stringify({ key: 'rooms', value: updated })
-        });
-        toast.success(`Room Added: ${room.name}`);
-    };
-
-    const removeRoom = async (id: string) => {
-        const updated = rooms.filter(r => r.id !== id);
-        setRooms(updated);
-
-        // Save to LocalStorage
-        localStorage.setItem('hackathon_rooms', JSON.stringify(updated));
-
-        // Save to DB
-        await fetch('/api/settings', {
-            method: 'POST',
-            body: JSON.stringify({ key: 'rooms', value: updated })
-        });
-        toast.success("Room Removed");
-    };
-
     const toggleRoundRelease = async (round: string) => {
         let newRounds;
         if (releasedRounds.includes(round)) {
@@ -509,15 +383,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
-    const toggleCertificatesEnabled = async () => {
-        const newState = !isCertificatesEnabled;
-        setIsCertificatesEnabled(newState);
-        await fetch('/api/settings', {
-            method: 'POST',
-            body: JSON.stringify({ key: 'is_certificates_enabled', value: newState })
-        });
-    };
-
     const updateEnabledMeals = async (meals: string[]) => {
         setEnabledMeals(meals);
         try {
@@ -533,7 +398,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const updateProjectScore = async (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>) => {
+    const updateProjectScore = async (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>): Promise<boolean> => {
         let newScores: any = {};
         let newComments: any = {};
         let newDetailed: any = {};
@@ -569,11 +434,8 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
             }
             return p;
         });
-        setProjects(updatedProjects);
-
-        // Sync to DB
         try {
-            await fetch('/api/teams', {
+            const response = await fetch('/api/teams', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -583,8 +445,15 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                     roundDetailedScores: newDetailed
                 })
             });
+            if (!response.ok) {
+                console.error("Failed to save evaluation:", await response.json().catch(() => null));
+                return false;
+            }
+            setProjects(updatedProjects);
+            return true;
         } catch (err) {
             console.error("Failed to sync score to DB:", err);
+            return false;
         }
     };
 
@@ -628,39 +497,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         } catch (err) {
             console.error("Failed to update round time:", err);
             toast.error("Cloud sync failed");
-        }
-    };
-
-    const updateTeamLogistics = async (projectId: any, data: { room?: string, volunteer_name?: string, volunteer_phone?: string, roomWifiSSID?: string, roomWifiPass?: string, assigned_judge?: string, assigned_judge_2?: string }) => {
-        setProjects(prev => prev.map(p => p.id === projectId ? {
-            ...p,
-            room: data.room ?? p.room,
-            roomWifiSSID: data.roomWifiSSID ?? p.roomWifiSSID,
-            roomWifiPass: data.roomWifiPass ?? p.roomWifiPass,
-            coordinator: {
-                name: data.volunteer_name ?? p.coordinator?.name ?? "",
-                phone: data.volunteer_phone ?? p.coordinator?.phone ?? "",
-                assigned_judge: data.assigned_judge ?? p.coordinator?.assigned_judge ?? "",
-                assigned_judge_2: data.assigned_judge_2 ?? p.coordinator?.assigned_judge_2 ?? ""
-            }
-        } : p));
-
-        try {
-            const response = await fetch('/api/teams', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: projectId, ...data })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Failed to update logistics:", errorData);
-                throw new Error(errorData.error || 'Failed to update');
-            }
-            toast.success("Logistics updated!");
-        } catch (err: any) {
-            console.error("Failed to update logistics:", err);
-            toast.error(`Sync failed: ${err.message}`);
         }
     };
 
@@ -1155,28 +991,17 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 updateHackathonStartDate,
                 emergencyContact,
                 updateEmergencyContact,
-                wifiDetails,
-                updateWifiDetails,
-                wifiNetworks,
-                addWifiNetwork,
-                removeWifiNetwork,
-                rooms,
-                addRoom,
-                removeRoom,
                 releasedRounds,
                 toggleRoundRelease,
                 isSubmissionLocked,
                 toggleSubmissionLock,
                 isRoundLockEnabled,
                 toggleRoundLock,
-                isCertificatesEnabled,
-                toggleCertificatesEnabled,
                 enabledMeals,
                 updateEnabledMeals,
                 projects,
                 isLoading,
                 updateProjectScore,
-                updateTeamLogistics,
                 checkInTeam,
                 registerTeam,
                 judges,

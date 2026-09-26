@@ -210,7 +210,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                             type="text"
                             value={manualId}
                             onChange={(e) => setManualId(e.target.value)}
-                            placeholder="VH-101"
+                            placeholder="TRI26002"
                             className="flex-grow bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm font-bold outline-none focus:border-slate-800 transition-all uppercase italic tracking-wider shadow-inner"
                         />
                         <button

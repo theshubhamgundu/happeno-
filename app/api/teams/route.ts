@@ -10,6 +10,15 @@ import { MAX_TEAM_MEMBERS } from '@/lib/constants';
 // Disable edge caching so data is always fresh
 export const revalidate = 0;
 
+function hasValidCriterionScores(value: unknown): boolean {
+    if (typeof value === 'number') return Number.isFinite(value) && value >= 1 && value <= 10;
+    if (Array.isArray(value)) return value.every(hasValidCriterionScores);
+    if (value && typeof value === 'object') {
+        return Object.values(value as Record<string, unknown>).every(hasValidCriterionScores);
+    }
+    return false;
+}
+
 export async function GET(req: Request) {
     if (process.env.USE_SUPABASE_REGISTRATIONS === 'true') {
         return getSupabaseTeams(req);
@@ -18,7 +27,35 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const teamId = searchParams.get('teamId');
+        if (teamId) {
+            const databaseResponse = await getSupabaseTeams(req);
+            if (databaseResponse.ok) {
+                const databaseTeams = await databaseResponse.json();
+                if (Array.isArray(databaseTeams) && databaseTeams.length > 0) {
+                    return NextResponse.json(databaseTeams);
+                }
+            }
+        }
         let teams = getLocalTeams();
+        if (!teamId) {
+            try {
+                const databaseResponse = await getSupabaseTeams(req);
+                if (databaseResponse.ok) {
+                    const databaseTeams = await databaseResponse.json();
+                    if (Array.isArray(databaseTeams)) {
+                        const localTeamIds = new Set(teams.map(team => String(team.teamId || team.id).toLowerCase()));
+                        teams = [
+                            ...teams,
+                            ...databaseTeams.filter((team: { teamId?: string; id?: string }) =>
+                                !localTeamIds.has(String(team.teamId || team.id).toLowerCase())
+                            )
+                        ];
+                    }
+                }
+            } catch (databaseError) {
+                console.error('Failed to include database-only teams:', databaseError);
+            }
+        }
         if (teamId) {
             teams = teams.filter(team => String(team.teamId || '').toLowerCase().includes(teamId.toLowerCase()));
         }
@@ -34,7 +71,9 @@ async function getSupabaseTeams(req: Request) {
         const { searchParams } = new URL(req.url);
         const teamId = searchParams.get('teamId');
 
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        const hasTeamCredentials = process.env.NEXT_PUBLIC_TEAM_SUPABASE_URL && process.env.NEXT_PUBLIC_TEAM_SUPABASE_ANON_KEY;
+        const hasSharedCredentials = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        if (!hasTeamCredentials && !hasSharedCredentials) {
             const mergeStatePath = path.join(process.cwd(), 'data', 'local-team-merges.json');
             if (fs.existsSync(mergeStatePath)) {
                 let teams = getLocalTeams();
@@ -110,10 +149,6 @@ async function getSupabaseTeams(req: Request) {
                         isPILocked: false,
                         isTSLocked: false,
                         trackPreferences: registration.track.split(',').map(track => track.trim()).filter(Boolean),
-                        room: '',
-                        roomWifiSSID: '',
-                        roomWifiPass: '',
-                        coordinator: { name: '', phone: '', assigned_judge: '', assigned_judge_2: '' },
                         submission: { github: '', presentation: '', demo: '', deployment: '', isFinal: false },
                         roundScores: {},
                         roundDetailedScores: {},
@@ -154,10 +189,6 @@ async function getSupabaseTeams(req: Request) {
                     isPILocked: false,
                     isTSLocked: false,
                     trackPreferences: [],
-                    room: "",
-                    roomWifiSSID: "",
-                    roomWifiPass: "",
-                    coordinator: { name: "", phone: "", assigned_judge: "", assigned_judge_2: "" },
                     submission: { github: "", presentation: "", demo: "", deployment: "", isFinal: false },
                     roundScores: {},
                     roundDetailedScores: {},
@@ -232,15 +263,6 @@ async function getSupabaseTeams(req: Request) {
             isPILocked: r.raw_data?.pi_locked || false,
             isTSLocked: r.raw_data?.ts_locked || false,
             trackPreferences: r.raw_data?.track_preferences || [],
-            room: r.room || "",
-            roomWifiSSID: r.room_wifi_ssid || "",
-            roomWifiPass: r.room_wifi_pass || "",
-            coordinator: {
-                name: r.volunteer_name || "",
-                phone: r.volunteer_phone || "",
-                assigned_judge: (r.assigned_judge || "").split("|")[0] || "",
-                assigned_judge_2: (r.assigned_judge || "").split("|")[1] || ""
-            },
             submission: {
                 github: r.github_url || "",
                 presentation: r.presentation_url || "",
@@ -267,9 +289,12 @@ async function getSupabaseTeams(req: Request) {
 
 export async function PATCH(req: Request) {
     try {
-        const { id, problemStatement, proposedIdea, techStack, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, checkedInAt, room, volunteer_name, volunteer_phone, roomWifiSSID, roomWifiPass, assigned_judge, assigned_judge_2, members, memberMealState, transferMembers } = await req.json();
+        const { id, problemStatement, proposedIdea, techStack, submission, roundScores, roundComments, roundDetailedScores, isCheckedIn, checkedInAt, members, memberMealState, transferMembers } = await req.json();
 
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+        if (roundDetailedScores !== undefined && !hasValidCriterionScores(roundDetailedScores)) {
+            return NextResponse.json({ error: 'Criterion scores must be between 1 and 10.' }, { status: 400 });
+        }
 
         if (process.env.USE_SUPABASE_REGISTRATIONS !== 'true' && transferMembers !== undefined) {
             if (!Array.isArray(transferMembers)) {
@@ -346,14 +371,6 @@ export async function PATCH(req: Request) {
         if (roundComments !== undefined) updateData.round_comments = roundComments;
         if (roundDetailedScores !== undefined) updateData.round_detailed_scores = roundDetailedScores;
         if (isCheckedIn !== undefined) updateData.is_checked_in = isCheckedIn;
-        if (room !== undefined) updateData.room = room;
-        if (volunteer_name !== undefined) updateData.volunteer_name = volunteer_name;
-        if (volunteer_phone !== undefined) updateData.volunteer_phone = volunteer_phone;
-        if (assigned_judge !== undefined || assigned_judge_2 !== undefined) {
-            updateData.assigned_judge = `${assigned_judge || ""}|${assigned_judge_2 || ""}`;
-        }
-        if (roomWifiSSID !== undefined) updateData.room_wifi_ssid = roomWifiSSID;
-        if (roomWifiPass !== undefined) updateData.room_wifi_pass = roomWifiPass;
         if (submission) {
             if (submission.github !== undefined) updateData.github_url = submission.github;
             if (submission.presentation !== undefined) updateData.presentation_url = submission.presentation;

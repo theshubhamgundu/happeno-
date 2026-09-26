@@ -62,7 +62,6 @@ export default function UsersManagement() {
     const [existingMemberQuery, setExistingMemberQuery] = useState('');
     const [selectedExistingMembers, setSelectedExistingMembers] = useState<{ sourceTeamId: string; memberIndex: number }[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [filterYear, setFilterYear] = useState<string>("All Years");
     const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null);
 
     const handleAddParticipant = async () => {
@@ -133,14 +132,9 @@ export default function UsersManagement() {
                            (memberObj.college?.toLowerCase() || "").includes(searchQuery.toLowerCase());
                 });
 
-            const matchesYear = filterYear === "All Years" || project.members.some(m => {
-                const memberObj = typeof m === 'string' ? { fullName: m } : m;
-                return memberObj.year === filterYear;
-            });
-
-            return matchesSearch && matchesYear;
+            return matchesSearch;
         });
-    }, [projects, searchQuery, filterYear]);
+    }, [projects, searchQuery]);
 
     const filteredUsersForExport = useMemo(() => {
         const users: UserListItem[] = [];
@@ -299,19 +293,6 @@ export default function UsersManagement() {
                         />
                     </div>
 
-                    <div className="flex gap-4 w-full lg:w-auto">
-                        <select
-                            value={filterYear}
-                            onChange={(e) => setFilterYear(e.target.value)}
-                            className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold uppercase text-xs outline-none focus:border-slate-800 transition-all cursor-pointer appearance-none min-w-[160px]"
-                        >
-                            <option value="All Years">All Years</option>
-                            <option value="1st Year">1st Year</option>
-                            <option value="2nd Year">2nd Year</option>
-                            <option value="3rd Year">3rd Year</option>
-                            <option value="4th Year">4th Year</option>
-                        </select>
-                    </div>
                 </div>
 
                 {/* User Table */}

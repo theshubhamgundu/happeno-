@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Download, MapPin, QrCode, ShieldCheck, Users, Coffee, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, Download, QrCode, ShieldCheck, Users, Coffee, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import QRCode from "qrcode";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
@@ -141,8 +141,7 @@ export default function TeamTicket() {
                                     </p>
                                 </div>
                             </div>
-                            <div className="grid border-t border-slate-100 sm:grid-cols-2">
-                                <Detail icon={MapPin} label="Assigned space" value={team.room || "To be assigned"} />
+                            <div className="grid border-t border-slate-100 sm:grid-cols-1">
                                 <Detail icon={CalendarDays} label="Check-in" value="8:00 AM · Event day" />
                             </div>
                         </section>
