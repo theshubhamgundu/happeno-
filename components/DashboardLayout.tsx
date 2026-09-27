@@ -247,10 +247,10 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
                 </header>
 
                 <main className="mx-auto w-full max-w-[1480px] px-4 py-4 md:px-5 md:py-5">
-                    <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                    {type !== "admin" && <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
                         <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#c85847]">{type} portal</p><h1 className="mt-1 text-xl font-semibold tracking-[-0.025em] text-slate-900 md:text-2xl">{title}</h1></div>
                         <p className="max-w-sm text-[13px] leading-5 text-slate-500">Stay informed, complete your tasks, and keep the event moving.</p>
-                    </div>
+                    </div>}
                     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="dashboard-content min-w-0">{children}</motion.div>
                 </main>
             </div>

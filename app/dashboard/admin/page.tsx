@@ -25,7 +25,6 @@ import {
     CheckCircle2,
     ClipboardList,
     ArrowUpRight,
-    Activity,
     Coffee,
     X
 } from "lucide-react";
@@ -461,25 +460,6 @@ export default function AdminDashboard() {
     return (
         <DashboardLayout type="admin" title="Admin workspace">
             <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
-                <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(125deg,rgba(89,28,135,0.42),rgba(13,8,30,0.9)_48%,rgba(18,13,36,0.82))] p-6 md:p-8 shadow-2xl">
-                    <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#14b8a6]/10 blur-3xl" />
-                    <div className="absolute bottom-0 left-1/3 h-40 w-80 rounded-full bg-slate-900/15 blur-3xl" />
-                    <div className="relative flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
-                        <div className="max-w-2xl">
-                            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#14b8a6]">
-                                <Activity size={14} /> Operations overview
-                            </div>
-                            <h1 className="font-kanit text-3xl font-black italic uppercase tracking-tight text-white md:text-5xl">TRICITY control room</h1>
-                            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/55 md:text-base">Monitor registrations, complete pending approvals, and keep event operations organized from one focused workspace.</p>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                            <button onClick={() => { window.location.hash = "entries"; setActiveTab("teams"); }} className="inline-flex items-center gap-2 rounded-xl bg-[#14b8a6] px-5 py-3 text-xs font-black uppercase tracking-wider text-black transition hover:-translate-y-0.5 hover:bg-white">
-                                <Users size={16} /> View teams
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
                 <section className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
                     <MetricCard label="Registered entries" value={dashboardStats.total} icon={Users} tone="purple" />
                     <MetricCard label="Participating entries" value={dashboardStats.active} icon={CheckCircle2} tone="green" />
