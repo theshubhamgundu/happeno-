@@ -7,15 +7,10 @@ import {
     Users, Gavel, HandHelping, Settings
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { DEMO_JUDGE, DEMO_TEAM_ID, DEMO_VOLUNTEER } from "@/lib/demo-data";
 
 // ─── Constants ────────────────────────────────────────────────────────
-const ADMIN_ID = "admin@tricity";
-const ADMIN_PASS = "@Snapx1911";
-
 type RoleOption = "participant" | "judge" | "volunteer" | "admin";
 
 const ROLES: { key: RoleOption; label: string; icon: typeof Users; color: string; glow: string; desc: string }[] = [
@@ -89,24 +84,6 @@ export default function LoginPage() {
         setDetectedRole(null);
     };
 
-    // The four role cards are intentionally one-click demo entry points. These
-    // identifiers are local session data only; no demo account is written to Supabase.
-    const openDemoDashboard = (role: RoleOption) => {
-        if (role === "participant") {
-            login("team", { teamId: DEMO_TEAM_ID, name: "Team Nova" });
-            return;
-        }
-        if (role === "judge") {
-            login("judge", { id: DEMO_JUDGE.generatedId, name: DEMO_JUDGE.name });
-            return;
-        }
-        if (role === "volunteer") {
-            login("volunteer", { id: DEMO_VOLUNTEER.generatedId, name: DEMO_VOLUNTEER.name });
-            return;
-        }
-        login("admin", { id: "DEMO-ADMIN-01", name: "Demo Administrator" });
-    };
-
     const handleSubmit = async () => {
         setError("");
         const id = loginId.trim();
@@ -118,16 +95,6 @@ export default function LoginPage() {
         setIsVerifying(true);
 
         try {
-            if (selectedRole === "admin") {
-                if (id.toLowerCase() === ADMIN_ID.toLowerCase() && pass === ADMIN_PASS) {
-                    setDetectedRole("Admin");
-                    login('admin', { id: ADMIN_ID });
-                } else {
-                    setError("Invalid Admin credentials");
-                }
-                return;
-            }
-
             if (selectedRole === "participant") {
                 const response = await fetch('/api/auth/team', {
                     method: 'POST',
@@ -145,39 +112,20 @@ export default function LoginPage() {
                 return;
             }
 
-            if (selectedRole === "judge") {
-                const { data: judgeData } = await supabase
-                    .from('judges')
-                    .select('*')
-                    .ilike('generated_id', id)
-                    .eq('password', pass)
-                    .maybeSingle();
-
-                if (judgeData) {
-                    setDetectedRole("Judge");
-                    login('judge', { id: judgeData.generated_id, name: judgeData.name });
-                } else {
-                    setError("Invalid Judge ID or Password");
-                }
+            const response = await fetch('/api/auth/staff', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: selectedRole, id, password: pass })
+            });
+            const staffData = await response.json();
+            if (!response.ok || !staffData.success) {
+                setError(staffData.error || `Invalid ${selectedRole} credentials`);
                 return;
             }
 
-            if (selectedRole === "volunteer") {
-                const { data: volData } = await supabase
-                    .from('volunteers')
-                    .select('*')
-                    .ilike('generated_id', id)
-                    .eq('password', pass)
-                    .maybeSingle();
-
-                if (volData) {
-                    setDetectedRole("Volunteer");
-                    login('volunteer', { id: volData.generated_id, name: volData.name });
-                } else {
-                    setError("Invalid Volunteer ID or Password");
-                }
-                return;
-            }
+            const role = selectedRole as Exclude<RoleOption, 'participant'>;
+            setDetectedRole(role[0].toUpperCase() + role.slice(1));
+            login(role, { id: staffData.id, name: staffData.name });
         } catch (err) {
             console.error("Login error:", err);
             setError("System error. Please try again.");
@@ -240,7 +188,7 @@ export default function LoginPage() {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.4, delay: i * 0.08 }}
-                                        onClick={() => openDemoDashboard(role.key)}
+                                        onClick={() => setSelectedRole(role.key)}
                                         className="group pro-card rounded-xl p-6 text-left bg-white border border-gray-200 hover:border-teal-600 transition-all duration-300 overflow-hidden cursor-pointer"
                                     >
                                         <div className="relative z-10">

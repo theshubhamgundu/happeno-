@@ -3,6 +3,8 @@ import { teamSupabase as supabase } from '@/lib/supabase';
 import { randomBytes } from 'node:crypto';
 import { Resend } from 'resend';
 import QRCode from 'qrcode';
+import { getSession, hasRole } from '@/lib/session';
+import { hashPassword } from '@/lib/password';
 
 function escapeHtml(value: string): string {
     return value.replace(/[&<>"']/g, character => ({
@@ -54,6 +56,10 @@ function textValue(value: unknown): string {
  */
 
 export async function POST(req: Request) {
+    if (!hasRole(getSession(req), ['admin'])) {
+        return NextResponse.json({ error: 'Administrator access required.' }, { status: 403 });
+    }
+
     try {
         const body = await req.json() as { registrations?: unknown };
         const incomingRegs = body.registrations;
@@ -106,27 +112,28 @@ export async function POST(req: Request) {
 
         const { data: existingRows, error: lookupError } = await supabase
             .from('registrations')
-            .select('team_id, password, status')
+            .select('team_id, password_hash, status')
             .in('team_id', registrations.map(registration => registration.teamId));
 
         if (lookupError) {
             return NextResponse.json({ error: 'Failed to check existing registrations', details: lookupError.message }, { status: 500 });
         }
 
-        const existingPasswords = new Map<string, string | null>(
-            (existingRows || []).map((row: { team_id: string; password: string | null }) => [row.team_id, row.password] as [string, string | null])
+        const existingPasswordHashes = new Map<string, string | null>(
+            (existingRows || []).map((row: { team_id: string; password_hash: string | null }) => [row.team_id, row.password_hash] as [string, string | null])
         );
         const existingStatuses = new Map<string, string | null>(
             (existingRows || []).map((row: { team_id: string; status: string | null }) => [row.team_id, row.status] as [string, string | null])
         );
         const teamCredentials = new Map<string, string>();
-        const toInsert = registrations.map(registration => {
-            const password = existingPasswords.get(registration.teamId) || randomBytes(12).toString('base64url');
-            teamCredentials.set(registration.teamId, password);
+        const toInsert = await Promise.all(registrations.map(async registration => {
+            const existingPasswordHash = existingPasswordHashes.get(registration.teamId);
+            const password = existingPasswordHash ? null : randomBytes(18).toString('base64url');
+            if (password) teamCredentials.set(registration.teamId, password);
             return {
                 team_name: registration.teamName,
                 team_id: registration.teamId,
-                password,
+                password_hash: existingPasswordHash || await hashPassword(password!),
                 track: registration.track,
                 problem_statement: registration.problemStatement,
                 college: registration.captain.college || '',
@@ -138,7 +145,7 @@ export async function POST(req: Request) {
                 status: existingStatuses.get(registration.teamId) || 'REGISTERED',
                 raw_data: registration
             };
-        });
+        }));
 
         const { data, error } = await supabase
             .from('registrations')
@@ -161,7 +168,7 @@ export async function POST(req: Request) {
             for (const registration of registrations) {
                 const teamId = registration.teamId;
                 const qrBuffer = await QRCode.toBuffer(teamId, { width: 350, margin: 1 });
-                const password = teamCredentials.get(teamId)!;
+                const password = teamCredentials.get(teamId);
                 const recipients = registration.participants
                     .map((member, participantIndex) => ({ member, participantIndex }))
                     .filter(({ member }) => member.email)
@@ -175,7 +182,7 @@ export async function POST(req: Request) {
                     const teamName = escapeHtml(registration.teamName);
                     const memberName = escapeHtml(member.fullName || 'Participant');
                     const safeTeamId = escapeHtml(teamId);
-                    const credentialBlock = isCaptain
+                    const credentialBlock = isCaptain && password
                         ? `<p><strong>Team login ID:</strong> ${safeTeamId}<br/><strong>Password:</strong> ${escapeHtml(password)}</p><p>Sign in at <a href="https://tricity.online/login">tricity.online/login</a>.</p>`
                         : '';
                     try {

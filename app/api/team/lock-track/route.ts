@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
+import { getSession, hasRole } from '@/lib/session';
 
 export async function POST(req: Request) {
+    const session = getSession(req);
+    if (!hasRole(session, ['team']) || !session.teamId) {
+        return NextResponse.json({ success: false, message: 'Team authentication required.' }, { status: 401 });
+    }
+
     try {
         const { teamId, track, problemStatement } = await req.json();
 
-        if (!teamId || !track || !problemStatement) {
+        if (!teamId || teamId !== session.teamId || !track || !problemStatement) {
             return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
         }
 

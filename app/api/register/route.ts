@@ -1,75 +1,52 @@
 import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
 
-/**
- * Password formula: first 2 UPPERCASE letters of each member's name joined with "-"
- * then @TRI-[TEAM_NUMBER]
- * Example: members ["Rahul Verma", "Ankit Kumar", "Priya Nair"], team 101
- *          → RA-AN-PR@TRI-101
- */
-function generatePasswordFromMembers(members: any[], teamNum: number): string {
-    const initials = members
-        .map((m: any) => {
-            const name: string = typeof m === 'string' ? m : (m.fullName || m.name || '');
-            return name.replace(/[^a-zA-Z]/g, '').slice(0, 2).toUpperCase();
-        })
-        .filter(Boolean)
-        .join('-');
-
-    return `${initials}@TRI-${teamNum}`;
-}
-
 export async function POST(req: Request) {
+    if (process.env.PUBLIC_REGISTRATIONS_OPEN !== 'true') {
+        return NextResponse.json({ success: false, message: 'Registrations are closed.' }, { status: 403 });
+    }
+
     try {
         const body = await req.json();
         const { teamName, domain, members, userTransactionId, teamId } = body;
 
-        console.log("🚀 Registering Team (Draft):", { team: teamName, track: domain, orderId: userTransactionId, teamId });
-
-        if (!teamName || !domain || !members || !userTransactionId || !teamId) {
+        if (typeof teamName !== 'string' || !teamName.trim() || teamName.length > 120 ||
+            typeof domain !== 'string' || !domain.trim() || domain.length > 120 ||
+            typeof userTransactionId !== 'string' || !userTransactionId.trim() || userTransactionId.length > 128 ||
+            !Array.isArray(members) || members.length < 1 || members.length > 4 || typeof teamId !== 'string') {
             return NextResponse.json({ success: false, message: "Missing required fields (including Team ID and Transaction ID)" }, { status: 400 });
+        }
+        if (members.some(member => !member ||
+            typeof member.fullName !== 'string' || !member.fullName.trim() ||
+            typeof member.email !== 'string' || !/^\S+@\S+\.\S+$/.test(member.email) ||
+            typeof member.phone !== 'string' || !member.phone.trim() ||
+            typeof member.college !== 'string' || !member.college.trim())) {
+            return NextResponse.json({ success: false, message: 'Every team member must have valid name, email, phone, and college details.' }, { status: 400 });
         }
 
         // Use the manual transaction ID provided by the user
-        const transactionId = userTransactionId;
+        const transactionId = userTransactionId.trim();
 
-        // 1. Generate Team ID Server-Side to prevent duplicates
-        // Fetch all team IDs to find gaps
-        const { data: allRegistrations } = await supabase
+        const nextTeamId = String(teamId).trim();
+        const teamNumber = Number(nextTeamId.match(/(\d+)$/)?.[1]);
+        if (!/^TRICITY_\d+$/.test(nextTeamId) || !Number.isSafeInteger(teamNumber)) {
+            return NextResponse.json({ success: false, message: 'Invalid team ID reservation.' }, { status: 400 });
+        }
+
+        const { data: existingTeam, error: lookupError } = await supabase
             .from('registrations')
-            .select('team_id');
-
-        const existingNums = new Set<number>();
-        if (allRegistrations) {
-            allRegistrations.forEach((r: any) => {
-                if (!r.team_id) return;
-                const parts = r.team_id.split('_');
-                if (parts.length >= 3) {
-                    const num = parseInt(parts[parts.length - 1]);
-                    if (!isNaN(num)) {
-                        existingNums.add(num);
-                    }
-                }
-            });
+            .select('team_id')
+            .eq('team_id', nextTeamId)
+            .maybeSingle();
+        if (lookupError) throw lookupError;
+        if (existingTeam) {
+            return NextResponse.json({ success: false, message: 'This team ID has already been used. Request a new ID.' }, { status: 409 });
         }
-
-        // Find the first available ID starting from 101
-        let nextNum = 101;
-        while (existingNums.has(nextNum)) {
-            nextNum++;
-        }
-
-        const nextTeamId = `TRICITY_${nextNum}`;
-        console.log(`🆔 Server Generated Team ID: ${nextTeamId}`);
-
-        // Generate unique password from members' initials
-        const password = generatePasswordFromMembers(members, nextNum);
-        console.log(`🔑 Generated Password: ${password}`);
 
         // Save registration as PENDING verification
         const { error: sbError } = await supabase
             .from('registrations')
-            .upsert([
+            .insert([
                 {
                     team_id: nextTeamId, // Use server-generated ID
                     transaction_id: transactionId,
@@ -82,7 +59,7 @@ export async function POST(req: Request) {
                     captain_mobile: members[0].phone,
                     college: members[0].college,
                     raw_data: body,
-                    password: password, // Auto-generated from member initials
+                    password_hash: null,
                     created_at: new Date().toISOString()
                 }
             ]);
@@ -91,25 +68,22 @@ export async function POST(req: Request) {
             console.error("❌ Failed to save to Supabase:", sbError);
             return NextResponse.json({
                 success: false,
-                message: "Database save failed",
-                details: sbError.message,
-                code: sbError.code
-            }, { status: 500 });
+                message: sbError.code === '23505' ? 'This transaction or team ID has already been registered.' : 'Database save failed.'
+            }, { status: sbError.code === '23505' ? 409 : 503 });
         }
 
         return NextResponse.json({
             success: true,
             teamName: teamName,
             transactionId: transactionId,
-            teamId: nextTeamId // Return the authoritative ID
+            teamId: nextTeamId
         });
 
     } catch (error: any) {
-        console.error('❌ Registration Error:', error);
+        console.error('Registration failed:', error);
         return NextResponse.json({
             success: false,
-            message: "Registration failed",
-            details: String(error)
-        }, { status: 500 });
+            message: 'Registration could not be saved to Supabase.'
+        }, { status: 503 });
     }
 }

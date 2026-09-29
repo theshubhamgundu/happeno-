@@ -1,92 +1,62 @@
-# TRI-CITY AI HACKATHON - Premium Hackathon Platform 🚀
+# Tri-City AI Hackathon
 
-TRI-CITY AI HACKATHON is a state-of-the-art hackathon management platform designed for a premium user experience. It features a seamless registration flow, dynamic payment processing, and comprehensive dashboards for participants, judges, and administrators.
+The Tri-City AI Hackathon platform supports participant registration, payments, team submissions, and event operations for administrators, judges, and volunteers.
 
-## ✨ Features
+## Technology
 
-- **Advanced Registration Flow**: 3-step process (Details â†’ UPI Payment â†’ UTR Verification).
-- **Dynamic Identity System**: Automated sequential Team ID generation (`TRICITY_101`).
-- **Smart Payment Integration**: 
-  - Dynamic UPI QR Code generation.
-  - Automatic transaction note embedding for reconciliation.
-  - Support for 12-digit UTR verification.
-- **Comprehensive Dashboards**:
-  - **Team Portal**: Digital entry tickets with QR codes, submission tracking, and project status.
-  - **Admin Command**: Full control over registrations, payment verification, and participant directory.
-  - **Judge Panel**: Structured grading pool for project evaluation.
-- **Automated Communication**: Professional HTML confirmation emails sent via **Resend** upon registration approval.
-- **Premium Aesthetics**: High-fidelity UI using Framer Motion animations and custom glassmorphism effects.
+- Next.js 16 with the App Router, React 19, and TypeScript
+- Supabase for application data
+- Manual UPI/UTR payment review for registrations
+- Resend for optional email notifications
+- Tailwind CSS and Framer Motion for the interface
 
-## ðŸ› ï¸ Technology Stack
+## Project Structure
 
-- **Framework**: Next.js 15 (App Router)
-- **Styling**: Tailwind CSS & Vanilla CSS
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
-- **Backend/Database**: Supabase (PostgreSQL)
-- **Email**: Resend API
-- **Transitions**: Next View Transitions
+- `app/` contains public pages, dashboards, and API routes.
+- `components/` contains shared and landing-page UI.
+- `context/` contains shared application state.
+- `data/` contains legacy import files; runtime application records are stored in Supabase.
+- `lib/` contains database, payment, email, and application helpers.
+- `public/` contains static assets.
+- `scripts/` contains the one-time data migration utility.
+- `database_setup.sql` defines the Supabase schema and access policy.
 
-## ðŸš€ Getting Started
+## Local Development
 
-### 1. Prerequisites
-- Node.js (Latest LTS)
-- Supabase Account
-- Resend API Key
+Use Node.js 20.9 or later, then install dependencies:
 
-### 2. Installation
-```bash
-# Clone the repository
-git clone <your-repo-url>
-
-# Install dependencies
+```sh
 npm install
 ```
 
-### 3. Environment Setup
-Create a `.env` file in the root directory:
+Create `.env.local` in the project root. The service-role key must remain server-only; never prefix it with `NEXT_PUBLIC_` or commit it.
+
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-RESEND_API_KEY=your_resend_key
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=
+AUTH_SESSION_SECRET=
+ADMIN_LOGIN_ID=
+ADMIN_PASSWORD=
+LIVESCORE_PASSWORD=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+RESEND_API_KEY=
+PUBLIC_REGISTRATIONS_OPEN=false
+NEXT_PUBLIC_REGISTRATIONS_OPEN=false
 ```
 
-### 4. Database Setup
-Execute the SQL scripts found in `database_setup.sql` and `update_schema.sql` within your Supabase SQL Editor.
+Apply `database_setup.sql` to the Supabase SQL editor before starting the app. The app uses one Supabase project for registrations, settings, judges, and volunteers; it no longer falls back to local JSON files. `AUTH_SESSION_SECRET` should be a long random value. `ADMIN_LOGIN_ID`, `ADMIN_PASSWORD`, `LIVESCORE_PASSWORD`, and `PUBLIC_REGISTRATIONS_OPEN` are server-only configuration. Set both registration flags to `true` to open the registration form and API.
 
-### 5. Run Locally
-```bash
+To import the existing CSV/JSON records, configure the environment variables above and run `npm run migrate:data`. The importer is safe to rerun and upserts records by their IDs. Keep the source files until you have checked the imported row counts and sample records in Supabase. Set `RESEND_API_KEY` to enable email notifications.
+
+Start the development server:
+
+```sh
 npm run dev
 ```
 
-## ðŸ“„ License
-Â© 2026 TRI-CITY AI HACKATHON. All Rights Reserved. Built for high-performance innovation.
+## Validation
 
----
-
-## ðŸ† Project Submission Template
-*Participants: Please copy the section below and replace it with your project details as part of the mandatory Day 1 documentation update.*
-
-### ðŸ“‹ Team Information
-- **Team Name**: [Your Team Name]
-- **Team ID**: [TRICITY_XXX]
-- **Members**:
-  1. [Member 1 Name]
-  2. [Member 2 Name]
-  3. [Member 3 Name]
-
-### ðŸ’¡ Project Overview
-- **Problem Statement**: [Define the core problem you are solving]
-- **Proposed Solution**: [Briefly explain your solution]
-- **Innovation & Differentiation**: [What makes your project unique compared to existing solutions?]
-- **Detailed Description**: [Comprehensive project breakdown]
-
-### ðŸ› ï¸ Technical Details
-- **Tech Stack**: [List languages, frameworks, databases, etc.]
-- **System Architecture**: [Overview of how components interact]
-- **APIs / External Services**: [List all third-party tools/APIs used]
-
-### ðŸ—ºï¸ Implementation Roadmap
-- **Phase 1**: [Day 1 Milestones]
-- **Phase 2**: [Day 2 Milestones]
-- **Future Scope**: [Scalability and real-world impact]
+```sh
+npm run lint
+npm run build
+```

@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
-import fs from 'fs';
-import path from 'path';
 import { EVENT_MEALS, getDefaultMealAccess } from '@/lib/meals';
+import { getSession, hasRole } from '@/lib/session';
 
 /**
  * POST /api/admin/bulk-meals
@@ -14,6 +13,10 @@ import { EVENT_MEALS, getDefaultMealAccess } from '@/lib/meals';
  *                                otherwise all meals are set to included: true.
  */
 export async function POST(req: Request) {
+    if (!hasRole(getSession(req), ['admin'])) {
+        return NextResponse.json({ error: 'Administrator access required.' }, { status: 403 });
+    }
+
     try {
         const body = await req.json().catch(() => ({}));
         const mealKeys: string[] = body.mealKeys ?? EVENT_MEALS.map(m => m.key);
@@ -26,33 +29,10 @@ export async function POST(req: Request) {
             }
         });
 
-        // --- Local mode (no Supabase) ---
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-            const dataPath = path.join(process.cwd(), 'data', 'registrations.json');
-            if (!fs.existsSync(dataPath)) {
-                return NextResponse.json({ error: 'No local data file found' }, { status: 404 });
-            }
-
-            const localData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-            let updated = 0;
-
-            const patched = localData.map((t: any) => {
-                // Only set if mealAccess is absent or empty
-                if (!t.mealAccess || Object.keys(t.mealAccess).length === 0) {
-                    t.mealAccess = mealAccess;
-                    updated++;
-                }
-                return t;
-            });
-
-            fs.writeFileSync(dataPath, JSON.stringify(patched, null, 2), 'utf8');
-            return NextResponse.json({ updated, total: localData.length });
-        }
-
-        // --- Supabase mode ---
         const { data: teams, error: fetchError } = await supabase
-            .from('projects')
-            .select('id, meal_access');
+            .from('registrations')
+            .select('transaction_id, meal_access')
+            .neq('status', 'MERGED');
 
         if (fetchError) throw fetchError;
 
@@ -60,9 +40,9 @@ export async function POST(req: Request) {
         for (const team of (teams || [])) {
             if (!team.meal_access || Object.keys(team.meal_access).length === 0) {
                 const { error } = await supabase
-                    .from('projects')
+                    .from('registrations')
                     .update({ meal_access: mealAccess })
-                    .eq('id', team.id);
+                    .eq('transaction_id', team.transaction_id);
                 if (error) throw error;
                 updated++;
             }

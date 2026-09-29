@@ -18,7 +18,7 @@ interface MemberData {
 }
 
 function RegisterPageContent() {
-    const REGISTRATIONS_OPEN = false; // Closed for public
+    const REGISTRATIONS_OPEN = process.env.NEXT_PUBLIC_REGISTRATIONS_OPEN === 'true';
     const searchParams = useSearchParams();
     const initialMember = {
         fullName: "",
@@ -77,7 +77,8 @@ function RegisterPageContent() {
         try {
             const idRes = await fetch('/api/register-id');
             const idData = await idRes.json();
-            const nextTeamId = idRes.ok ? idData.nextId : "PENDING";
+            if (!idRes.ok || !idData.nextId) throw new Error(idData.error || 'Could not reserve a team ID.');
+            const nextTeamId = idData.nextId;
 
             setTeamId(nextTeamId);
 
@@ -163,6 +164,7 @@ function RegisterPageContent() {
                         Your details for <span className="text-[#FFEE00] font-bold">{teamName}</span> have been sent. <br />
                         <span className="text-xs mt-4 block">Please wait for manual approval by the administrators. You will be notified via email once your team is confirmed.</span>
                     </p>
+                    {teamId && <p className="mb-8 break-all font-mono text-sm text-white/70">Team ID: <span className="text-[#FFEE00]">{teamId}</span></p>}
                     <Link href="/" className="inline-block bg-[#FFEE00] text-[#62009B] font-kanit font-black px-10 py-4 rounded-full hover:bg-[#FFD620] transition-transform hover:scale-105 uppercase tracking-widest">
                         Back to Home
                     </Link>

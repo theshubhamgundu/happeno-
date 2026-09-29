@@ -18,7 +18,6 @@ import {
     UserCog,
     Lock,
     Eye,
-    EyeOff,
     Download,
     Upload,
     LayoutDashboard,
@@ -58,7 +57,6 @@ export default function AdminDashboard() {
     const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
     const [emergencyForm, setEmergencyForm] = useState({ name: "", phone: "" });
     const [isEditingEmergency, setIsEditingEmergency] = useState(false);
-    const [visiblePasswords, setVisiblePasswords] = useState<Set<any>>(new Set());
     const [showMergeModal, setShowMergeModal] = useState(false);
     const [selectedMergeTeams, setSelectedMergeTeams] = useState<string[]>([]);
     const [mergeTeamName, setMergeTeamName] = useState("");
@@ -160,16 +158,6 @@ export default function AdminDashboard() {
         } finally {
             setIsMerging(false);
         }
-    };
-
-    const togglePasswordVisibility = (teamId: any, e: React.MouseEvent) => {
-        e.stopPropagation();
-        setVisiblePasswords(prev => {
-            const next = new Set(prev);
-            if (next.has(teamId)) next.delete(teamId);
-            else next.add(teamId);
-            return next;
-        });
     };
 
     const handleBulkMealAssign = async () => {
@@ -558,27 +546,9 @@ export default function AdminDashboard() {
                                                     <span className="text-[10px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{team.teamId}</span>
                                                 </div>
                                                 <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track} • {team.college}</p>
-                                                {/* Password Badge */}
                                                 <div className="flex items-center gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
                                                     <Lock size={10} className="text-blue-400/60" />
-                                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">Password:</span>
-                                                    <code className={`text-[11px] font-mono font-bold transition-all ${team.password
-                                                        ? 'text-blue-400 bg-blue-500/10 border border-blue-500/20'
-                                                        : 'text-white/20 bg-white/5 border border-white/10'
-                                                        } px-2 py-0.5 rounded`}>
-                                                        {team.password
-                                                            ? (visiblePasswords.has(team.id) ? team.password : '••••••••')
-                                                            : 'Not Set'}
-                                                    </code>
-                                                    {team.password && (
-                                                        <button
-                                                            onClick={(e) => togglePasswordVisibility(team.id, e)}
-                                                            className="text-white/30 hover:text-blue-400 transition-colors"
-                                                            title={visiblePasswords.has(team.id) ? 'Hide password' : 'Show password'}
-                                                        >
-                                                            {visiblePasswords.has(team.id) ? <EyeOff size={12} /> : <Eye size={12} />}
-                                                        </button>
-                                                    )}
+                                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">Login credentials are protected</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -637,32 +607,12 @@ export default function AdminDashboard() {
                                                         </div>
                                                     </div>
 
-                                                    {/* 3. Login Password */}
+                                                    {/* 3. Credential storage */}
                                                     <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
-                                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><Lock size={10} /> Login Password</span>
-                                                        <div className="bg-blue-500/5 rounded-xl p-4 border border-blue-500/20 space-y-3">
-                                                            <div className="flex justify-between items-center gap-3">
-                                                                <span className="text-[10px] text-white/40 font-bold uppercase shrink-0">Team Password</span>
-                                                                <code className="text-xs font-mono font-black text-blue-400 bg-blue-500/10 px-3 py-1 rounded border border-blue-500/20">
-                                                                    {team.password
-                                                                        ? (visiblePasswords.has(team.id) ? team.password : '••••••••')
-                                                                        : <span className="text-white/20 italic">Not Set</span>}
-                                                                </code>
-                                                                {team.password && (
-                                                                    <button
-                                                                        onClick={(e) => togglePasswordVisibility(team.id, e)}
-                                                                        className="p-1.5 rounded-lg bg-white/5 text-white/40 hover:text-blue-400 transition-colors"
-                                                                    >
-                                                                        {visiblePasswords.has(team.id) ? <EyeOff size={14} /> : <Eye size={14} />}
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        {!team.password && (
-                                                            <p className="text-[9px] text-slate-900/70 font-bold uppercase tracking-wide">
-                                                                Login credentials are not available for this team.
-                                                            </p>
-                                                        )}
+                                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><Lock size={10} /> Login credentials</span>
+                                                        <p className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 text-xs leading-relaxed text-white/50">
+                                                            Credentials are stored as one-way hashes and cannot be viewed here. The team receives its password when credentials are issued.
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </motion.div>
@@ -779,7 +729,7 @@ export default function AdminDashboard() {
                                             <div className="flex items-center gap-4">
                                                 <div className="text-right">
                                                     <span className="text-[9px] font-black text-white/20 uppercase block tracking-widest">Credentials</span>
-                                                    <code className="text-[10px] font-mono text-slate-900 font-black">PASS: {judge.password}</code>
+                                                    <code className="text-[10px] font-mono text-slate-900 font-black">{judge.password ? `PASS: ${judge.password}` : 'Password shown only when issued'}</code>
                                                 </div>
                                                 <button onClick={() => removeJudge(judge.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
                                             </div>
@@ -865,7 +815,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center gap-4">
                                             <div className="text-right">
                                                 <span className="text-[9px] font-black text-white/20 uppercase block tracking-widest">Credentials</span>
-                                                <code className="text-[10px] font-mono text-blue-400 font-black">PASS: {vol.password}</code>
+                                                <code className="text-[10px] font-mono text-blue-400 font-black">{vol.password ? `PASS: ${vol.password}` : 'Password shown only when issued'}</code>
                                             </div>
                                             <button onClick={() => removeVolunteer(vol.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
                                         </div>

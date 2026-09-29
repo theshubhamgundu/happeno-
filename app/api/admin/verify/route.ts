@@ -1,177 +1,96 @@
+import { randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { teamSupabase as supabase } from '@/lib/supabase';
 import { Resend } from 'resend';
 import QRCode from 'qrcode';
-import fs from 'fs';
-import path from 'path';
-import sharp from 'sharp';
+import { supabase } from '@/lib/supabase';
+import { getSession, hasRole } from '@/lib/session';
+import { hashPassword } from '@/lib/password';
+
+function escapeHtml(value: string): string {
+    return value.replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[character] || character);
+}
 
 export async function POST(req: Request) {
+    if (!hasRole(getSession(req), ['admin'])) {
+        return NextResponse.json({ success: false, message: 'Administrator access required.' }, { status: 403 });
+    }
+
     try {
-        const { transactionId } = await req.json();
-
+        const body = await req.json();
+        const transactionId = typeof body.transactionId === 'string' ? body.transactionId.trim() : '';
         if (!transactionId) {
-            return NextResponse.json({ success: false, message: "Transaction ID is required" }, { status: 400 });
+            return NextResponse.json({ success: false, message: 'Transaction ID is required.' }, { status: 400 });
         }
 
-        console.log(`ðŸš€ Verifying payment for: ${transactionId}`);
+        const resendApiKey = process.env.RESEND_API_KEY;
+        if (!resendApiKey) {
+            return NextResponse.json({ success: false, message: 'Email service is not configured; registration was not approved.' }, { status: 503 });
+        }
 
-        // 1. Update Status to COMPLETED
-        const { data: registration, error: sbError } = await supabase
+        const { data: existing, error: lookupError } = await supabase
             .from('registrations')
-            .update({ status: 'COMPLETED' })
+            .select('transaction_id, team_id, team_name, track, captain, email, members, status, password_hash, completed_at')
             .eq('transaction_id', transactionId)
-            .select()
-            .single();
-
-        if (sbError || !registration) {
-            console.error("Supabase Update Error:", sbError);
-            return NextResponse.json({ success: false, message: "Failed to update status" }, { status: 500 });
+            .maybeSingle();
+        if (lookupError) throw lookupError;
+        if (!existing) return NextResponse.json({ success: false, message: 'Registration not found.' }, { status: 404 });
+        if (existing.status === 'COMPLETED') {
+            return NextResponse.json({ success: false, message: 'This registration is already approved.' }, { status: 409 });
         }
 
-        // 2. Extract Captain's Email
-        let captainEmail = registration.email || "";
-
-        if (!captainEmail) {
-            try {
-                const members = typeof registration.members === 'string'
-                    ? JSON.parse(registration.members)
-                    : registration.members;
-
-                if (Array.isArray(members) && members.length > 0) {
-                    captainEmail = members[0].email || members[0].Email || "";
-                }
-            } catch (e) {
-                console.error("âŒ Error parsing members for email:", e);
-            }
+        const members = Array.isArray(existing.members) ? existing.members : [];
+        const captainEmail = existing.email || members[0]?.email || members[0]?.Email;
+        if (typeof captainEmail !== 'string' || !captainEmail.trim()) {
+            return NextResponse.json({ success: false, message: 'A captain email is required before approval.' }, { status: 422 });
         }
 
-        // 3. Send Confirmation Email with Ticket Attachment
-        if (captainEmail && process.env.RESEND_API_KEY) {
-            try {
-                const resend = new Resend(process.env.RESEND_API_KEY);
+        const password = randomBytes(18).toString('base64url');
+        const passwordHash = await hashPassword(password);
+        const { data: approved, error: updateError } = await supabase
+            .from('registrations')
+            .update({ status: 'COMPLETED', password_hash: passwordHash, completed_at: new Date().toISOString() })
+            .eq('transaction_id', transactionId)
+            .neq('status', 'COMPLETED')
+            .select('team_id, team_name, track, captain')
+            .maybeSingle();
+        if (updateError) throw updateError;
+        if (!approved) return NextResponse.json({ success: false, message: 'Registration was already approved.' }, { status: 409 });
 
-                const qrBuffer = await QRCode.toBuffer(registration.team_id, {
-                    width: 350,
-                    margin: 1,
-                    color: {
-                        dark: '#000000',
-                        light: '#FFFFFF',
-                    },
-                });
-
-                // 2. Generate Ticket with Sharp
-                const templatePath = path.join(process.cwd(), 'public', 'ticket-template.png');
-                const templateBuffer = fs.readFileSync(templatePath);
-
-                // Create SVG for Team ID text to overlay
-                const svgText = Buffer.from(`
-                    <svg width="400" height="150">
-                        <text x="50%" y="30%" font-family="Segoe UI, sans-serif" font-size="20" font-weight="900" fill="#000000" text-anchor="middle" dominant-baseline="middle" style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.5;">TEAM ID</text>
-                        <text x="50%" y="70%" font-family="Segoe UI, sans-serif" font-size="36" font-weight="900" fill="#62009B" text-anchor="middle" dominant-baseline="middle">${registration.team_id}</text>
-                    </svg>
-                `);
-
-                // Generate composite image (Template is 2000x647)
-                const ticketBuffer = await sharp(templateBuffer)
-                    .composite([
-                        {
-                            input: qrBuffer,
-                            top: 60,
-                            left: 1575 // Centered in the yellow area (x ~1540 to ~1950)
-                        },
-                        {
-                            input: svgText,
-                            top: 420,
-                            left: 1550
-                        }
-                    ])
-                    .png()
-                    .toBuffer();
-
-                // 3. Send via Resend
-                const { data, error: resendError } = await resend.emails.send({
-                    from: 'TRI-CITY AI HACKATHON <admin@tricity.online>',
-                    to: captainEmail,
-                    subject: `Registration Confirmed: See you at TRI-CITY AI HACKATHON ðŸš€`,
-                    attachments: [
-                        {
-                            filename: `tricity_Ticket_${registration.team_id}.png`,
-                            content: ticketBuffer,
-                        },
-                    ],
-                    html: `
-                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a; padding: 20px; border: 1px solid #eee; border-radius: 20px;">
-                            <div style="text-align: center; margin-bottom: 30px;">
-                                <h1 style="color: #62009B; text-transform: uppercase; margin-bottom: 5px; font-size: 28px;">REGISTRATION CONFIRMED</h1>
-                                <p style="color: #666; font-size: 18px; margin-top: 0;">You're officially a participant of TRI-CITY AI HACKATHON</p>
-                            </div>
-                            
-                            <p>Dear <strong>${registration.captain}</strong>,</p>
-                            <p>Congratulations! Your team <strong>${registration.team_name}</strong> has successfully completed the registration process for TRI-CITY AI HACKATHON. We are excited to have you on board!</p>
-
-                            <div style="background: #f8f9fa; border: 2px solid #62009B; border-radius: 15px; padding: 25px; margin: 25px 0;">
-                                <h3 style="margin-top: 0; font-size: 16px; color: #62009B; border-bottom: 1px solid #ddd; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Official Event Details</h3>
-                                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                                    <tr>
-                                        <td style="padding: 8px 0; color: #666; width: 140px;"><strong>Team ID:</strong></td>
-                                        <td style="font-weight: bold; color: #1a1a1a;">${registration.team_id}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; color: #666; width: 140px;"><strong>Community:</strong></td>
-                                        <td><a href="https://chat.whatsapp.com/J5Cqelh3gVPLalKt9FEqPp?mode=gi_t" style="color: #25d366; font-weight: bold; text-decoration: none;">Join WhatsApp Group</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; color: #666;"><strong>Track:</strong></td>
-                                        <td>${registration.track}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; color: #666;"><strong>Event Dates:</strong></td>
-                                        <td style="color: #62009B; font-weight: 900;">27 - 28 February 2026</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; color: #666;"><strong>Venue:</strong></td>
-                                        <td>Centle India (Centle India), near Ramoji Film City, Deshmuki Village, Yadadri Bhuvanagiri, TS - 508284</td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                            <div style="text-align: center; margin: 30px 0; padding: 20px; border: 2px dashed #eee; border-radius: 15px;">
-                                <h3 style="color: #62009B; margin-bottom: 10px;">Your Digital Entry Ticket</h3>
-                                <p style="color: #777; font-size: 14px; margin-top: 0;">We have attached your official digital ticket to this email. Please keep it handy (on your phone or printed) for entry verification at the venue gate.</p>
-                            </div>
-
-                            <p style="font-size: 14px; line-height: 1.6; color: #555; background: #fff8e1; padding: 15px; border-radius: 10px; border-left: 4px solid #ffc107;">
-                                <strong>Note:</strong> Join the <a href="https://chat.whatsapp.com/J5Cqelh3gVPLalKt9FEqPp?mode=gi_t" style="color: #62009B; font-weight: bold; text-decoration: none;">Official WhatsApp Community</a> for live updates, networking, and support. Your hacker desk details are also updated in your team dashboard.
-                            </p>
-
-                            <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; text-align: center;">
-                                <p style="margin: 0; color: #999; font-size: 12px;">See you at the hackathon!</p>
-                                <p style="margin: 5px 0; color: #62009B; font-weight: black; font-size: 14px;">TEAM TRI-CITY AI HACKATHON</p>
-                                <p style="margin: 0; color: #ccc; font-size: 10px;">Centle India Flagship Event</p>
-                            </div>
-                        </div>
-                    `
-                });
-
-                if (resendError) {
-                    console.error("âŒ Resend API Error:", resendError);
-                } else {
-                    console.log(`ðŸ“§ Email and Ticket sent successfully to ${captainEmail}. Response:`, data);
-                }
-            } catch (emailError) {
-                console.error("âŒ Email/Ticket Generation Failed:", emailError);
-            }
+        try {
+            const teamName = escapeHtml(approved.team_name || 'Your team');
+            const teamId = escapeHtml(approved.team_id || '');
+            const captain = escapeHtml(approved.captain || 'Participant');
+            const track = escapeHtml(approved.track || '');
+            const signInUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.online'}/login`;
+            const qrCode = await QRCode.toBuffer(approved.team_id || '', { width: 350, margin: 1 });
+            const resend = new Resend(resendApiKey);
+            const { error: emailError } = await resend.emails.send({
+                from: 'TRI-CITY AI HACKATHON <admin@tricity.online>',
+                to: captainEmail.trim(),
+                subject: `Registration approved: ${approved.team_name}`,
+                attachments: [{ filename: `tricity-checkin-${(approved.team_id || '').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, content: qrCode }],
+                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6"><h1>Registration approved</h1><p>Hello ${captain},</p><p>Your team <strong>${teamName}</strong> has been approved for TRI-CITY AI HACKATHON.</p><p><strong>Team ID:</strong> ${teamId}<br/><strong>Track:</strong> ${track}</p><p><strong>Login password:</strong> ${escapeHtml(password)}</p><p><a href="${escapeHtml(signInUrl)}">Sign in to your team dashboard</a>. Store this password securely; it cannot be retrieved later.</p><p>Your check-in QR code is attached.</p></div>`
+            });
+            if (emailError) throw emailError;
+        } catch (emailError) {
+            const { error: rollbackError } = await supabase
+                .from('registrations')
+                .update({ status: existing.status, password_hash: existing.password_hash, completed_at: existing.completed_at })
+                .eq('transaction_id', transactionId);
+            if (rollbackError) console.error('Approval rollback failed:', rollbackError);
+            console.error('Approval email failed:', emailError);
+            return NextResponse.json({ success: false, message: 'Approval email failed; registration was not approved.' }, { status: 502 });
         }
 
-        return NextResponse.json({ success: true, team: registration.team_name });
-
-    } catch (error: any) {
-        console.error('âŒ Verification Error:', error);
-        return NextResponse.json({
-            success: false,
-            message: "Verification failed",
-            details: String(error)
-        }, { status: 500 });
+        return NextResponse.json({ success: true, team: approved.team_name, message: 'Registration approved and credentials emailed.' });
+    } catch (error) {
+        console.error('Registration approval failed:', error);
+        return NextResponse.json({ success: false, message: 'Could not approve registration in Supabase.' }, { status: 503 });
     }
 }

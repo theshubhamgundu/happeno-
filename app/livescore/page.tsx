@@ -53,21 +53,26 @@ export default function LiveScorePage() {
             .sort((a, b) => calculateAverage(b) - calculateAverage(a));
     }, [projects, searchQuery, selectedDomain, calculateAverage]);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (password === "tricity@livescore") {
-            setIsAuthenticated(true);
-            localStorage.setItem("livescore_auth", "true");
-            toast.success("Identity verified.");
-        } else {
-            toast.error("Access denied.");
+        try {
+            const response = await fetch('/api/auth/livescore', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            if (!response.ok) throw new Error('Access denied.');
+            window.location.reload();
+        } catch {
+            toast.error('Access denied.');
         }
     };
 
     useEffect(() => {
-        if (localStorage.getItem("livescore_auth") === "true") {
-            setIsAuthenticated(true);
-        }
+        fetch('/api/auth/session')
+            .then(response => response.ok ? response.json() : null)
+            .then(session => setIsAuthenticated(session?.role === 'livescore'))
+            .catch(() => setIsAuthenticated(false));
     }, []);
 
     const downloadCSV = (roundId?: string) => {
@@ -177,7 +182,7 @@ export default function LiveScorePage() {
 
                     <button
                         onClick={() => {
-                            localStorage.removeItem("livescore_auth");
+                            void fetch('/api/auth/logout', { method: 'POST' });
                             setIsAuthenticated(false);
                         }}
                         className="bg-white border border-slate-300 hover:bg-slate-800 hover:border-slate-800 hover:text-slate-900 p-2.5 rounded-lg transition-all shadow-sm flex items-center gap-2 text-xs font-bold uppercase tracking-wider"

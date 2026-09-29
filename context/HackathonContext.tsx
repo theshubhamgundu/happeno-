@@ -1,11 +1,11 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 import { STATIC_ROUNDS_CONFIG } from "@/lib/constants";
 import { MAX_TEAM_MEMBERS } from "@/lib/constants";
-import { DEMO_JUDGE, DEMO_PROJECT, DEMO_VOLUNTEER, isDemoSession } from "@/lib/demo-data";
 
 interface EmergencyContact {
     name: string;
@@ -53,7 +53,6 @@ interface HackathonContextType {
     isLoading: boolean;
     updateProjectScore: (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>) => Promise<boolean>;
     checkInTeam: (projectId: any) => Promise<void>;
-    registerTeam: (teamData: Omit<Project, 'id' | 'roundScores'>) => void;
     judges: Judge[];
     addJudge: (judge: { name: string, specialization: string }) => void;
     removeJudge: (id: string) => void;
@@ -123,8 +122,6 @@ export interface Project {
     };
 }
 
-const PROJECTS: Project[] = [];
-
 const HackathonContext = createContext<HackathonContextType | undefined>(undefined);
 
 export const HackathonProvider = ({ children }: { children: ReactNode }) => {
@@ -161,12 +158,25 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     const [judges, setJudges] = useState<Judge[]>([]);
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const { user } = useAuth();
+    const pathname = usePathname();
+    const needsHackathonData = pathname.startsWith('/dashboard') ||
+        pathname === '/livescore' ||
+        pathname === '/registrations-count';
 
     const mountedRef = React.useRef(true);
 
-    // Load from LocalStorage on mount + Sync from Server
+    // Load application data from Supabase-backed APIs.
     useEffect(() => {
         mountedRef.current = true;
+        if (!needsHackathonData) {
+            setIsLoading(false);
+            return () => {
+                mountedRef.current = false;
+            };
+        }
+
+        setIsLoading(true);
+
         // 1. Fetch Global Settings from DB
         const fetchSettings = async (isBackground = false) => {
             try {
@@ -199,13 +209,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         // 2. Sync projects strictly from server
         // OPTIMIZATION: If user is a team, only fetch THEIR team data to save Supabase resources
         const fetchServerTeams = async (isBackground = false) => {
-            // Demo sessions must never depend on the registrations table. This
-            // keeps the dashboards usable when development credentials are absent.
-            if (user?.role !== 'admin' && isDemoSession(user)) {
-                if (mountedRef.current) setProjects([DEMO_PROJECT]);
-                return;
-            }
-
             try {
                 let url = '/api/teams';
                 if (user?.role === 'team' && user?.teamId) {
@@ -222,7 +225,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 }
             } catch (err) {
                 if (!isBackground) console.error("Failed to sync teams from server:", err);
-                if (user?.role !== 'admin' && isDemoSession(user) && mountedRef.current) setProjects([DEMO_PROJECT]);
             }
         };
 
@@ -236,64 +238,14 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
 
                 // 1. Fetch from Server
                 const [judgesRes, volunteersRes] = await Promise.all([
-                    fetch('/api/judges'),
-                    fetch('/api/volunteers')
+                    user?.role === 'admin' ? fetch('/api/judges') : Promise.resolve(null),
+                    user?.role === 'admin' ? fetch('/api/volunteers') : Promise.resolve(null)
                 ]);
 
-                if (judgesRes.ok) currentJudges = await judgesRes.json();
-                if (volunteersRes.ok) currentVolunteers = await volunteersRes.json();
+                if (judgesRes?.ok) currentJudges = await judgesRes.json();
+                if (volunteersRes?.ok) currentVolunteers = await volunteersRes.json();
 
-                // 2. Migration: If server empty but local valid, push local to server
-                const localJudgesStr = localStorage.getItem('hackathon_judges');
-                if (Array.isArray(currentJudges) && currentJudges.length === 0 && localJudgesStr) {
-                    const localJudges = JSON.parse(localJudgesStr);
-                    if (Array.isArray(localJudges) && localJudges.length > 0) {
-                        console.log("Migrating local judges to server...");
-                        for (const j of localJudges) {
-                            try {
-                                await fetch('/api/judges', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        name: j.name,
-                                        specialization: j.specialization,
-                                        generated_id: j.generatedId || j.generated_id,
-                                        password: j.password
-                                    })
-                                });
-                            } catch (e) { console.error("Migration failed for judge", j, e); }
-                        }
-                        const r = await fetch('/api/judges');
-                        if (r.ok) currentJudges = await r.json();
-                    }
-                }
-
-                const localVolsStr = localStorage.getItem('hackathon_volunteers');
-                if (Array.isArray(currentVolunteers) && currentVolunteers.length === 0 && localVolsStr) {
-                    const localVols = JSON.parse(localVolsStr);
-                    if (Array.isArray(localVols) && localVols.length > 0) {
-                        console.log("Migrating local volunteers to server...");
-                        for (const v of localVols) {
-                            try {
-                                await fetch('/api/volunteers', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        name: v.name,
-                                        phone: v.phone,
-                                        role: v.role,
-                                        generated_id: v.generatedId || v.generated_id,
-                                        password: v.password
-                                    })
-                                });
-                            } catch (e) { console.error("Migration failed for vol", v, e); }
-                        }
-                        const r = await fetch('/api/volunteers');
-                        if (r.ok) currentVolunteers = await r.json();
-                    }
-                }
-
-                // 3. Normalize Data (Map snake_case DB fields to camelCase State)
+                // Normalize database fields to the client model.
                 const normalize = (list: any[]) => list.map(item => ({
                     ...item,
                     generatedId: item.generated_id || item.generatedId,
@@ -301,26 +253,17 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 }));
 
                 if (Array.isArray(currentJudges)) {
-                    const normalizedJudges = normalize(currentJudges);
-                    setJudges(isDemoSession(user) ? [DEMO_JUDGE, ...normalizedJudges] : normalizedJudges);
+                    setJudges(normalize(currentJudges));
                 }
                 if (Array.isArray(currentVolunteers)) {
-                    const normalizedVolunteers = normalize(currentVolunteers);
-                    setVolunteers(isDemoSession(user) ? [DEMO_VOLUNTEER, ...normalizedVolunteers] : normalizedVolunteers);
+                    setVolunteers(normalize(currentVolunteers));
                 }
 
             } catch (error) {
                 console.error("Failed to fetch judges/volunteers:", error);
 
-                // Fallback to local storage if API completely fails
-                const savedJudges = localStorage.getItem('hackathon_judges');
-                if (savedJudges) setJudges(JSON.parse(savedJudges));
-                const savedVolunteers = localStorage.getItem('hackathon_volunteers');
-                if (savedVolunteers) setVolunteers(JSON.parse(savedVolunteers));
-                if (isDemoSession(user)) {
-                    setJudges([DEMO_JUDGE]);
-                    setVolunteers([DEMO_VOLUNTEER]);
-                }
+                setJudges([]);
+                setVolunteers([]);
             }
 
             setIsLoading(false);
@@ -342,7 +285,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
             mountedRef.current = false;
             clearInterval(interval);
         };
-    }, [user]);
+    }, [user, needsHackathonData]);
 
     const updateHackathonStartDate = async (date: string) => {
         setHackathonStartDate(date);
@@ -517,35 +460,22 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const addJudge = async (judgeData: { name: string, specialization: string }) => {
-        const id = Math.random().toString(36).substr(2, 9);
-        const nextNumber = 101 + judges.length;
-        const generatedId = `TRJ-${nextNumber}`;
-        const password = `${nextNumber}@tricity`;
-
-        const newJudge: Judge = {
-            ...judgeData,
-            id,
-            generatedId,
-            password
-        };
-
-        // Optimistic update
-        const updated = [...judges, newJudge];
-        setJudges(updated);
-        localStorage.setItem('hackathon_judges', JSON.stringify(updated));
-
         try {
-            await fetch('/api/judges', {
+            const response = await fetch('/api/judges', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: judgeData.name,
-                    specialization: judgeData.specialization,
-                    generated_id: generatedId,
-                    password: password
-                })
+                body: JSON.stringify(judgeData)
             });
-            toast.success(`Judge added. ID: ${generatedId}`);
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Judge save failed');
+            const newJudge: Judge = {
+                ...judgeData,
+                id: result.data.id,
+                generatedId: result.data.generated_id,
+                password: result.data.password
+            };
+            setJudges(current => [...current, newJudge]);
+            toast.success(`Judge added. ID: ${newJudge.generatedId}`);
         } catch (err) {
             console.error(err);
             toast.error("Failed to save judge to server");
@@ -553,17 +483,14 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const removeJudge = async (id: string) => {
-        // Optimistic
-        const updated = judges.filter(j => j.id !== id);
-        setJudges(updated);
-        localStorage.setItem('hackathon_judges', JSON.stringify(updated));
-
         try {
             const judge = judges.find(j => j.id === id);
             // Try deleting by generatedId if available (for server logic), otherwise use id
             const deleteId = judge?.generatedId || id;
 
-            await fetch(`/api/judges?id=${deleteId}`, { method: 'DELETE' });
+            const response = await fetch(`/api/judges?id=${deleteId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Judge deletion failed');
+            setJudges(current => current.filter(judge => judge.id !== id));
             toast.success("Judge removed");
         } catch (err) {
             console.error(err);
@@ -572,35 +499,22 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const addVolunteer = async (volunteerData: { name: string, phone: string, role: string }) => {
-        const id = Math.random().toString(36).substr(2, 9);
-        const nextNumber = 101 + volunteers.length;
-        const generatedId = `TRV-${nextNumber}`;
-        const password = `${nextNumber}@tricity`;
-
-        const newVol: Volunteer = {
-            ...volunteerData,
-            id,
-            generatedId,
-            password
-        };
-
-        const updated = [...volunteers, newVol];
-        setVolunteers(updated);
-        localStorage.setItem('hackathon_volunteers', JSON.stringify(updated));
-
         try {
-            await fetch('/api/volunteers', {
+            const response = await fetch('/api/volunteers', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: volunteerData.name,
-                    phone: volunteerData.phone,
-                    role: volunteerData.role,
-                    generated_id: generatedId,
-                    password: password
-                })
+                body: JSON.stringify(volunteerData)
             });
-            toast.success(`Volunteer added. ID: ${generatedId}`);
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Volunteer save failed');
+            const newVol: Volunteer = {
+                ...volunteerData,
+                id: result.data.id,
+                generatedId: result.data.generated_id,
+                password: result.data.password
+            };
+            setVolunteers(current => [...current, newVol]);
+            toast.success(`Volunteer added. ID: ${newVol.generatedId}`);
         } catch (err) {
             console.error(err);
             toast.error("Failed to save volunteer to server");
@@ -608,30 +522,18 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const removeVolunteer = async (id: string) => {
-        const updated = volunteers.filter(v => v.id !== id);
-        setVolunteers(updated);
-        localStorage.setItem('hackathon_volunteers', JSON.stringify(updated));
-
         try {
             const vol = volunteers.find(v => v.id === id);
             const deleteId = vol?.generatedId || id;
 
-            await fetch(`/api/volunteers?id=${deleteId}`, { method: 'DELETE' });
+            const response = await fetch(`/api/volunteers?id=${deleteId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Volunteer deletion failed');
+            setVolunteers(current => current.filter(volunteer => volunteer.id !== id));
             toast.success("Volunteer removed");
         } catch (err) {
             console.error(err);
             toast.error("Failed to remove volunteer from server");
         }
-    };
-
-    const registerTeam = (teamData: Omit<Project, 'id' | 'roundScores'>) => {
-        const newTeam: Project = {
-            ...teamData,
-            id: projects.length + 1,
-            roundScores: {}
-        };
-        const updatedProjects = [...projects, newTeam];
-        setProjects(updatedProjects);
     };
 
     const updateMemberDetails = async (projectId: any, memberIndex: number, updatedMemberData: Member): Promise<boolean> => {
@@ -1003,7 +905,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 isLoading,
                 updateProjectScore,
                 checkInTeam,
-                registerTeam,
                 judges,
                 addJudge,
                 removeJudge,

@@ -88,9 +88,6 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="en">
-        <head>
-          <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${montserrat.variable} ${dmSans.variable} ${syne.variable} ${spaceMono.variable} ${poppins.className} antialiased overflow-x-hidden bg-white text-slate-900`}
         >

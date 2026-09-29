@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useHackathon } from "@/context/HackathonContext";
 import { Lock, Users, ShieldCheck, Download, Search, FileText, ChevronRight, LogOut } from "lucide-react";
@@ -8,23 +8,40 @@ import { Lock, Users, ShieldCheck, Download, Search, FileText, ChevronRight, Log
 export default function RegistrationsCountPage() {
     const { projects, isLoading } = useHackathon();
     const [password, setPassword] = useState("");
+    const [loginId, setLoginId] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [error, setError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
 
-    const handleLogin = (e?: React.FormEvent) => {
+    const handleLogin = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        if (password === "tricity@2.0") {
-            setIsAuthenticated(true);
+        try {
+            const response = await fetch('/api/auth/staff', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: 'admin', id: loginId, password })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Invalid credentials.');
             setError("");
-        } else {
-            setError("Invalid credentials. Please contact administration.");
+            window.location.reload();
+        } catch (error) {
+            setError(error instanceof Error ? error.message : 'Could not authenticate.');
         }
     };
 
+    useEffect(() => {
+        fetch('/api/auth/session')
+            .then(response => response.ok ? response.json() : null)
+            .then(session => setIsAuthenticated(session?.role === 'admin'))
+            .catch(() => setIsAuthenticated(false));
+    }, []);
+
     const handleLogout = () => {
+        void fetch('/api/auth/logout', { method: 'POST' });
         setIsAuthenticated(false);
         setPassword("");
+        setLoginId("");
     };
 
     const completedRegistrations = useMemo(() => {
@@ -107,12 +124,23 @@ export default function RegistrationsCountPage() {
 
                         <form onSubmit={handleLogin} className="space-y-4">
                             <div className="space-y-2">
+                                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider ml-1">Admin ID</label>
+                                <input
+                                    type="text"
+                                    value={loginId}
+                                    onChange={(e) => setLoginId(e.target.value)}
+                                    autoComplete="username"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all"
+                                />
+                            </div>
+                            <div className="space-y-2">
                                 <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider ml-1">Access Key</label>
                                 <input
                                     type="password"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    autoComplete="current-password"
                                     autoFocus
                                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all"
                                 />

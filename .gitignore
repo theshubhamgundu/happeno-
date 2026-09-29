@@ -6,6 +6,9 @@
 # testing
 /coverage
 
+# IDE workspace state
+/.vs/
+
 # next.js
 /.next/
 /out/

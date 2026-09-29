@@ -1,108 +1,58 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import fs from 'fs';
-import path from 'path';
+import { getSession, hasRole } from '@/lib/session';
 
-// Cache responses at the edge for 60 seconds to prevent DB spikes
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
+    const session = getSession(req);
+    if (!hasRole(session, ['admin', 'judge', 'volunteer', 'team', 'livescore'])) {
+        return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+    }
+
     try {
-        // Fallback to local file system if Supabase is not configured
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-            const settingsPath = path.join(process.cwd(), 'data', 'settings.json');
-            
-            if (fs.existsSync(settingsPath)) {
-                const localSettings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-                return NextResponse.json(localSettings);
-            } else {
-                // Create default settings file if it doesn't exist
-                const defaultSettings = {
-                    start_date: "2026-02-27",
-                    emergency_contact: { name: "Event Coordinator", phone: "+1-555-0123" },
-                    is_submission_locked: false,
-                    is_round_lock_enabled: true,
-                    enabled_meals: ["day1_breakfast", "day1_lunch", "day1_dinner", "day2_breakfast", "day2_lunch"],
-                    released_rounds: [],
-                    round_configs: []
-                };
-                
-                // Ensure data directory exists
-                const dataDir = path.join(process.cwd(), 'data');
-                if (!fs.existsSync(dataDir)) {
-                    fs.mkdirSync(dataDir, { recursive: true });
-                }
-                
-                fs.writeFileSync(settingsPath, JSON.stringify(defaultSettings, null, 2));
-                return NextResponse.json(defaultSettings);
-            }
-        }
-
         const { data, error } = await supabase
             .from('hackathon_settings')
-            .select('*');
+            .select('key, value');
 
-        if (error) {
-            console.error('❌ Settings Fetch Error:', error);
-            // If table doesn't exist yet, return empty but don't crash
-            return NextResponse.json({});
+        if (error) throw error;
+
+        let settings = Object.fromEntries((data || []).map(({ key, value }) => [key, value]));
+        if (session.role === 'livescore') {
+            const publicKeys = new Set(['start_date', 'released_rounds', 'round_configs', 'is_submission_locked']);
+            settings = Object.fromEntries(Object.entries(settings).filter(([key]) => publicKeys.has(key)));
+        } else if (session.role === 'team') {
+            const teamKeys = new Set(['start_date', 'emergency_contact', 'wifi_details', 'released_rounds', 'round_configs', 'is_submission_locked', 'is_round_lock_enabled', 'enabled_meals']);
+            settings = Object.fromEntries(Object.entries(settings).filter(([key]) => teamKeys.has(key)));
         }
-
-        // Convert key-value rows to a single object
-        const settings = (data || []).reduce((acc: any, item: any) => {
-            acc[item.key] = item.value;
-            return acc;
-        }, {});
-
-        return NextResponse.json(settings);
+        return NextResponse.json(settings, { headers: { 'Cache-Control': 'no-store' } });
     } catch (error) {
-        console.error('❌ Settings API Error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('Settings fetch failed:', error);
+        return NextResponse.json({ error: 'Could not fetch settings from Supabase.' }, { status: 503 });
     }
 }
 
 export async function POST(req: Request) {
+    if (!hasRole(getSession(req), ['admin'])) {
+        return NextResponse.json({ error: 'Administrator access required.' }, { status: 403 });
+    }
+
     try {
-        const { key, value } = await req.json();
+        const body = await req.json();
+        const { key, value } = body;
 
-        if (!key) {
-            return NextResponse.json({ error: 'Key is required' }, { status: 400 });
-        }
-
-        // Fallback to local file system if Supabase is not configured
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-            const settingsPath = path.join(process.cwd(), 'data', 'settings.json');
-            
-            let settings = {};
-            if (fs.existsSync(settingsPath)) {
-                settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-            }
-            
-            // Update the setting
-            (settings as any)[key] = value;
-            
-            // Ensure data directory exists
-            const dataDir = path.join(process.cwd(), 'data');
-            if (!fs.existsSync(dataDir)) {
-                fs.mkdirSync(dataDir, { recursive: true });
-            }
-            
-            fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
-            return NextResponse.json({ success: true });
+        if (typeof key !== 'string' || !key.trim() || value === undefined) {
+            return NextResponse.json({ error: 'A setting key and value are required.' }, { status: 400 });
         }
 
         const { error } = await supabase
             .from('hackathon_settings')
-            .upsert({ key, value, updated_at: new Date().toISOString() });
+            .upsert({ key: key.trim(), value, updated_at: new Date().toISOString() });
 
-        if (error) {
-            console.error(`❌ Error updating setting ${key}:`, error);
-            return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
-        }
-
+        if (error) throw error;
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('❌ Settings Update Error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('Settings update failed:', error);
+        return NextResponse.json({ error: 'Could not save settings to Supabase.' }, { status: 503 });
     }
 }

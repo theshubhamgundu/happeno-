@@ -55,7 +55,6 @@ function EditRegistrationContent() {
     const [editedTeam, setEditedTeam] = useState<TeamData | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [savedPassword, setSavedPassword] = useState("");
 
     const handleLookup = async () => {
         const id = teamIdInput.trim();
@@ -74,15 +73,23 @@ function EditRegistrationContent() {
         setAuthError("");
 
         try {
-            const res = await fetch(
-                `/api/participant-update?teamId=${encodeURIComponent(id)}&password=${encodeURIComponent(pass)}`
-            );
+            const authRes = await fetch('/api/auth/team', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ teamId: id, password: pass })
+            });
+            const authData = await authRes.json();
+            if (!authRes.ok) {
+                setAuthError(authData.error || 'Invalid team credentials.');
+                return;
+            }
+
+            const res = await fetch('/api/participant-update', { cache: 'no-store' });
             const data = await res.json();
 
             if (res.ok && data.success) {
                 setTeam(data.team);
                 setEditedTeam(JSON.parse(JSON.stringify(data.team)));
-                setSavedPassword(pass);
                 toast.success(`Welcome! Found team "${data.team.teamName}"`);
             } else {
                 setAuthError(data.error || "Team not found. Check your credentials.");
@@ -132,7 +139,6 @@ function EditRegistrationContent() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     teamId: team.teamId,
-                    password: savedPassword,
                     teamName: editedTeam.teamName,
                     track: editedTeam.track,
                     captain: editedTeam.members[0]?.fullName || editedTeam.captain,
@@ -160,11 +166,11 @@ function EditRegistrationContent() {
     };
 
     const handleLogout = () => {
+        void fetch('/api/auth/logout', { method: 'POST' });
         setTeam(null);
         setEditedTeam(null);
         setTeamIdInput("");
         setPasswordInput("");
-        setSavedPassword("");
         setIsEditing(false);
         setAuthError("");
     };
