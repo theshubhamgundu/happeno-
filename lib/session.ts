@@ -17,7 +17,9 @@ const SESSION_SECONDS = 60 * 60 * 12;
 
 function getSecret(): string {
     const secret = process.env.AUTH_SESSION_SECRET;
-    if (!secret) throw new Error('AUTH_SESSION_SECRET is not configured.');
+    if (!secret || Buffer.byteLength(secret) < 32) {
+        throw new Error('AUTH_SESSION_SECRET must contain at least 32 bytes of random data.');
+    }
     return secret;
 }
 

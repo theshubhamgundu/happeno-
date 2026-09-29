@@ -95,29 +95,6 @@ export default function AdminDashboard() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 50;
 
-    // Silent one-time backfill: if any team has no password OR has old-format password (no '@'), regenerate all
-    const backfillRan = useRef(false);
-    useEffect(() => {
-        if (isLoading) return; // Wait until data is loaded
-        if (backfillRan.current) return; // Only run once per session
-        if (projects.length === 0) return;
-        // Old format: TRI-TEAMNAME-101 (no '@')
-        // New format: RA-AN-PR@TRI-101 (has '@')
-        const needsUpdate = projects.some(p => !p.password || !p.password.includes('@'));
-        if (!needsUpdate) return; // All passwords already in new format
-        backfillRan.current = true;
-        console.log(`ðŸ”‘ Detected old/missing passwords â€” regenerating with new member-initials formula...`);
-        fetch('/api/admin/generate-passwords', { method: 'POST' })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    console.log(`âœ… Passwords updated for ${data.updated} teams. Refreshing...`);
-                    window.location.reload();
-                }
-            })
-            .catch(err => console.error('Password backfill failed:', err));
-    }, [projects, isLoading]);
-
     const handleMergeTeams = async () => {
         if (selectedMergeTeams.length < 2) {
             toast.error("Please select at least 2 teams to merge.");

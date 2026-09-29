@@ -83,7 +83,6 @@ export interface Project {
     teamId?: string;
     transactionId?: string; // Manual Transaction ID
     status?: string; // PENDING or COMPLETED
-    password?: string;
     name: string;
     team: string;
     track: string;
@@ -168,7 +167,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     // Load application data from Supabase-backed APIs.
     useEffect(() => {
         mountedRef.current = true;
-        if (!needsHackathonData) {
+        if (!needsHackathonData || !user) {
             setIsLoading(false);
             return () => {
                 mountedRef.current = false;

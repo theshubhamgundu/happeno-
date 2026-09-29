@@ -79,7 +79,7 @@ export async function POST(req: Request) {
             teamId: nextTeamId
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Registration failed:', error);
         return NextResponse.json({
             success: false,

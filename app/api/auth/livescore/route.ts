@@ -3,6 +3,10 @@ import { NextResponse } from 'next/server';
 import { setSessionCookie } from '@/lib/session';
 
 export async function POST(req: Request) {
+    if (!process.env.AUTH_SESSION_SECRET || Buffer.byteLength(process.env.AUTH_SESSION_SECRET) < 32) {
+        return NextResponse.json({ success: false, error: 'Authentication is not configured. Set AUTH_SESSION_SECRET to at least 32 random bytes.' }, { status: 503 });
+    }
+
     try {
         const { password } = await req.json();
         const configuredPassword = process.env.LIVESCORE_PASSWORD;

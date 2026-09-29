@@ -6,14 +6,13 @@ import { toast } from "sonner";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
-import { DEMO_PROJECT, DEMO_TEAM_ID } from "@/lib/demo-data";
 
 type SubmissionKey = "repo" | "video" | "presentation" | "demo";
 
 export default function TeamSubmissions() {
     const { user } = useAuth();
     const { projects, isSubmissionLocked } = useHackathon();
-    const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || (user?.teamId === DEMO_TEAM_ID ? DEMO_PROJECT : null), [projects, user]);
+    const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || null, [projects, user]);
     const [values, setValues] = useState<Record<SubmissionKey, string>>({ repo: "", video: "", presentation: "", demo: "" });
     const [saving, setSaving] = useState<SubmissionKey | null>(null);
     const [timeLocked, setTimeLocked] = useState(false);

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-type Role = 'team' | 'judge' | 'volunteer' | 'admin' | null;
+type Role = 'team' | 'judge' | 'volunteer' | 'admin' | 'livescore' | null;
 
 interface AuthContextType {
     user: { role: Role; id?: string; teamId?: string; name?: string } | null;

@@ -13,7 +13,7 @@ export async function GET() {
         if (error) throw error;
 
         return NextResponse.json({ success: true, nextId });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Register-ID route failed:', error);
         return NextResponse.json({
             success: false,

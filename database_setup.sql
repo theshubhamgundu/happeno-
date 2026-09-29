@@ -117,11 +117,19 @@ from registrations;
 
 create or replace function next_registration_team_id()
 returns text
-language sql
+language plpgsql
 security definer
 set search_path = public
 as $$
-    select 'TRICITY_' || nextval('registration_team_number_seq')::text;
+declare
+    candidate text;
+begin
+    loop
+        candidate := 'TRICITY_' || nextval('registration_team_number_seq')::text;
+        exit when not exists (select 1 from registrations where team_id = candidate);
+    end loop;
+    return candidate;
+end;
 $$;
 
 create sequence if not exists judge_id_seq start with 101;

@@ -4,16 +4,21 @@ import { setSessionCookie } from '@/lib/session';
 import { verifyPassword } from '@/lib/password';
 
 export async function POST(req: Request) {
+    if (!process.env.AUTH_SESSION_SECRET || Buffer.byteLength(process.env.AUTH_SESSION_SECRET) < 32) {
+        return NextResponse.json({ success: false, error: 'Authentication is not configured. Set AUTH_SESSION_SECRET to at least 32 random bytes.' }, { status: 503 });
+    }
+
     try {
         const { teamId, password } = await req.json();
         if (typeof teamId !== 'string' || typeof password !== 'string') {
             return NextResponse.json({ success: false, error: 'Team ID and password are required.' }, { status: 400 });
         }
+        const normalizedTeamId = teamId.trim().toUpperCase();
 
         const { data: databaseTeam, error: databaseError } = await supabase
             .from('registrations')
             .select('team_id, team_name, password_hash, status')
-            .eq('team_id', teamId.trim())
+            .eq('team_id', normalizedTeamId)
             .maybeSingle();
 
         if (databaseError) {

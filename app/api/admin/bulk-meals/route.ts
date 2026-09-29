@@ -49,7 +49,7 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({ updated, total: (teams || []).length });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Could not update meal access.' }, { status: 503 });
     }
 }

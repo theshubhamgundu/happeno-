@@ -6,7 +6,6 @@ import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentat
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
-import { DEMO_PROJECT, DEMO_TEAM_ID } from "@/lib/demo-data";
 import { TRACKS, PROBLEM_STATEMENTS } from "@/lib/constants";
 import { toast } from "sonner";
 
@@ -51,15 +50,6 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
 
         setIsLocking(true);
         try {
-            // Bypass API for demo team
-            if (team.teamId === DEMO_TEAM_ID) {
-                setTimeout(() => {
-                    toast.success("Track locked successfully! (Demo Mode)");
-                    onLocked(selectedTrack, selectedPS);
-                }, 800);
-                return;
-            }
-
             const res = await fetch("/api/team/lock-track", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -151,14 +141,14 @@ export default function TeamDashboard() {
     const [otherTechEnabled, setOtherTechEnabled] = useState<Record<string, boolean>>({});
     const [otherTechInput, setOtherTechInput] = useState<Record<string, string>>({});
     
-    // Local state for locked track/ps to avoid reload breaking demo state
+    // Local state for values being edited before the database confirms them.
     const [localTrack, setLocalTrack] = useState<string | null>(null);
     const [localPS, setLocalPS] = useState<string | null>(null);
     
     const [editingPI, setEditingPI] = useState(false);
     const [editingTS, setEditingTS] = useState(false);
     
-    const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || (user?.teamId === DEMO_TEAM_ID ? DEMO_PROJECT : null), [projects, user]);
+    const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || null, [projects, user]);
 
     // Lock state comes from the DB via the API — not guessed from data presence
     const isPSLocked = Boolean(team?.isPSLocked);

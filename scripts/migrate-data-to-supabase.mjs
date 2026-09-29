@@ -1,22 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
-import { loadEnvConfig } from '@next/env';
+import nextEnv from '@next/env';
 import bcrypt from 'bcryptjs';
+import { randomUUID } from 'node:crypto';
 import Papa from 'papaparse';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
+const { loadEnvConfig } = nextEnv;
 loadEnvConfig(root);
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const dryRun = process.argv.includes('--dry-run');
 
-if (!supabaseUrl || !serviceRoleKey) {
+if (!dryRun && (!supabaseUrl || !serviceRoleKey)) {
     throw new Error('Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY before running the data migration.');
 }
 
-const supabase = createClient(supabaseUrl, serviceRoleKey, {
+const supabase = supabaseUrl && serviceRoleKey ? createClient(supabaseUrl, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false }
-});
+}) : null;
 
 function readJson(relativePath, fallback) {
     const filePath = path.join(root, relativePath);
@@ -128,7 +131,7 @@ async function toRegistrationRow(team, existingRegistration) {
     const submission = team.submission || {};
 
     return {
-        transaction_id: team.transactionId || team.transaction_id || undefined,
+        transaction_id: team.transactionId || team.transaction_id || existingRegistration?.transaction_id || randomUUID(),
         team_id: String(team.teamId || team.team_id || team.id),
         team_name: team.team || team.name || team.teamName || 'Unknown Team',
         password_hash: existingRegistration?.password_hash || (team.password ? await bcrypt.hash(team.password, 12) : null),
@@ -168,6 +171,7 @@ async function toRegistrationRow(team, existingRegistration) {
 }
 
 async function upsertInBatches(table, rows, onConflict) {
+    if (!supabase) throw new Error('Supabase client is not available.');
     for (let offset = 0; offset < rows.length; offset += 500) {
         const { error } = await supabase.from(table).upsert(rows.slice(offset, offset + 500), { onConflict });
         if (error) throw new Error(`Failed importing ${table}: ${error.message}`);
@@ -216,19 +220,30 @@ async function main() {
         }
     }
 
-    const existingPasswordHashes = new Map();
+    if (dryRun) {
+        console.log(JSON.stringify({
+            registrations: finalTeams.length,
+            settings: Object.keys(readJson('data/settings.json', {})).length,
+            judges: readJson('data/judges.json', []).length,
+            volunteers: readJson('data/volunteers.json', []).length
+        }, null, 2));
+        return;
+    }
+
+    if (!supabase) throw new Error('Supabase client is not available.');
+    const existingRegistrations = new Map();
     const teamIds = finalTeams.map(team => String(team.teamId || team.team_id || team.id));
     for (let offset = 0; offset < teamIds.length; offset += 500) {
         const { data, error } = await supabase
             .from('registrations')
-            .select('team_id, password_hash, created_at')
+            .select('team_id, transaction_id, password_hash, created_at')
             .in('team_id', teamIds.slice(offset, offset + 500));
         if (error) throw new Error(`Failed checking existing registrations: ${error.message}`);
-        for (const row of data || []) existingPasswordHashes.set(row.team_id, row);
+        for (const row of data || []) existingRegistrations.set(row.team_id, row);
     }
 
     const registrationRows = await Promise.all(finalTeams.map(team =>
-        toRegistrationRow(team, existingPasswordHashes.get(String(team.teamId || team.team_id || team.id)))
+        toRegistrationRow(team, existingRegistrations.get(String(team.teamId || team.team_id || team.id)))
     ));
     await upsertInBatches('registrations', registrationRows, 'team_id');
 

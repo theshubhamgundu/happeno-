@@ -6,8 +6,11 @@ import { getSession, hasRole } from '@/lib/session';
 import { hashPassword } from '@/lib/password';
 import { randomBytes } from 'node:crypto';
 
-function getMemberName(member: any): string {
-    return typeof member === 'string' ? member : member?.fullName || member?.name || '';
+function getMemberName(member: unknown): string {
+    if (typeof member === 'string') return member;
+    if (!member || typeof member !== 'object') return '';
+    const value = member as { fullName?: string; name?: string };
+    return value.fullName || value.name || '';
 }
 
 export async function POST(req: Request) {
@@ -27,24 +30,34 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'New team name is required.' }, { status: 400 });
         }
 
-        const { data: sourceTeams, error: fetchError } = await supabase
+        const sourceIds = sourceTeamIds.map(String);
+        const { data: transactionTeams, error: transactionError } = await supabase
             .from('registrations')
             .select('*')
-            .in('team_id', sourceTeamIds.map(String))
+            .in('transaction_id', sourceIds)
             .neq('status', 'MERGED');
-        if (fetchError) throw fetchError;
-        if (!sourceTeams || sourceTeams.length !== sourceTeamIds.length) {
+        if (transactionError) throw transactionError;
+
+        const foundIds = new Set((transactionTeams || []).flatMap(team => [team.transaction_id, team.team_id]));
+        const unresolvedTeamIds = sourceIds.filter(id => !foundIds.has(id));
+        const { data: teamIdTeams, error: teamIdError } = unresolvedTeamIds.length
+            ? await supabase.from('registrations').select('*').in('team_id', unresolvedTeamIds).neq('status', 'MERGED')
+            : { data: [], error: null };
+        if (teamIdError) throw teamIdError;
+
+        const teamsByTransaction = new Map([...(transactionTeams || []), ...(teamIdTeams || [])].map(team => [team.transaction_id, team]));
+        const sourceTeams = [...teamsByTransaction.values()];
+        if (sourceTeams.length !== sourceIds.length) {
             return NextResponse.json({ error: 'One or more source teams could not be found.' }, { status: 404 });
         }
 
-        const orderedSources = sourceTeamIds.map(id => sourceTeams.find(team => team.team_id === String(id))!);
+        const orderedSources = sourceIds.map(id => sourceTeams.find(team => team.team_id === id || team.transaction_id === id)!);
         const members = orderedSources.flatMap(team => Array.isArray(team.members) ? team.members : []);
         if (!members.length) return NextResponse.json({ error: 'The selected teams have no participants.' }, { status: 400 });
         if (members.length > MAX_TEAM_MEMBERS) {
             return NextResponse.json({ error: `A team can have at most ${MAX_TEAM_MEMBERS} participants.` }, { status: 400 });
         }
 
-        const entryType = members.length === 1 ? 'IND' : members.length === 2 ? 'DUO' : 'SQD';
         const { data: teamId, error: idError } = await supabase.rpc('next_registration_team_id');
         if (idError || typeof teamId !== 'string') throw idError || new Error('Could not reserve a team ID.');
         const password = randomBytes(18).toString('base64url');

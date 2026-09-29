@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useHackathon } from "@/context/HackathonContext";
-import { DEMO_PROJECT, DEMO_TEAM_ID } from "@/lib/demo-data";
 
 const adminOperationItems = [
     { href: "/dashboard/admin#entries", section: "entries", icon: Users, label: "Entries" },
@@ -48,18 +47,7 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
 
     const displayName = useMemo(() => {
         if (type === 'team') {
-            // Updated to match TeamDashboard logic
-            let activeTeam;
-            if (user?.teamId) {
-                activeTeam = projects.find(p => p.teamId === user.teamId || p.id === user.teamId);
-            }
-            if (!activeTeam && user?.teamId === DEMO_TEAM_ID) {
-                activeTeam = DEMO_PROJECT;
-            }
-            // Fallback only if no specific teamId is set (for demo/testing)
-            if (!activeTeam) {
-                activeTeam = projects.find(p => p.teamId?.startsWith('VH-')) || projects[0];
-            }
+            const activeTeam = projects.find(project => project.teamId === user?.teamId || project.id === user?.teamId);
             return activeTeam ? activeTeam.team : "Team Name";
         }
         if (type === 'admin') return "Administrator";

@@ -26,8 +26,10 @@ function memberEmail(member: unknown): string {
     return (member as { email?: string }).email || '';
 }
 
-function teamResponse(row: Record<string, any>) {
-    const rawData = row.raw_data || {};
+function teamResponse(row: Record<string, unknown>) {
+    const rawData = row.raw_data && typeof row.raw_data === 'object'
+        ? row.raw_data as Record<string, unknown>
+        : {};
     return {
         id: row.transaction_id || '',
         name: row.team_name || 'Unknown Team',
@@ -99,15 +101,35 @@ async function transferTeamMembers(targetId: string, selections: { sourceTeamId:
     const sourceIds = [...new Set(selections.map(selection => selection.sourceTeamId))];
     if (sourceIds.includes(targetId)) throw new Error('Choose participants from other teams.');
 
-    const { data: rows, error } = await supabase
+    const lookupIds = [...sourceIds, targetId];
+    const { data: transactionRows, error: transactionError } = await supabase
         .from('registrations')
         .select('transaction_id, team_id, team_name, members, member_meal_state, raw_data, captain, captain_mobile, college')
-        .in('team_id', [...sourceIds, targetId]);
-    if (error) throw error;
+        .in('transaction_id', lookupIds);
+    if (transactionError) throw transactionError;
 
-    const byTeamId = new Map((rows || []).map(row => [row.team_id, row]));
+    const foundIds = new Set((transactionRows || []).flatMap(row => [row.transaction_id, row.team_id]));
+    const unresolvedTeamIds = lookupIds.filter(id => !foundIds.has(id));
+    const { data: teamIdRows, error: teamIdError } = unresolvedTeamIds.length
+        ? await supabase
+            .from('registrations')
+            .select('transaction_id, team_id, team_name, members, member_meal_state, raw_data, captain, captain_mobile, college')
+            .in('team_id', unresolvedTeamIds)
+        : { data: [], error: null };
+    if (teamIdError) throw teamIdError;
+
+    const rowsByTransaction = new Map([...(transactionRows || []), ...(teamIdRows || [])].map(row => [row.transaction_id, row]));
+    const rows = [...rowsByTransaction.values()];
+    const byTeamId = new Map<string, typeof rows[number]>();
+    for (const row of rows) {
+        byTeamId.set(row.team_id, row);
+        byTeamId.set(row.transaction_id, row);
+    }
     const target = byTeamId.get(targetId);
     if (!target) throw new Error('The destination team could not be found. Refresh and try again.');
+    if (sourceIds.some(id => byTeamId.get(id)?.transaction_id === target.transaction_id)) {
+        throw new Error('Choose participants from other teams.');
+    }
 
     const sourceRows = sourceIds.map(id => byTeamId.get(id));
     if (sourceRows.some(row => !row)) throw new Error('A source team could not be found. Refresh and try again.');
@@ -200,7 +222,7 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Team session is missing its team ID.' }, { status: 403 });
         }
         const pageSize = 1000;
-        const teams: Record<string, any>[] = [];
+        const teams: Record<string, unknown>[] = [];
         let from = 0;
 
         while (true) {
@@ -231,6 +253,25 @@ export async function GET(req: Request) {
                 roundComments: team.roundComments,
                 isCheckedIn: team.isCheckedIn,
                 submission: team.submission
+            })), { headers: { 'Cache-Control': 'no-store' } });
+        }
+        if (session.role === 'judge') {
+            return NextResponse.json(result.map(team => ({
+                id: team.id,
+                teamId: team.teamId,
+                name: team.name,
+                team: team.team,
+                track: team.track,
+                status: team.status,
+                problemStatement: team.problemStatement,
+                proposedIdea: team.proposedIdea,
+                techStack: team.techStack,
+                members: (Array.isArray(team.members) ? team.members : []).map((member: unknown) => ({ fullName: memberName(member) })),
+                submission: team.submission,
+                roundScores: team.roundScores,
+                roundDetailedScores: team.roundDetailedScores,
+                roundComments: team.roundComments,
+                isEliminated: team.isEliminated
             })), { headers: { 'Cache-Control': 'no-store' } });
         }
         return NextResponse.json(result, { headers: { 'Cache-Control': 'no-store' } });
@@ -268,7 +309,7 @@ export async function PATCH(req: Request) {
             }
         }
         if (session.role === 'volunteer') {
-            const allowedKeys = new Set(['id', 'isCheckedIn', 'checkedInAt', 'memberMealState', 'members', 'transferMembers']);
+            const allowedKeys = new Set(['id', 'isCheckedIn', 'checkedInAt', 'memberMealState']);
             if (Object.keys(body).some(key => !allowedKeys.has(key))) {
                 return NextResponse.json({ error: 'Volunteer sessions may only update check-in and meal operations.' }, { status: 403 });
             }
@@ -291,7 +332,7 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ error: 'Team sessions may only update their own project.' }, { status: 403 });
         }
 
-        const updateData: Record<string, any> = {};
+        const updateData: Record<string, unknown> = {};
         if (members !== undefined) {
             if (!Array.isArray(members)) return NextResponse.json({ error: 'Members must be an array.' }, { status: 400 });
             if (members.length > MAX_TEAM_MEMBERS && members.length > (existing.members || []).length) {

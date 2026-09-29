@@ -6,7 +6,6 @@ import QRCode from "qrcode";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
-import { DEMO_PROJECT, DEMO_TEAM_ID } from "@/lib/demo-data";
 import { EVENT_MEALS } from "@/lib/meals";
 
 function getMemberId(member: any, index: number): string {
@@ -25,10 +24,7 @@ export default function TeamTicket() {
     const [memberQrs, setMemberQrs] = useState<Record<string, string>>({});
     const [activePassIndex, setActivePassIndex] = useState(0); // 0 = leader, 1+ = members
 
-    const team = useMemo(() => 
-        projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || 
-        (user?.teamId === DEMO_TEAM_ID ? DEMO_PROJECT : null), 
-    [projects, user]);
+    const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || null, [projects, user]);
 
     const members = useMemo(() => team?.members || [], [team]);
 
