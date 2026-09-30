@@ -1,13 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 type Role = 'team' | 'judge' | 'volunteer' | 'admin' | 'livescore' | null;
 
 interface AuthContextType {
-    user: { role: Role; id?: string; teamId?: string; name?: string } | null;
-    login: (role: Role, data?: { id?: string; teamId?: string; name?: string }) => void;
+    user: { role: Role; id?: string; teamId?: string; name?: string; portalMode?: 'edit' | 'event' | 'closed' } | null;
+    login: (role: Role, data?: { id?: string; teamId?: string; name?: string; portalMode?: 'edit' | 'event' | 'closed' }) => void;
     logout: () => void;
     isLoading: boolean;
 }
@@ -15,9 +15,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<{ role: Role; id?: string; teamId?: string; name?: string } | null>(null);
+    const [user, setUser] = useState<{ role: Role; id?: string; teamId?: string; name?: string; portalMode?: 'edit' | 'event' | 'closed' } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         let active = true;
@@ -29,7 +30,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         role: session.role as Role,
                         id: session.id,
                         teamId: session.teamId,
-                        name: session.name
+                        name: session.name,
+                        portalMode: session.portalMode
                     });
                 }
             })
@@ -40,9 +42,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return () => { active = false; };
     }, []);
 
-    const login = (role: Role, data?: { id?: string; teamId?: string; name?: string }) => {
+    useEffect(() => {
+        if (user?.role !== 'team') return;
+
+        let active = true;
+        const refreshPortalMode = async () => {
+            if (document.visibilityState !== 'visible') return;
+            try {
+                const response = await fetch('/api/auth/session', { cache: 'no-store' });
+                if (!response.ok) {
+                    if (active && response.status === 401) {
+                        setUser(null);
+                        router.replace('/login');
+                    }
+                    return;
+                }
+
+                const session = await response.json();
+                if (!active || !session?.authenticated || session.role !== 'team') return;
+                const portalMode = session.portalMode as 'edit' | 'event' | 'closed';
+                setUser(current => {
+                    if (current?.role !== 'team' || current.portalMode === portalMode) return current;
+                    return { ...current, portalMode };
+                });
+
+                if (portalMode === 'closed' && (pathname.startsWith('/dashboard/team') || pathname === '/edit-registration')) {
+                    router.replace('/login');
+                } else if (portalMode === 'edit' && pathname.startsWith('/dashboard/team')) {
+                    router.replace('/edit-registration');
+                } else if (portalMode === 'event' && pathname === '/edit-registration') {
+                    router.replace('/dashboard/team');
+                }
+            } catch (error) {
+                console.error('Participant portal mode refresh failed:', error);
+            }
+        };
+
+        void refreshPortalMode();
+        const interval = setInterval(() => void refreshPortalMode(), 30000);
+        window.addEventListener('focus', refreshPortalMode);
+        return () => {
+            active = false;
+            clearInterval(interval);
+            window.removeEventListener('focus', refreshPortalMode);
+        };
+    }, [user?.role, pathname, router]);
+
+    const login = (role: Role, data?: { id?: string; teamId?: string; name?: string; portalMode?: 'edit' | 'event' | 'closed' }) => {
         setUser({ role, ...data });
-        router.push(`/dashboard/${role}`);
+        const destination = role === 'team' && data?.portalMode === 'edit'
+            ? '/edit-registration'
+            : `/dashboard/${role}`;
+        router.push(destination);
     };
 
     const logout = () => {

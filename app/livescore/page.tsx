@@ -3,12 +3,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { Search, Download, Lock, CheckCircle2, BarChart3, Users, FileText, LogOut } from "lucide-react";
 import { useHackathon, Project } from "@/context/HackathonContext";
-import { STATIC_ROUNDS_CONFIG } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
 export default function LiveScorePage() {
-    const { projects, judges } = useHackathon();
+    const { projects, judges, roundConfigs } = useHackathon();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
@@ -30,16 +29,19 @@ export default function LiveScorePage() {
         }
 
         let totalSum = 0;
-        ['round1', 'round2', 'round3', 'round4'].forEach(rid => {
+        let completedRounds = 0;
+        roundConfigs.forEach(round => {
+            const rid = round.id;
             const judgeScores = p.roundScores[rid] || {};
             const scores = Object.values(judgeScores).filter(s => s !== null && s !== undefined);
             if (scores.length > 0) {
                 const avg = scores.reduce((s, v) => s + (Number(v) || 0), 0) / scores.length;
                 totalSum += avg;
+                completedRounds++;
             }
         });
-        return totalSum;
-    }, []);
+        return completedRounds ? totalSum / completedRounds : 0;
+    }, [roundConfigs]);
 
     const filteredProjects = useMemo(() => {
         return projects
@@ -76,7 +78,7 @@ export default function LiveScorePage() {
     }, []);
 
     const downloadCSV = (roundId?: string) => {
-        const round = STATIC_ROUNDS_CONFIG.find(r => r.id === roundId);
+        const round = roundConfigs.find(r => r.id === roundId);
         const fileName = round ? `TRICITY_${round.title.replace(/\s+/g, '_')}.csv` : `TRICITY_Standings.csv`;
 
         let csvContent = "Rank,Team ID,Team Name,Domain";
@@ -91,7 +93,7 @@ export default function LiveScorePage() {
             }
             csvContent += ",Average Score\n";
         } else {
-            csvContent += ",R1 Avg,R2 Avg,R3 Avg,R4 Avg,Total Score\n";
+            csvContent += `,${roundConfigs.map(round => `${round.title} Avg`).join(',')},Overall Average\n`;
         }
 
         filteredProjects.forEach((p, index) => {
@@ -116,7 +118,7 @@ export default function LiveScorePage() {
                 }
                 row += `,${calculateAverage(p, roundId).toFixed(2)}\n`;
             } else {
-                row += `,${calculateAverage(p, 'round1').toFixed(2)},${calculateAverage(p, 'round2').toFixed(2)},${calculateAverage(p, 'round3').toFixed(2)},${calculateAverage(p, 'round4').toFixed(2)},${calculateAverage(p).toFixed(2)}\n`;
+                row += `,${roundConfigs.map(round => calculateAverage(p, round.id).toFixed(2)).join(',')},${calculateAverage(p).toFixed(2)}\n`;
             }
             csvContent += row;
         });
@@ -239,7 +241,7 @@ export default function LiveScorePage() {
                         </div>
 
                         <div className="flex gap-2 overflow-x-auto w-full lg:w-auto">
-                            {STATIC_ROUNDS_CONFIG.map(r => (
+                            {roundConfigs.map(r => (
                                 <button
                                     key={r.id}
                                     onClick={() => downloadCSV(r.id)}
@@ -265,7 +267,7 @@ export default function LiveScorePage() {
                                     <tr className="bg-slate-900 border-b border-slate-800">
                                         <th className="py-5 px-6 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest w-20">POS</th>
                                         <th className="py-5 px-6 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">IDENTIFICATION</th>
-                                        {STATIC_ROUNDS_CONFIG.map(r => (
+                                        {roundConfigs.map(r => (
                                             <th key={r.id} className="py-5 px-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">{r.id.toUpperCase()}</th>
                                         ))}
                                         <th className="py-5 px-8 text-right text-[10px] font-bold text-white uppercase tracking-widest">AGGREGATE IQ</th>
@@ -293,10 +295,7 @@ export default function LiveScorePage() {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <ScoreCell p={p} roundId="round1" calculateAverage={calculateAverage} />
-                                                <ScoreCell p={p} roundId="round2" calculateAverage={calculateAverage} />
-                                                <ScoreCell p={p} roundId="round3" calculateAverage={calculateAverage} />
-                                                <ScoreCell p={p} roundId="round4" calculateAverage={calculateAverage} />
+                                                {roundConfigs.map(round => <ScoreCell key={round.id} p={p} roundId={round.id} calculateAverage={calculateAverage} />)}
                                                 <td className="py-5 px-8 text-right">
                                                     <div className="flex flex-col items-end">
                                                         <span className="text-xl font-black text-slate-900 tabular-nums">
@@ -318,7 +317,7 @@ export default function LiveScorePage() {
     );
 }
 
-function ScoreCell({ p, roundId, calculateAverage }: { p: Project, roundId: string, calculateAverage: any }) {
+function ScoreCell({ p, roundId, calculateAverage }: { p: Project; roundId: string; calculateAverage: (project: Project, id?: string) => number }) {
     const avg = calculateAverage(p, roundId);
     const hasScores = p.roundScores?.[roundId] && Object.keys(p.roundScores[roundId]).length > 0;
 

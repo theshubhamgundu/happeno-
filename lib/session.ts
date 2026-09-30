@@ -1,6 +1,7 @@
 import 'server-only';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { NextResponse } from 'next/server';
+import type { ParticipantPortalMode } from '@/lib/event-windows';
 
 export type SessionRole = 'team' | 'judge' | 'volunteer' | 'admin' | 'livescore';
 
@@ -9,6 +10,7 @@ export interface AppSession {
     id?: string;
     teamId?: string;
     name?: string;
+    portalMode?: ParticipantPortalMode;
     expiresAt: number;
 }
 

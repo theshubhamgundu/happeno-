@@ -4,118 +4,99 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import {
     CheckCircle2,
     X,
-    QrCode,
     AlertTriangle
 } from "lucide-react";
 
 import { useHackathon, Project } from "@/context/HackathonContext";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { QRScanner } from "@/components/QRScanner";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/context/AuthContext";
 import { EVENT_MEALS } from "@/lib/meals";
 
 export default function VolunteerDashboard() {
-    const { user } = useAuth();
-    const { projects, checkInTeam, claimMemberMeal, isLoading, volunteers, enabledMeals } = useHackathon();
-    const [showScanner, setShowScanner] = useState(false);
+    const { isLoading } = useHackathon();
     const [scannedTeam, setScannedTeam] = useState<Project | null>(null);
     const [scanResult, setScanResult] = useState<{ 
         type: 'checkin' | 'meal';
-        status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALREADY_CHECKED_IN' | 'REJECTED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN'; 
+        status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALREADY_CHECKED_IN' | 'REJECTED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN' | 'DUPLICATE_SCAN';
         message?: string;
         claimedAt?: string; 
         claimedBy?: string;
         mealName?: string;
         memberId?: string;
     } | null>(null);
-    const currentVolunteer = useMemo(() => {
-        return volunteers.find(v => v.id === user?.id || v.generatedId === user?.id);
-    }, [volunteers, user]);
-
-    const handleScan = (data: string) => {
-        // Start async processing but return synchronously
-        processScan(data);
-        return true; // Always return true to indicate scan was received
-    };
-
-    const processScan = async (data: string) => {
-        let identifier = data.trim();
-        let passType = 'legacy';
+    const processScan = async (data: string): Promise<boolean> => {
+        setScanResult(null);
+        let teamId = data.trim();
+        let passType: 'legacy' | 'leader' | 'member' = 'legacy';
         let memberId = '';
-
         try {
             const parsed = JSON.parse(data);
-            identifier = String(parsed.registrationId || parsed.teamId || identifier).trim();
-            passType = parsed.passType || 'legacy';
-            memberId = parsed.memberId || '';
-        } catch (e) { }
+            teamId = String(parsed.teamId || parsed.registrationId || teamId).trim();
+            passType = parsed.passType === 'leader' || parsed.passType === 'member' ? parsed.passType : 'legacy';
+            memberId = typeof parsed.memberId === 'string' ? parsed.memberId : '';
+        } catch { }
 
-        const normalizedIdentifier = identifier.trim().toUpperCase();
-        const team = projects.find(project =>
-            String(project.teamId || "").trim().toUpperCase() === normalizedIdentifier ||
-            String(project.id || "").trim().toUpperCase() === normalizedIdentifier
-        );
+        if (!teamId) {
+            toast.error('Invalid QR pass.');
+            return false;
+        }
 
-        if (team) {
-            setScannedTeam(team);
-            setShowScanner(false);
-            
-            if (passType === 'leader' || passType === 'legacy') {
-                if (team.checkedInAt || team.isCheckedIn) {
-                    setScanResult({ type: 'checkin', status: 'ALREADY_CHECKED_IN', message: 'Team already checked in' });
-                } else {
-                    await checkInTeam(team.id);
-                    setScanResult({ type: 'checkin', status: 'PERMITTED', message: 'Check-in successful' });
-                    toast.success(`${team.name} verified!`);
-                }
-            } else if (passType === 'member') {
-                if (!team.checkedInAt && !team.isCheckedIn) {
-                    setScanResult({ type: 'checkin', status: 'REJECTED', message: 'Team check-in not completed. Scan Team Leader pass first.' });
-                } else {
-                    await handleMemberMeal(team, memberId);
-                }
+        try {
+            const response = await fetch('/api/volunteer/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ teamId, passType, memberId })
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                toast.error(payload.error || 'Scan could not be verified. Try again.');
+                return false;
             }
-        } else {
-            toast.error("Invalid QR Pass: Team not found");
-        }
-    };
 
-    const handleMemberMeal = async (team: Project, memberId: string) => {
-        if (!enabledMeals || enabledMeals.length === 0) {
-            setScanResult({ type: 'meal', status: 'NOT_INCLUDED', message: 'No meals are currently enabled for this event.' });
-            return;
-        }
+            const result = payload.result as Record<string, unknown>;
+            const teamName = String(result.teamName || 'Team');
+            const canonicalTeamId = String(result.teamId || teamId).toUpperCase();
+            const mealKey = typeof result.mealKey === 'string' ? result.mealKey : '';
+            const mealConfig = EVENT_MEALS.find(meal => meal.key === mealKey);
+            const mealLabel = mealConfig ? `${mealConfig.dayLabel} ${mealConfig.mealLabel}` : mealKey;
+            setScannedTeam({
+                id: canonicalTeamId,
+                teamId: canonicalTeamId,
+                name: teamName,
+                team: teamName,
+                track: '',
+                problemStatement: '',
+                members: [],
+                captain: '',
+                captainMobile: '',
+                college: '',
+                roundScores: {}
+            });
 
-        const memberSlots = team.memberMealState?.[memberId] || {};
-        
-        // Find next expected meal
-        let nextMealKey: string | null = null;
-        for (const mealKey of enabledMeals) {
-            if (!memberSlots[mealKey]?.claimedAt) {
-                nextMealKey = mealKey;
-                break;
+            if (result.status === 'PERMITTED' && passType !== 'member') {
+                setScanResult({ type: 'checkin', status: 'PERMITTED', message: 'Check-in successful' });
+                toast.success(`${teamName} checked in.`);
+            } else if (result.status === 'ALREADY_CHECKED_IN') {
+                setScanResult({ type: 'checkin', status: 'ALREADY_CHECKED_IN', message: 'Team already checked in' });
+            } else if (result.status === 'PERMITTED') {
+                setScanResult({ type: 'meal', status: 'PERMITTED', message: `${mealLabel} claimed`, mealName: mealLabel, memberId, claimedAt: String(result.claimedAt || '') });
+                toast.success(`${mealLabel} claimed.`);
+            } else if (result.status === 'DUPLICATE_SCAN') {
+                setScanResult({ type: 'meal', status: 'DUPLICATE_SCAN', message: 'This pass was just scanned. Wait a few seconds and try again if needed.' });
+            } else if (result.status === 'ALL_MEALS_CLAIMED') {
+                setScanResult({ type: 'meal', status: 'ALL_MEALS_CLAIMED', message: 'All included meals have been claimed.' });
+            } else if (result.status === 'NEEDS_CHECKIN') {
+                setScanResult({ type: 'meal', status: 'NEEDS_CHECKIN', message: 'Scan the team leader pass before claiming meals.' });
+            } else {
+                setScanResult({ type: 'meal', status: 'NOT_INCLUDED', message: 'No unclaimed meal is assigned to this participant.' });
             }
-        }
-
-        if (!nextMealKey) {
-            setScanResult({ type: 'meal', status: 'ALL_MEALS_CLAIMED', message: 'All meals claimed' });
-            return;
-        }
-
-        const result = await claimMemberMeal(team.id, memberId, nextMealKey, currentVolunteer?.id);
-        const mealConfig = EVENT_MEALS.find(m => m.key === nextMealKey);
-        const mealLabel = mealConfig ? `${mealConfig.dayLabel} ${mealConfig.mealLabel}` : nextMealKey;
-
-        if (result.status === 'PERMITTED') {
-            setScanResult({ type: 'meal', status: 'PERMITTED', message: `${mealLabel} Claimed`, mealName: mealLabel, memberId, claimedAt: result.claimedAt });
-            toast.success("Meal claimed successfully!");
-        } else if (result.status === 'ALREADY_CLAIMED') {
-            setScanResult({ type: 'meal', status: 'ALREADY_CLAIMED', message: `${mealLabel} already claimed`, mealName: mealLabel, memberId, claimedAt: result.claimedAt });
-            toast.error("Meal already claimed!");
-        } else {
-            setScanResult({ type: 'meal', status: result.status, message: 'Scan rejected' });
+            return true;
+        } catch (error) {
+            console.error('Volunteer scan request failed:', error);
+            toast.error('Scanner could not reach the server. Retry the scan.');
+            return false;
         }
     };
 
@@ -132,24 +113,7 @@ export default function VolunteerDashboard() {
 
     return (
         <DashboardLayout type="volunteer" title="Volunteer Scanner">
-            <div className="mx-auto max-w-md rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-                        <div className="mx-auto grid h-14 w-14 place-items-center rounded-xl bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-700">
-                            <QrCode size={28} />
-                        </div>
-                        <h2 className="mt-3 text-base font-semibold text-slate-800">Pass Scanner</h2>
-                        <p className="mt-1 text-xs text-slate-500 max-w-xs mx-auto">
-                            Scan any pass — the system automatically detects whether it&apos;s a <strong>Team Leader</strong> (check-in) or <strong>Member</strong> (meal) pass.
-                        </p>
-                        <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-slate-500">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Ready to scan
-                        </p>
-                        <button
-                            onClick={() => setShowScanner(true)}
-                            className="mt-5 w-full rounded-lg bg-teal-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-teal-700 active:scale-[0.98]"
-                        >
-                            Open Scanner
-                        </button>
-            </div>
+            {!scannedTeam && <QRScanner onScan={processScan} onClose={() => undefined} showCloseButton={false} />}
 
             {/* ====== UNIFIED RESULT MODAL ====== */}
             <AnimatePresence>
@@ -187,9 +151,7 @@ export default function VolunteerDashboard() {
                             {/* Result Status Card */}
                             {(() => {
                                 const isGreen = scanResult.status === 'PERMITTED';
-                                const isYellow = scanResult.status === 'ALREADY_CHECKED_IN' || scanResult.status === 'ALREADY_CLAIMED' || scanResult.status === 'ALL_MEALS_CLAIMED';
-                                const isRed = scanResult.status === 'REJECTED' || scanResult.status === 'NOT_INCLUDED' || scanResult.status === 'NEEDS_CHECKIN';
-
+                                const isYellow = scanResult.status === 'ALREADY_CHECKED_IN' || scanResult.status === 'ALREADY_CLAIMED' || scanResult.status === 'ALL_MEALS_CLAIMED' || scanResult.status === 'DUPLICATE_SCAN';
                                 const bgColor = isGreen ? 'bg-green-500/10 border-green-500/20' : isYellow ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20';
                                 const iconBg = isGreen ? 'bg-green-500' : isYellow ? 'bg-amber-500' : 'bg-red-500';
                                 const textColor = isGreen ? 'text-green-400' : isYellow ? 'text-amber-400' : 'text-red-400';
@@ -241,12 +203,6 @@ export default function VolunteerDashboard() {
             </AnimatePresence>
 
             {/* Scanner UI */}
-            <AnimatePresence>
-                {showScanner && (
-                    <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
-                )}
-            </AnimatePresence>
-
             <style jsx global>{`
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }

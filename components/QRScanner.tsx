@@ -1,22 +1,54 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { X, Camera, AlertCircle, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { X, Camera, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
 
 interface QRScannerProps {
-    onScan: (data: string) => boolean; // Returns true if valid, false if wrong
+    onScan: (data: string) => boolean | Promise<boolean>;
     onClose: () => void;
+    showCloseButton?: boolean;
 }
 
-export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
+export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose, showCloseButton = true }) => {
     const [error, setError] = useState<string | null>(null);
     const [scanState, setScanState] = useState<'idle' | 'scanning' | 'success' | 'error'>('scanning');
+    const [isProcessing, setIsProcessing] = useState(false);
     const [manualId, setManualId] = useState("");
     const scannerRef = useRef<Html5Qrcode | null>(null);
     const scanCooldown = useRef(false);
+    const mountedRef = useRef(true);
+
+    const handleVerification = useCallback(async (data: string) => {
+        scanCooldown.current = true;
+        setIsProcessing(true);
+        setScanState('scanning');
+
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        let isValid = false;
+        try {
+            isValid = await onScan(data);
+        } catch (scanError) {
+            console.error('QR scan processing failed:', scanError);
+        }
+        if (!mountedRef.current) return;
+
+        if (isValid) {
+            setScanState('success');
+        } else {
+            setScanState('error');
+            setTimeout(() => {
+                if (!mountedRef.current) return;
+                setScanState('scanning');
+                setIsProcessing(false);
+                scanCooldown.current = false;
+            }, 2000);
+        }
+    }, [onScan]);
 
     useEffect(() => {
+        mountedRef.current = true;
         const startScanner = async () => {
             try {
                 const html5QrCode = new Html5Qrcode("scanner-viewport");
@@ -33,16 +65,19 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                     config,
                     (decodedText) => {
                         if (scanCooldown.current) return;
-                        handleVerification(decodedText);
+                        void handleVerification(decodedText);
                     },
-                    (errorMessage) => {
+                    () => {
                         // Silently handle scan failures (common when no QR is in frame)
                     }
                 );
-            } catch (err: any) {
-                const errorStr = (err?.message || err || "").toString();
-                const isPermissionError = err?.name === "NotAllowedError" || errorStr.includes("Permission denied");
-                const isNotFoundError = err?.name === "NotFoundError" || errorStr.includes("NotFoundError");
+            } catch (err: unknown) {
+                const errorInfo = err && typeof err === 'object'
+                    ? err as { message?: unknown; name?: unknown }
+                    : {};
+                const errorStr = String(errorInfo.message || err || '');
+                const isPermissionError = errorInfo.name === "NotAllowedError" || errorStr.includes("Permission denied");
+                const isNotFoundError = errorInfo.name === "NotFoundError" || errorStr.includes("NotFoundError");
 
                 if (isPermissionError) {
                     setError("PERMISSION_DENIED");
@@ -59,34 +94,12 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
         startScanner();
 
         return () => {
+            mountedRef.current = false;
             if (scannerRef.current && scannerRef.current.isScanning) {
                 scannerRef.current.stop().catch(console.error);
             }
         };
-    }, []);
-
-    const handleVerification = async (data: string) => {
-        scanCooldown.current = true;
-        setScanState('scanning');
-
-        // Simulating a small network/processing delay for "Verification" feel
-        await new Promise(r => setTimeout(r, 600));
-
-        const isValid = onScan(data);
-
-        if (isValid) {
-            setScanState('success');
-            // Scanner will be closed by parent's state change if valid
-            // but we keep success state UI for a brief moment
-        } else {
-            setScanState('error');
-            // Reset to scanning after 2 seconds so they can try again
-            setTimeout(() => {
-                setScanState('scanning');
-                scanCooldown.current = false;
-            }, 2000);
-        }
-    };
+    }, [handleVerification]);
 
     const handleManualSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -127,9 +140,11 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                             </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-3 hover:bg-white/5 rounded-2xl transition-colors text-white/20 hover:text-white">
-                        <X size={24} />
-                    </button>
+                    {showCloseButton && (
+                        <button onClick={onClose} className="p-3 hover:bg-white/5 rounded-2xl transition-colors text-white/20 hover:text-white" aria-label="Close scanner">
+                            <X size={24} />
+                        </button>
+                    )}
                 </div>
 
                 {/* Scanner Viewport */}
@@ -188,7 +203,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                             </div>
 
                             {/* State Feedback Overlays */}
-                            {scanState === 'scanning' && scanCooldown.current && (
+                            {scanState === 'scanning' && isProcessing && (
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                                     <Loader2 size={48} className="text-slate-900 animate-spin" />
                                 </div>
@@ -215,7 +230,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                         />
                         <button
                             type="submit"
-                            disabled={scanState !== 'scanning' || scanCooldown.current}
+                            disabled={scanState !== 'scanning' || isProcessing}
                             className="w-full sm:w-auto bg-[#FFEE00] text-black font-black uppercase italic py-4 sm:px-10 rounded-xl hover:scale-105 transition-all active:scale-95 shadow-[0_10px_30px_rgba(255,238,0,0.1) disabled:opacity-50"
                         >
                             Verify

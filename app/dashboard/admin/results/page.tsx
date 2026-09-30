@@ -1,9 +1,9 @@
 "use client";
 
-import { Download, FileText, MessageSquare, Search, Trophy, X } from "lucide-react";
+import { Download, MessageSquare, Search, X } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useHackathon, Project } from "@/context/HackathonContext";
-import { STATIC_ROUNDS_CONFIG } from "@/lib/constants";
+import type { JudgingRound } from "@/lib/judging-rounds";
 import { useMemo, useState } from "react";
 
 type ScoreSummary = {
@@ -13,15 +13,14 @@ type ScoreSummary = {
     evaluations: Record<string, number>;
 };
 
-const maxScore = (roundId: string) =>
-    (STATIC_ROUNDS_CONFIG.find(round => round.id === roundId)?.criteria.length ?? 0) * 5;
+const maxScore = (round: JudgingRound) => round.criteria.length * 10;
 
-function getScoreSummary(project: Project): ScoreSummary {
+function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary {
     const roundPercents: Record<string, number | null> = {};
     const evaluations: Record<string, number> = {};
     const completed: number[] = [];
 
-    STATIC_ROUNDS_CONFIG.forEach(round => {
+    rounds.forEach(round => {
         const scores = Object.values(project.roundScores?.[round.id] ?? {})
             .map(Number)
             .filter(score => Number.isFinite(score));
@@ -32,7 +31,7 @@ function getScoreSummary(project: Project): ScoreSummary {
             return;
         }
 
-        const percentage = (scores.reduce((total, score) => total + score, 0) / scores.length / maxScore(round.id)) * 100;
+        const percentage = (scores.reduce((total, score) => total + score, 0) / scores.length / maxScore(round)) * 100;
         const rounded = Number(percentage.toFixed(1));
         roundPercents[round.id] = rounded;
         completed.push(rounded);
@@ -47,14 +46,14 @@ function getScoreSummary(project: Project): ScoreSummary {
 }
 
 export default function AdminResults() {
-    const { projects, judges } = useHackathon();
+    const { projects, judges, roundConfigs } = useHackathon();
     const [search, setSearch] = useState("");
     const [track, setTrack] = useState("all");
     const [view, setView] = useState<"ranked" | "all" | "pending">("ranked");
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
     const tracks = useMemo(() => Array.from(new Set(projects.map(project => project.track).filter(Boolean))).sort(), [projects]);
-    const projectRows = useMemo(() => projects.map(project => ({ project, score: getScoreSummary(project) })), [projects]);
+    const projectRows = useMemo(() => projects.map(project => ({ project, score: getScoreSummary(project, roundConfigs) })), [projects, roundConfigs]);
 
     const displayedRows = useMemo(() => {
         const query = search.trim().toLowerCase();
@@ -74,15 +73,15 @@ export default function AdminResults() {
         total: projects.length,
         ranked: projectRows.filter(row => row.score.overallPercent !== null).length,
         pending: projectRows.filter(row => row.score.overallPercent === null).length,
-        complete: projectRows.filter(row => row.score.completedRounds === STATIC_ROUNDS_CONFIG.length).length,
-    }), [projectRows, projects.length]);
+        complete: projectRows.filter(row => row.score.completedRounds === roundConfigs.length).length,
+    }), [projectRows, projects.length, roundConfigs.length]);
 
     const exportLeaderboard = () => {
-        const headers = ["Rank", "Team", "Team ID", "Captain", "Track", ...STATIC_ROUNDS_CONFIG.map(round => `${round.title} (%)`), "Overall (%)", "Evaluated rounds"];
+        const headers = ["Rank", "Team", "Team ID", "Captain", "Track", ...roundConfigs.map(round => `${round.title} (%)`), "Overall (%)", "Evaluated rounds"];
         const lines = displayedRows.map((row, index) => [
             row.score.overallPercent === null ? "—" : String(index + 1), row.project.team, row.project.teamId, row.project.captain,
-            row.project.track, ...STATIC_ROUNDS_CONFIG.map(round => row.score.roundPercents[round.id] ?? "—"),
-            row.score.overallPercent ?? "—", `${row.score.completedRounds}/${STATIC_ROUNDS_CONFIG.length}`,
+            row.project.track, ...roundConfigs.map(round => row.score.roundPercents[round.id] ?? "—"),
+            row.score.overallPercent ?? "—", `${row.score.completedRounds}/${roundConfigs.length}`,
         ].map(value => `"${String(value ?? "").replaceAll('"', '""')}"`).join(","));
         const blob = new Blob([[headers.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
         const url = URL.createObjectURL(blob);
@@ -138,18 +137,18 @@ export default function AdminResults() {
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full min-w-[900px] text-left">
                             <thead className="bg-white/[.045] text-[10px] font-black uppercase tracking-[.16em] text-white/40">
-                                <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{STATIC_ROUNDS_CONFIG.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title}</th>)}<th className="px-4 py-4 text-center">Overall</th><th className="px-5 py-4 text-right">Details</th></tr>
+                                <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{roundConfigs.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title}</th>)}<th className="px-4 py-4 text-center">Overall</th><th className="px-5 py-4 text-right">Details</th></tr>
                             </thead>
                             <tbody>
-                                {displayedRows.map((row, index) => <LeaderboardRow key={row.project.id} row={row} rank={row.score.overallPercent === null ? null : index + 1} onSelect={() => setSelectedProject(row.project)} />)}
-                                {!displayedRows.length && <tr><td colSpan={STATIC_ROUNDS_CONFIG.length + 4} className="px-5 py-20 text-center text-sm text-white/35">No teams match this view.</td></tr>}
+                                {displayedRows.map((row, index) => <LeaderboardRow key={row.project.id} row={row} rounds={roundConfigs} rank={row.score.overallPercent === null ? null : index + 1} onSelect={() => setSelectedProject(row.project)} />)}
+                                {!displayedRows.length && <tr><td colSpan={roundConfigs.length + 4} className="px-5 py-20 text-center text-sm text-white/35">No teams match this view.</td></tr>}
                             </tbody>
                         </table>
                     </div>
                 </section>
             </main>
 
-            {selectedProject && <ProjectDetails project={selectedProject} judges={judges} onClose={() => setSelectedProject(null)} />}
+            {selectedProject && <ProjectDetails project={selectedProject} judges={judges} rounds={roundConfigs} onClose={() => setSelectedProject(null)} />}
         </DashboardLayout>
     );
 }
@@ -158,11 +157,11 @@ function Stat({ label, value, accent = "text-white" }: { label: string; value: n
     return <div className="rounded-2xl border border-white/10 bg-white/[.045] p-4"><p className="text-[9px] font-black uppercase tracking-[.14em] text-white/45">{label}</p><p className={`mt-2 text-2xl font-black ${accent}`}>{value}</p></div>;
 }
 
-function LeaderboardRow({ row, rank, onSelect }: { row: { project: Project; score: ScoreSummary }; rank: number | null; onSelect: () => void }) {
+function LeaderboardRow({ row, rounds, rank, onSelect }: { row: { project: Project; score: ScoreSummary }; rounds: JudgingRound[]; rank: number | null; onSelect: () => void }) {
     return <tr className="border-t border-white/5 text-sm transition hover:bg-white/[.035]">
         <td className="px-5 py-4"><span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-lg text-xs font-black ${rank && rank <= 3 ? "bg-[#14b8a6] text-black" : "bg-white/5 text-white/55"}`}>{rank ? `#${rank}` : "—"}</span></td>
         <td className="px-5 py-4"><p className="font-black uppercase text-white">{row.project.team || "Untitled team"}</p><p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{row.project.teamId} · {row.project.track || "No track"}</p></td>
-        {STATIC_ROUNDS_CONFIG.map(round => <td key={round.id} className="px-4 py-4 text-center"><ScoreCell value={row.score.roundPercents[round.id]} evaluations={row.score.evaluations[round.id]} /></td>)}
+        {rounds.map(round => <td key={round.id} className="px-4 py-4 text-center"><ScoreCell value={row.score.roundPercents[round.id]} evaluations={row.score.evaluations[round.id]} /></td>)}
         <td className="px-4 py-4 text-center"><ScoreCell value={row.score.overallPercent} evaluations={row.score.completedRounds} bold /></td>
         <td className="px-5 py-4 text-right"><button onClick={onSelect} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white/65 transition hover:border-[#14b8a6]/50 hover:text-[#14b8a6]"><MessageSquare size={14} /> Review</button></td>
     </tr>;
@@ -173,9 +172,9 @@ function ScoreCell({ value, evaluations, bold = false }: { value: number | null;
     return <div><span className={`${bold ? "text-lg" : "text-sm"} font-black text-white`}>{value.toFixed(1)}%</span><p className="mt-1 text-[9px] font-bold uppercase tracking-wider text-white/35">{evaluations} review{evaluations === 1 ? "" : "s"}</p></div>;
 }
 
-function ProjectDetails({ project, judges, onClose }: { project: Project; judges: { generatedId: string; name: string }[]; onClose: () => void }) {
+function ProjectDetails({ project, judges, rounds, onClose }: { project: Project; judges: { generatedId: string; name: string }[]; rounds: JudgingRound[]; onClose: () => void }) {
     return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"><div className="max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-white/10 bg-[#0b0713] p-6 shadow-2xl md:p-8">
         <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5"><div><p className="text-[10px] font-black uppercase tracking-[.2em] text-[#14b8a6]">Evaluation record</p><h2 className="mt-2 text-2xl font-black uppercase italic text-white">{project.team}</h2><p className="mt-1 text-xs text-white/45">{project.teamId} · {project.name || "Project title not submitted"}</p></div><button onClick={onClose} className="rounded-xl border border-white/10 p-3 text-white/50 hover:bg-white/10 hover:text-white"><X size={18} /></button></div>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">{STATIC_ROUNDS_CONFIG.map(round => { const entries = Object.entries(project.roundScores?.[round.id] ?? {}); return <section key={round.id} className="rounded-2xl border border-white/10 bg-white/[.035] p-5"><div className="mb-4 flex items-start justify-between gap-3"><div><h3 className="font-black text-white">{round.title}</h3><p className="text-xs text-white/40">{round.subtitle}</p></div><span className="text-[10px] font-bold text-white/40">{entries.length} reviews</span></div>{entries.length ? <div className="space-y-3">{entries.map(([judgeId, score]) => <div key={judgeId} className="rounded-xl bg-black/20 p-3"><div className="flex justify-between gap-3"><span className="text-xs font-bold text-white/75">{judges.find(judge => judge.generatedId === judgeId)?.name ?? judgeId}</span><span className="text-xs font-black text-[#14b8a6]">{Number(score).toFixed(1)} / {maxScore(round.id)}</span></div>{project.roundComments?.[round.id]?.[judgeId] && <p className="mt-2 text-xs leading-relaxed text-white/50">{project.roundComments[round.id][judgeId]}</p>}</div>)}</div> : <p className="text-sm text-white/30">No evaluation submitted.</p>}</section>; })}</div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">{rounds.map(round => { const entries = Object.entries(project.roundScores?.[round.id] ?? {}); return <section key={round.id} className="rounded-2xl border border-white/10 bg-white/[.035] p-5"><div className="mb-4 flex items-start justify-between gap-3"><div><h3 className="font-black text-white">{round.title}</h3><p className="text-xs text-white/40">{round.subtitle}</p></div><span className="text-[10px] font-bold text-white/40">{entries.length} evaluation{entries.length === 1 ? '' : 's'}</span></div>{entries.length ? <div className="space-y-3">{entries.map(([judgeId, score]) => <div key={judgeId} className="rounded-xl bg-black/20 p-3"><div className="flex justify-between gap-3"><span className="text-xs font-bold text-white/75">{judges.find(judge => judge.generatedId === judgeId)?.name ?? judgeId}</span><span className="text-xs font-black text-[#14b8a6]">{Number(score).toFixed(1)} / {maxScore(round)}</span></div>{project.roundComments?.[round.id]?.[judgeId] && <p className="mt-2 text-xs leading-relaxed text-white/50">{project.roundComments[round.id][judgeId]}</p>}</div>)}</div> : <p className="text-sm text-white/30">No evaluation submitted.</p>}</section>; })}</div>
     </div></div>;
 }

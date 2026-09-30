@@ -2,16 +2,12 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { MAX_TEAM_MEMBERS } from '@/lib/constants';
 import { getSession, hasRole } from '@/lib/session';
+import { getParticipantPortalMode } from '@/lib/event-windows';
 
 export const dynamic = 'force-dynamic';
 
-function hasValidCriterionScores(value: unknown): boolean {
-    if (typeof value === 'number') return Number.isFinite(value) && value >= 1 && value <= 10;
-    if (Array.isArray(value)) return value.every(hasValidCriterionScores);
-    if (value && typeof value === 'object') {
-        return Object.values(value as Record<string, unknown>).every(hasValidCriterionScores);
-    }
-    return false;
+function isEnabledFlag(value: unknown): boolean {
+    return value === true || (typeof value === 'string' && value.toLowerCase() === 'true');
 }
 
 function memberName(member: unknown): string {
@@ -211,8 +207,11 @@ async function transferTeamMembers(targetId: string, selections: { sourceTeamId:
 
 export async function GET(req: Request) {
     const session = getSession(req);
-    if (!hasRole(session, ['team', 'admin', 'judge', 'volunteer', 'livescore'])) {
+    if (!hasRole(session, ['team', 'admin', 'volunteer', 'livescore'])) {
         return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+    }
+    if (session.role === 'team' && await getParticipantPortalMode() !== 'event') {
+        return NextResponse.json({ error: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
     }
 
     try {
@@ -242,8 +241,60 @@ export async function GET(req: Request) {
         }
 
         const result = teams.map(teamResponse);
+        const requestedTeamIds = result.map(team => team.teamId).filter((id): id is string => typeof id === 'string' && Boolean(id));
+        const evaluations: Record<string, unknown>[] = [];
+        let evaluationStorageAvailable = true;
+        evaluationPages:
+        for (let teamOffset = 0; teamOffset < requestedTeamIds.length; teamOffset += 500) {
+            const teamIdBatch = requestedTeamIds.slice(teamOffset, teamOffset + 500);
+            for (let evaluationOffset = 0; ; evaluationOffset += 1000) {
+                const { data, error } = await supabase
+                    .from('judging_evaluations')
+                    .select('team_id, round_id, judge_id, criteria_scores, total_score, feedback, status')
+                    .in('team_id', teamIdBatch)
+                    .eq('status', 'submitted')
+                    .range(evaluationOffset, evaluationOffset + 999);
+                if (error?.code === 'PGRST205') {
+                    evaluationStorageAvailable = false;
+                    break evaluationPages;
+                }
+                if (error) throw error;
+                evaluations.push(...(data || []));
+                if (!data || data.length < 1000) break;
+            }
+        }
+        if (!evaluationStorageAvailable) {
+            console.warn('Judging evaluation table is not installed yet; returning legacy registration scores.');
+        }
+
+        const evaluationsByTeam = new Map<string, Record<string, unknown>[]>();
+        for (const evaluation of evaluations) {
+            const teamEvaluations = evaluationsByTeam.get(String(evaluation.team_id)) || [];
+            teamEvaluations.push(evaluation);
+            evaluationsByTeam.set(String(evaluation.team_id), teamEvaluations);
+        }
+
+        const resultWithEvaluations = result.map(team => {
+            const roundScores = { ...(team.roundScores as Record<string, Record<string, number>> || {}) };
+            const roundDetailedScores = { ...(team.roundDetailedScores as Record<string, Record<string, Record<string, number>>> || {}) };
+            const roundComments = { ...(team.roundComments as Record<string, Record<string, string | null>> || {}) };
+            for (const evaluation of evaluationsByTeam.get(String(team.teamId)) || []) {
+                const roundId = String(evaluation.round_id);
+                const judgeId = String(evaluation.judge_id);
+                roundScores[roundId] = { ...(roundScores[roundId] || {}), [judgeId]: Number(evaluation.total_score) };
+                roundDetailedScores[roundId] = {
+                    ...(roundDetailedScores[roundId] || {}),
+                    [judgeId]: evaluation.criteria_scores as Record<string, number> || {}
+                };
+                roundComments[roundId] = {
+                    ...(roundComments[roundId] || {}),
+                    [judgeId]: String(evaluation.feedback || '')
+                };
+            }
+            return { ...team, roundScores, roundDetailedScores, roundComments };
+        });
         if (session.role === 'livescore') {
-            return NextResponse.json(result.map(team => ({
+            return NextResponse.json(resultWithEvaluations.map(team => ({
                 id: team.id,
                 teamId: team.teamId,
                 name: team.name,
@@ -255,26 +306,7 @@ export async function GET(req: Request) {
                 submission: team.submission
             })), { headers: { 'Cache-Control': 'no-store' } });
         }
-        if (session.role === 'judge') {
-            return NextResponse.json(result.map(team => ({
-                id: team.id,
-                teamId: team.teamId,
-                name: team.name,
-                team: team.team,
-                track: team.track,
-                status: team.status,
-                problemStatement: team.problemStatement,
-                proposedIdea: team.proposedIdea,
-                techStack: team.techStack,
-                members: (Array.isArray(team.members) ? team.members : []).map((member: unknown) => ({ fullName: memberName(member) })),
-                submission: team.submission,
-                roundScores: team.roundScores,
-                roundDetailedScores: team.roundDetailedScores,
-                roundComments: team.roundComments,
-                isEliminated: team.isEliminated
-            })), { headers: { 'Cache-Control': 'no-store' } });
-        }
-        return NextResponse.json(result, { headers: { 'Cache-Control': 'no-store' } });
+        return NextResponse.json(resultWithEvaluations, { headers: { 'Cache-Control': 'no-store' } });
     } catch (error) {
         console.error('Team fetch failed:', error);
         return NextResponse.json({ error: 'Could not fetch teams from Supabase.' }, { status: 503 });
@@ -283,8 +315,11 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
     const session = getSession(req);
-    if (!hasRole(session, ['team', 'admin', 'judge', 'volunteer'])) {
+    if (!hasRole(session, ['team', 'admin', 'volunteer'])) {
         return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+    }
+    if (session.role === 'team' && await getParticipantPortalMode() !== 'event') {
+        return NextResponse.json({ error: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
     }
 
     try {
@@ -296,16 +331,13 @@ export async function PATCH(req: Request) {
         } = body;
 
         if (typeof id !== 'string' || !id) return NextResponse.json({ error: 'ID is required.' }, { status: 400 });
+        if (roundScores !== undefined || roundComments !== undefined || roundDetailedScores !== undefined) {
+            return NextResponse.json({ error: 'Evaluations must be saved through the durable judging workflow.' }, { status: 409 });
+        }
         if (session.role === 'team') {
-            const allowedKeys = new Set(['id', 'problemStatement', 'proposedIdea', 'techStack', 'submission']);
+            const allowedKeys = new Set(['id', 'proposedIdea', 'techStack', 'submission']);
             if (Object.keys(body).some(key => !allowedKeys.has(key))) {
                 return NextResponse.json({ error: 'Team sessions may only update their own project details.' }, { status: 403 });
-            }
-        }
-        if (session.role === 'judge') {
-            const allowedKeys = new Set(['id', 'roundScores', 'roundComments', 'roundDetailedScores']);
-            if (Object.keys(body).some(key => !allowedKeys.has(key))) {
-                return NextResponse.json({ error: 'Judge sessions may only update evaluation data.' }, { status: 403 });
             }
         }
         if (session.role === 'volunteer') {
@@ -313,9 +345,6 @@ export async function PATCH(req: Request) {
             if (Object.keys(body).some(key => !allowedKeys.has(key))) {
                 return NextResponse.json({ error: 'Volunteer sessions may only update check-in and meal operations.' }, { status: 403 });
             }
-        }
-        if (roundDetailedScores !== undefined && !hasValidCriterionScores(roundDetailedScores)) {
-            return NextResponse.json({ error: 'Criterion scores must be between 1 and 10.' }, { status: 400 });
         }
         if (transferMembers !== undefined) {
             if (!Array.isArray(transferMembers) || transferMembers.some(selection =>
@@ -330,6 +359,30 @@ export async function PATCH(req: Request) {
         if (!existing) return NextResponse.json({ error: 'Team not found.' }, { status: 404 });
         if (session.role === 'team' && existing.team_id !== session.teamId) {
             return NextResponse.json({ error: 'Team sessions may only update their own project.' }, { status: 403 });
+        }
+
+        if (session.role === 'team') {
+            const existingRawData = existing.raw_data && typeof existing.raw_data === 'object'
+                ? existing.raw_data as Record<string, unknown>
+                : {};
+            if (proposedIdea !== undefined && isEnabledFlag(existingRawData.pi_locked)) {
+                return NextResponse.json({ error: 'The proposed idea has already been locked.' }, { status: 409 });
+            }
+            if (techStack !== undefined && isEnabledFlag(existingRawData.ts_locked)) {
+                return NextResponse.json({ error: 'The tech stack has already been locked.' }, { status: 409 });
+            }
+
+            if (proposedIdea !== undefined || techStack !== undefined || submission !== undefined) {
+                const { data: submissionLock, error: submissionLockError } = await supabase
+                    .from('hackathon_settings')
+                    .select('value')
+                    .eq('key', 'is_submission_locked')
+                    .maybeSingle();
+                if (submissionLockError) throw submissionLockError;
+                if (isEnabledFlag(submissionLock?.value)) {
+                    return NextResponse.json({ error: 'Team submissions are locked by the event administrators.' }, { status: 423 });
+                }
+            }
         }
 
         const updateData: Record<string, unknown> = {};
@@ -365,9 +418,6 @@ export async function PATCH(req: Request) {
         if (rawDataChanged) updateData.raw_data = rawData;
 
         if (memberMealState !== undefined) updateData.member_meal_state = memberMealState;
-        if (roundScores !== undefined) updateData.round_scores = roundScores;
-        if (roundComments !== undefined) updateData.round_comments = roundComments;
-        if (roundDetailedScores !== undefined) updateData.round_detailed_scores = roundDetailedScores;
         if (isCheckedIn !== undefined) updateData.is_checked_in = isCheckedIn;
         if (submission) {
             if (submission.github !== undefined) updateData.github_url = submission.github;

@@ -7,7 +7,7 @@ The Tri-City AI Hackathon platform supports participant registration, payments, 
 - Next.js 16 with the App Router, React 19, and TypeScript
 - Supabase for application data
 - Manual UPI/UTR payment review for registrations
-- Resend for optional email notifications
+- Nodemailer and authenticated SMTP for email notifications
 - Tailwind CSS and Framer Motion for the interface
 
 ## Project Structure
@@ -39,14 +39,21 @@ ADMIN_LOGIN_ID=
 ADMIN_PASSWORD=
 LIVESCORE_PASSWORD=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-RESEND_API_KEY=
+SMTP_HOST=cloud-xent.crazzydns.com
+SMTP_CONNECT_HOST=148.113.0.192
+SMTP_TLS_SERVERNAME=cloud-xent.crazzydns.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=business@centle.in
+SMTP_PASSWORD=
+EMAIL_FROM=TRI-CITY AI HACKATHON <business@centle.in>
 PUBLIC_REGISTRATIONS_OPEN=false
 NEXT_PUBLIC_REGISTRATIONS_OPEN=false
 ```
 
 Apply `database_setup.sql` to the Supabase SQL editor before starting the app. The app uses one Supabase project for registrations, settings, judges, and volunteers; it no longer falls back to local JSON files. `AUTH_SESSION_SECRET` should be a long random value. `ADMIN_LOGIN_ID`, `ADMIN_PASSWORD`, `LIVESCORE_PASSWORD`, and `PUBLIC_REGISTRATIONS_OPEN` are server-only configuration. Set both registration flags to `true` to open the registration form and API.
 
-To import the existing CSV/JSON records, configure the environment variables above and run `npm run migrate:data`. The importer is safe to rerun and upserts records by their IDs. Keep the source files until you have checked the imported row counts and sample records in Supabase. Set `RESEND_API_KEY` to enable email notifications.
+To import the existing CSV/JSON records, configure the environment variables above and run `npm run migrate:data`. The importer is safe to rerun and upserts records by their IDs. Keep the source files until you have checked the imported row counts and sample records in Supabase. Configure the SMTP variables to enable email notifications; keep `SMTP_PASSWORD` secret and out of source control.
 
 Start the development server:
 

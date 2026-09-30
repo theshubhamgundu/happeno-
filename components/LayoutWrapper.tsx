@@ -13,7 +13,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
     useEffect(() => {
         if (!isLoading && user?.role === 'team' && pathname === '/') {
-            router.push('/dashboard/team');
+            router.push(user.portalMode === 'edit' ? '/edit-registration' : '/dashboard/team');
         }
     }, [user, isLoading, pathname, router]);
 

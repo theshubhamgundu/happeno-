@@ -1,10 +1,10 @@
 import { randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import QRCode from 'qrcode';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
 import { hashPassword } from '@/lib/password';
+import { sendEmail } from '@/lib/email';
 
 function escapeHtml(value: string): string {
     return value.replace(/[&<>"']/g, character => ({
@@ -28,14 +28,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, message: 'Transaction ID is required.' }, { status: 400 });
         }
 
-        const resendApiKey = process.env.RESEND_API_KEY;
-        if (!resendApiKey) {
-            return NextResponse.json({ success: false, message: 'Email service is not configured; registration was not approved.' }, { status: 503 });
-        }
-
         const { data: existing, error: lookupError } = await supabase
             .from('registrations')
-            .select('transaction_id, team_id, team_name, track, captain, email, members, status, password_hash, completed_at')
+            .select('transaction_id, team_id, team_name, track, captain, email, members, status, password_hash, credentials_issued_at, completed_at')
             .eq('transaction_id', transactionId)
             .maybeSingle();
         if (lookupError) throw lookupError;
@@ -54,7 +49,7 @@ export async function POST(req: Request) {
         const passwordHash = await hashPassword(password);
         const { data: approved, error: updateError } = await supabase
             .from('registrations')
-            .update({ status: 'COMPLETED', password_hash: passwordHash, completed_at: new Date().toISOString() })
+            .update({ status: 'COMPLETED', password_hash: passwordHash, credentials_issued_at: new Date().toISOString(), completed_at: new Date().toISOString() })
             .eq('transaction_id', transactionId)
             .neq('status', 'COMPLETED')
             .select('team_id, team_name, track, captain')
@@ -69,19 +64,16 @@ export async function POST(req: Request) {
             const track = escapeHtml(approved.track || '');
             const signInUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.online'}/login`;
             const qrCode = await QRCode.toBuffer(approved.team_id || '', { width: 350, margin: 1 });
-            const resend = new Resend(resendApiKey);
-            const { error: emailError } = await resend.emails.send({
-                from: 'TRI-CITY AI HACKATHON <admin@tricity.online>',
+            await sendEmail({
                 to: captainEmail.trim(),
                 subject: `Registration approved: ${approved.team_name}`,
                 attachments: [{ filename: `tricity-checkin-${(approved.team_id || '').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, content: qrCode }],
                 html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6"><h1>Registration approved</h1><p>Hello ${captain},</p><p>Your team <strong>${teamName}</strong> has been approved for TRI-CITY AI HACKATHON.</p><p><strong>Team ID:</strong> ${teamId}<br/><strong>Track:</strong> ${track}</p><p><strong>Login password:</strong> ${escapeHtml(password)}</p><p><a href="${escapeHtml(signInUrl)}">Sign in to your team dashboard</a>. Store this password securely; it cannot be retrieved later.</p><p>Your check-in QR code is attached.</p></div>`
             });
-            if (emailError) throw emailError;
         } catch (emailError) {
             const { error: rollbackError } = await supabase
                 .from('registrations')
-                .update({ status: existing.status, password_hash: existing.password_hash, completed_at: existing.completed_at })
+                .update({ status: existing.status, password_hash: existing.password_hash, credentials_issued_at: existing.credentials_issued_at, completed_at: existing.completed_at })
                 .eq('transaction_id', transactionId);
             if (rollbackError) console.error('Approval rollback failed:', rollbackError);
             console.error('Approval email failed:', emailError);

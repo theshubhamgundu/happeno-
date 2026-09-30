@@ -16,7 +16,6 @@ import {
     AlertTriangle,
     Save,
     UserCog,
-    Lock,
     Eye,
     Download,
     Upload,
@@ -25,7 +24,10 @@ import {
     ClipboardList,
     ArrowUpRight,
     Coffee,
-    X
+    X,
+    KeyRound,
+    Copy,
+    type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -34,11 +36,14 @@ import { EVENT_MEALS } from "@/lib/meals";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Papa from "papaparse";
+import type { JudgingRound } from "@/lib/judging-rounds";
 
 export default function AdminDashboard() {
     const {
         projects,
         isLoading,
+        roundConfigs,
+        saveRoundConfigs,
         judges,
         addJudge,
         removeJudge,
@@ -207,6 +212,56 @@ export default function AdminDashboard() {
     // --- CSV IMPORT LOGIC ---
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isImporting, setIsImporting] = useState(false);
+    const [resettingTeamId, setResettingTeamId] = useState<string | null>(null);
+    const [credentialResetResult, setCredentialResetResult] = useState<{
+        teamId: string;
+        teamName: string;
+        leadEmail: string;
+        temporaryPassword: string;
+        emailAccepted: boolean;
+    } | null>(null);
+
+    const handleResetTeamCredentials = async (teamId: string, teamName: string) => {
+        const confirmed = window.confirm(`Reset login for ${teamName}? The current password will stop working immediately, and a new password will be emailed to the registered lead.`);
+        if (!confirmed) return;
+
+        setResettingTeamId(teamId);
+        setCredentialResetResult(null);
+        try {
+            const response = await fetch('/api/admin/reset-team-credentials', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ teamId })
+            });
+            const result = await response.json() as {
+                success?: boolean;
+                error?: string;
+                message?: string;
+                teamId?: string;
+                leadEmail?: string;
+                temporaryPassword?: string;
+                emailAccepted?: boolean;
+            };
+
+            if (!response.ok || !result.success || !result.temporaryPassword || !result.leadEmail) {
+                throw new Error(result.error || 'Could not reset team credentials.');
+            }
+
+            setCredentialResetResult({
+                teamId: result.teamId || teamId,
+                teamName,
+                leadEmail: result.leadEmail,
+                temporaryPassword: result.temporaryPassword,
+                emailAccepted: Boolean(result.emailAccepted)
+            });
+            if (result.emailAccepted) toast.success(result.message || 'SMTP accepted the credentials email.');
+            else toast.warning(result.message || 'SMTP did not accept the email. Share the new password through a verified channel.');
+        } catch (error: unknown) {
+            toast.error(error instanceof Error ? error.message : 'Could not reset team credentials.');
+        } finally {
+            setResettingTeamId(null);
+        }
+    };
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -215,107 +270,114 @@ export default function AdminDashboard() {
         setIsImporting(true);
         const loadingToast = toast.loading(`Parsing ${file.name}...`);
 
+        const readValue = (row: Record<string, string>, keys: string[]) => {
+            for (const key of keys) {
+                const value = row[key];
+                if (typeof value === 'string' && value.trim()) return value.trim();
+            }
+            return '';
+        };
+
+        const normalizeParticipants = (row: Record<string, string>) => {
+            const participantEntries: Array<{ fullName: string; email: string; phone: string; college: string; year: string; department: string }> = [];
+            const base = {
+                fullName: readValue(row, ['Name', 'full_name', 'fullName', 'Leader Name', 'captain', 'Captain Name']),
+                email: readValue(row, ['Email', 'email', 'Leader Email', 'Captain Email']),
+                phone: readValue(row, ['Phone Number', 'phone', 'Leader Phone', 'Captain Phone', 'Mobile Number']),
+                college: readValue(row, ['College', 'college', 'Leader College']),
+                year: readValue(row, ['Year', 'year']),
+                department: readValue(row, ['Department', 'department'])
+            };
+
+            if (base.fullName || base.email) {
+                participantEntries.push(base);
+            }
+
+            for (let index = 2; index <= 4; index += 1) {
+                const fullName = readValue(row, [`Member ${index} Name`, `Member${index} Name`, `member_${index}_name`, `member${index}Name`]);
+                const email = readValue(row, [`Member ${index} Email`, `Member${index} Email`, `member_${index}_email`, `member${index}Email`]);
+                const phone = readValue(row, [`Member ${index} Phone`, `Member${index} Phone`, `member_${index}_phone`, `member${index}Phone`]);
+                const college = readValue(row, [`Member ${index} College`, `member_${index}_college`, `member${index}College`]);
+                if (fullName || email || phone || college) {
+                    participantEntries.push({ fullName, email, phone, college, year: '', department: '' });
+                }
+            }
+
+            return participantEntries.filter(entry => entry.fullName || entry.email || entry.phone || entry.college);
+        };
+
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,
             complete: async (results) => {
                 try {
                     const rows = results.data as Record<string, string>[];
-                    const hasRegistrationIds = rows.some(row => row['Registration ID']?.trim());
-                    const registrations = hasRegistrationIds
-                        ? Array.from(rows.reduce((groups, row) => {
-                            const teamId = row['Registration ID']?.trim();
-                            if (!teamId) return groups;
+                    const groupedRegistrations = rows.reduce((groups, row) => {
+                        const teamId = readValue(row, ['Registration ID', 'registration_id', 'team_id', 'Team ID']) || `TRICITY_IMPORT_${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+                        const current = groups.get(teamId) || {
+                            teamId,
+                            teamName: readValue(row, ['Team Name', 'team_name', 'Team']) || '',
+                            track: readValue(row, ['Selected Tracks', 'track', 'Track']) || 'General',
+                            problemStatement: readValue(row, ['Problem Statement', 'problem_statement']) || '',
+                            participants: [] as Array<{ fullName: string; email: string; phone: string; college: string; year: string; department: string }>,
+                            leaderEmail: ''
+                        };
 
-                            const participant = {
-                                fullName: row['Name']?.trim() || '',
-                                email: row['Email']?.trim() || '',
-                                phone: row['Phone Number']?.trim() || '',
-                                college: row['College']?.trim() || '',
-                                year: row['Year']?.trim() || '',
-                                department: row['Department']?.trim() || ''
-                            };
-                            if (!participant.fullName && !participant.email) return groups;
+                        const participants = normalizeParticipants(row);
+                        if (participants.length) {
+                            current.participants.push(...participants);
+                        }
 
-                            const registration = groups.get(teamId) || {
-                                teamId,
-                                teamName: row['Team Name']?.trim() || '',
-                                track: row['Selected Tracks']?.trim() || 'General',
-                                participants: [] as { participant: typeof participant; isLeader: boolean }[]
-                            };
-                            registration.participants.push({
-                                participant,
-                                isLeader: row['Role']?.trim().toLowerCase() === 'team leader'
-                            });
-                            groups.set(teamId, registration);
-                            return groups;
-                        }, new Map<string, { teamId: string; teamName: string; track: string; participants: { participant: { fullName: string; email: string; phone: string; college: string; year: string; department: string }; isLeader: boolean }[] }>()).values())
-                            .map(registration => {
-                                registration.participants.sort((a, b) => Number(b.isLeader) - Number(a.isLeader));
-                                const participants = registration.participants.map(entry => entry.participant);
-                                return {
-                                    ...registration,
-                                    participants,
-                                    teamName: registration.teamName.toLowerCase() === 'individual'
-                                        ? participants[0]?.fullName || registration.teamName
-                                        : registration.teamName
-                                };
-                            })
-                        : rows.map((row) => {
-                        const participants = [];
-                        
-                        // Leader
-                        if (row['Leader Name'] || row['Leader Email']) {
-                            participants.push({
-                                fullName: row['Leader Name'] || '',
-                                email: row['Leader Email'] || '',
-                                phone: row['Leader Phone'] || '',
-                                college: row['College'] || ''
-                            });
+                        const roleValue = readValue(row, ['Role', 'role', 'Lead Role'])?.toLowerCase() || '';
+                        if (roleValue.includes('leader') && participants[0]?.email) {
+                            current.leaderEmail = participants[0].email;
                         }
-                        // Member 2
-                        if (row['Member 2 Name'] || row['Member 2 Email']) {
-                            participants.push({
-                                fullName: row['Member 2 Name'] || '',
-                                email: row['Member 2 Email'] || '',
-                                phone: row['Member 2 Phone'] || ''
-                            });
-                        }
-                        // Member 3
-                        if (row['Member 3 Name'] || row['Member 3 Email']) {
-                            participants.push({
-                                fullName: row['Member 3 Name'] || '',
-                                email: row['Member 3 Email'] || '',
-                                phone: row['Member 3 Phone'] || ''
-                            });
-                        }
-                        // Member 4
-                        if (row['Member 4 Name'] || row['Member 4 Email']) {
-                            participants.push({
-                                fullName: row['Member 4 Name'] || '',
-                                email: row['Member 4 Email'] || '',
-                                phone: row['Member 4 Phone'] || ''
-                            });
-                        }
+                        current.teamName = current.teamName || readValue(row, ['Team Name', 'team_name', 'Team']) || participants[0]?.fullName || 'Unknown Team';
+                        groups.set(teamId, current);
+                        return groups;
+                    }, new Map<string, {
+                        teamId: string;
+                        teamName: string;
+                        track: string;
+                        problemStatement: string;
+                        participants: Array<{ fullName: string; email: string; phone: string; college: string; year: string; department: string }>;
+                            leaderEmail: string;
+                    }>());
+
+                    const registrations = Array.from(groupedRegistrations.values()).map(entry => {
+                        const participants = entry.participants.filter(participant => participant.fullName || participant.email || participant.phone || participant.college);
+                        const captain = participants.find(participant => participant.email.toLowerCase() === entry.leaderEmail.toLowerCase()) || participants[0] || {
+                            fullName: '',
+                            email: '',
+                            phone: '',
+                            college: '',
+                            year: '',
+                            department: ''
+                        };
 
                         return {
-                            teamName: row['Team Name'] || '',
-                            track: row['Track'] || 'General',
-                            problemStatement: row['Problem Statement'] || '',
-                            participants
+                            teamId: entry.teamId,
+                            teamName: entry.teamName.toLowerCase() === 'individual' ? captain.fullName || entry.teamName : entry.teamName,
+                            track: entry.track || 'General',
+                            problemStatement: entry.problemStatement,
+                            participants: [captain, ...participants.filter(participant => participant.email.toLowerCase() !== captain.email.toLowerCase())],
+                            captain
                         };
-                    });
+                    }).filter(registration => registration.teamId && registration.participants.length > 0);
+
+                    if (!registrations.length) {
+                        throw new Error('No valid participant rows were found in the CSV.');
+                    }
 
                     toast.loading(`Importing ${registrations.length} teams...`, { id: loadingToast });
 
-                    // 1. Import Registrations
                     const importRes = await fetch('/api/admin/import-registrations', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ registrations })
                     });
                     const importData = await importRes.json();
-                    
+
                     if (!importData.success) throw new Error(importData.error || 'Import failed');
 
                     if (importData.emailFailures > 0) {
@@ -323,19 +385,20 @@ export default function AdminDashboard() {
                     } else {
                         toast.success(`Successfully imported ${importData.imported} teams and sent ${importData.emailsSent} emails.`, { id: loadingToast });
                     }
-                    
-                    // Reload page to fetch new data
+
                     setTimeout(() => window.location.reload(), 2000);
-                } catch (error: any) {
-                    console.error("CSV Import Error:", error);
-                    toast.error(error.message || "Failed to process CSV file", { id: loadingToast });
+                } catch (error: unknown) {
+                    console.error('CSV Import Error:', error);
+                    const message = error instanceof Error ? error.message : 'Failed to process CSV file';
+                    toast.error(message, { id: loadingToast });
                 } finally {
                     setIsImporting(false);
                     if (fileInputRef.current) fileInputRef.current.value = '';
                 }
             },
             error: (error) => {
-                toast.error(`Error parsing CSV: ${error.message}`, { id: loadingToast });
+                const message = error instanceof Error ? `Error parsing CSV: ${error.message}` : 'Error parsing CSV file';
+                toast.error(message, { id: loadingToast });
                 setIsImporting(false);
                 if (fileInputRef.current) fileInputRef.current.value = '';
             }
@@ -437,7 +500,7 @@ export default function AdminDashboard() {
                     <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
                         <div>
                             <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Registration entries</h2>
-                            <p className="mt-1 text-xs text-white/45">Search registrations or open a participant's complete record.</p>
+                            <p className="mt-1 text-xs text-white/45">Search registrations or open a participant&apos;s complete record.</p>
                         </div>
                         <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-[#14b8a6]" /> {filteredTeams.length} shown</div>
                     </div>
@@ -523,10 +586,6 @@ export default function AdminDashboard() {
                                                     <span className="text-[10px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{team.teamId}</span>
                                                 </div>
                                                 <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track} • {team.college}</p>
-                                                <div className="flex items-center gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
-                                                    <Lock size={10} className="text-blue-400/60" />
-                                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">Login credentials are protected</span>
-                                                </div>
                                             </div>
                                         </div>
 
@@ -584,12 +643,45 @@ export default function AdminDashboard() {
                                                         </div>
                                                     </div>
 
-                                                    {/* 3. Credential storage */}
+                                                    {/* 3. Credential recovery */}
                                                     <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
-                                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><Lock size={10} /> Login credentials</span>
-                                                        <p className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 text-xs leading-relaxed text-white/50">
-                                                            Credentials are stored as one-way hashes and cannot be viewed here. The team receives its password when credentials are issued.
-                                                        </p>
+                                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><KeyRound size={10} /> Login recovery</span>
+                                                        <button
+                                                            type="button"
+                                                            disabled={!team.teamId || resettingTeamId === team.teamId}
+                                                            onClick={() => { if (team.teamId) void handleResetTeamCredentials(team.teamId, team.team); }}
+                                                            className="inline-flex items-center gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-amber-200 transition hover:bg-amber-400/20 disabled:cursor-wait disabled:opacity-50"
+                                                        >
+                                                            <KeyRound size={13} />
+                                                            {resettingTeamId === team.teamId ? 'Resetting...' : 'Reset & email password'}
+                                                        </button>
+                                                        {credentialResetResult && credentialResetResult.teamId === team.teamId && (
+                                                            <div role="status" aria-live="polite" className="space-y-3 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
+                                                                <p className="text-xs font-bold text-white">New password (shown once)</p>
+                                                                <p className="break-all rounded-lg bg-black/30 p-3 font-mono text-sm text-amber-100">{credentialResetResult.temporaryPassword}</p>
+                                                                <p className="text-xs leading-relaxed text-white/60">
+                                                                    {credentialResetResult.emailAccepted
+                                                                        ? `SMTP accepted the message for ${credentialResetResult.leadEmail}. Check Inbox and Spam; delivery is not confirmed. Share this password only through a verified support channel.`
+                                                                        : `SMTP did not accept the message for ${credentialResetResult.leadEmail}. Share this password only through a verified support channel.`}
+                                                                </p>
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => void navigator.clipboard.writeText(credentialResetResult.temporaryPassword).then(() => toast.success('Password copied.')).catch(() => toast.error('Clipboard access is unavailable.'))}
+                                                                        className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-bold text-white/80 hover:bg-white/10"
+                                                                    >
+                                                                        <Copy size={12} /> Copy password
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setCredentialResetResult(null)}
+                                                                        className="rounded-lg px-3 py-2 text-[10px] font-bold text-white/50 hover:bg-white/5"
+                                                                    >
+                                                                        Dismiss
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </motion.div>
@@ -628,6 +720,7 @@ export default function AdminDashboard() {
             {/* Judges Tab */}
             {activeTab === 'judges' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <JudgingRoundSettings rounds={roundConfigs} onSave={saveRoundConfigs} />
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
                         <div className="flex justify-between items-center mb-8">
                             <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Add Official Judge</h3>
@@ -1088,7 +1181,7 @@ export default function AdminDashboard() {
     );
 }
 
-function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: number | string; icon: any; tone: "purple" | "amber" | "green" | "blue" | "orange" | "red" }) {
+function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: number | string; icon: LucideIcon; tone: "purple" | "amber" | "green" | "blue" | "orange" | "red" }) {
     const tones = {
         purple: "bg-slate-900/15 text-slate-900 border-slate-800/20",
         amber: "bg-amber-500/15 text-amber-300 border-amber-400/20",
@@ -1108,5 +1201,92 @@ function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: 
                 <span className={`flex h-9 w-9 items-center justify-center rounded-xl border ${tones[tone]}`}><Icon size={17} /></span>
             </div>
         </article>
+    );
+}
+
+function JudgingRoundSettings({ rounds, onSave }: { rounds: JudgingRound[]; onSave: (rounds: JudgingRound[]) => Promise<boolean> }) {
+    const [draftRounds, setDraftRounds] = useState(rounds);
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => setDraftRounds(rounds), [rounds]);
+
+    const updateRound = (roundId: string, update: Partial<JudgingRound>) => {
+        setDraftRounds(current => current.map(round => round.id === roundId ? { ...round, ...update } : round));
+    };
+
+    const addRound = () => {
+        const last = draftRounds[draftRounds.length - 1];
+        const nextNumber = draftRounds.reduce((max, round) => {
+            const match = round.id.match(/(\d+)$/);
+            return Math.max(max, match ? Number(match[1]) : 0);
+        }, 0) + 1;
+        const criteria = (last?.criteria || []).map((criterion, index) => ({
+            ...criterion,
+            id: `r${nextNumber}q${index + 1}`
+        }));
+        setDraftRounds(current => [...current, {
+            id: `round${nextNumber}`,
+            title: `Round ${nextNumber}`,
+            subtitle: 'Evaluation round',
+            dayOffset: last ? last.dayOffset + (last.hour >= 20 ? 1 : 0) : 0,
+            hour: last && last.hour < 20 ? Math.min(last.hour + 2, 23) : 10,
+            minute: 0,
+            criteria: criteria.length ? criteria : [{ id: `r${nextNumber}q1`, label: 'Overall solution quality', desc: '' }]
+        }]);
+    };
+
+    const save = async () => {
+        setIsSaving(true);
+        try {
+            await onSave(draftRounds);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    return (
+        <section className="space-y-6 rounded-[2rem] border border-white/10 bg-white/[.04] p-6 md:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h3 className="text-xl font-black uppercase italic tracking-tight text-white">Judging rounds</h3>
+                    <p className="mt-1 text-xs text-white/45">Set round timing and scoring criteria. Submitted round history stays attached to its round ID.</p>
+                </div>
+                <div className="flex gap-2">
+                    <button type="button" onClick={addRound} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-white hover:bg-white/10">
+                        <Plus size={14} /> Add round
+                    </button>
+                    <button type="button" onClick={() => void save()} disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-[#14b8a6] px-3 py-2 text-xs font-black uppercase text-black disabled:opacity-50">
+                        <Save size={14} /> {isSaving ? 'Saving...' : 'Save rounds'}
+                    </button>
+                </div>
+            </div>
+            <div className="space-y-4">
+                {draftRounds.map(round => (
+                    <article key={round.id} className="space-y-4 rounded-2xl border border-white/10 bg-black/15 p-4 md:p-5">
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                            <input aria-label={`${round.title} title`} value={round.title} onChange={event => updateRound(round.id, { title: event.target.value })} className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm font-bold text-white" />
+                            <input aria-label={`${round.title} subtitle`} value={round.subtitle} onChange={event => updateRound(round.id, { subtitle: event.target.value })} className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white" />
+                            <label className="flex items-center gap-2 text-xs text-white/55">Day offset
+                                <input type="number" min="0" max="7" value={round.dayOffset} onChange={event => updateRound(round.id, { dayOffset: Number(event.target.value) })} className="w-16 rounded-lg border border-white/10 bg-black/20 px-2 py-2 text-sm text-white" />
+                            </label>
+                            <label className="flex items-center gap-2 text-xs text-white/55">Hour IST
+                                <input type="number" min="0" max="23" value={round.hour} onChange={event => updateRound(round.id, { hour: Number(event.target.value) })} className="w-16 rounded-lg border border-white/10 bg-black/20 px-2 py-2 text-sm text-white" />
+                            </label>
+                            <label className="flex items-center gap-2 text-xs text-white/55">Minute
+                                <input type="number" min="0" max="59" value={round.minute} onChange={event => updateRound(round.id, { minute: Number(event.target.value) })} className="w-16 rounded-lg border border-white/10 bg-black/20 px-2 py-2 text-sm text-white" />
+                            </label>
+                        </div>
+                        <div className="space-y-2">
+                            {round.criteria.map((criterion, index) => (
+                                <div key={criterion.id} className="grid gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                                    <input aria-label={`${round.title} criterion ${index + 1}`} value={criterion.label} onChange={event => updateRound(round.id, { criteria: round.criteria.map(item => item.id === criterion.id ? { ...item, label: event.target.value } : item) })} className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white" />
+                                    <input aria-label={`${round.title} criterion ${index + 1} guidance`} value={criterion.desc || ''} onChange={event => updateRound(round.id, { criteria: round.criteria.map(item => item.id === criterion.id ? { ...item, desc: event.target.value } : item) })} className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/70" />
+                                </div>
+                            ))}
+                        </div>
+                    </article>
+                ))}
+            </div>
+        </section>
     );
 }

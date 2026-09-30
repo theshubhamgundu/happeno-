@@ -60,6 +60,7 @@ export async function POST(req: Request) {
                     college: members[0].college,
                     raw_data: body,
                     password_hash: null,
+                    credentials_issued_at: null,
                     created_at: new Date().toISOString()
                 }
             ]);

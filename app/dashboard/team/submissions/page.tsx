@@ -15,11 +15,9 @@ export default function TeamSubmissions() {
     const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || null, [projects, user]);
     const [values, setValues] = useState<Record<SubmissionKey, string>>({ repo: "", video: "", presentation: "", demo: "" });
     const [saving, setSaving] = useState<SubmissionKey | null>(null);
-    const [timeLocked, setTimeLocked] = useState(false);
 
     const [isInitialized, setIsInitialized] = useState(false);
 
-    useEffect(() => { const update = () => setTimeLocked(new Date() < new Date("2026-02-27T09:30:00+05:30")); update(); const interval = setInterval(update, 10000); return () => clearInterval(interval); }, []);
     useEffect(() => { 
         if (team?.submission && !isInitialized) { 
             setValues({ repo: team.submission.github || "", video: team.submission.demo || "", presentation: team.submission.presentation || "", demo: team.submission.deployment || "" }); 
@@ -33,7 +31,7 @@ export default function TeamSubmissions() {
         setSaving(key);
         try { const result = await fetch("/api/teams", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: team.id, submission: { [field]: values[key] } }) }); if (!result.ok) throw new Error(); toast.success("Saved successfully"); } catch { toast.error("Could not save this link. Please try again."); } finally { setSaving(null); }
     };
-    const locked = timeLocked || isSubmissionLocked;
+    const locked = isSubmissionLocked;
     const items = [
         { key: "repo" as const, label: "Source code", help: "GitHub repository URL", placeholder: "https://github.com/your-team/project", icon: Github, required: true },
         { key: "presentation" as const, label: "Presentation", help: "Google Slides, Canva, or PDF link", placeholder: "https://…", icon: Presentation, required: true },

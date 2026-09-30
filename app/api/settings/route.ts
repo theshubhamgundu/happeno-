@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
+import { normalizeJudgingRounds } from '@/lib/judging-rounds';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +44,46 @@ export async function POST(req: Request) {
 
         if (typeof key !== 'string' || !key.trim() || value === undefined) {
             return NextResponse.json({ error: 'A setting key and value are required.' }, { status: 400 });
+        }
+
+        if (key.trim() === 'round_configs') {
+            if (!Array.isArray(value)) {
+                return NextResponse.json({ error: 'Judging rounds must be an array.' }, { status: 400 });
+            }
+            const nextRounds = normalizeJudgingRounds(value);
+            if (nextRounds.length !== value.length || !nextRounds.length) {
+                return NextResponse.json({ error: 'Every round needs a unique ID and at least one valid criterion.' }, { status: 400 });
+            }
+
+            const { data: previousSetting, error: previousError } = await supabase
+                .from('hackathon_settings')
+                .select('value')
+                .eq('key', 'round_configs')
+                .maybeSingle();
+            if (previousError) throw previousError;
+
+            const evaluations: { round_id: string; status: string }[] = [];
+            for (let offset = 0; ; offset += 1000) {
+                const { data, error } = await supabase
+                    .from('judging_evaluations')
+                    .select('round_id, status')
+                    .range(offset, offset + 999);
+                if (error) throw error;
+                evaluations.push(...(data || []));
+                if (!data || data.length < 1000) break;
+            }
+
+            const previousRounds = normalizeJudgingRounds(previousSetting?.value);
+            for (const evaluation of evaluations) {
+                const previousRound = previousRounds.find(round => round.id === evaluation.round_id);
+                const nextRound = nextRounds.find(round => round.id === evaluation.round_id);
+                if (!nextRound) {
+                    return NextResponse.json({ error: `Round ${evaluation.round_id} already has evaluations and cannot be removed.` }, { status: 409 });
+                }
+                if (previousRound && JSON.stringify(previousRound.criteria) !== JSON.stringify(nextRound.criteria)) {
+                    return NextResponse.json({ error: `Round ${evaluation.round_id} already has evaluation activity; its rubric can no longer be changed.` }, { status: 409 });
+                }
+            }
         }
 
         const { error } = await supabase

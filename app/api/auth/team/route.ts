@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
 import { setSessionCookie } from '@/lib/session';
 import { verifyPassword } from '@/lib/password';
+import { getParticipantPortalMode } from '@/lib/event-windows';
 
 export async function POST(req: Request) {
     if (!process.env.AUTH_SESSION_SECRET || Buffer.byteLength(process.env.AUTH_SESSION_SECRET) < 32) {
@@ -13,11 +14,15 @@ export async function POST(req: Request) {
         if (typeof teamId !== 'string' || typeof password !== 'string') {
             return NextResponse.json({ success: false, error: 'Team ID and password are required.' }, { status: 400 });
         }
+        const portalMode = await getParticipantPortalMode();
+        if (portalMode === 'closed') {
+            return NextResponse.json({ success: false, error: 'The participant portal is currently closed.' }, { status: 403 });
+        }
         const normalizedTeamId = teamId.trim().toUpperCase();
 
         const { data: databaseTeam, error: databaseError } = await supabase
             .from('registrations')
-            .select('team_id, team_name, password_hash, status')
+            .select('team_id, team_name, password_hash, credentials_issued_at, status')
             .eq('team_id', normalizedTeamId)
             .maybeSingle();
 
@@ -25,7 +30,7 @@ export async function POST(req: Request) {
             console.error('Database team authentication failed:', databaseError);
             return NextResponse.json({ success: false, error: 'Could not verify team credentials.' }, { status: 503 });
         }
-        if (!databaseTeam?.password_hash || !(await verifyPassword(password, databaseTeam.password_hash))) {
+        if (!databaseTeam?.password_hash || !databaseTeam.credentials_issued_at || !(await verifyPassword(password, databaseTeam.password_hash))) {
             return NextResponse.json({ success: false, error: 'Invalid Participant ID or Password' }, { status: 401 });
         }
         if (['PENDING', 'REJECTED', 'MERGED'].includes(String(databaseTeam.status).toUpperCase())) {
@@ -36,9 +41,10 @@ export async function POST(req: Request) {
             NextResponse.json({
                 success: true,
                 teamId: databaseTeam.team_id,
-                teamName: databaseTeam.team_name
+                teamName: databaseTeam.team_name,
+                portalMode
             }),
-            { role: 'team', id: databaseTeam.team_id, teamId: databaseTeam.team_id, name: databaseTeam.team_name }
+            { role: 'team', id: databaseTeam.team_id, teamId: databaseTeam.team_id, name: databaseTeam.team_name, portalMode }
         );
     } catch (error) {
         console.error('Team authentication failed:', error);

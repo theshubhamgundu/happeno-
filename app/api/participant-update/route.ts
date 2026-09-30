@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
 import { MAX_TEAM_MEMBERS } from '@/lib/constants';
+import { getParticipantPortalMode } from '@/lib/event-windows';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,10 @@ export async function GET(req: Request) {
     }
 
     try {
+        if (await getParticipantPortalMode() !== 'edit') {
+            return NextResponse.json({ error: 'Registration editing is available only October 5–6, 2026 (IST).' }, { status: 403 });
+        }
+
         const { data, error } = await supabase
             .from('registrations')
             .select('team_id, team_name, track, captain, captain_mobile, college, email, members, status, problem_statement, created_at')
@@ -49,6 +54,10 @@ export async function PATCH(req: Request) {
     }
 
     try {
+        if (await getParticipantPortalMode() !== 'edit') {
+            return NextResponse.json({ error: 'Registration editing is available only October 5–6, 2026 (IST).' }, { status: 403 });
+        }
+
         const body = await req.json();
         const allowedKeys = new Set(['teamId', 'teamName', 'track', 'captain', 'captainMobile', 'college', 'email', 'members']);
         if (Object.keys(body).some(key => !allowedKeys.has(key))) {

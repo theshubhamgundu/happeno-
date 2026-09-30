@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 import { STATIC_ROUNDS_CONFIG } from "@/lib/constants";
 import { MAX_TEAM_MEMBERS } from "@/lib/constants";
+import { normalizeJudgingRounds, type JudgingRound } from "@/lib/judging-rounds";
 
 interface EmergencyContact {
     name: string;
@@ -47,12 +48,12 @@ interface HackathonContextType {
     toggleRoundLock: () => void;
     enabledMeals: string[];
     updateEnabledMeals: (meals: string[]) => Promise<void>;
-    roundConfigs: typeof STATIC_ROUNDS_CONFIG;
+    roundConfigs: JudgingRound[];
+    saveRoundConfigs: (configs: JudgingRound[]) => Promise<boolean>;
     updateRoundTime: (roundId: string, hour: number, minute: number, dayOffset: number) => void;
     projects: Project[];
     isLoading: boolean;
-    updateProjectScore: (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>) => Promise<boolean>;
-    checkInTeam: (projectId: any) => Promise<void>;
+    checkInTeam: (projectId: any) => Promise<boolean>;
     judges: Judge[];
     addJudge: (judge: { name: string, specialization: string }) => void;
     removeJudge: (id: string) => void;
@@ -63,7 +64,7 @@ interface HackathonContextType {
     removeTeamMember: (projectId: any, memberIndex: number) => Promise<boolean>;
     addTeamMember: (projectId: any, memberData: Member) => Promise<boolean>;
     transferTeamMembers: (projectId: any, selections: { sourceTeamId: string; memberIndex: number }[]) => Promise<boolean>;
-    claimMemberMeal: (projectId: any, memberId: string, mealKey: string, volunteerId?: string) => Promise<{ status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN'; claimedAt?: string; claimedBy?: string; mealName?: string; }>;
+    claimMemberMeal: (projectId: any, memberId: string, mealKey: string, volunteerId?: string) => Promise<{ status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN' | 'SAVE_FAILED'; claimedAt?: string; claimedBy?: string; mealName?: string; }>;
     resetMemberMeal: (projectId: any, memberId: string, mealKey: string) => Promise<void>;
     bulkAssignMealPlan: (projectIds: any[], mealKeys: string[], included: boolean) => Promise<void>;
     toggleMealAccess: (projectId: any, mealKey: string, included: boolean) => Promise<void>;
@@ -126,7 +127,7 @@ const HackathonContext = createContext<HackathonContextType | undefined>(undefin
 export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     // Default to a date in the future
     // Default constants removed to ensure DB is the only source
-    const [hackathonStartDate, setHackathonStartDate] = useState("2026-02-27");
+    const [hackathonStartDate, setHackathonStartDate] = useState("TBD");
 
     // Default Emergency Contact
     const [emergencyContact, setEmergencyContact] = useState<EmergencyContact>({
@@ -147,7 +148,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
     const [enabledMeals, setEnabledMeals] = useState<string[]>([]);
 
     // Dynamic Round Configs
-    const [roundConfigs, setRoundConfigs] = useState(STATIC_ROUNDS_CONFIG);
+    const [roundConfigs, setRoundConfigs] = useState<JudgingRound[]>(normalizeJudgingRounds(STATIC_ROUNDS_CONFIG));
 
     // Projects Global State - Start empty and sync from server/local
     const [projects, setProjects] = useState<Project[]>([]);
@@ -163,6 +164,12 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         pathname === '/registrations-count';
 
     const mountedRef = React.useRef(true);
+
+    useEffect(() => {
+        if (user?.role === 'team' && user.portalMode !== 'event') {
+            setProjects([]);
+        }
+    }, [user?.role, user?.portalMode]);
 
     // Load application data from Supabase-backed APIs.
     useEffect(() => {
@@ -188,16 +195,8 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                     if (dbSettings.is_round_lock_enabled !== undefined) setIsRoundLockEnabled(dbSettings.is_round_lock_enabled);
                     if (dbSettings.enabled_meals !== undefined) setEnabledMeals(dbSettings.enabled_meals);
                     if (dbSettings.released_rounds) setReleasedRounds(dbSettings.released_rounds);
-                    if (dbSettings.round_configs) {
-                        // Merge static criteria with dynamic times
-                        const merged = STATIC_ROUNDS_CONFIG.map(staticRound => {
-                            const dynamic = dbSettings.round_configs.find((d: any) => d.id === staticRound.id);
-                            if (dynamic) {
-                                return { ...staticRound, hour: dynamic.hour, minute: dynamic.minute, dayOffset: dynamic.dayOffset };
-                            }
-                            return staticRound;
-                        });
-                        setRoundConfigs(merged);
+                    if (Array.isArray(dbSettings.round_configs)) {
+                        setRoundConfigs(normalizeJudgingRounds(dbSettings.round_configs));
                     }
                 }
             } catch (err) {
@@ -208,6 +207,10 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         // 2. Sync projects strictly from server
         // OPTIMIZATION: If user is a team, only fetch THEIR team data to save Supabase resources
         const fetchServerTeams = async (isBackground = false) => {
+            if (user?.role === 'judge' || user?.role === 'volunteer') {
+                setProjects([]);
+                return;
+            }
             try {
                 let url = '/api/teams';
                 if (user?.role === 'team' && user?.teamId) {
@@ -221,6 +224,8 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                     // If we are a team, we might want to merge with existing if it's a partial update,
                     // but for now, replacing is fine since the state is scoped.
                     setProjects(serverTeams || []);
+                } else if (mountedRef.current && user?.role === 'team' && [401, 403].includes(response.status)) {
+                    setProjects([]);
                 }
             } catch (err) {
                 if (!isBackground) console.error("Failed to sync teams from server:", err);
@@ -340,65 +345,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const updateProjectScore = async (projectId: any, roundId: string, judgeId: string, score: number, comment?: string, detailedScores?: Record<string, number>): Promise<boolean> => {
-        let newScores: any = {};
-        let newComments: any = {};
-        let newDetailed: any = {};
-        const updatedProjects = projects.map(p => {
-            if (p.id === projectId) {
-                // Initialize if they don't exist
-                const currentRoundScores = p.roundScores?.[roundId] || {};
-                const currentRoundComments = p.roundComments?.[roundId] || {};
-                const currentRoundDetailed = p.roundDetailedScores?.[roundId] || {};
-
-                newScores = {
-                    ...(p.roundScores || {}),
-                    [roundId]: {
-                        ...currentRoundScores,
-                        [judgeId]: score
-                    }
-                };
-                newComments = {
-                    ...(p.roundComments || {}),
-                    [roundId]: {
-                        ...currentRoundComments,
-                        [judgeId]: comment || ""
-                    }
-                };
-                newDetailed = {
-                    ...(p.roundDetailedScores || {}),
-                    [roundId]: {
-                        ...currentRoundDetailed,
-                        [judgeId]: detailedScores || {}
-                    }
-                };
-                return { ...p, roundScores: newScores, roundComments: newComments, roundDetailedScores: newDetailed };
-            }
-            return p;
-        });
-        try {
-            const response = await fetch('/api/teams', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: projectId,
-                    roundScores: newScores,
-                    roundComments: newComments,
-                    roundDetailedScores: newDetailed
-                })
-            });
-            if (!response.ok) {
-                console.error("Failed to save evaluation:", await response.json().catch(() => null));
-                return false;
-            }
-            setProjects(updatedProjects);
-            return true;
-        } catch (err) {
-            console.error("Failed to sync score to DB:", err);
-            return false;
-        }
-    };
-
     const toggleRoundLock = async () => {
         const newValue = !isRoundLockEnabled;
         setIsRoundLockEnabled(newValue);
@@ -422,18 +368,10 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         setRoundConfigs(updated);
 
         try {
-            // Save only IDs and times to settings to keep it clean
-            const configToSave = updated.map(r => ({
-                id: r.id,
-                hour: r.hour,
-                minute: r.minute,
-                dayOffset: r.dayOffset
-            }));
-
             await fetch('/api/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key: 'round_configs', value: configToSave })
+                body: JSON.stringify({ key: 'round_configs', value: updated })
             });
             toast.success("Round time updated");
         } catch (err) {
@@ -442,19 +380,49 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const checkInTeam = async (projectId: any) => {
-        const now = new Date().toISOString();
-        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, isCheckedIn: true, checkedInAt: now } : p));
+    const saveRoundConfigs = async (configs: JudgingRound[]): Promise<boolean> => {
+        const normalized = normalizeJudgingRounds(configs);
+        if (!normalized.length || normalized.length !== configs.length) {
+            toast.error('At least one valid judging round is required.');
+            return false;
+        }
+
+        const previous = roundConfigs;
+        setRoundConfigs(normalized);
         try {
-            await fetch('/api/teams', {
+            const response = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'round_configs', value: normalized })
+            });
+            if (!response.ok) throw new Error('Round settings could not be saved.');
+            toast.success('Judging rounds saved');
+            return true;
+        } catch (error) {
+            setRoundConfigs(previous);
+            toast.error(error instanceof Error ? error.message : 'Round settings could not be saved.');
+            return false;
+        }
+    };
+
+    const checkInTeam = async (projectId: any): Promise<boolean> => {
+        const now = new Date().toISOString();
+        const project = projects.find(item => item.id === projectId);
+        if (!project) return false;
+        try {
+            const response = await fetch('/api/teams', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: projectId, isCheckedIn: true, checkedInAt: now })
             });
+            if (!response.ok) throw new Error('Check-in was rejected by the server.');
+            setProjects(prev => prev.map(item => item.id === projectId ? { ...item, isCheckedIn: true, checkedInAt: now } : item));
             toast.success("Team Checked In!");
+            return true;
         } catch (err) {
             console.error(err);
             toast.error("Check-in sync failed");
+            return false;
         }
     };
 
@@ -705,7 +673,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const claimMemberMeal = async (projectId: any, memberId: string, mealKey: string, volunteerId?: string): Promise<{ status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN'; claimedAt?: string; claimedBy?: string; mealName?: string; }> => {
+    const claimMemberMeal = async (projectId: any, memberId: string, mealKey: string, volunteerId?: string): Promise<{ status: 'PERMITTED' | 'ALREADY_CLAIMED' | 'NOT_INCLUDED' | 'ALL_MEALS_CLAIMED' | 'NEEDS_CHECKIN' | 'SAVE_FAILED'; claimedAt?: string; claimedBy?: string; mealName?: string; }> => {
         const project = projects.find(p => p.id === projectId);
         if (!project) return { status: 'NOT_INCLUDED' };
 
@@ -735,16 +703,17 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
             }
         };
 
-        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, memberMealState: updatedMemberMealState } : p));
-
         try {
-            await fetch('/api/teams', {
+            const response = await fetch('/api/teams', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: projectId, memberMealState: updatedMemberMealState })
             });
+            if (!response.ok) throw new Error('Meal claim was rejected by the server.');
+            setProjects(prev => prev.map(p => p.id === projectId ? { ...p, memberMealState: updatedMemberMealState } : p));
         } catch (err) {
             console.error("Failed to sync member meal claim:", err);
+            return { status: 'SAVE_FAILED' };
         }
 
         return { status: 'PERMITTED', claimedAt: now, claimedBy: volunteerId || "Volunteer", mealName: mealKey };
@@ -902,7 +871,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 updateEnabledMeals,
                 projects,
                 isLoading,
-                updateProjectScore,
                 checkInTeam,
                 judges,
                 addJudge,
@@ -912,6 +880,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 removeVolunteer,
                 roundConfigs,
                 updateRoundTime,
+                saveRoundConfigs,
                 updateMemberDetails,
                 removeTeamMember,
                 addTeamMember,
