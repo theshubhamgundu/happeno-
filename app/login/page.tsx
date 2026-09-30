@@ -51,32 +51,13 @@ export default function LoginPage() {
         setIsVerifying(true);
 
         try {
-            // Try Participant
-            let response = await fetch('/api/auth/team', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ teamId: id, password: pass })
-            });
-            let data = await response.json();
-            
-            if (response.ok && data.success) {
-                setDetectedRole("Participant");
-                login('team', { teamId: data.teamId, name: data.teamName, portalMode: data.portalMode });
-                return;
-            }
-            if (response.status === 403 && data.error && !data.error.includes("Invalid")) {
-                setError(data.error);
-                setIsVerifying(false);
-                return;
-            }
-
-            // Try Admin
-            response = await fetch('/api/auth/staff', {
+            // Try Admin First
+            let response = await fetch('/api/auth/staff', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role: 'admin', id, password: pass })
             });
-            data = await response.json();
+            let data = await response.json();
             
             if (response.ok && data.success) {
                 setDetectedRole("Admin");
@@ -109,6 +90,24 @@ export default function LoginPage() {
             if (response.ok && data.success) {
                 setDetectedRole("Volunteer");
                 login('volunteer', { id: data.id, name: data.name });
+                return;
+            }
+
+            // Finally, Try Participant
+            response = await fetch('/api/auth/team', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ teamId: id, password: pass })
+            });
+            data = await response.json();
+            
+            if (response.ok && data.success) {
+                setDetectedRole("Participant");
+                login('team', { teamId: data.teamId, name: data.teamName, portalMode: data.portalMode });
+                return;
+            }
+            if (response.status === 403 && data.error && !data.error.includes("Invalid")) {
+                setError(data.error);
                 return;
             }
 
