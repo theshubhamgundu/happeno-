@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
 import { normalizeJudgingRounds } from '@/lib/judging-rounds';
+import { redis } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,13 +13,32 @@ export async function GET(req: Request) {
     }
 
     try {
-        const { data, error } = await supabase
-            .from('hackathon_settings')
-            .select('key, value');
+        let rawSettings = null;
 
-        if (error) throw error;
+        // 1. Try to fetch from Redis Cache
+        if (redis) {
+            const cachedSettings = await redis.get('hackathon_settings_cache');
+            if (cachedSettings) {
+                rawSettings = typeof cachedSettings === 'string' ? JSON.parse(cachedSettings) : cachedSettings;
+            }
+        }
 
-        let settings = Object.fromEntries((data || []).map(({ key, value }) => [key, value]));
+        // 2. Fetch from Supabase if cache is missing
+        if (!rawSettings) {
+            const { data, error } = await supabase
+                .from('hackathon_settings')
+                .select('key, value');
+
+            if (error) throw error;
+            rawSettings = data || [];
+
+            // 3. Save to Redis Cache (expire in 60 seconds)
+            if (redis) {
+                await redis.setex('hackathon_settings_cache', 60, JSON.stringify(rawSettings));
+            }
+        }
+
+        let settings = Object.fromEntries((rawSettings || []).map(({ key, value }: { key: string; value: any }) => [key, value]));
         if (session.role === 'livescore') {
             const publicKeys = new Set(['start_date', 'released_rounds', 'round_configs', 'is_submission_locked']);
             settings = Object.fromEntries(Object.entries(settings).filter(([key]) => publicKeys.has(key)));
@@ -91,6 +111,11 @@ export async function POST(req: Request) {
             .upsert({ key: key.trim(), value, updated_at: new Date().toISOString() });
 
         if (error) throw error;
+        
+        if (redis) {
+            await redis.del('hackathon_settings_cache');
+        }
+        
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('Settings update failed:', error);

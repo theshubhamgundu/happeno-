@@ -220,6 +220,23 @@ export async function GET(req: Request) {
         if (session.role === 'team' && !teamId) {
             return NextResponse.json({ error: 'Team session is missing its team ID.' }, { status: 403 });
         }
+
+        // --- ADDED REDIS CACHING FOR FULL TEAM LIST ---
+        if (!teamId && redis) {
+            try {
+                // Determine cache key based on role (livescore needs a stripped down payload)
+                const cacheKey = session.role === 'livescore' ? 'all_teams_cache_livescore' : 'all_teams_cache_admin';
+                const cachedTeams = await redis.get(cacheKey);
+                if (cachedTeams) {
+                    const parsedTeams = typeof cachedTeams === 'string' ? JSON.parse(cachedTeams) : cachedTeams;
+                    return NextResponse.json(parsedTeams, { headers: { 'Cache-Control': 'no-store' } });
+                }
+            } catch (cacheErr) {
+                console.error("Redis cache read error:", cacheErr);
+            }
+        }
+        // ----------------------------------------------
+
         const pageSize = 1000;
         const teams: Record<string, unknown>[] = [];
         let from = 0;
@@ -293,8 +310,12 @@ export async function GET(req: Request) {
             }
             return { ...team, roundScores, roundDetailedScores, roundComments };
         });
+
+        let responsePayload;
+        let cacheKeyToSet: string | null = null;
+        
         if (session.role === 'livescore') {
-            return NextResponse.json(resultWithEvaluations.map(team => ({
+            responsePayload = resultWithEvaluations.map(team => ({
                 id: team.id,
                 teamId: team.teamId,
                 name: team.name,
@@ -304,9 +325,23 @@ export async function GET(req: Request) {
                 roundComments: team.roundComments,
                 isCheckedIn: team.isCheckedIn,
                 submission: team.submission
-            })), { headers: { 'Cache-Control': 'no-store' } });
+            }));
+            if (!teamId) cacheKeyToSet = 'all_teams_cache_livescore';
+        } else {
+            responsePayload = resultWithEvaluations;
+            if (!teamId) cacheKeyToSet = 'all_teams_cache_admin';
         }
-        return NextResponse.json(resultWithEvaluations, { headers: { 'Cache-Control': 'no-store' } });
+
+        // Save to cache for 30 seconds if it was a full fetch
+        if (cacheKeyToSet && redis) {
+            try {
+                await redis.setex(cacheKeyToSet, 30, JSON.stringify(responsePayload));
+            } catch (err) {
+                console.error("Failed to write to Redis cache:", err);
+            }
+        }
+
+        return NextResponse.json(responsePayload, { headers: { 'Cache-Control': 'no-store' } });
     } catch (error) {
         console.error('Team fetch failed:', error);
         return NextResponse.json({ error: 'Could not fetch teams from Supabase.' }, { status: 503 });
