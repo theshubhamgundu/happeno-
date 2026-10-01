@@ -22,6 +22,8 @@ import {
     LayoutDashboard,
     CheckCircle2,
     ClipboardList,
+    Award,
+    Database,
     ArrowUpRight,
     Coffee,
     X,
@@ -1245,52 +1247,215 @@ export default function AdminDashboard() {
 
             {/* ═══════════ CSV EXPORTS TAB ═══════════ */}
             {activeTab === 'exports' && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-6 lg:flex-row lg:items-center">
                         <div>
-                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Data Exports</h2>
-                            <p className="mt-1 text-xs text-white/45">Download event data as CSV files. Opens instantly in Excel, Google Sheets, or any spreadsheet app.</p>
+                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
+                                <FileSpreadsheet className="text-[#14b8a6]" size={28} />
+                                One-Click CSV Export Hub
+                            </h2>
+                            <p className="mt-1 text-xs text-white/50 max-w-2xl">
+                                Instantly download live Hackathon datasets formatted for Excel, Google Sheets, Mailchimp, and printer-ready ceremony packets.
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => handleCSVExport('master', 'Master Event Dump')}
+                                disabled={isExporting !== null}
+                                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase text-xs tracking-wider transition-all shadow-[0_0_20px_rgba(20,184,166,0.25)] active:scale-95 disabled:opacity-50"
+                            >
+                                <Database size={16} />
+                                {isExporting === 'master' ? 'Generating...' : 'Export Complete Master Archive'}
+                            </button>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {[
-                            { type: 'teams', label: 'All Teams', desc: 'Team ID, name, track, captain, college, check-in status', icon: Users, color: 'teal' },
-                            { type: 'judges', label: 'Judges Directory', desc: 'Judge ID, name, specialization', icon: ShieldCheck, color: 'purple' },
-                            { type: 'volunteers', label: 'Volunteers Directory', desc: 'Volunteer ID, name, phone, role', icon: Users, color: 'blue' },
-                            { type: 'emails', label: 'All Participant Emails', desc: 'Every participant email for mail merges, newsletters', icon: ClipboardList, color: 'amber' },
-                            { type: 'dietary', label: 'Dietary Restrictions', desc: 'Participant dietary notes for catering coordination', icon: Coffee, color: 'red' },
-                        ].map(exp => (
-                            <button
-                                key={exp.type}
-                                onClick={() => handleCSVExport(exp.type, exp.label)}
-                                disabled={isExporting !== null}
-                                className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                                        exp.color === 'teal' ? 'bg-teal-500/20 text-teal-400' :
-                                        exp.color === 'purple' ? 'bg-purple-500/20 text-purple-400' :
-                                        exp.color === 'blue' ? 'bg-blue-500/20 text-blue-400' :
-                                        exp.color === 'amber' ? 'bg-amber-500/20 text-amber-400' :
-                                        'bg-red-500/20 text-red-400'
-                                    }`}>
-                                        <exp.icon size={22} />
+                    {/* Section 1: Ceremony & Evaluation */}
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                            <Award size={16} />
+                            <span>1. Judging, Ceremony & Deliverables</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[
+                                { 
+                                    type: 'standings', 
+                                    label: 'Final Scores & Standings', 
+                                    desc: 'Team rank, track, problem statement, Round 1 score, Round 2 score, total score, and judge comments. Essential for closing ceremony awards.', 
+                                    badge: 'Closing Ceremony',
+                                    icon: Award, 
+                                    color: 'amber' 
+                                },
+                                { 
+                                    type: 'submissions', 
+                                    label: 'Project Deliverables & Links', 
+                                    desc: 'Live deployment URLs, GitHub repository links, demo video links, and presentation slide decks for judging review.', 
+                                    badge: 'Jury Review',
+                                    icon: Presentation, 
+                                    color: 'teal' 
+                                },
+                            ].map(exp => (
+                                <button
+                                    key={exp.type}
+                                    onClick={() => handleCSVExport(exp.type, exp.label)}
+                                    disabled={isExporting !== null}
+                                    className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50 relative overflow-hidden"
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                            exp.color === 'amber' ? 'bg-amber-500/20 text-amber-300' : 'bg-teal-500/20 text-teal-400'
+                                        }`}>
+                                            <exp.icon size={22} />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                                                {exp.badge}
+                                            </span>
+                                            {isExporting === exp.type ? (
+                                                <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                            )}
+                                        </div>
                                     </div>
-                                    {isExporting === exp.type ? (
-                                        <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
-                                    ) : (
-                                        <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
-                                    )}
-                                </div>
-                                <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
-                                <p className="mt-1 text-xs text-white/40">{exp.desc}</p>
-                                <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
-                                    <FileSpreadsheet size={12} />
-                                    Download CSV
-                                </div>
-                            </button>
-                        ))}
+                                    <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
+                                    <p className="mt-1 text-xs text-white/50 leading-relaxed">{exp.desc}</p>
+                                    <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                        <FileSpreadsheet size={13} />
+                                        Download CSV
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Section 2: Catering & Venue Logistics */}
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                            <Coffee size={16} />
+                            <span>2. Catering & Venue Operations</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {[
+                                { 
+                                    type: 'meals', 
+                                    label: 'Meal Claims & Catering Audit', 
+                                    desc: 'Detailed log of breakfast, lunch, snacks, and dinner claims across Day 1 & Day 2. Perfect for catering vendor invoice reconciliation.', 
+                                    icon: Coffee, 
+                                    color: 'red' 
+                                },
+                                { 
+                                    type: 'dietary', 
+                                    label: 'Dietary Restrictions', 
+                                    desc: 'Special diet requirements, vegetarian/vegan preferences, and allergies for food preparation.', 
+                                    icon: Coffee, 
+                                    color: 'orange' 
+                                },
+                                { 
+                                    type: 'checkin', 
+                                    label: 'Gate Check-in & Rooms', 
+                                    desc: 'Participant arrival timestamps, assigned rooms, assigned volunteer guide, and Wi-Fi credentials.', 
+                                    icon: ScanLine, 
+                                    color: 'green' 
+                                },
+                            ].map(exp => (
+                                <button
+                                    key={exp.type}
+                                    onClick={() => handleCSVExport(exp.type, exp.label)}
+                                    disabled={isExporting !== null}
+                                    className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                            exp.color === 'red' ? 'bg-rose-500/20 text-rose-300' :
+                                            exp.color === 'orange' ? 'bg-orange-500/20 text-orange-300' :
+                                            'bg-emerald-500/20 text-emerald-300'
+                                        }`}>
+                                            <exp.icon size={22} />
+                                        </div>
+                                        {isExporting === exp.type ? (
+                                            <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                        )}
+                                    </div>
+                                    <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
+                                    <p className="mt-1 text-xs text-white/50 leading-relaxed">{exp.desc}</p>
+                                    <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                        <FileSpreadsheet size={13} />
+                                        Download CSV
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Section 3: Communications & Staff Directories */}
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                            <Users size={16} />
+                            <span>3. Communications & People Directories</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {[
+                                { 
+                                    type: 'emails', 
+                                    label: 'Participant Emails (Mail Merge)', 
+                                    desc: 'Every participant email, name, phone, team name, and track for newsletters and announcements.', 
+                                    icon: ClipboardList, 
+                                    color: 'blue' 
+                                },
+                                { 
+                                    type: 'teams', 
+                                    label: 'All Registered Teams', 
+                                    desc: 'Complete teams roster with captain contacts, college, and track selections.', 
+                                    icon: Users, 
+                                    color: 'teal' 
+                                },
+                                { 
+                                    type: 'judges', 
+                                    label: 'Judges Directory', 
+                                    desc: 'Official judge IDs, names, and assigned domain specializations.', 
+                                    icon: ShieldCheck, 
+                                    color: 'purple' 
+                                },
+                                { 
+                                    type: 'volunteers', 
+                                    label: 'Volunteers Directory', 
+                                    desc: 'Floor operations staff, contact phone numbers, and event roles.', 
+                                    icon: Users, 
+                                    color: 'blue' 
+                                },
+                            ].map(exp => (
+                                <button
+                                    key={exp.type}
+                                    onClick={() => handleCSVExport(exp.type, exp.label)}
+                                    disabled={isExporting !== null}
+                                    className="group p-5 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                                            exp.color === 'blue' ? 'bg-sky-500/20 text-sky-300' :
+                                            exp.color === 'teal' ? 'bg-teal-500/20 text-teal-300' :
+                                            'bg-purple-500/20 text-purple-300'
+                                        }`}>
+                                            <exp.icon size={18} />
+                                        </div>
+                                        {isExporting === exp.type ? (
+                                            <div className="w-4 h-4 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <Download size={14} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                        )}
+                                    </div>
+                                    <h3 className="mt-3 text-base font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
+                                    <p className="mt-1 text-[11px] text-white/50 leading-relaxed">{exp.desc}</p>
+                                    <div className="mt-3 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                        <FileSpreadsheet size={11} />
+                                        Download CSV
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
