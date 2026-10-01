@@ -319,6 +319,33 @@ export default function AdminDashboard() {
         }
     };
 
+    const filteredTeams = useMemo(() => {
+        return projects.filter(p => {
+            const query = searchQuery.toLowerCase().trim();
+            if (!query) return true;
+
+            const teamName = (p.team || "Unknown Team").toLowerCase();
+            const captainName = (p.captain || "N/A").toLowerCase();
+
+            const matchesTeam = teamName.includes(query);
+            const matchesId = (p.teamId || "").toLowerCase().includes(query);
+            const matchesCaptain = captainName.includes(query);
+
+            // Handle numeric-only search (e.g., "101" -> matches "VH-101")
+            const isNumeric = /^\d+$/.test(query);
+            const matchesPrefixId = isNumeric && (p.teamId || "").toLowerCase().includes(`tricity_${query}`);
+
+            return matchesTeam || matchesId || matchesCaptain || matchesPrefixId;
+        });
+    }, [projects, searchQuery]);
+
+    const paginatedTeams = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredTeams.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredTeams, currentPage]);
+
+    const totalPages = Math.ceil(filteredTeams.length / itemsPerPage);
+
     const toggleSelectTeam = (id: string) => {
         setSelectedTeamIds(prev => 
             prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
@@ -429,32 +456,6 @@ export default function AdminDashboard() {
 
     const [newJudge, setNewJudge] = useState({ name: "", specialization: "" });
     const [newVolunteer, setNewVolunteer] = useState({ name: "", phone: "", role: "" });
-    const filteredTeams = useMemo(() => {
-        return projects.filter(p => {
-            const query = searchQuery.toLowerCase().trim();
-            if (!query) return true;
-
-            const teamName = (p.team || "Unknown Team").toLowerCase();
-            const captainName = (p.captain || "N/A").toLowerCase();
-
-            const matchesTeam = teamName.includes(query);
-            const matchesId = (p.teamId || "").toLowerCase().includes(query);
-            const matchesCaptain = captainName.includes(query);
-
-            // Handle numeric-only search (e.g., "101" -> matches "VH-101")
-            const isNumeric = /^\d+$/.test(query);
-            const matchesPrefixId = isNumeric && (p.teamId || "").toLowerCase().includes(`tricity_${query}`);
-
-            return matchesTeam || matchesId || matchesCaptain || matchesPrefixId;
-        });
-    }, [projects, searchQuery]);
-
-    const paginatedTeams = useMemo(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        return filteredTeams.slice(startIndex, startIndex + itemsPerPage);
-    }, [filteredTeams, currentPage]);
-
-    const totalPages = Math.ceil(filteredTeams.length / itemsPerPage);
 
     const dashboardStats = useMemo(() => {
         let totalMealsClaimed = 0;
@@ -1090,7 +1091,8 @@ export default function AdminDashboard() {
                                     </AnimatePresence>
                                 </div>
                             </div>
-                        ))}
+                        );
+                    })}
                     </div>
 
                     {/* Pagination Controls */}
