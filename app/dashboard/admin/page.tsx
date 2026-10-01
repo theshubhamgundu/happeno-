@@ -1639,12 +1639,12 @@ export default function AdminDashboard() {
                     <JudgingRoundSettings rounds={roundConfigs} onSave={saveRoundConfigs} />
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
                         <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Add Official Judge</h3>
+                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Add Official Evaluator</h3>
                             <button
                                 onClick={handleExportJudges}
                                 className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
                             >
-                                <Download size={18} /> Export Judges CSV
+                                <Download size={18} /> Export Evaluators CSV
                             </button>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -1658,25 +1658,60 @@ export default function AdminDashboard() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Specialization Domain</label>
-                                <input
-                                    className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] transition-colors"
+                                <div className="flex items-center justify-between ml-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Assigned Tracks (7 Available)</label>
+                                    <span className="text-[9px] text-white/40">Select as many or none</span>
+                                </div>
+                                <select
+                                    className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] transition-colors text-xs"
                                     value={newJudge.specialization}
-                                    placeholder="e.g. General"
                                     onChange={(e) => setNewJudge({ ...newJudge, specialization: e.target.value })}
-                                />
+                                >
+                                    <option value="">All 7 Tracks (General Evaluator)</option>
+                                    {TRACKS.map(t => (
+                                        <option key={t} value={t}>{t}</option>
+                                    ))}
+                                </select>
+                                <div className="flex flex-wrap gap-1 mt-1.5">
+                                    {TRACKS.map(t => {
+                                        const isSelected = (newJudge.specialization || '').includes(t);
+                                        return (
+                                            <button
+                                                key={t}
+                                                type="button"
+                                                onClick={() => {
+                                                    const current = (newJudge.specialization || '').split(',').map(s => s.trim()).filter(Boolean);
+                                                    const updated = current.includes(t)
+                                                        ? current.filter(s => s !== t)
+                                                        : [...current, t];
+                                                    setNewJudge({ ...newJudge, specialization: updated.join(', ') });
+                                                }}
+                                                className={`text-[9px] px-2 py-0.5 rounded font-bold border transition-colors ${
+                                                    isSelected
+                                                        ? "bg-[#14b8a6]/20 border-[#14b8a6] text-[#14b8a6]"
+                                                        : "bg-white/5 border-white/10 text-white/40 hover:text-white"
+                                                }`}
+                                            >
+                                                {t}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                            <div className="flex items-end">
+                            <div className="flex items-start md:items-end">
                                 <button
                                     onClick={() => {
-                                        if (newJudge.name && newJudge.specialization) {
-                                            addJudge(newJudge);
+                                        if (newJudge.name) {
+                                            addJudge({
+                                                name: newJudge.name,
+                                                specialization: newJudge.specialization || "All 7 Tracks"
+                                            });
                                             setNewJudge({ name: "", specialization: "" });
                                         }
                                     }}
                                     className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
                                 >
-                                    <Plus size={18} /> Add Judicial POC
+                                    <Plus size={18} /> Add Evaluator
                                 </button>
                             </div>
                         </div>
@@ -1684,14 +1719,14 @@ export default function AdminDashboard() {
                         <div className="flex justify-between items-center mt-12 mb-6">
                             <div>
                                 <h3 className="text-xl font-black italic uppercase tracking-tighter text-white">Registered Evaluators</h3>
-                                <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Total: {judges.length} Judges</p>
+                                <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Total: {judges.length} Evaluators</p>
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             {judges.length === 0 ? (
                                 <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
-                                    <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs font-kanit">No Judges Assigned Yet</p>
+                                    <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs font-kanit">No Evaluators Assigned Yet</p>
                                 </div>
                             ) : (
                                 [...judges]

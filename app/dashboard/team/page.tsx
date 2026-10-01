@@ -6,7 +6,7 @@ import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentat
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
-import { TRACKS, PROBLEM_STATEMENTS } from "@/lib/constants";
+import { TRACKS, PROBLEM_STATEMENTS, getProblemStatementsForTrack } from "@/lib/constants";
 import { toast } from "sonner";
 
 
@@ -56,11 +56,15 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
                 body: JSON.stringify({ teamId: team.teamId, track: selectedTrack, problemStatement: selectedPS })
             });
             
-            if (res.ok) {
+            const data = await res.json().catch(() => ({}));
+            
+            if (res.ok || res.status === 409 || data.success) {
+                const finalTrack = data.track || selectedTrack || team.track;
+                const finalPS = data.problemStatement || selectedPS || team.problemStatement;
                 toast.success("Track and problem statement locked successfully!");
-                onLocked(selectedTrack, selectedPS);
+                onLocked(finalTrack, finalPS);
             } else {
-                toast.error("Failed to lock track. Please try again.");
+                toast.error(data.message || "Failed to lock track. Please try again.");
             }
         } catch (error) {
             toast.error("Network error occurred.");
@@ -101,7 +105,7 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
                         <div className="animate-in fade-in slide-in-from-top-4 duration-300">
                             <h3 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">2. Select Problem Statement</h3>
                             <div className="grid gap-3">
-                                {(PROBLEM_STATEMENTS[selectedTrack] || []).map((ps: string, idx: number) => (
+                                {getProblemStatementsForTrack(selectedTrack).map((ps: string, idx: number) => (
                                     <button
                                         key={idx}
                                         onClick={() => setSelectedPS(ps)}
@@ -133,7 +137,7 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
 }
 
 export default function TeamDashboard() {
-    const { projects, isLoading, isSubmissionLocked } = useHackathon();
+    const { projects, isLoading, isSubmissionLocked, refreshTeams } = useHackathon();
     const { user } = useAuth();
     
     const [proposedIdea, setProposedIdea] = useState("");
@@ -327,12 +331,22 @@ export default function TeamDashboard() {
     const members = team.members.map((member: any, index: number) => ({ name: typeof member === "string" ? member : member.fullName, role: index === 0 ? "Team lead" : "Member", detail: typeof member === "string" ? "Participant" : member.department || "Participant" }));
     const submitted = Boolean(team.submission?.isFinal);
 
+    const isLockedInDB = Boolean(team.isPSLocked || (team.track && team.problemStatement));
     const actualTrack = localTrack || team.track;
     const actualPS = localPS || team.problemStatement;
 
-    // If track or problem statement is not set, force the Lock-In Flow
-    if (!actualTrack || !actualPS) {
-        return <LockInFlow team={team} onLocked={(track, ps) => { setLocalTrack(track); setLocalPS(ps); }} />;
+    // If already locked in DB, proceed directly to workspace. Otherwise force Lock-In Flow.
+    if (!isLockedInDB && (!actualTrack || !actualPS)) {
+        return (
+            <LockInFlow
+                team={team}
+                onLocked={(track, ps) => {
+                    setLocalTrack(track);
+                    setLocalPS(ps);
+                    if (refreshTeams) refreshTeams();
+                }}
+            />
+        );
     }
 
     return <DashboardLayout type="team" title="Project overview">

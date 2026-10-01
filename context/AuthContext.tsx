@@ -67,6 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 });
 
                 if (portalMode === 'closed' && (pathname.startsWith('/dashboard/team') || pathname === '/edit-registration')) {
+                    setUser(null);
                     router.replace('/login');
                 } else if (portalMode === 'edit' && pathname.startsWith('/dashboard/team')) {
                     router.replace('/edit-registration');

@@ -18,7 +18,7 @@ import {
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { useHackathon, type Project } from "@/context/HackathonContext";
+import type { Project } from "@/context/HackathonContext";
 import { useAuth } from "@/context/AuthContext";
 import type { JudgingRound } from "@/lib/judging-rounds";
 
@@ -30,18 +30,6 @@ function safeHttpUrl(value: unknown): string | null {
     } catch {
         return null;
     }
-}
-
-interface JudgeEvaluationRecord {
-    id: string;
-    teamId: string;
-    teamName: string;
-    roundId: string;
-    roundTitle: string;
-    totalScore: number | null;
-    status: string;
-    submittedAt: string | null;
-    feedback: string;
 }
 
 interface OfflineQueueItem {
@@ -57,7 +45,6 @@ interface OfflineQueueItem {
 }
 
 export default function JudgeDashboard() {
-    const { isLoading } = useHackathon();
     const { user } = useAuth();
     const [teamIdInput, setTeamIdInput] = useState('');
     const [isStarting, setIsStarting] = useState(false);
@@ -68,8 +55,6 @@ export default function JudgeDashboard() {
     const [currentScores, setCurrentScores] = useState<Record<string, number>>({});
     const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [myEvaluations, setMyEvaluations] = useState<JudgeEvaluationRecord[]>([]);
-    const [isLoadingEvaluations, setIsLoadingEvaluations] = useState(false);
     const [alreadyEvaluatedInfo, setAlreadyEvaluatedInfo] = useState<{ teamId: string; teamName: string; roundTitle: string; score: number | null } | null>(null);
 
     // Offline resilience & mobile sync state
@@ -127,24 +112,6 @@ export default function JudgeDashboard() {
     }, []);
 
     // Load judge's evaluation history
-    const fetchJudgeEvaluations = async () => {
-        if (!currentJudge) return;
-        setIsLoadingEvaluations(true);
-        try {
-            const res = await fetch('/api/judging/evaluations');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.success && Array.isArray(data.evaluations)) {
-                    setMyEvaluations(data.evaluations);
-                }
-            }
-        } catch (err) {
-            console.warn('Failed to load judge evaluations:', err);
-        } finally {
-            setIsLoadingEvaluations(false);
-        }
-    };
-
     // Background Queue Synchronizer: drains offline submissions when network is restored
     const processOfflineQueue = useCallback(async () => {
         if (typeof window === 'undefined') return;
@@ -189,7 +156,6 @@ export default function JudgeDashboard() {
 
         if (syncedCount > 0) {
             toast.success(`Synced ${syncedCount} evaluation${syncedCount === 1 ? '' : 's'} from your phone to the server!`);
-            void fetchJudgeEvaluations();
         }
     }, [loadOfflineQueue, draftStorageKey]);
 
@@ -227,12 +193,6 @@ export default function JudgeDashboard() {
         };
     }, [loadOfflineQueue, processOfflineQueue]);
 
-    useEffect(() => {
-        if (currentJudge) {
-            void fetchJudgeEvaluations();
-        }
-    }, [currentJudge?.id]);
-
     const returnToTeamLookup = () => {
         setActiveProject(null);
         setEvaluationRound(null);
@@ -241,20 +201,22 @@ export default function JudgeDashboard() {
         setCurrentScores({});
         setComment('');
         setOfflineSubmitNotice(null);
-        void fetchJudgeEvaluations();
     };
 
     const handleScoreChange = (criterionId: string, value: number) => {
         setCurrentScores(previous => ({ ...previous, [criterionId]: value }));
     };
 
-    const handleStartEvaluation = async () => {
+    const handleStartEvaluation = async (targetTeamId?: string) => {
+        const selectedId = (targetTeamId || teamIdInput).trim();
+        if (targetTeamId) setTeamIdInput(targetTeamId);
+
         if (!currentJudge) {
-            toast.error('Judge profile not found. Sign in again and retry.');
+            toast.error('Evaluator profile not found. Sign in again and retry.');
             return;
         }
-        if (!teamIdInput.trim()) {
-            toast.error('Enter a team ID.');
+        if (!selectedId) {
+            toast.error('Please enter a team ID.');
             return;
         }
 
@@ -264,7 +226,7 @@ export default function JudgeDashboard() {
             const response = await fetch('/api/judging/evaluations', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ teamId: teamIdInput.trim() })
+                body: JSON.stringify({ teamId: selectedId })
             });
             const result = await response.json();
             if (!response.ok || !result.success) {
@@ -453,20 +415,7 @@ export default function JudgeDashboard() {
 
     const dashboardTitle = activeProject
         ? "Project Evaluation"
-        : currentJudge ? `Judge: ${currentJudge.name}` : "Judge Dashboard";
-
-    if (isLoading) {
-        return (
-            <DashboardLayout type="judge" title="Loading judging pool">
-                <div className="grid min-h-[320px] place-items-center">
-                    <div className="text-center">
-                        <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-[#FFEE00] border-t-transparent" />
-                        <p className="mt-4 text-xs font-semibold text-white/50">Loading all teams and evaluation data</p>
-                    </div>
-                </div>
-            </DashboardLayout>
-        );
-    }
+        : "Evaluator Workspace";
 
     return (
         <DashboardLayout type="judge" title={dashboardTitle}>
@@ -477,17 +426,17 @@ export default function JudgeDashboard() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="mx-auto max-w-3xl space-y-6"
+                        className="mx-auto max-w-xl space-y-6 pt-4 sm:pt-10"
                     >
-                        {/* Header Badges: Judge Name + Network/Offline Status Pill */}
-                        <div className="flex flex-wrap items-center justify-between gap-3">
+                        {/* Status bar: Evaluator name & sync status */}
+                        <div className="flex items-center justify-between gap-3 px-1">
                             {currentJudge && (
-                                <div className="inline-flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white">
-                                    <UserCircle2 size={16} className="text-[#FFEE00]" />
-                                    {currentJudge.name}
+                                <div className="inline-flex items-center gap-2 text-xs font-bold text-slate-400">
+                                    <UserCircle2 size={15} className="text-[#FFEE00]" />
+                                    <span>Evaluator: <strong className="text-white">{currentJudge.name}</strong></span>
                                 </div>
                             )}
-                            <div className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold ${
+                            <div className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
                                 !isOnline
                                     ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
                                     : offlineQueue.length > 0
@@ -496,17 +445,17 @@ export default function JudgeDashboard() {
                             }`}>
                                 {!isOnline ? (
                                     <>
-                                        <WifiOff size={14} className="animate-pulse" />
-                                        <span>Offline Mode (Safe)</span>
+                                        <WifiOff size={13} className="animate-pulse" />
+                                        <span>Offline Mode</span>
                                     </>
                                 ) : offlineQueue.length > 0 ? (
                                     <>
-                                        <CloudUpload size={14} className="animate-bounce" />
+                                        <CloudUpload size={13} className="animate-bounce" />
                                         <span>{offlineQueue.length} Queued to Sync</span>
                                     </>
                                 ) : (
                                     <>
-                                        <Wifi size={14} />
+                                        <Wifi size={13} />
                                         <span>Online & Synced</span>
                                     </>
                                 )}
@@ -574,93 +523,40 @@ export default function JudgeDashboard() {
                             </motion.div>
                         )}
 
-                        <form onSubmit={event => { event.preventDefault(); void handleStartEvaluation(); }} className="rounded-2xl border border-white/10 bg-white/[.045] p-6 md:p-8">
-                            <h2 className="text-xl font-black uppercase italic text-white">Start evaluation</h2>
-                            <p className="mt-1 text-xs text-white/50">Enter the assigned Team ID to open the scoring rubric and project details.</p>
-                            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                        {/* Direct Team ID Input Form */}
+                        <form
+                            onSubmit={event => { event.preventDefault(); void handleStartEvaluation(); }}
+                            className="rounded-3xl border border-white/10 bg-white/[.04] p-6 sm:p-10 shadow-2xl backdrop-blur-xl space-y-6"
+                        >
+                            <div className="space-y-2">
+                                <h2 className="text-2xl sm:text-3xl font-black uppercase italic text-white tracking-tight">
+                                    Start Evaluation
+                                </h2>
+                                <p className="text-xs sm:text-sm text-white/50 leading-relaxed">
+                                    Enter the assigned Team ID to open the scoring rubric and project details.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col gap-3">
                                 <input
+                                    autoFocus
                                     autoComplete="off"
                                     value={teamIdInput}
                                     onChange={event => setTeamIdInput(event.target.value.toUpperCase())}
-                                    placeholder="Enter team ID (e.g. TC-101)"
+                                    placeholder="Enter Team ID (e.g. TC-101)"
                                     aria-label="Team ID"
-                                    className="h-12 min-w-0 flex-1 rounded-xl border border-white/10 bg-black/30 px-4 font-mono text-sm font-bold uppercase text-white outline-none focus:border-[#FFEE00]"
+                                    className="h-14 w-full rounded-2xl border border-white/15 bg-black/40 px-5 font-mono text-lg sm:text-xl font-bold uppercase tracking-wider text-white placeholder:text-white/20 outline-none focus:border-[#FFEE00] focus:ring-2 focus:ring-[#FFEE00]/20 transition-all"
                                 />
-                                <button type="submit" disabled={isStarting || !teamIdInput.trim()} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#FFEE00] px-6 text-xs font-black uppercase tracking-wider text-black disabled:cursor-wait disabled:opacity-50 hover:bg-[#e6d600] transition-colors">
-                                    <ClipboardCheck size={16} /> {isStarting ? 'Checking...' : 'Start scoring'}
+                                <button
+                                    type="submit"
+                                    disabled={isStarting || !teamIdInput.trim()}
+                                    className="h-14 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-[#FFEE00] px-6 text-sm font-black uppercase tracking-wider text-black disabled:cursor-not-allowed disabled:opacity-40 hover:bg-[#e6d600] active:scale-[0.99] transition-all shadow-[0_4px_20px_rgba(255,238,0,0.25)]"
+                                >
+                                    <ClipboardCheck size={18} />
+                                    {isStarting ? 'Loading Project Details...' : 'Start Evaluation'}
                                 </button>
                             </div>
                         </form>
-
-                        {/* Submitted Evaluations List */}
-                        <div className="rounded-2xl border border-white/10 bg-white/[.03] p-6 space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <h3 className="text-sm font-black uppercase tracking-wider text-white">Your Submitted Evaluations</h3>
-                                    <span className="rounded-full bg-white/10 px-2 py-0.5 font-mono text-[10px] font-bold text-white/70">
-                                        {myEvaluations.filter(e => e.status === 'submitted').length}
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={() => void fetchJudgeEvaluations()}
-                                    disabled={isLoadingEvaluations}
-                                    className="text-[11px] font-bold text-white/40 hover:text-white transition-colors"
-                                >
-                                    {isLoadingEvaluations ? 'Refreshing...' : 'Refresh'}
-                                </button>
-                            </div>
-
-                            {myEvaluations.filter(e => e.status === 'submitted').length === 0 ? (
-                                <p className="text-xs text-white/40 italic py-4 text-center">
-                                    No evaluations submitted yet. Enter a team ID above to evaluate a team.
-                                </p>
-                            ) : (
-                                <div className="grid gap-2.5 max-h-[360px] overflow-y-auto pr-1">
-                                    {myEvaluations.filter(e => e.status === 'submitted').map(ev => (
-                                        <div
-                                            key={ev.id}
-                                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-white/5 bg-white/[.02] p-3.5 hover:bg-white/[.05] transition-colors"
-                                        >
-                                            <div className="min-w-0">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-mono text-xs font-black text-[#FFEE00] bg-[#FFEE00]/10 px-1.5 py-0.5 rounded border border-[#FFEE00]/20">
-                                                        {ev.teamId}
-                                                    </span>
-                                                    <span className="text-xs font-bold text-white truncate max-w-[200px] sm:max-w-[280px]">
-                                                        {ev.teamName}
-                                                    </span>
-                                                    <span className="text-[10px] text-white/40 font-medium hidden sm:inline">
-                                                        • {ev.roundTitle}
-                                                    </span>
-                                                </div>
-                                                {ev.feedback && (
-                                                    <p className="mt-1 text-[11px] text-white/50 italic line-clamp-1">
-                                                        &ldquo;{ev.feedback}&rdquo;
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                                                <div className="text-right">
-                                                    <div className="text-xs font-mono font-black text-emerald-400">
-                                                        {ev.totalScore !== null ? `${ev.totalScore} pts` : 'Submitted'}
-                                                    </div>
-                                                    {ev.submittedAt && (
-                                                        <div className="text-[9px] text-white/30 font-medium">
-                                                            {new Date(ev.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">
-                                                    <CheckCircle2 size={12} />
-                                                    <span>Recorded</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
                     </motion.div>
                 ) : (
                     <motion.div

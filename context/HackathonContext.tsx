@@ -70,6 +70,7 @@ interface HackathonContextType {
     toggleMealAccess: (projectId: any, mealKey: string, included: boolean) => Promise<void>;
     deleteTeams: (teamIds: string[]) => Promise<boolean>;
     bulkUpdateTeams: (teamIds: string[], updates: { track?: string; room?: string; roomWifiSSID?: string; roomWifiPass?: string; isCheckedIn?: boolean }) => Promise<boolean>;
+    refreshTeams: () => Promise<void>;
 }
 
 export interface Member {
@@ -219,7 +220,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                     url += `?teamId=${user.teamId}`;
                 }
 
-                const response = await fetch(url);
+                const response = await fetch(url, { cache: 'no-store' });
                 if (response.ok && mountedRef.current) {
                     const serverTeams = await response.json();
 
@@ -950,7 +951,10 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 bulkAssignMealPlan,
                 toggleMealAccess,
                 deleteTeams,
-                bulkUpdateTeams
+                bulkUpdateTeams,
+                refreshTeams: async () => {
+                    await fetchServerTeams(false);
+                }
             }}
         >
             {children}

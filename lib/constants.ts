@@ -46,39 +46,127 @@ export const TRACKS = [
 export const MAX_TEAM_MEMBERS = 4;
 
 export const PROBLEM_STATEMENTS: Record<string, string[]> = {
+    // SaaSsum AI / SaaSum AI (IT & AI)
     "SaaSsum AI (IT & AI)": [
         "Build an AI-driven automated ticketing system.",
         "Develop a predictive maintenance model for IT infrastructure.",
         "Create an intelligent code review assistant."
     ],
+    "SaaSum AI (IT & AI)": [
+        "Build an AI-driven automated ticketing system.",
+        "Develop a predictive maintenance model for IT infrastructure.",
+        "Create an intelligent code review assistant."
+    ],
+    "SaaSsum AI": [
+        "Build an AI-driven automated ticketing system.",
+        "Develop a predictive maintenance model for IT infrastructure.",
+        "Create an intelligent code review assistant."
+    ],
+    "SaaSum AI": [
+        "Build an AI-driven automated ticketing system.",
+        "Develop a predictive maintenance model for IT infrastructure.",
+        "Create an intelligent code review assistant."
+    ],
+
+    // Maceco (Analytics)
     "Maceco (Analytics)": [
         "Design a real-time sales dashboard with anomaly detection.",
         "Build a customer churn prediction model.",
         "Develop an automated data cleaning and pre-processing pipeline."
     ],
+    "Maceco": [
+        "Design a real-time sales dashboard with anomaly detection.",
+        "Build a customer churn prediction model.",
+        "Develop an automated data cleaning and pre-processing pipeline."
+    ],
+
+    // Tobofu (Marketing)
     "Tobofu (Marketing)": [
         "Create an AI tool for generating personalized ad copy.",
         "Build a social media sentiment analysis dashboard.",
         "Develop a customer segmentation model based on browsing behavior."
     ],
+    "Tobofu": [
+        "Create an AI tool for generating personalized ad copy.",
+        "Build a social media sentiment analysis dashboard.",
+        "Develop a customer segmentation model based on browsing behavior."
+    ],
+
+    // Promtal (HR Tech)
     "Promtal (HR Tech)": [
         "Build an automated resume screening tool.",
         "Create an employee engagement prediction model.",
         "Develop an AI-driven interview scheduling assistant."
     ],
+    "Promtal": [
+        "Build an automated resume screening tool.",
+        "Create an employee engagement prediction model.",
+        "Develop an AI-driven interview scheduling assistant."
+    ],
+
+    // Skill Tank (EdTech)
     "Skill Tank (EdTech)": [
         "Build a personalized learning path generator.",
         "Create an automated student essay grading tool.",
         "Develop a virtual AI tutor for technical subjects."
     ],
+    "Skill Tank": [
+        "Build a personalized learning path generator.",
+        "Create an automated student essay grading tool.",
+        "Develop a virtual AI tutor for technical subjects."
+    ],
+
+    // Vriddhi (FinTech)
     "Vriddhi (FinTech)": [
         "Design a fraud detection system for online transactions.",
         "Build a personal finance assistant for budgeting.",
         "Create a predictive model for stock market trends."
     ],
+    "Vriddhi": [
+        "Design a fraud detection system for online transactions.",
+        "Build a personal finance assistant for budgeting.",
+        "Create a predictive model for stock market trends."
+    ],
+
+    // Open Innovation
     "Open Innovation": [
+        "Propose and solve any problem statement of your choice.",
+        "Build a tool that improves local community engagement.",
+        "Create a sustainability-focused tech solution."
+    ],
+    "Open Innovation (Any Domain)": [
         "Propose and solve any problem statement of your choice.",
         "Build a tool that improves local community engagement.",
         "Create a sustainability-focused tech solution."
     ]
 };
+
+export function getProblemStatementsForTrack(track?: string | null): string[] {
+    if (!track) return [];
+
+    // 1. Direct match
+    if (PROBLEM_STATEMENTS[track] && PROBLEM_STATEMENTS[track].length > 0) {
+        return PROBLEM_STATEMENTS[track];
+    }
+
+    // 2. Normalized alphanumeric match
+    const normalize = (val: string) => val.toLowerCase().replace(/\s*\(.*?\)/g, '').replace(/[^a-z0-9]/g, '');
+    const cleanTrack = normalize(track);
+
+    for (const [key, statements] of Object.entries(PROBLEM_STATEMENTS)) {
+        if (normalize(key) === cleanTrack && statements.length > 0) {
+            return statements;
+        }
+    }
+
+    // 3. Substring inclusion match
+    for (const [key, statements] of Object.entries(PROBLEM_STATEMENTS)) {
+        const cleanKey = normalize(key);
+        if (cleanTrack && (cleanKey.includes(cleanTrack) || cleanTrack.includes(cleanKey)) && statements.length > 0) {
+            return statements;
+        }
+    }
+
+    // 4. Fallback to Open Innovation
+    return PROBLEM_STATEMENTS["Open Innovation"] || [];
+}

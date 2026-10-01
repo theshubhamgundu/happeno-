@@ -91,11 +91,11 @@ export const DashboardSidebar = ({ type, isOpen, onClose, isCollapsed, onToggleC
         ],
         volunteer: [
             { href: "/dashboard/volunteer", icon: LayoutDashboard, label: "Operations" },
-            { href: "/dashboard/volunteer/tickets", icon: ClipboardCheck, label: "Tickets" },
         ],
         admin: [
             { href: "/dashboard/admin", icon: BarChart3, label: "Analytics" },
             { href: "/dashboard/admin/users", icon: Users, label: "Roles" },
+            { href: "/dashboard/admin/tickets", icon: LifeBuoy, label: "Tickets" },
             { href: "/dashboard/admin/deadlines", icon: Zap, label: "Deadline" },
             { href: "/dashboard/admin/results", icon: GanttChartSquare, label: "Results" },
         ]

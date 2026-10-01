@@ -31,17 +31,17 @@ function teamResponse(row: Record<string, unknown>) {
         id: row.transaction_id || '',
         name: row.team_name || 'Unknown Team',
         team: row.team_name || 'Unknown Team',
-        track: row.track || '',
+        track: (row.track as string) || (rawData.track as string) || '',
         captain: row.captain || 'N/A',
         captainMobile: row.captain_mobile || '',
         college: row.college || '',
         teamId: row.team_id || '',
         members: row.members || [],
         status: row.status || 'PENDING',
-        problemStatement: row.problem_statement || '',
-        proposedIdea: row.proposed_idea || '',
-        techStack: row.tech_stack || {},
-        isPSLocked: rawData.ps_locked || false,
+        problemStatement: (row.problem_statement as string) || (rawData.problem_statement as string) || (rawData.problemStatement as string) || '',
+        proposedIdea: row.proposed_idea || (rawData.proposed_idea as string) || (rawData.proposedIdea as string) || '',
+        techStack: row.tech_stack || rawData.tech_stack || rawData.techStack || {},
+        isPSLocked: Boolean(rawData.ps_locked || (row.problem_statement && row.track)),
         isPILocked: rawData.pi_locked || false,
         isTSLocked: rawData.ts_locked || false,
         trackPreferences: row.track_preferences || [],
@@ -211,7 +211,8 @@ export async function GET(req: Request) {
     if (!hasRole(session, ['team', 'admin', 'volunteer', 'livescore'])) {
         return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
     }
-    if (session.role === 'team' && await getParticipantPortalMode() !== 'event') {
+    const portalMode = session.portalMode || await getParticipantPortalMode();
+    if (session.role === 'team' && portalMode !== 'event') {
         return NextResponse.json({ error: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
     }
 
@@ -354,7 +355,8 @@ export async function PATCH(req: Request) {
     if (!hasRole(session, ['team', 'admin', 'volunteer'])) {
         return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
     }
-    if (session.role === 'team' && await getParticipantPortalMode() !== 'event') {
+    const portalMode = session.portalMode || await getParticipantPortalMode();
+    if (session.role === 'team' && portalMode !== 'event') {
         return NextResponse.json({ error: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
     }
 

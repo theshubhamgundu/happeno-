@@ -1,60 +1,91 @@
 import { NextResponse } from 'next/server';
-import { teamSupabase as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
 import { getParticipantPortalMode } from '@/lib/event-windows';
+import { redis } from '@/lib/redis';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
     const session = getSession(req);
-    if (!hasRole(session, ['team']) || !session.teamId) {
-        return NextResponse.json({ success: false, message: 'Team authentication required.' }, { status: 401 });
+    if (!hasRole(session, ['team', 'admin']) || (!session.teamId && session.role !== 'admin')) {
+        return NextResponse.json({ success: false, message: 'Team authentication required. Please sign in again.' }, { status: 401 });
     }
-    if (await getParticipantPortalMode() !== 'event') {
+
+    const portalMode = session.portalMode || await getParticipantPortalMode();
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+
+    if (!isDevelopment && session.role === 'team' && portalMode !== 'event') {
         return NextResponse.json({ success: false, message: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
     }
 
     try {
-        const { teamId, track, problemStatement } = await req.json();
+        const body = await req.json().catch(() => ({}));
+        const track = typeof body.track === 'string' ? body.track.trim() : '';
+        const problemStatement = typeof body.problemStatement === 'string' ? body.problemStatement.trim() : '';
+        const teamIdFromBody = typeof body.teamId === 'string' ? body.teamId.trim() : '';
+        const targetTeamId = (session.role === 'admin' && teamIdFromBody) ? teamIdFromBody : (session.teamId || teamIdFromBody);
 
-        if (typeof teamId !== 'string' || teamId !== session.teamId || typeof track !== 'string' || !track.trim() || typeof problemStatement !== 'string' || !problemStatement.trim()) {
-            return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
+        if (!targetTeamId || !track || !problemStatement) {
+            return NextResponse.json({ success: false, message: "Missing required fields (track, problem statement, or team ID)." }, { status: 400 });
         }
 
         const { data: existing, error: lookupError } = await supabase
             .from('registrations')
-            .select('raw_data')
-            .eq('team_id', teamId)
+            .select('transaction_id, team_id, track, problem_statement, raw_data')
+            .or(`team_id.eq.${targetTeamId},transaction_id.eq.${targetTeamId}`)
             .maybeSingle();
+
         if (lookupError) throw lookupError;
         if (!existing) {
-            return NextResponse.json({ success: false, message: 'Team not found.' }, { status: 404 });
+            return NextResponse.json({ success: false, message: `Team not found with ID ${targetTeamId}.` }, { status: 404 });
         }
 
         const rawData = existing.raw_data && typeof existing.raw_data === 'object'
             ? { ...existing.raw_data }
             : {};
-        if (rawData.ps_locked === true) {
-            return NextResponse.json({ success: false, message: 'The track and problem statement are already locked.' }, { status: 409 });
+
+        if (rawData.ps_locked === true && existing.track && existing.problem_statement) {
+            return NextResponse.json({
+                success: true,
+                message: 'The track and problem statement are already locked.',
+                track: existing.track,
+                problemStatement: existing.problem_statement,
+                alreadyLocked: true
+            });
         }
         rawData.ps_locked = true;
+        rawData.track = track;
+        rawData.problem_statement = problemStatement;
+        rawData.problemStatement = problemStatement;
 
-        const { error } = await supabase
+        const { error: updateError } = await supabase
             .from('registrations')
             .update({
                 track: track,
                 problem_statement: problemStatement,
                 raw_data: rawData
             })
-            .eq('team_id', session.teamId);
+            .eq('team_id', existing.team_id || targetTeamId);
 
-        if (error) {
-            console.error("Failed to lock track:", error);
-            return NextResponse.json({ success: false, message: "Database update failed", details: error.message }, { status: 500 });
+        if (updateError) {
+            console.error("Failed to lock track:", updateError);
+            return NextResponse.json({ success: false, message: "Database update failed", details: updateError.message }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true });
+        if (redis) {
+            try {
+                await redis.del('all_teams_cache_admin');
+                await redis.del('all_teams_cache_livescore');
+            } catch (e) {
+                console.error('Redis cache invalidate error:', e);
+            }
+        }
+
+        return NextResponse.json({ success: true, track, problemStatement });
 
     } catch (error: unknown) {
         console.error('Lock Track Error:', error);
-        return NextResponse.json({ success: false, message: "Server error" }, { status: 500 });
+        return NextResponse.json({ success: false, message: error instanceof Error ? error.message : "Server error" }, { status: 500 });
     }
 }

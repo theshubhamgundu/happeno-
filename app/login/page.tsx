@@ -25,10 +25,17 @@ export default function LoginPage() {
     // Redirect if already logged in
     useEffect(() => {
         if (!isLoading && user && user.role) {
-            const destination = user.role === 'team' && user.portalMode === 'edit'
-                ? '/edit-registration'
-                : `/dashboard/${user.role}`;
-            router.push(destination);
+            if (user.role === 'team') {
+                if (user.portalMode === 'closed') {
+                    // Portal closed: do NOT redirect to /dashboard/team
+                    return;
+                }
+                if (user.portalMode === 'edit') {
+                    router.replace('/edit-registration');
+                    return;
+                }
+            }
+            router.replace(`/dashboard/${user.role}`);
         }
     }, [user, isLoading, router]);
 
