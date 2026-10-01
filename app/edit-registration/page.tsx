@@ -1,31 +1,25 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
     ArrowLeft, Search, Save, Users, User, Edit3, CheckCircle2,
-    AlertCircle, Eye, EyeOff, Loader2, KeyRound, ShieldCheck
+    AlertCircle, Loader2, KeyRound, ShieldCheck, Clock, Copy,
+    GitMerge, UserPlus, HelpCircle, Send, Check, X, Sparkles, ChevronRight, Phone, Mail
 } from "lucide-react";
-
-const AVAILABLE_TRACKS = [
-    "SaaSum AI",
-    "Maceco",
-    "Tobofu",
-    "Promtal",
-    "Skill Tank",
-    "Vriddhi",
-    "Open Innovation"
-];
+import { TRACKS } from "@/lib/constants";
 
 interface MemberData {
     fullName: string;
     email: string;
     phone: string;
     college: string;
-    year: string;
-    department: string;
+    year?: string;
+    department?: string;
+    replacedAt?: string;
 }
 
 interface TeamData {
@@ -38,629 +32,1145 @@ interface TeamData {
     email: string;
     members: MemberData[];
     status: string;
-    problemStatement: string;
-    createdAt: string;
+    problemStatement?: string;
+    createdAt?: string;
 }
 
-function EditRegistrationContent() {
-    // Auth state
-    const [teamIdInput, setTeamIdInput] = useState("");
-    const [passwordInput, setPasswordInput] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
-    const [authError, setAuthError] = useState("");
+interface PendingMerge {
+    code: string;
+    sourceTeamId: string;
+    sourceTeamName: string;
+    sourceCaptain: string;
+    sourceMemberCount: number;
+    targetTeamId: string;
+    targetTeamName: string;
+    targetCaptain: string;
+    targetMemberCount: number;
+    status: string;
+}
 
-    // Team data state
+function EditRegistrationInner() {
+    const searchParams = useSearchParams();
+    const urlTeamId = searchParams.get('teamId') || '';
+    const urlToken = searchParams.get('token') || '';
+
+    // Auth State
+    const [teamIdInput, setTeamIdInput] = useState(urlTeamId);
+    const [captainContactInput, setCaptainContactInput] = useState('');
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [authError, setAuthError] = useState('');
+
+    // Team Data
     const [team, setTeam] = useState<TeamData | null>(null);
     const [editedTeam, setEditedTeam] = useState<TeamData | null>(null);
-    const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
-    const handleLookup = async () => {
-        const id = teamIdInput.trim();
-        const pass = passwordInput.trim();
+    // Merge Feature State
+    const [generatedCode, setGeneratedCode] = useState<string | null>(null);
+    const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+    const [inputMergeCode, setInputMergeCode] = useState('');
+    const [isSubmittingMerge, setIsSubmittingMerge] = useState(false);
+    const [pendingMerge, setPendingMerge] = useState<PendingMerge | null>(null);
+    const [isRespondingMerge, setIsRespondingMerge] = useState(false);
 
-        if (!id) {
-            setAuthError("Please enter your Team ID");
-            return;
+    // Member Replacement State
+    const [replacingSlotIndex, setReplacingSlotIndex] = useState<number | null>(null);
+    const [replacementForm, setReplacementForm] = useState({
+        fullName: '',
+        email: '',
+        phone: '',
+        college: '',
+        department: '',
+        year: ''
+    });
+    const [isReplacing, setIsReplacing] = useState(false);
+
+    // Self-Help Lookup Modal State
+    const [showLookupModal, setShowLookupModal] = useState(false);
+    const [lookupQuery, setLookupQuery] = useState('');
+    const [lookupLoading, setLookupLoading] = useState(false);
+    const [lookupResults, setLookupResults] = useState<any[]>([]);
+
+    // Support Ticket State
+    const [showHelpModal, setShowHelpModal] = useState(false);
+    const [helpCategory, setHelpCategory] = useState('Roster Query');
+    const [helpText, setHelpText] = useState('');
+    const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
+
+    // Auto-login if arriving via official magic link
+    useEffect(() => {
+        if (urlTeamId && urlToken) {
+            void verifyAndLoadTeam(urlTeamId, urlToken, '');
         }
-        if (!pass) {
-            setAuthError("Please enter your password");
-            return;
-        }
+    }, [urlTeamId, urlToken]);
 
-        setIsSearching(true);
-        setAuthError("");
-
+    const verifyAndLoadTeam = async (id: string, token: string, contact: string) => {
+        setIsVerifying(true);
+        setAuthError('');
         try {
-            const authRes = await fetch('/api/auth/team', {
+            const res = await fetch('/api/team/verify-access', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ teamId: id, password: pass })
+                body: JSON.stringify({
+                    teamId: id.trim().toUpperCase(),
+                    token: token.trim() || undefined,
+                    captainContact: contact.trim() || undefined
+                })
             });
-            const authData = await authRes.json();
-            if (!authRes.ok) {
-                setAuthError(authData.error || 'Invalid team credentials.');
-                return;
-            }
 
-            const res = await fetch('/api/participant-update', { cache: 'no-store' });
             const data = await res.json();
-
-            if (res.ok && data.success) {
+            if (data.success && data.team) {
                 setTeam(data.team);
                 setEditedTeam(JSON.parse(JSON.stringify(data.team)));
-                toast.success(`Welcome! Found team "${data.team.teamName}"`);
+                if (data.pendingMerge) setPendingMerge(data.pendingMerge);
+                toast.success(`Welcome Team "${data.team.teamName}"!`);
             } else {
-                setAuthError(data.error || "Team not found. Check your credentials.");
+                setAuthError(data.error || 'Verification failed. Please check your Team ID and contact.');
             }
-        } catch (err) {
-            setAuthError("Network error. Please try again.");
+        } catch {
+            setAuthError('Network error. Could not verify team.');
         } finally {
-            setIsSearching(false);
+            setIsVerifying(false);
         }
     };
 
-    const handleMemberChange = (index: number, field: keyof MemberData, value: string) => {
-        if (!editedTeam) return;
-        const newMembers = [...editedTeam.members];
-        newMembers[index] = { ...newMembers[index], [field]: value };
-        setEditedTeam({ ...editedTeam, members: newMembers });
+    const handleManualLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!teamIdInput.trim()) {
+            setAuthError('Please enter your Team ID');
+            return;
+        }
+        if (!captainContactInput.trim()) {
+            setAuthError('Please enter the registered Team Captain email or mobile number');
+            return;
+        }
+        void verifyAndLoadTeam(teamIdInput, '', captainContactInput);
     };
 
-    const handleTrackToggle = (trackName: string) => {
-        if (!editedTeam) return;
-        const currentTracks = editedTeam.track ? editedTeam.track.split(',').map(t => t.trim()).filter(Boolean) : [];
-        
-        if (currentTracks.includes(trackName)) {
-            setEditedTeam({
-                ...editedTeam,
-                track: currentTracks.filter(t => t !== trackName).join(', ')
+    const handleLookupTeam = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!lookupQuery.trim()) return;
+        setLookupLoading(true);
+        try {
+            const res = await fetch('/api/team/verify-access', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'lookup_team',
+                    query: lookupQuery.trim(),
+                    sendMagicLink: true
+                })
             });
-        } else {
-            if (currentTracks.length < 3) {
-                setEditedTeam({
-                    ...editedTeam,
-                    track: [...currentTracks, trackName].join(', ')
-                });
+            const data = await res.json();
+            if (data.success) {
+                setLookupResults(data.results || []);
+                toast.success(data.message || 'Found matching registration!');
             } else {
-                toast.error("You can select a maximum of 3 tracks.");
+                toast.error(data.error || 'No team found with those details.');
             }
+        } catch {
+            toast.error('Search error. Please try again.');
+        } finally {
+            setLookupLoading(false);
         }
     };
 
-    const handleSave = async () => {
-        if (!editedTeam || !team) return;
-
+    const handleSaveRosterEdits = async () => {
+        if (!editedTeam) return;
         setIsSaving(true);
         try {
-            const res = await fetch("/api/participant-update", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+            const res = await fetch('/api/team/roster-action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    teamId: team.teamId,
+                    action: 'update_details',
                     teamName: editedTeam.teamName,
                     track: editedTeam.track,
-                    captain: editedTeam.members[0]?.fullName || editedTeam.captain,
-                    captainMobile: editedTeam.members[0]?.phone || editedTeam.captainMobile,
-                    college: editedTeam.members[0]?.college || editedTeam.college,
-                    email: editedTeam.members[0]?.email || editedTeam.email,
-                    members: editedTeam.members,
-                }),
+                    college: editedTeam.college,
+                    members: editedTeam.members
+                })
             });
 
             const data = await res.json();
-
-            if (res.ok && data.success) {
-                toast.success("Details updated successfully!");
+            if (data.success) {
+                toast.success('Roster details updated and saved successfully!');
                 setTeam(JSON.parse(JSON.stringify(editedTeam)));
-                setIsEditing(false);
             } else {
-                toast.error(data.error || "Failed to save changes.");
+                toast.error(data.error || 'Failed to update roster.');
             }
-        } catch (err) {
-            toast.error("Network error. Please try again.");
+        } catch {
+            toast.error('Network error saving changes.');
         } finally {
             setIsSaving(false);
         }
     };
 
-    const handleLogout = () => {
-        void fetch('/api/auth/logout', { method: 'POST' });
-        setTeam(null);
-        setEditedTeam(null);
-        setTeamIdInput("");
-        setPasswordInput("");
-        setIsEditing(false);
-        setAuthError("");
+    const handleExecuteMemberReplacement = async () => {
+        if (replacingSlotIndex === null || !replacementForm.fullName || !replacementForm.email) {
+            toast.error('Please enter the new member’s name and email address.');
+            return;
+        }
+
+        setIsReplacing(true);
+        try {
+            const res = await fetch('/api/team/roster-action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'replace_member',
+                    memberIndex: replacingSlotIndex,
+                    newMember: replacementForm
+                })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                toast.success(data.message || 'Member successfully replaced!');
+                if (editedTeam) {
+                    const updated = [...editedTeam.members];
+                    updated[replacingSlotIndex] = {
+                        fullName: replacementForm.fullName,
+                        email: replacementForm.email,
+                        phone: replacementForm.phone,
+                        college: replacementForm.college,
+                        department: replacementForm.department,
+                        year: replacementForm.year,
+                        replacedAt: new Date().toISOString()
+                    };
+                    setEditedTeam({ ...editedTeam, members: updated });
+                    setTeam({ ...editedTeam, members: updated });
+                }
+                setReplacingSlotIndex(null);
+                setReplacementForm({ fullName: '', email: '', phone: '', college: '', department: '', year: '' });
+            } else {
+                toast.error(data.error || 'Replacement failed.');
+            }
+        } catch {
+            toast.error('Network error executing replacement.');
+        } finally {
+            setIsReplacing(false);
+        }
     };
 
-    const hasChanges = JSON.stringify(team) !== JSON.stringify(editedTeam);
+    const handleGenerateMergeCode = async () => {
+        setIsGeneratingCode(true);
+        try {
+            const res = await fetch('/api/team/roster-action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'create_merge_code' })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setGeneratedCode(data.code);
+                toast.success(`Merge code created: ${data.code}`);
+            } else {
+                toast.error(data.error || 'Failed to create code.');
+            }
+        } catch {
+            toast.error('Error generating merge code.');
+        } finally {
+            setIsGeneratingCode(false);
+        }
+    };
 
-    // ─── AUTH SCREEN ───
-    if (!team) {
-        return (
-            <main className="min-h-screen bg-gradient-to-b from-[#F8F9FA] via-white to-white flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden">
-                {/* Background grid */}
-                <div
-                    className="absolute inset-0 opacity-[0.035] pointer-events-none"
-                    style={{
-                        backgroundImage: `linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)`,
-                        backgroundSize: '40px 40px',
-                    }}
-                />
-                <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-teal-100/10 blur-[160px] rounded-full" />
-                    <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-teal-100/10 blur-[160px] rounded-full" />
-                </div>
+    const handleSubmitMergeCode = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inputMergeCode.trim()) return;
+        setIsSubmittingMerge(true);
+        try {
+            const res = await fetch('/api/team/roster-action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'submit_merge_code',
+                    code: inputMergeCode.trim().toUpperCase()
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success(data.message);
+                setInputMergeCode('');
+            } else {
+                toast.error(data.error || 'Failed to submit merge code.');
+            }
+        } catch {
+            toast.error('Network error during merge request.');
+        } finally {
+            setIsSubmittingMerge(false);
+        }
+    };
 
-                <div className="relative z-10 w-full max-w-md">
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-center mb-8"
-                    >
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0f766e] to-[#0d9488] mb-5 shadow-lg shadow-teal-500/20">
-                            <Edit3 size={28} className="text-white" />
+    const handleRespondMerge = async (decision: 'APPROVE' | 'REJECT') => {
+        if (!pendingMerge) return;
+        setIsRespondingMerge(true);
+        try {
+            const res = await fetch('/api/team/roster-action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'respond_merge',
+                    code: pendingMerge.code,
+                    decision
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success(data.message);
+                setPendingMerge(null);
+                // Refresh team data
+                if (team) {
+                    void verifyAndLoadTeam(team.teamId, '', team.captainMobile || team.email);
+                }
+            } else {
+                toast.error(data.error || 'Failed to respond to merge.');
+            }
+        } catch {
+            toast.error('Network error during merge response.');
+        } finally {
+            setIsRespondingMerge(false);
+        }
+    };
+
+    const handleSubmitSupportTicket = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!helpText.trim()) return;
+        setIsSubmittingHelp(true);
+        try {
+            const res = await fetch('/api/admin/inbound-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'create_ticket',
+                    fromEmail: team?.email || 'participant@portal',
+                    fromName: team?.captain || 'Participant',
+                    subject: `[Roster Query] ${helpCategory} - ${team?.teamName || 'Team'}`,
+                    snippet: helpText.trim(),
+                    teamId: team?.teamId || 'GUEST',
+                    teamName: team?.teamName || 'Unknown Team'
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success('Your support request has been logged! Our team will respond shortly.');
+                setHelpText('');
+                setShowHelpModal(false);
+            } else {
+                toast.error(data.error || 'Failed to submit query.');
+            }
+        } catch {
+            toast.error('Error contacting help desk.');
+        } finally {
+            setIsSubmittingHelp(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-[#06000F] text-slate-100 font-sans selection:bg-[#14b8a6] selection:text-black">
+            {/* Top Navigation Bar */}
+            <header className="border-b border-white/10 bg-black/40 backdrop-blur-xl sticky top-0 z-40">
+                <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+                    <Link href="/" className="flex items-center gap-2.5 group">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#14b8a6] to-purple-600 flex items-center justify-center font-black text-black text-sm">
+                            TC
                         </div>
-                        <h1 className="font-display font-extrabold text-3xl md:text-4xl text-[#0f172a] mb-2">
-                            Edit Registration
-                        </h1>
-                        <p className="font-body text-gray-500 text-sm md:text-base">
-                            Enter your Team ID & password to update your details
-                        </p>
-                    </motion.div>
+                        <span className="font-kanit font-black italic tracking-wider text-white text-lg group-hover:text-[#14b8a6] transition">
+                            TRI-CITY 2026
+                        </span>
+                    </Link>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.1 }}
-                    >
-                        <div className="pro-card rounded-xl p-6 md:p-8 bg-white border border-gray-200 shadow-sm">
-                            <div className="space-y-5">
-                                {/* Team ID */}
-                                <div className="space-y-2">
-                                    <label className="text-xs font-mono font-semibold uppercase tracking-wider text-gray-600 flex items-center gap-1.5">
-                                        <KeyRound size={12} />
-                                        Team ID
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. TRI26002"
-                                        value={teamIdInput}
-                                        onChange={(e) => { setTeamIdInput(e.target.value); setAuthError(""); }}
-                                        onKeyDown={(e) => e.key === "Enter" && handleLookup()}
-                                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-base font-body text-[#0f172a] placeholder:text-gray-400 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-teal-500/20 transition-all uppercase"
-                                    />
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setShowHelpModal(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-bold text-white/80 transition cursor-pointer"
+                        >
+                            <HelpCircle size={14} className="text-[#14b8a6]" />
+                            First-Timer FAQs
+                        </button>
+                        {team && (
+                            <button
+                                type="button"
+                                onClick={() => { setTeam(null); setEditedTeam(null); }}
+                                className="px-3 py-1.5 rounded-xl border border-white/10 text-white/50 hover:text-white text-xs font-bold transition cursor-pointer"
+                            >
+                                Log out
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </header>
+
+            <main className="max-w-6xl mx-auto px-4 py-8">
+                {/* ══════════════ VIEW 1: AUTHENTICATION / ACCESS GATE ══════════════ */}
+                {!team ? (
+                    <div className="max-w-md mx-auto pt-8">
+                        <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="p-8 rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-2xl relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-[#14b8a6]/10 rounded-full blur-3xl pointer-events-none" />
+
+                            <div className="text-center mb-6">
+                                <div className="inline-flex w-14 h-14 rounded-2xl bg-[#14b8a6]/15 border border-[#14b8a6]/30 text-[#14b8a6] items-center justify-center mb-3">
+                                    <ShieldCheck size={28} />
                                 </div>
+                                <h1 className="text-2xl font-black italic uppercase tracking-tight text-white">
+                                    Team Correction Portal
+                                </h1>
+                                <p className="text-xs text-white/50 mt-1.5">
+                                    Active for external registrations: October 5–6, 2026
+                                </p>
+                            </div>
 
-                                {/* Password */}
-                                <div className="space-y-2">
-                                    <label className="text-xs font-mono font-semibold uppercase tracking-wider text-gray-600 flex items-center gap-1.5">
-                                        <ShieldCheck size={12} />
-                                        Password
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            placeholder="Enter your team password"
-                                            value={passwordInput}
-                                            onChange={(e) => { setPasswordInput(e.target.value); setAuthError(""); }}
-                                            onKeyDown={(e) => e.key === "Enter" && handleLookup()}
-                                            className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-base font-body text-[#0f172a] placeholder:text-gray-400 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-teal-500/20 transition-all pr-12"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-                                        >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Error */}
-                                <AnimatePresence>
-                                    {authError && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -4 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -4 }}
-                                            className="flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200"
-                                        >
-                                            <AlertCircle size={16} className="text-red-500 shrink-0 mt-0.5" />
-                                            <p className="text-red-700 text-xs font-body font-semibold">{authError}</p>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                {/* Submit */}
-                                <button
-                                    onClick={handleLookup}
-                                    disabled={isSearching}
-                                    className="btn-primary w-full"
-                                >
-                                    {isSearching ? (
-                                        <>
-                                            <Loader2 size={18} className="animate-spin" />
-                                            <span>Looking up...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Search size={16} />
-                                            <span>Find My Registration</span>
-                                        </>
-                                    )}
-                                </button>
-
-                                <div className="pt-3 border-t border-gray-100 text-center">
-                                    <p className="font-body text-xs text-gray-400">
-                                        Use the same Team ID and password you received during registration
+                            {/* 48-Hour Live Window Banner */}
+                            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs mb-6 flex items-start gap-2.5">
+                                <Clock size={16} className="shrink-0 text-amber-400 mt-0.5" />
+                                <div className="leading-relaxed">
+                                    <p className="font-bold">48-Hour Roster Window Active</p>
+                                    <p className="text-white/70 text-[11px] mt-0.5">
+                                        Team leads can cross-check names, replace absent members, or merge solo/duo teams. Rosters permanently lock on October 6 at 11:59 PM.
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.4 }}
-                        className="mt-6 text-center"
-                    >
-                        <Link
-                            href="/"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-[#0f172a] hover:border-gray-300 transition-all font-display font-semibold text-xs uppercase tracking-wider group"
-                        >
-                            <ArrowLeft size={14} />
-                            Back to Home
-                        </Link>
-                    </motion.div>
-                </div>
-            </main>
-        );
-    }
+                            {authError && (
+                                <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs mb-5 flex items-center gap-2.5">
+                                    <AlertCircle size={16} className="shrink-0 text-red-400" />
+                                    <span>{authError}</span>
+                                </div>
+                            )}
 
-    // ─── EDIT SCREEN ───
-    return (
-        <main className="min-h-screen bg-gradient-to-b from-[#F8F9FA] via-white to-white relative overflow-hidden">
-            {/* Background grid */}
-            <div
-                className="absolute inset-0 opacity-[0.035] pointer-events-none"
-                style={{
-                    backgroundImage: `linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)`,
-                    backgroundSize: '40px 40px',
-                }}
-            />
-
-            <div className="relative z-10 max-w-4xl mx-auto px-4 py-8 md:py-12">
-                {/* Top bar */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center justify-between mb-8"
-                >
-                    <button
-                        onClick={handleLogout}
-                        className="inline-flex items-center gap-2 text-gray-500 hover:text-[#0f172a] transition-colors group font-display font-semibold text-xs uppercase tracking-wider"
-                    >
-                        <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                        Sign Out
-                    </button>
-
-                    <div className="flex items-center gap-3">
-                        {isEditing && hasChanges && (
-                            <motion.button
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                onClick={handleSave}
-                                disabled={isSaving}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0f766e] text-white text-xs font-display font-bold uppercase tracking-wider hover:bg-[#0d6b63] transition-all shadow-sm shadow-teal-500/20 disabled:opacity-60"
-                            >
-                                {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                                {isSaving ? "Saving..." : "Save Changes"}
-                            </motion.button>
-                        )}
-                        {!isEditing ? (
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0f172a] text-white text-xs font-display font-bold uppercase tracking-wider hover:bg-[#1e293b] transition-all shadow-sm"
-                            >
-                                <Edit3 size={14} />
-                                Edit Details
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => {
-                                    setIsEditing(false);
-                                    setEditedTeam(JSON.parse(JSON.stringify(team)));
-                                }}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-gray-600 text-xs font-display font-bold uppercase tracking-wider hover:bg-gray-50 transition-all border border-gray-200"
-                            >
-                                Cancel
-                            </button>
-                        )}
-                    </div>
-                </motion.div>
-
-                {/* Team Header Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 }}
-                    className="pro-card rounded-xl p-6 bg-white border border-gray-200 mb-6"
-                >
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#0d9488] flex items-center justify-center text-2xl font-display font-bold text-white shadow-md shadow-teal-500/20">
-                                {(editedTeam?.teamName || "T").charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                {isEditing ? (
+                            <form onSubmit={handleManualLogin} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                        Assigned Team ID
+                                    </label>
                                     <input
                                         type="text"
-                                        value={editedTeam?.teamName || ""}
-                                        onChange={(e) => editedTeam && setEditedTeam({ ...editedTeam, teamName: e.target.value })}
-                                        className="text-xl font-display font-bold text-[#0f172a] bg-transparent border-b-2 border-teal-500 focus:outline-none pb-0.5"
+                                        placeholder="e.g. TC-1042"
+                                        value={teamIdInput}
+                                        onChange={e => setTeamIdInput(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono uppercase tracking-wider outline-none focus:border-[#14b8a6] transition"
+                                        required
                                     />
-                                ) : (
-                                    <h2 className="text-xl font-display font-bold text-[#0f172a]">{team.teamName}</h2>
-                                )}
-                                <p className="text-sm font-mono text-gray-500 mt-0.5">{team.teamId}</p>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                        Registered Captain Email or Phone
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Lead email or 10-digit mobile"
+                                        value={captainContactInput}
+                                        onChange={e => setCaptainContactInput(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-[#14b8a6] transition"
+                                        required
+                                    />
+                                    <p className="text-[10px] text-white/40 mt-1">
+                                        Must match the details submitted during agency registration.
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isVerifying}
+                                    className="w-full py-3.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,184,166,0.3)] mt-2"
+                                >
+                                    {isVerifying ? (
+                                        <>
+                                            <Loader2 size={16} className="animate-spin" /> Verifying Team...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Access Roster Hub <ChevronRight size={14} />
+                                        </>
+                                    )}
+                                </button>
+                            </form>
+
+                            <div className="mt-6 pt-5 border-t border-white/10 text-center">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowLookupModal(true)}
+                                    className="text-xs text-[#14b8a6] hover:underline font-bold"
+                                >
+                                    Forgot your Team ID? Search by Email / Phone
+                                </button>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-display font-bold uppercase tracking-wider ${
-                                team.status === 'REGISTERED' || team.status === 'CONFIRMED'
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : team.status === 'PENDING'
-                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                    : 'bg-gray-50 text-gray-600 border border-gray-200'
-                            }`}>
-                                <CheckCircle2 size={12} />
-                                {team.status}
-                            </span>
-                        </div>
+                        </motion.div>
                     </div>
-                </motion.div>
-
-                {/* Tracks Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.08 }}
-                    className="pro-card rounded-xl p-6 bg-white border border-gray-200 mb-6"
-                >
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                            <h3 className="font-display font-bold text-lg text-[#0f172a]">Selected Tracks</h3>
-                            <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded-md">Max 3</span>
-                        </div>
-                    </div>
-                    
-                    {isEditing ? (
-                        <div className="flex flex-wrap gap-2">
-                            {AVAILABLE_TRACKS.map(track => {
-                                const currentTracks = editedTeam?.track ? editedTeam.track.split(',').map(t => t.trim()).filter(Boolean) : [];
-                                const isSelected = currentTracks.includes(track);
-                                return (
-                                    <button
-                                        key={track}
-                                        onClick={() => handleTrackToggle(track)}
-                                        className={`px-3 py-1.5 rounded-full text-xs font-display font-bold uppercase tracking-wider border transition-all ${
-                                            isSelected
-                                                ? 'bg-teal-50 text-teal-700 border-teal-500'
-                                                : 'bg-white text-gray-500 border-gray-200 hover:border-teal-300'
-                                        }`}
-                                    >
-                                        {track}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <div className="flex flex-wrap gap-2">
-                            {(team.track ? team.track.split(',').map(t => t.trim()).filter(Boolean) : []).length > 0 ? (
-                                (team.track ? team.track.split(',').map(t => t.trim()).filter(Boolean) : []).map(track => (
-                                    <span key={track} className="px-3 py-1.5 rounded-full bg-teal-50 text-teal-700 text-xs font-display font-bold uppercase tracking-wider border border-teal-200">
-                                        {track}
-                                    </span>
-                                ))
-                            ) : (
-                                <span className="text-sm font-body text-gray-400 italic">No tracks selected</span>
-                            )}
-                        </div>
-                    )}
-                </motion.div>
-
-                {/* Members */}
-                <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="space-y-4"
-                >
-                    <div className="flex items-center gap-2 mb-2">
-                        <Users size={18} className="text-[#0f766e]" />
-                        <h3 className="font-display font-bold text-lg text-[#0f172a]">Team Members</h3>
-                        {isEditing && (
-                            <span className="ml-auto text-xs font-mono text-teal-600 bg-teal-50 px-2 py-1 rounded-md border border-teal-200">
-                                Editing Mode
-                            </span>
-                        )}
-                    </div>
-
-                    {(editedTeam?.members || []).map((member, idx) => (
-                        <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.12 + idx * 0.05 }}
-                            className="pro-card rounded-xl p-5 md:p-6 bg-white border border-gray-200 relative overflow-hidden"
-                        >
-                            {/* Role tag */}
-                            <div className="absolute top-0 right-0">
-                                <div className={`px-3 py-1 text-[10px] font-display font-bold uppercase tracking-wider rounded-bl-lg ${
-                                    idx === 0
-                                        ? 'bg-[#0f766e] text-white'
-                                        : 'bg-gray-100 text-gray-600'
-                                }`}>
-                                    <span className="flex items-center gap-1">
-                                        <User size={10} />
-                                        {idx === 0 ? "Team Lead" : `Member ${idx + 1}`}
-                                    </span>
+                ) : (
+                    /* ══════════════ VIEW 2: AUTHENTICATED TEAM CORRECTION HUB ══════════════ */
+                    <div className="space-y-6">
+                        {/* Countdown / Window Banner */}
+                        <div className="p-5 rounded-3xl bg-gradient-to-r from-teal-500/15 to-purple-600/15 border border-[#14b8a6]/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex items-center gap-3.5">
+                                <div className="w-12 h-12 rounded-2xl bg-[#14b8a6]/20 border border-[#14b8a6]/40 text-[#14b8a6] flex items-center justify-center shrink-0">
+                                    <Clock size={24} />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <h2 className="font-kanit font-black italic uppercase text-lg text-white">
+                                            Roster Correction Window Active
+                                        </h2>
+                                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase">
+                                            Open until Oct 6, 11:59 PM
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-white/60 mt-0.5">
+                                        Review team spelling, replace inactive members, or merge teams. Full digital QR passes unlock on <strong>October 10 at 08:00 AM</strong>.
+                                    </p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
-                                <FieldGroup
-                                    label="Full Name"
-                                    value={member.fullName || ""}
-                                    editing={isEditing}
-                                    onChange={(val) => handleMemberChange(idx, "fullName", val)}
-                                    placeholder="Full legal name"
-                                />
-                                <FieldGroup
-                                    label="Email"
-                                    value={member.email || ""}
-                                    editing={isEditing}
-                                    onChange={(val) => handleMemberChange(idx, "email", val)}
-                                    placeholder="email@example.com"
-                                    type="email"
-                                />
-                                <FieldGroup
-                                    label="Phone"
-                                    value={member.phone || ""}
-                                    editing={isEditing}
-                                    onChange={(val) => handleMemberChange(idx, "phone", val)}
-                                    placeholder="+91 00000 00000"
-                                />
-                                <FieldGroup
-                                    label="College"
-                                    value={member.college || ""}
-                                    editing={isEditing}
-                                    onChange={(val) => handleMemberChange(idx, "college", val)}
-                                    placeholder="College Name"
-                                />
-                                <FieldGroup
-                                    label="Year"
-                                    value={member.year || ""}
-                                    editing={isEditing}
-                                    onChange={(val) => handleMemberChange(idx, "year", val)}
-                                    placeholder="e.g. 3rd Year"
-                                    selectOptions={["1st Year", "2nd Year", "3rd Year", "4th Year"]}
-                                />
-                                <FieldGroup
-                                    label="Department"
-                                    value={member.department || ""}
-                                    editing={isEditing}
-                                    onChange={(val) => handleMemberChange(idx, "department", val)}
-                                    placeholder="e.g. CSE"
-                                />
-                            </div>
-                        </motion.div>
-                    ))}
-                </motion.div>
-
-                {/* Bottom save bar (mobile sticky) */}
-                {isEditing && hasChanges && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="fixed bottom-0 left-0 right-0 md:relative md:mt-6 bg-white/90 backdrop-blur-md border-t md:border border-gray-200 md:rounded-xl p-4 flex items-center justify-between gap-4 z-50"
-                    >
-                        <p className="text-xs font-body text-gray-500">
-                            You have unsaved changes
-                        </p>
-                        <div className="flex items-center gap-3">
                             <button
-                                onClick={() => {
-                                    setIsEditing(false);
-                                    setEditedTeam(JSON.parse(JSON.stringify(team)));
-                                }}
-                                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-xs font-display font-bold uppercase tracking-wider hover:bg-gray-200 transition-all"
-                            >
-                                Discard
-                            </button>
-                            <button
-                                onClick={handleSave}
+                                type="button"
+                                onClick={handleSaveRosterEdits}
                                 disabled={isSaving}
-                                className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-[#0f766e] text-white text-xs font-display font-bold uppercase tracking-wider hover:bg-[#0d6b63] transition-all shadow-sm shadow-teal-500/20 disabled:opacity-60"
+                                className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase italic tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0 shadow-[0_0_20px_rgba(20,184,166,0.3)]"
                             >
-                                {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                                {isSaving ? "Saving..." : "Save"}
+                                <Save size={15} className={isSaving ? 'animate-spin' : ''} />
+                                {isSaving ? 'Saving Changes...' : 'Save All Changes'}
                             </button>
                         </div>
-                    </motion.div>
-                )}
-            </div>
-        </main>
-    );
-}
 
-// ─── Field Component ─────────────────────────────────────────────────
-function FieldGroup({
-    label,
-    value,
-    editing,
-    onChange,
-    placeholder,
-    type = "text",
-    selectOptions,
-}: {
-    label: string;
-    value: string;
-    editing: boolean;
-    onChange: (val: string) => void;
-    placeholder?: string;
-    type?: string;
-    selectOptions?: string[];
-}) {
-    return (
-        <div className="space-y-1.5">
-            <label className="text-[10px] font-mono font-semibold uppercase tracking-wider text-gray-400">
-                {label}
-            </label>
-            {editing ? (
-                selectOptions ? (
-                    <select
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm font-body text-[#0f172a] focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-teal-500/20 transition-all"
-                    >
-                        <option value="" disabled>Select</option>
-                        {selectOptions.map((opt) => (
-                            <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                    </select>
-                ) : (
-                    <input
-                        type={type}
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        placeholder={placeholder}
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm font-body text-[#0f172a] placeholder:text-gray-300 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-teal-500/20 transition-all"
-                    />
-                )
-            ) : (
-                <p className="text-sm font-body text-[#0f172a] py-2.5 px-3 rounded-lg bg-gray-50 border border-gray-100 min-h-[40px]">
-                    {value || <span className="text-gray-300 italic">Not provided</span>}
-                </p>
-            )}
+                        {/* Pending Merge Alert Banner (If Another Team Requested Merge) */}
+                        {pendingMerge && (
+                            <div className="p-5 rounded-3xl bg-purple-500/20 border-2 border-purple-500/50 shadow-[0_0_30px_rgba(168,85,247,0.2)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div className="flex items-center gap-3.5">
+                                    <div className="w-11 h-11 rounded-2xl bg-purple-500/30 text-purple-300 flex items-center justify-center shrink-0">
+                                        <GitMerge size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-white text-sm">
+                                            Incoming Merge Request from &quot;{pendingMerge.targetTeamName}&quot;
+                                        </h3>
+                                        <p className="text-xs text-purple-200/70 mt-0.5">
+                                            Team Lead <strong>{pendingMerge.targetCaptain}</strong> entered your merge code. Combined team will have <strong>{pendingMerge.sourceMemberCount + pendingMerge.targetMemberCount} / 4 members</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <button
+                                        type="button"
+                                        disabled={isRespondingMerge}
+                                        onClick={() => void handleRespondMerge('APPROVE')}
+                                        className="px-5 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-black uppercase italic text-xs tracking-wider transition cursor-pointer disabled:opacity-50"
+                                    >
+                                        {isRespondingMerge ? 'Processing...' : 'Approve & Merge'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={isRespondingMerge}
+                                        onClick={() => void handleRespondMerge('REJECT')}
+                                        className="px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-xs font-bold transition cursor-pointer"
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Column 1 & 2: Team Roster & Details */}
+                            <div className="lg:col-span-2 space-y-6">
+                                {/* Team Info Card */}
+                                <div className="p-6 rounded-3xl border border-white/10 bg-white/[0.03] space-y-4">
+                                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-[#14b8a6] flex items-center justify-center font-black">
+                                                <Users size={20} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-black uppercase italic tracking-tight text-white">
+                                                    Team Information
+                                                </h3>
+                                                <span className="font-mono text-xs text-[#14b8a6] font-bold">
+                                                    ID: {team.teamId}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <span className="px-3 py-1 rounded-full bg-white/10 text-white/70 text-[10px] font-black uppercase">
+                                            {team.members.length} / 4 Members
+                                        </span>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                                Team Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={editedTeam?.teamName || ''}
+                                                onChange={e => editedTeam && setEditedTeam({ ...editedTeam, teamName: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white font-bold outline-none focus:border-[#14b8a6] transition"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                                Innovation Track
+                                            </label>
+                                            <select
+                                                value={editedTeam?.track || ''}
+                                                onChange={e => editedTeam && setEditedTeam({ ...editedTeam, track: e.target.value })}
+                                                className="w-full bg-[#0D0219] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white font-bold outline-none focus:border-[#14b8a6] transition"
+                                            >
+                                                {TRACKS.map(t => (
+                                                    <option key={t} value={t} className="bg-[#0D0219] text-white">
+                                                        {t}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                            College / Institution
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={editedTeam?.college || ''}
+                                            onChange={e => editedTeam && setEditedTeam({ ...editedTeam, college: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#14b8a6] transition"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Member Cards List */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between px-1">
+                                        <h3 className="text-sm font-black uppercase italic tracking-wider text-white flex items-center gap-2">
+                                            <User size={16} className="text-[#14b8a6]" />
+                                            Registered Team Members
+                                        </h3>
+                                        <span className="text-[11px] text-white/40">
+                                            Max 2 member replacements allowed per team
+                                        </span>
+                                    </div>
+
+                                    {editedTeam?.members.map((m, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition space-y-3"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2.5">
+                                                    <span className="w-6 h-6 rounded-lg bg-white/10 text-white/70 font-mono text-xs flex items-center justify-center font-bold">
+                                                        {idx + 1}
+                                                    </span>
+                                                    <h4 className="font-bold text-sm text-white">
+                                                        {idx === 0 ? `${m.fullName || 'Lead'} (Team Captain)` : m.fullName || `Member ${idx + 1}`}
+                                                    </h4>
+                                                    {m.replacedAt && (
+                                                        <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[9px] font-black uppercase">
+                                                            Replaced
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {idx > 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setReplacingSlotIndex(idx);
+                                                            setReplacementForm({
+                                                                fullName: '',
+                                                                email: '',
+                                                                phone: '',
+                                                                college: editedTeam.college || '',
+                                                                department: '',
+                                                                year: ''
+                                                            });
+                                                        }}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-[11px] font-bold transition cursor-pointer"
+                                                    >
+                                                        <UserPlus size={13} /> Replace Member
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                                                <div>
+                                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                                        Full Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={m.fullName || ''}
+                                                        onChange={e => {
+                                                            const copy = [...editedTeam.members];
+                                                            copy[idx].fullName = e.target.value;
+                                                            setEditedTeam({ ...editedTeam, members: copy });
+                                                        }}
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#14b8a6]"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                                        Email Address
+                                                    </label>
+                                                    <input
+                                                        type="email"
+                                                        value={m.email || ''}
+                                                        onChange={e => {
+                                                            const copy = [...editedTeam.members];
+                                                            copy[idx].email = e.target.value;
+                                                            setEditedTeam({ ...editedTeam, members: copy });
+                                                        }}
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#14b8a6]"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                                        Mobile Number
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={m.phone || ''}
+                                                        onChange={e => {
+                                                            const copy = [...editedTeam.members];
+                                                            copy[idx].phone = e.target.value;
+                                                            setEditedTeam({ ...editedTeam, members: copy });
+                                                        }}
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono outline-none focus:border-[#14b8a6]"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Column 3: Team Merge Hub & Anti-Spam FAQ */}
+                            <div className="space-y-6">
+                                {/* Peer-to-Peer Merge Tool */}
+                                <div className="p-6 rounded-3xl border border-purple-500/30 bg-purple-950/20 backdrop-blur-md space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 flex items-center justify-center">
+                                            <GitMerge size={20} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-base font-black uppercase italic tracking-tight text-white">
+                                                Merge Teams
+                                            </h3>
+                                            <p className="text-[11px] text-purple-300/70">
+                                                Combine with another solo or duo team
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Sub-Feature A: Generate Code */}
+                                    <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2.5">
+                                        <span className="text-[10px] font-black uppercase text-white/40 tracking-wider block">
+                                            Option 1: Invite Another Team
+                                        </span>
+                                        {generatedCode ? (
+                                            <div className="p-3 rounded-xl bg-[#14b8a6]/10 border border-[#14b8a6]/40 flex items-center justify-between">
+                                                <div>
+                                                    <span className="text-[10px] text-white/40 block font-bold">Your Merge Code:</span>
+                                                    <span className="font-mono text-xl font-black text-[#14b8a6] tracking-widest">
+                                                        {generatedCode}
+                                                    </span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        void navigator.clipboard.writeText(generatedCode);
+                                                        toast.success('Merge code copied to clipboard!');
+                                                    }}
+                                                    className="px-3 py-1.5 rounded-lg bg-[#14b8a6] text-black font-black text-[10px] uppercase flex items-center gap-1 cursor-pointer"
+                                                >
+                                                    <Copy size={12} /> Copy
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                disabled={isGeneratingCode}
+                                                onClick={handleGenerateMergeCode}
+                                                className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition cursor-pointer"
+                                            >
+                                                {isGeneratingCode ? 'Creating Code...' : 'Generate 30-Min Merge Code'}
+                                            </button>
+                                        )}
+                                        <p className="text-[10px] text-white/40">
+                                            Share this code with the other Team Lead. Once they enter it, you will get an approval prompt.
+                                        </p>
+                                    </div>
+
+                                    {/* Sub-Feature B: Enter Code */}
+                                    <form onSubmit={handleSubmitMergeCode} className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2.5">
+                                        <span className="text-[10px] font-black uppercase text-white/40 tracking-wider block">
+                                            Option 2: Enter Their Merge Code
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. MG-8492"
+                                                value={inputMergeCode}
+                                                onChange={e => setInputMergeCode(e.target.value)}
+                                                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white uppercase outline-none focus:border-purple-400"
+                                            />
+                                            <button
+                                                type="submit"
+                                                disabled={isSubmittingMerge || !inputMergeCode.trim()}
+                                                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs uppercase transition cursor-pointer disabled:opacity-50"
+                                            >
+                                                {isSubmittingMerge ? '...' : 'Request'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                {/* First-Timer FAQ Shield Widget */}
+                                <div className="p-6 rounded-3xl border border-white/10 bg-white/[0.03] space-y-4">
+                                    <div className="flex items-center gap-2.5 text-xs font-black uppercase text-white/60 tracking-wider">
+                                        <HelpCircle size={16} className="text-[#14b8a6]" />
+                                        <span>First-Timer Guide</span>
+                                    </div>
+
+                                    <div className="space-y-2 text-xs">
+                                        <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                                            <p className="font-bold text-white mb-1">When do we get our Digital Passes?</p>
+                                            <p className="text-white/60 text-[11px] leading-relaxed">
+                                                On October 7, after all rosters are locked. QR badges and meal passes will be emailed to your lead.
+                                            </p>
+                                        </div>
+
+                                        <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                                            <p className="font-bold text-white mb-1">Can our team have 3 members?</p>
+                                            <p className="text-white/60 text-[11px] leading-relaxed">
+                                                Yes! Teams can have anywhere between 2 and 4 members. You do not have to find a 4th if you already have 3.
+                                            </p>
+                                        </div>
+
+                                        <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                                            <p className="font-bold text-white mb-1">Need special assistance?</p>
+                                            <p className="text-white/60 text-[11px] leading-relaxed mb-2">
+                                                Please submit an in-app ticket below instead of calling organizer phone numbers.
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowHelpModal(true)}
+                                                className="w-full py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-[#14b8a6] font-bold text-[11px] transition cursor-pointer"
+                                            >
+                                                Open Help Desk Ticket
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </main>
+
+            {/* ══════════════ MODAL 1: REPLACE MEMBER MODAL ══════════════ */}
+            <AnimatePresence>
+                {replacingSlotIndex !== null && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-md bg-[#0D0219] border-2 border-amber-500/40 rounded-[2rem] p-6 shadow-2xl overflow-hidden"
+                        >
+                            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center">
+                                        <UserPlus size={18} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-black uppercase italic tracking-tight text-white text-base">
+                                            Replace Member #{replacingSlotIndex + 1}
+                                        </h3>
+                                        <p className="text-[10px] text-amber-400 font-bold uppercase tracking-widest">
+                                            Anti-Fraud Substitution
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setReplacingSlotIndex(null)}
+                                    className="p-1.5 rounded-full hover:bg-white/10 text-white/50 hover:text-white"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <p className="text-xs text-white/60 mb-4 leading-relaxed">
+                                Enter the new teammate’s details below. An automated security notice will be emailed to the previous participant.
+                            </p>
+
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                        New Member Full Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Full Name"
+                                        value={replacementForm.fullName}
+                                        onChange={e => setReplacementForm({ ...replacementForm, fullName: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                        New Member Email Address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        placeholder="student@college.edu"
+                                        value={replacementForm.email}
+                                        onChange={e => setReplacementForm({ ...replacementForm, email: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                            Mobile Number
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="10-digit number"
+                                            value={replacementForm.phone}
+                                            onChange={e => setReplacementForm({ ...replacementForm, phone: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                            College
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="College Name"
+                                            value={replacementForm.college}
+                                            onChange={e => setReplacementForm({ ...replacementForm, college: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setReplacingSlotIndex(null)}
+                                        className="flex-1 py-2.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={isReplacing || !replacementForm.fullName || !replacementForm.email}
+                                        onClick={handleExecuteMemberReplacement}
+                                        className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-black uppercase italic text-xs tracking-wider transition cursor-pointer disabled:opacity-50"
+                                    >
+                                        {isReplacing ? 'Updating...' : 'Confirm Replacement'}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ══════════════ MODAL 2: FORGOT TEAM ID LOOKUP TOOL ══════════════ */}
+            <AnimatePresence>
+                {showLookupModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-md bg-[#0D0219] border border-white/10 rounded-[2rem] p-6 shadow-2xl"
+                        >
+                            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-9 h-9 rounded-xl bg-[#14b8a6]/20 text-[#14b8a6] flex items-center justify-center">
+                                        <Search size={18} />
+                                    </div>
+                                    <h3 className="font-black uppercase italic tracking-tight text-white text-base">
+                                        Find Your Team ID
+                                    </h3>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowLookupModal(false)}
+                                    className="p-1.5 rounded-full hover:bg-white/10 text-white/50 hover:text-white"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleLookupTeam} className="space-y-3 mb-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                        Enter Registered Email or Mobile Number
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. captain@college.edu or 9876543210"
+                                            value={lookupQuery}
+                                            onChange={e => setLookupQuery(e.target.value)}
+                                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#14b8a6]"
+                                            required
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={lookupLoading}
+                                            className="px-4 py-2 rounded-xl bg-[#14b8a6] text-black font-black text-xs uppercase"
+                                        >
+                                            {lookupLoading ? '...' : 'Search'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            {lookupResults.length > 0 && (
+                                <div className="space-y-2 max-h-48 overflow-y-auto">
+                                    {lookupResults.map(r => (
+                                        <div
+                                            key={r.teamId}
+                                            onClick={() => {
+                                                setTeamIdInput(r.teamId);
+                                                setShowLookupModal(false);
+                                                toast.success(`Selected Team ID ${r.teamId}`);
+                                            }}
+                                            className="p-3 rounded-xl bg-white/5 hover:bg-[#14b8a6]/10 border border-white/10 hover:border-[#14b8a6]/40 transition cursor-pointer flex items-center justify-between"
+                                        >
+                                            <div>
+                                                <span className="font-bold text-sm text-white block">{r.teamName}</span>
+                                                <span className="text-[11px] text-white/50">{r.captainName} • {r.maskedEmail}</span>
+                                            </div>
+                                            <span className="font-mono text-xs font-black text-[#14b8a6] bg-[#14b8a6]/20 px-2 py-0.5 rounded">
+                                                {r.teamId}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ══════════════ MODAL 3: IN-APP SUPPORT TICKET MODAL ══════════════ */}
+            <AnimatePresence>
+                {showHelpModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-md bg-[#0D0219] border border-white/10 rounded-[2rem] p-6 shadow-2xl"
+                        >
+                            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                                        <HelpCircle size={18} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-black uppercase italic tracking-tight text-white text-base">
+                                            First-Timer Support Desk
+                                        </h3>
+                                        <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">
+                                            Fast Response from Organizers
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowHelpModal(false)}
+                                    className="p-1.5 rounded-full hover:bg-white/10 text-white/50 hover:text-white"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSubmitSupportTicket} className="space-y-3.5">
+                                <div>
+                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                        Issue Category
+                                    </label>
+                                    <select
+                                        value={helpCategory}
+                                        onChange={e => setHelpCategory(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-blue-400"
+                                    >
+                                        <option value="Roster Query" className="bg-[#0D0219]">Roster & Teammate Change</option>
+                                        <option value="Team Merge" className="bg-[#0D0219]">Team Merge Question</option>
+                                        <option value="Pass & QR" className="bg-[#0D0219]">Digital Pass / Event Dates</option>
+                                        <option value="Other" className="bg-[#0D0219]">General Hackathon Question</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                        Describe your issue
+                                    </label>
+                                    <textarea
+                                        rows={4}
+                                        placeholder="Please provide details (e.g. My teammate dropped out and I need to add X)..."
+                                        value={helpText}
+                                        onChange={e => setHelpText(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-blue-400"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowHelpModal(false)}
+                                        className="flex-1 py-2.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmittingHelp || !helpText.trim()}
+                                        className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase italic text-xs tracking-wider transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                                    >
+                                        <Send size={13} className={isSubmittingHelp ? 'animate-spin' : ''} />
+                                        {isSubmittingHelp ? 'Sending...' : 'Submit Query'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
 
-// ─── Export ──────────────────────────────────────────────────────────
 export default function EditRegistrationPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-teal-200 border-t-[#0f766e] rounded-full animate-spin" />
+            <div className="min-h-screen bg-[#06000F] flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
             </div>
         }>
-            <EditRegistrationContent />
+            <EditRegistrationInner />
         </Suspense>
     );
 }

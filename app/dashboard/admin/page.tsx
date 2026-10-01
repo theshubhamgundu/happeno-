@@ -50,6 +50,8 @@ import {
     Inbox,
     Send,
     Reply,
+    GitMerge,
+    History,
     type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
@@ -837,6 +839,94 @@ export default function AdminDashboard() {
         totalTeams: number;
     } | null>(null);
 
+    // --- ROSTER CORRECTION WINDOW & AUDIT STATE ---
+    const [showRosterModal, setShowRosterModal] = useState(false);
+    const [rosterPortalMode, setRosterPortalMode] = useState<'edit' | 'closed' | 'event'>('edit');
+    const [rosterOverride, setRosterOverride] = useState<string>('auto');
+    const [rosterAuditLogs, setRosterAuditLogs] = useState<any[]>([]);
+    const [isLoadingRosterSettings, setIsLoadingRosterSettings] = useState(false);
+    const [isDispatchingRosterLinks, setIsDispatchingRosterLinks] = useState(false);
+    const [rosterDispatchTarget, setRosterDispatchTarget] = useState<'leads' | 'members'>('leads');
+    const [rosterDispatchProgress, setRosterDispatchProgress] = useState({ processed: 0, sent: 0, failed: 0 });
+
+    const fetchRosterSettings = async () => {
+        setIsLoadingRosterSettings(true);
+        try {
+            const res = await fetch('/api/admin/roster-settings');
+            const data = await res.json();
+            if (data.success) {
+                setRosterPortalMode(data.portalMode || 'edit');
+                setRosterOverride(data.settings?.participant_edit_override || 'auto');
+                setRosterAuditLogs(data.auditLogs || []);
+            }
+        } catch (e) {
+            console.error('Failed to fetch roster settings:', e);
+        } finally {
+            setIsLoadingRosterSettings(false);
+        }
+    };
+
+    const handleSetRosterOverride = async (overrideValue: string) => {
+        try {
+            const res = await fetch('/api/admin/roster-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'set_override', overrideValue })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success(data.message);
+                void fetchRosterSettings();
+            } else {
+                toast.error(data.error || 'Failed to update window.');
+            }
+        } catch {
+            toast.error('Network error updating window.');
+        }
+    };
+
+    const handleDispatchRosterEmails = async (target: 'leads' | 'members') => {
+        setRosterDispatchTarget(target);
+        setIsDispatchingRosterLinks(true);
+        setRosterDispatchProgress({ processed: 0, sent: 0, failed: 0 });
+
+        let offset = 0;
+        const batchSize = 25;
+        let keepGoing = true;
+
+        toast.loading(`Starting batch dispatch to ${target}...`, { id: 'roster-dispatch' });
+
+        try {
+            while (keepGoing) {
+                const res = await fetch('/api/admin/dispatch-verification-emails', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ target, batchSize, offset })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Dispatch error');
+
+                setRosterDispatchProgress(prev => ({
+                    processed: prev.processed + (data.processed || 0),
+                    sent: prev.sent + (data.sentCount || 0),
+                    failed: prev.failed + (data.failCount || 0)
+                }));
+
+                if (!data.hasMore || (data.processed || 0) === 0) {
+                    keepGoing = false;
+                } else {
+                    offset += data.processed;
+                    await new Promise(r => setTimeout(r, 500));
+                }
+            }
+            toast.success(`Completed dispatch to ${target}!`, { id: 'roster-dispatch' });
+        } catch (err: any) {
+            toast.error(err.message || 'Error during dispatch.', { id: 'roster-dispatch' });
+        } finally {
+            setIsDispatchingRosterLinks(false);
+        }
+    };
+
     const [resettingTeamId, setResettingTeamId] = useState<string | null>(null);
     const [credentialResetResult, setCredentialResetResult] = useState<{
         teamId: string;
@@ -1178,6 +1268,19 @@ export default function AdminDashboard() {
                             className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-[10px] font-black uppercase tracking-wider text-white transition hover:border-[#14b8a6]/50 hover:text-[#14b8a6]"
                         >
                             <Download size={18} /> Export
+                        </button>
+
+                        {/* Roster Window & Audit Hub */}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowRosterModal(true);
+                                void fetchRosterSettings();
+                            }}
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-500/70 hover:bg-teal-500/30 cursor-pointer"
+                        >
+                            <GitMerge size={18} /> Roster Window & Audit
+                            <span className={`w-2 h-2 rounded-full ${rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' : 'bg-white/40'}`} />
                         </button>
                         
                         {/* Merge Teams */}
@@ -3743,6 +3846,219 @@ export default function AdminDashboard() {
                                     </button>
                                 </div>
                             </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ ROSTER CORRECTION WINDOW & AUDIT MODAL ═══════════ */}
+            <AnimatePresence>
+                {showRosterModal && (
+                    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-4xl max-h-[90vh] bg-[#0D0219] border-2 border-teal-500/40 rounded-[2.5rem] p-6 sm:p-8 shadow-2xl overflow-y-auto custom-scrollbar"
+                        >
+                            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+                                <div className="flex items-center gap-3.5">
+                                    <div className="w-12 h-12 rounded-2xl bg-teal-500/20 text-[#14b8a6] border border-teal-500/40 flex items-center justify-center shrink-0">
+                                        <GitMerge size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black uppercase italic tracking-tight text-white">
+                                            Roster Correction Window & Audit Trail
+                                        </h3>
+                                        <p className="text-xs text-teal-400 font-bold uppercase tracking-widest mt-0.5">
+                                            Self-Service Control Hub (Oct 5–6 Window)
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowRosterModal(false)}
+                                    className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
+                                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                                    title="Close"
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+
+                            {/* Section 1: Window Status & Live Override */}
+                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/10 mb-6 space-y-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div>
+                                        <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">
+                                            Current Participant Portal Status
+                                        </span>
+                                        <div className="flex items-center gap-2.5 mt-1">
+                                            <span className={`w-2.5 h-2.5 rounded-full ${
+                                                rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' :
+                                                rosterPortalMode === 'event' ? 'bg-blue-400' : 'bg-amber-400'
+                                            }`} />
+                                            <span className="text-base font-black italic uppercase text-white">
+                                                {rosterPortalMode === 'edit' ? 'Correction Window Open (Edit Mode)' :
+                                                 rosterPortalMode === 'event' ? 'Event Workspace Active (Hackathon Live)' :
+                                                 'Locked / Frozen (Countdown Active)'}
+                                            </span>
+                                            <span className="px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60">
+                                                Override: {rosterOverride}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Override Controls */}
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <button
+                                            type="button"
+                                            onClick={() => void handleSetRosterOverride('open')}
+                                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                                                rosterOverride === 'open' ? 'bg-emerald-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
+                                            }`}
+                                        >
+                                            Force Open
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => void handleSetRosterOverride('closed')}
+                                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                                                rosterOverride === 'closed' ? 'bg-amber-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
+                                            }`}
+                                        >
+                                            Force Lock
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => void handleSetRosterOverride('auto')}
+                                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                                                rosterOverride === 'auto' ? 'bg-teal-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
+                                            }`}
+                                        >
+                                            Auto (Oct 5–6)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Section 2: Launch Campaign Dispatchers */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                {/* Lead Dispatcher Card */}
+                                <div className="p-5 rounded-3xl bg-teal-500/[0.05] border border-teal-500/30 space-y-3">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-xl bg-teal-500/20 text-[#14b8a6] flex items-center justify-center font-bold">
+                                            <Mail size={16} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-white text-sm">1. Magic Links to Team Leads</h4>
+                                            <span className="text-[10px] text-teal-400 font-semibold">Primary Roster Access</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-white/60 leading-relaxed">
+                                        Emails each Team Captain their private, encrypted link to <strong>/edit-registration</strong> so they can fix names, replace absent members, or merge without passwords.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        disabled={isDispatchingRosterLinks}
+                                        onClick={() => void handleDispatchRosterEmails('leads')}
+                                        className="w-full py-2.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
+                                    >
+                                        {isDispatchingRosterLinks && rosterDispatchTarget === 'leads' ? 'Dispatching Leads...' : 'Dispatch Magic Links to Leads'}
+                                    </button>
+                                </div>
+
+                                {/* Member Dispatcher Card */}
+                                <div className="p-5 rounded-3xl bg-blue-500/[0.05] border border-blue-500/30 space-y-3">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                                            <Users size={16} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-white text-sm">2. Confirmation to Members</h4>
+                                            <span className="text-[10px] text-blue-300 font-semibold">Read-Only Notice</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-white/60 leading-relaxed">
+                                        Sends read-only confirmation to all participants so they know they are registered and gives them their lead&apos;s contact for coordination.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        disabled={isDispatchingRosterLinks}
+                                        onClick={() => void handleDispatchRosterEmails('members')}
+                                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
+                                    >
+                                        {isDispatchingRosterLinks && rosterDispatchTarget === 'members' ? 'Dispatching Members...' : 'Dispatch Member Notices'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Live Dispatch Progress */}
+                            {isDispatchingRosterLinks && (
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 mb-6 space-y-2">
+                                    <div className="flex justify-between text-xs font-bold text-white">
+                                        <span>Dispatching to {rosterDispatchTarget}...</span>
+                                        <span className="text-teal-400">Processed: {rosterDispatchProgress.processed} (Sent: {rosterDispatchProgress.sent})</span>
+                                    </div>
+                                    <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                                        <div className="bg-teal-400 h-full animate-pulse w-full rounded-full" />
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Section 3: Live Immutable Audit Trail */}
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between px-1">
+                                    <div className="flex items-center gap-2">
+                                        <History size={16} className="text-[#14b8a6]" />
+                                        <h4 className="font-bold text-white text-sm">Live Roster Audit Trail</h4>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={fetchRosterSettings}
+                                        className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
+                                    >
+                                        <RefreshCw size={12} className={isLoadingRosterSettings ? 'animate-spin' : ''} /> Refresh
+                                    </button>
+                                </div>
+
+                                {rosterAuditLogs.length === 0 ? (
+                                    <div className="py-12 text-center rounded-2xl border border-dashed border-white/10">
+                                        <History size={32} className="mx-auto mb-2 text-white/20" />
+                                        <p className="text-xs text-white/40 uppercase tracking-widest font-bold">No roster modifications yet</p>
+                                        <p className="text-[11px] text-white/20 mt-1">Changes made during Oct 5–6 will appear here in real-time with IP addresses.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                                        {rosterAuditLogs.map((log: any) => (
+                                            <div
+                                                key={log.id}
+                                                className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                                            >
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                                                            log.action === 'MERGE_TEAMS' ? 'bg-purple-500/20 text-purple-300' :
+                                                            log.action === 'REPLACE_MEMBER' ? 'bg-amber-500/20 text-amber-300' :
+                                                            'bg-teal-500/20 text-teal-300'
+                                                        }`}>
+                                                            {log.action}
+                                                        </span>
+                                                        <span className="font-mono font-bold text-white">{log.teamId}</span>
+                                                        <span className="text-white/40 text-[11px]">• {log.actor}</span>
+                                                    </div>
+                                                    <p className="text-white/70 text-[11px]">{log.summary}</p>
+                                                </div>
+
+                                                <div className="text-right shrink-0 text-[10px] font-mono text-white/30">
+                                                    <div>{new Date(log.timestamp).toLocaleTimeString()}</div>
+                                                    <div>IP: {log.ip}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </motion.div>
                     </div>
                 )}

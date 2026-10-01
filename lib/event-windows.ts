@@ -6,6 +6,7 @@ export type ParticipantPortalMode = 'edit' | 'event' | 'closed';
 const WINDOW_KEYS = [
     'participant_edit_start',
     'participant_edit_end',
+    'participant_edit_override',
     'event_access_start',
     'event_access_end'
 ] as const;
@@ -18,13 +19,21 @@ export async function getParticipantPortalMode(now = new Date()): Promise<Partic
     if (error) throw error;
 
     const settings = new Map((data || []).map(row => [row.key, row.value]));
-    const editStart = Date.parse(String(settings.get('participant_edit_start') || ''));
-    const editEnd = Date.parse(String(settings.get('participant_edit_end') || ''));
-    const eventStart = Date.parse(String(settings.get('event_access_start') || ''));
-    const eventEnd = Date.parse(String(settings.get('event_access_end') || ''));
+
+    // Check manual override first
+    const override = String(settings.get('participant_edit_override') || '').toLowerCase().trim();
+    if (override === 'open' || override === 'edit') return 'edit';
+    if (override === 'closed') return 'closed';
+    if (override === 'event') return 'event';
+
+    const editStart = Date.parse(String(settings.get('participant_edit_start') || '2026-10-05T00:00:00+05:30'));
+    const editEnd = Date.parse(String(settings.get('participant_edit_end') || '2026-10-06T23:59:59+05:30'));
+    const eventStart = Date.parse(String(settings.get('event_access_start') || '2026-10-10T08:00:00+05:30'));
+    const eventEnd = Date.parse(String(settings.get('event_access_end') || '2026-10-11T20:00:00+05:30'));
     const current = now.getTime();
 
     if (Number.isFinite(editStart) && Number.isFinite(editEnd) && current >= editStart && current < editEnd) return 'edit';
     if (Number.isFinite(eventStart) && Number.isFinite(eventEnd) && current >= eventStart && current < eventEnd) return 'event';
     return 'closed';
 }
+
