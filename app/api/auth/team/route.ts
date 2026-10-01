@@ -3,6 +3,8 @@ import { teamSupabase as supabase } from '@/lib/supabase';
 import { setSessionCookie } from '@/lib/session';
 import { verifyPassword } from '@/lib/password';
 import { getParticipantPortalMode } from '@/lib/event-windows';
+import { Ratelimit } from '@upstash/ratelimit';
+import { redis } from '@/lib/redis';
 
 export async function POST(req: Request) {
     if (!process.env.AUTH_SESSION_SECRET || Buffer.byteLength(process.env.AUTH_SESSION_SECRET) < 32) {
@@ -10,6 +12,20 @@ export async function POST(req: Request) {
     }
 
     try {
+        // --- Rate Limiting ---
+        if (redis) {
+            const ratelimit = new Ratelimit({
+                redis,
+                limiter: Ratelimit.slidingWindow(5, '1 m'),
+                analytics: true,
+            });
+            const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1';
+            const { success } = await ratelimit.limit(`ratelimit_login_${ip}`);
+            if (!success) {
+                return NextResponse.json({ success: false, error: 'Too many login attempts. Please try again in a minute.' }, { status: 429 });
+            }
+        }
+        // ---------------------
         const { teamId, password } = await req.json();
         if (typeof teamId !== 'string' || typeof password !== 'string') {
             return NextResponse.json({ success: false, error: 'Team ID and password are required.' }, { status: 400 });

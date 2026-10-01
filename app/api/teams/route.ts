@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { MAX_TEAM_MEMBERS } from '@/lib/constants';
 import { getSession, hasRole } from '@/lib/session';
 import { getParticipantPortalMode } from '@/lib/event-windows';
+import { redis } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
