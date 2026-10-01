@@ -40,10 +40,6 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [activeAdminSection, setActiveAdminSection] = useState("entries");
     const { hackathonStartDate, projects, isSubmissionLocked } = useHackathon();
-    const [timeLeft, setTimeLeft] = useState("00:00:00");
-    const [hasStarted, setHasStarted] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [isFinished, setIsFinished] = useState(false);
 
     useEffect(() => {
         const syncAdminSection = () => setActiveAdminSection(window.location.hash.slice(1) || "entries");
@@ -94,51 +90,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
         }
     }, [user, isLoading, type, router]);
 
-    useEffect(() => {
-        const calculateTimeLeft = () => {
-            if (hackathonStartDate === "TBD") return;
-            const [year, month, day] = hackathonStartDate.split('-').map(Number);
-            const start = new Date(year, month - 1, day, 9, 30, 0);
-            const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-            const now = new Date();
 
-            const startDiff = start.getTime() - now.getTime();
-            const endDiff = end.getTime() - now.getTime();
-
-            if (startDiff > 0) {
-                // Not started yet
-                const dateStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const timeStr = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-                setTimeLeft(`${dateStr}, ${timeStr}`);
-                setHasStarted(false);
-                setProgress(0);
-                setIsFinished(false);
-            } else if (endDiff > 0) {
-                // Hacking in progress
-                const remaining = endDiff;
-                const hours = Math.floor(remaining / (1000 * 60 * 60));
-                const minutes = Math.floor((remaining / 1000 / 60) % 60);
-
-                setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
-                setHasStarted(true);
-                setIsFinished(false);
-
-                const total = end.getTime() - start.getTime();
-                const elapsed = now.getTime() - start.getTime();
-                setProgress((elapsed / total) * 100);
-            } else {
-                // Finished
-                setTimeLeft("00:00");
-                setHasStarted(true);
-                setIsFinished(true);
-                setProgress(100);
-            }
-        };
-
-        const timer = setInterval(calculateTimeLeft, 1000);
-        calculateTimeLeft();
-        return () => clearInterval(timer);
-    }, [hackathonStartDate]);
 
     if (isLoading || !user || user.role !== type) {
         return (
@@ -239,10 +191,6 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                         )}
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="hidden sm:block rounded-xl border border-slate-200 bg-[#fafafa] px-3 py-2 text-right">
-                            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{isFinished ? "Event ended" : hasStarted ? "Time remaining" : "Starts"}</p>
-                            <p className={`mt-0.5 font-mono text-sm font-bold ${isFinished ? "text-rose-600" : hasStarted ? "text-emerald-600" : "text-[#c85847]"}`}>{timeLeft}</p>
-                        </div>
                         {!hasSidebar && (
                             <div className="hidden sm:flex items-center gap-2 rounded-lg border border-slate-200 bg-[#fafafa] px-2.5 py-1.5 text-xs font-bold text-slate-700">
                                 <User size={14} className="text-[#c85847]" />

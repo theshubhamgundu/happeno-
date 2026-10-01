@@ -472,7 +472,10 @@ export default function AdminDashboard() {
                 toast.success(data.message || 'Submissions successfully cleared! Participant dashboards are now fresh.');
                 setShowClearSubmissionsModal(false);
                 if (clearSubmissionsTarget === 'selected') setSelectedTeamIds([]);
-                if (refreshTeams) await refreshTeams();
+                // Trigger background refresh safely without re-throwing into the submission handler
+                if (refreshTeams) {
+                    refreshTeams().catch(err => console.warn('Background refresh after clear submissions:', err));
+                }
             } else {
                 toast.error(data.error || 'Failed to clear submissions.');
             }

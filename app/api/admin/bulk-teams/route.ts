@@ -47,15 +47,11 @@ export async function POST(req: Request) {
             const { data: targetRows, error: fetchErr } = await query;
             if (fetchErr) throw fetchErr;
 
-            if (targetRows && targetRows.length > 0) {
-                for (const row of targetRows) {
-                    const raw = (row.raw_data && typeof row.raw_data === 'object') ? { ...(row.raw_data as any) } : {};
-                    if (clearIdeation) {
-                        raw.ps_locked = false;
-                        raw.pi_locked = false;
-                        raw.ts_locked = false;
-                    }
+            const targetCount = targetRows?.length || 0;
 
+            if (targetCount > 0) {
+                if (!clearIdeation) {
+                    // Instant single query batch update for all target teams
                     const updateFields: Record<string, unknown> = {
                         github_url: null,
                         presentation_url: null,
@@ -64,17 +60,43 @@ export async function POST(req: Request) {
                         is_final_submission: false
                     };
 
-                    if (clearIdeation) {
-                        updateFields.problem_statement = null;
-                        updateFields.proposed_idea = null;
-                        updateFields.tech_stack = null;
-                        updateFields.raw_data = raw;
+                    let updateQuery = supabase.from('registrations').update(updateFields);
+                    if (isAll) {
+                        updateQuery = updateQuery.neq('status', 'MERGED');
+                    } else {
+                        const targetTxIds = (targetRows || []).map(r => r.transaction_id);
+                        updateQuery = updateQuery.in('transaction_id', targetTxIds);
                     }
 
-                    await supabase
-                        .from('registrations')
-                        .update(updateFields)
-                        .eq('transaction_id', row.transaction_id);
+                    const { error: updateErr } = await updateQuery;
+                    if (updateErr) throw updateErr;
+                } else {
+                    // Concurrently update raw_data locks in parallel batches of 25
+                    const batchSize = 25;
+                    for (let i = 0; i < targetRows!.length; i += batchSize) {
+                        const chunk = targetRows!.slice(i, i + batchSize);
+                        await Promise.all(chunk.map(row => {
+                            const raw = (row.raw_data && typeof row.raw_data === 'object') ? { ...(row.raw_data as any) } : {};
+                            raw.ps_locked = false;
+                            raw.pi_locked = false;
+                            raw.ts_locked = false;
+
+                            return supabase
+                                .from('registrations')
+                                .update({
+                                    github_url: null,
+                                    presentation_url: null,
+                                    demo_url: null,
+                                    deployment_url: null,
+                                    is_final_submission: false,
+                                    problem_statement: null,
+                                    proposed_idea: null,
+                                    tech_stack: null,
+                                    raw_data: raw
+                                })
+                                .eq('transaction_id', row.transaction_id);
+                        }));
+                    }
                 }
             }
 
