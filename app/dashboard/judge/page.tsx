@@ -9,9 +9,13 @@ import {
     Target,
     ArrowLeft,
     UserCircle2,
-    CheckCircle2
+    CheckCircle2,
+    Wifi,
+    WifiOff,
+    RefreshCw,
+    CloudUpload
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useHackathon, type Project } from "@/context/HackathonContext";
@@ -40,6 +44,18 @@ interface JudgeEvaluationRecord {
     feedback: string;
 }
 
+interface OfflineQueueItem {
+    id: string; // evaluationId
+    teamId: string;
+    teamName: string;
+    roundId: string;
+    roundTitle: string;
+    criteriaScores: Record<string, number>;
+    feedback: string;
+    totalScore: number;
+    queuedAt: number;
+}
+
 export default function JudgeDashboard() {
     const { isLoading } = useHackathon();
     const { user } = useAuth();
@@ -56,11 +72,59 @@ export default function JudgeDashboard() {
     const [isLoadingEvaluations, setIsLoadingEvaluations] = useState(false);
     const [alreadyEvaluatedInfo, setAlreadyEvaluatedInfo] = useState<{ teamId: string; teamName: string; roundTitle: string; score: number | null } | null>(null);
 
+    // Offline resilience & mobile sync state
+    const [isOnline, setIsOnline] = useState(true);
+    const [offlineQueue, setOfflineQueue] = useState<OfflineQueueItem[]>([]);
+    const [isSyncingQueue, setIsSyncingQueue] = useState(false);
+    const [offlineSubmitNotice, setOfflineSubmitNotice] = useState<{
+        teamId: string;
+        teamName: string;
+        totalScore: number;
+        message: string;
+    } | null>(null);
+
     const currentJudge = user?.role === 'judge' && user.id
         ? { id: user.id, generatedId: user.id, name: user.name || user.id }
         : null;
 
-    const draftStorageKey = (tId: string, rId: string) => `tricity_judge_draft_${tId}_${rId}`;
+    const draftStorageKey = useCallback((tId: string, rId: string) => `tricity_judge_draft_${tId}_${rId}`, []);
+
+    const loadOfflineQueue = useCallback(() => {
+        if (typeof window === 'undefined') return [];
+        try {
+            const raw = localStorage.getItem('tricity_judge_offline_queue');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    setOfflineQueue(parsed);
+                    return parsed as OfflineQueueItem[];
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to parse offline queue:', e);
+        }
+        return [];
+    }, []);
+
+    const addQueueItem = useCallback((item: OfflineQueueItem) => {
+        setOfflineQueue(prev => {
+            const updated = [...prev.filter(q => q.id !== item.id), item];
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('tricity_judge_offline_queue', JSON.stringify(updated));
+            }
+            return updated;
+        });
+    }, []);
+
+    const removeQueueItem = useCallback((evalId: string) => {
+        setOfflineQueue(prev => {
+            const updated = prev.filter(q => q.id !== evalId);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('tricity_judge_offline_queue', JSON.stringify(updated));
+            }
+            return updated;
+        });
+    }, []);
 
     // Load judge's evaluation history
     const fetchJudgeEvaluations = async () => {
@@ -81,6 +145,88 @@ export default function JudgeDashboard() {
         }
     };
 
+    // Background Queue Synchronizer: drains offline submissions when network is restored
+    const processOfflineQueue = useCallback(async () => {
+        if (typeof window === 'undefined') return;
+        const currentQueue = loadOfflineQueue();
+        if (!currentQueue || currentQueue.length === 0) return;
+
+        setIsSyncingQueue(true);
+        let remaining = [...currentQueue];
+        let syncedCount = 0;
+
+        for (const item of currentQueue) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+                const response = await fetch('/api/judging/evaluations', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        evaluationId: item.id,
+                        criteriaScores: item.criteriaScores,
+                        feedback: item.feedback
+                    }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                const result = await response.json();
+                if (response.ok && (result.success || result.alreadySubmitted)) {
+                    remaining = remaining.filter(q => q.id !== item.id);
+                    localStorage.setItem('tricity_judge_offline_queue', JSON.stringify(remaining));
+                    localStorage.removeItem(draftStorageKey(item.teamId, item.roundId));
+                    syncedCount++;
+                }
+            } catch (err) {
+                console.warn(`Background sync failed for ${item.teamId}:`, err);
+            }
+        }
+
+        setOfflineQueue(remaining);
+        setIsSyncingQueue(false);
+
+        if (syncedCount > 0) {
+            toast.success(`Synced ${syncedCount} evaluation${syncedCount === 1 ? '' : 's'} from your phone to the server!`);
+            void fetchJudgeEvaluations();
+        }
+    }, [loadOfflineQueue, draftStorageKey]);
+
+    // Network connection listener & auto-sync heartbeat
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        setIsOnline(navigator.onLine);
+        loadOfflineQueue();
+
+        const handleOnline = () => {
+            setIsOnline(true);
+            toast.success('Internet reconnected. Syncing saved evaluations...');
+            void processOfflineQueue();
+        };
+
+        const handleOffline = () => {
+            setIsOnline(false);
+            toast.warning('Internet connection lost. Offline protection active on your phone.');
+        };
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        // Auto-sync polling every 20 seconds if items are queued
+        const syncInterval = setInterval(() => {
+            if (navigator.onLine) {
+                void processOfflineQueue();
+            }
+        }, 20000);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+            clearInterval(syncInterval);
+        };
+    }, [loadOfflineQueue, processOfflineQueue]);
+
     useEffect(() => {
         if (currentJudge) {
             void fetchJudgeEvaluations();
@@ -94,6 +240,7 @@ export default function JudgeDashboard() {
         setDraftStatus('idle');
         setCurrentScores({});
         setComment('');
+        setOfflineSubmitNotice(null);
         void fetchJudgeEvaluations();
     };
 
@@ -233,23 +380,44 @@ export default function JudgeDashboard() {
             toast.error("Score every criterion from 1 to 10 and add feedback before submitting.");
             return;
         }
+
+        const totalScore = evaluationRound.criteria.reduce((total, criterion) => total + Number(currentScores[criterion.id]), 0);
         setIsSubmitting(true);
+        setOfflineSubmitNotice(null);
+
+        // Pre-save into offline queue item in case of network drop or mobile browser crash
+        const queueItem: OfflineQueueItem = {
+            id: evaluationId,
+            teamId: activeProject.teamId,
+            teamName: activeProject.name,
+            roundId: evaluationRound.id,
+            roundTitle: evaluationRound.title,
+            criteriaScores: currentScores,
+            feedback: comment,
+            totalScore,
+            queuedAt: Date.now()
+        };
+
         try {
+            // 12-second timeout to prevent mobile browsers from hanging indefinitely in dead zones
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 12000);
+
             const response = await fetch('/api/judging/evaluations', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ evaluationId, criteriaScores: currentScores, feedback: comment })
+                body: JSON.stringify({ evaluationId, criteriaScores: currentScores, feedback: comment }),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
+
             const result = await response.json();
             if (!response.ok || !result.success) throw new Error(result.error || 'Evaluation was not saved.');
 
-            // Clear local draft upon confirmed server save
+            // Success: clear local draft and remove from queue
             if (typeof window !== 'undefined') {
-                try {
-                    localStorage.removeItem(draftStorageKey(activeProject.teamId, evaluationRound.id));
-                } catch (e) {
-                    console.warn('Failed to clear local draft:', e);
-                }
+                localStorage.removeItem(draftStorageKey(activeProject.teamId, evaluationRound.id));
+                removeQueueItem(evaluationId);
             }
 
             toast.success(`Evaluation submitted successfully: ${activeProject.name}`);
@@ -262,7 +430,22 @@ export default function JudgeDashboard() {
             setTeamIdInput('');
             void fetchJudgeEvaluations();
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : 'Evaluation was not saved. Your draft remains safely backed up on this device.');
+            console.warn('Evaluation submit encountered network failure:', error);
+            // Securely store in phone's persistent offline queue
+            addQueueItem(queueItem);
+
+            const isOfflineOrTimeout = typeof navigator !== 'undefined' && (!navigator.onLine || (error instanceof Error && (error.name === 'AbortError' || error.message.toLowerCase().includes('fetch'))));
+            if (isOfflineOrTimeout) {
+                setOfflineSubmitNotice({
+                    teamId: activeProject.teamId,
+                    teamName: activeProject.name,
+                    totalScore,
+                    message: 'Internet connection is weak or offline. Your scores and feedback are safely locked on this phone!'
+                });
+                toast.warning(`Network weak/offline: Scores for ${activeProject.name} are safely saved on your phone.`);
+            } else {
+                toast.error(error instanceof Error ? error.message : 'Submission failed. Your draft remains safely backed up on this device.');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -296,7 +479,66 @@ export default function JudgeDashboard() {
                         exit={{ opacity: 0, y: -10 }}
                         className="mx-auto max-w-3xl space-y-6"
                     >
-                        {currentJudge && <div className="inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-white">{currentJudge.name}</div>}
+                        {/* Header Badges: Judge Name + Network/Offline Status Pill */}
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            {currentJudge && (
+                                <div className="inline-flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white">
+                                    <UserCircle2 size={16} className="text-[#FFEE00]" />
+                                    {currentJudge.name}
+                                </div>
+                            )}
+                            <div className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold ${
+                                !isOnline
+                                    ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                                    : offlineQueue.length > 0
+                                    ? "border-[#FFEE00]/40 bg-[#FFEE00]/10 text-[#FFEE00]"
+                                    : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                            }`}>
+                                {!isOnline ? (
+                                    <>
+                                        <WifiOff size={14} className="animate-pulse" />
+                                        <span>Offline Mode (Safe)</span>
+                                    </>
+                                ) : offlineQueue.length > 0 ? (
+                                    <>
+                                        <CloudUpload size={14} className="animate-bounce" />
+                                        <span>{offlineQueue.length} Queued to Sync</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Wifi size={14} />
+                                        <span>Online & Synced</span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Offline Queue Pending Sync Banner */}
+                        {offlineQueue.length > 0 && (
+                            <div className="rounded-2xl border border-amber-500/30 bg-amber-950/40 p-4 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 shrink-0">
+                                        <CloudUpload size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xs font-black uppercase tracking-wider text-amber-200">
+                                            {offlineQueue.length} Evaluation{offlineQueue.length === 1 ? '' : 's'} Stored Locally on this Phone
+                                        </h4>
+                                        <p className="text-[11px] text-amber-100/70">
+                                            Saved safely during poor connection. They will auto-upload the instant network stabilizes.
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => void processOfflineQueue()}
+                                    disabled={isSyncingQueue || !isOnline}
+                                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#FFEE00] px-4 py-2 text-xs font-black text-black hover:bg-[#e6d600] disabled:opacity-50 transition-colors shrink-0"
+                                >
+                                    <RefreshCw size={13} className={isSyncingQueue ? "animate-spin" : ""} />
+                                    {isSyncingQueue ? "Syncing..." : "Sync Now"}
+                                </button>
+                            </div>
+                        )}
 
                         {/* Already Evaluated Notice Banner */}
                         {alreadyEvaluatedInfo && (
@@ -616,6 +858,54 @@ export default function JudgeDashboard() {
                                     {draftStatus === 'saving' ? 'Saving draft…' : draftStatus === 'saved' ? 'Draft saved' : draftStatus === 'error' ? 'Draft save failed. Keep this page open and retry before submitting.' : ''}
                                 </p>
                             </div>
+
+                            {/* Offline / Weak Connection Warning Banner */}
+                            {offlineSubmitNotice && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="rounded-2xl border border-amber-500/40 bg-amber-950/40 p-5 backdrop-blur-md space-y-3"
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <WifiOff className="h-6 w-6 text-amber-400 shrink-0 mt-0.5" />
+                                        <div className="min-w-0 flex-1">
+                                            <h4 className="text-sm font-black uppercase tracking-wider text-amber-300">
+                                                Weak / Offline Connection — Scores Safely Saved!
+                                            </h4>
+                                            <p className="mt-1 text-xs text-amber-100/80 leading-relaxed">
+                                                Your evaluation for <strong className="text-white font-bold">{offlineSubmitNotice.teamName}</strong> (Score: {offlineSubmitNotice.totalScore} pts) is safely preserved in this phone&apos;s memory. You won&apos;t lose anything even if you close the app.
+                                            </p>
+                                            <div className="mt-4 flex flex-wrap gap-2.5">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => void handleScoreSubmit()}
+                                                    disabled={isSubmitting}
+                                                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-xs font-black text-black hover:bg-amber-300 transition-colors"
+                                                >
+                                                    <RefreshCw size={14} className={isSubmitting ? "animate-spin" : ""} /> Retry Upload Now
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        toast.success(`Saved ${activeProject.name} to local queue. Will sync automatically.`);
+                                                        setActiveProject(null);
+                                                        setEvaluationRound(null);
+                                                        setEvaluationId(null);
+                                                        setCurrentScores({});
+                                                        setComment("");
+                                                        setDraftStatus('idle');
+                                                        setTeamIdInput('');
+                                                        setOfflineSubmitNotice(null);
+                                                    }}
+                                                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-black text-white hover:bg-white/20 transition-colors"
+                                                >
+                                                    <ClipboardCheck size={14} /> Queue & Score Next Team
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
 
                             {/* Action Console */}
                             <div className="pt-6 md:pt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 md:gap-8">
