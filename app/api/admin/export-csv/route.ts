@@ -11,6 +11,33 @@ function escapeCsv(val: unknown): string {
     return `"${str.replace(/"/g, '""')}"`;
 }
 
+function extractScore(val: unknown): number {
+    if (typeof val === 'number' && Number.isFinite(val)) return val;
+    if (typeof val === 'string' && val.trim() !== '' && !isNaN(Number(val))) return Number(val);
+    if (val && typeof val === 'object') {
+        const numbers = Object.values(val as Record<string, unknown>)
+            .map(v => typeof v === 'number' ? v : Number(v))
+            .filter(n => Number.isFinite(n));
+        if (numbers.length > 0) {
+            return Number((numbers.reduce((a, b) => a + b, 0) / numbers.length).toFixed(1));
+        }
+    }
+    return 0;
+}
+
+function getTeamRoundScore(roundScores: Record<string, any>, roundIdVariants: string[], evalsScore?: number): number {
+    for (const key of roundIdVariants) {
+        if (roundScores[key] !== undefined) {
+            const parsed = extractScore(roundScores[key]);
+            if (parsed > 0) return parsed;
+        }
+    }
+    if (typeof evalsScore === 'number' && Number.isFinite(evalsScore) && evalsScore > 0) {
+        return evalsScore;
+    }
+    return 0;
+}
+
 async function fetchAllRegistrations(): Promise<Record<string, any>[]> {
     const records: Record<string, any>[] = [];
     let from = 0;
@@ -90,14 +117,21 @@ export async function GET(req: Request) {
                 .select('team_id, round_id, total_score, feedback, judge_name')
                 .eq('status', 'submitted');
 
-            const evalMap = new Map<string, { round1?: number; round2?: number; feedback: string[] }>();
+            const evalMap = new Map<string, { roundScores: Map<string, number[]>; feedback: string[] }>();
             (evaluations || []).forEach(ev => {
-                const existing = evalMap.get(ev.team_id) || { feedback: [] };
-                const score = Number(ev.total_score) || 0;
-                if (ev.round_id === 'round1') existing.round1 = score;
-                else if (ev.round_id === 'round2') existing.round2 = score;
-                if (ev.feedback) existing.feedback.push(`[${ev.judge_name}]: ${ev.feedback}`);
-                evalMap.set(ev.team_id, existing);
+                let existing = evalMap.get(ev.team_id);
+                if (!existing) {
+                    existing = { roundScores: new Map(), feedback: [] };
+                    evalMap.set(ev.team_id, existing);
+                }
+                const score = Number(ev.total_score);
+                if (Number.isFinite(score)) {
+                    const roundId = String(ev.round_id || '').toLowerCase();
+                    const cur = existing.roundScores.get(roundId) || [];
+                    cur.push(score);
+                    existing.roundScores.set(roundId, cur);
+                }
+                if (ev.feedback) existing.feedback.push(`[${ev.judge_name || 'Judge'}]: ${ev.feedback}`);
             });
 
             const scoredTeams = teams.map(team => {
@@ -105,12 +139,23 @@ export async function GET(req: Request) {
                 const roundScores = (team.round_scores as Record<string, any>) || {};
                 const evals = evalMap.get(teamId);
 
-                const r1 = Number(roundScores.round1 ?? evals?.round1 ?? 0);
-                const r2 = Number(roundScores.round2 ?? evals?.round2 ?? 0);
-                const totalScore = r1 + r2;
+                const r1Evals = evals ? (evals.roundScores.get('round1') || evals.roundScores.get('r1') || evals.roundScores.get('round-1') || evals.roundScores.get('round_1')) : undefined;
+                const r1EvalScore = r1Evals && r1Evals.length > 0 ? Number((r1Evals.reduce((a, b) => a + b, 0) / r1Evals.length).toFixed(1)) : 0;
+
+                const r2Evals = evals ? (evals.roundScores.get('round2') || evals.roundScores.get('r2') || evals.roundScores.get('round-2') || evals.roundScores.get('round_2')) : undefined;
+                const r2EvalScore = r2Evals && r2Evals.length > 0 ? Number((r2Evals.reduce((a, b) => a + b, 0) / r2Evals.length).toFixed(1)) : 0;
+
+                const r1 = getTeamRoundScore(roundScores, ['round1', 'r1', 'round-1', 'round_1'], r1EvalScore);
+                const r2 = getTeamRoundScore(roundScores, ['round2', 'r2', 'round-2', 'round_2'], r2EvalScore);
+                const totalScore = Number((r1 + r2).toFixed(1));
 
                 const commentsObj = (team.round_comments as Record<string, any>) || {};
-                const dbComments = Object.entries(commentsObj).map(([r, c]) => `${r}: ${c}`).join(' | ');
+                const dbComments = Object.entries(commentsObj).map(([r, c]) => {
+                    if (typeof c === 'object' && c !== null) {
+                        return Object.entries(c).map(([j, txt]) => `${r} (${j}): ${txt}`).join(' | ');
+                    }
+                    return `${r}: ${c}`;
+                }).join(' | ');
                 const judgeComments = (evals?.feedback || []).join(' | ');
                 const allComments = [dbComments, judgeComments].filter(Boolean).join(' | ');
 
@@ -362,7 +407,30 @@ export async function GET(req: Request) {
         // 10. MASTER COMPREHENSIVE DUMP (ALL IN ONE)
         // ═════════════════════════════════════════════════════════
         else if (type === 'master') {
-            const teams = await fetchAllRegistrations();
+            const [teams, { data: evaluations }] = await Promise.all([
+                fetchAllRegistrations(),
+                supabase
+                    .from('judging_evaluations')
+                    .select('team_id, round_id, total_score')
+                    .eq('status', 'submitted')
+            ]);
+
+            const masterEvalMap = new Map<string, Map<string, number[]>>();
+            (evaluations || []).forEach(ev => {
+                let existing = masterEvalMap.get(ev.team_id);
+                if (!existing) {
+                    existing = new Map();
+                    masterEvalMap.set(ev.team_id, existing);
+                }
+                const score = Number(ev.total_score);
+                if (Number.isFinite(score)) {
+                    const roundId = String(ev.round_id || '').toLowerCase();
+                    const cur = existing.get(roundId) || [];
+                    cur.push(score);
+                    existing.set(roundId, cur);
+                }
+            });
+
             csvContent = 'Team ID,Transaction ID,Team Name,Track,Problem Statement,College,Captain,Captain Email,Captain Phone,Members Count,Status,Check-In Status,Room,Volunteer,GitHub URL,Presentation URL,Demo URL,Deployment URL,Final Submission,Round 1 Score,Round 2 Score,Total Score\n';
 
             for (const team of teams) {
@@ -370,11 +438,21 @@ export async function GET(req: Request) {
                 const members = Array.isArray(team.members) && team.members.length > 0 ? team.members : ((raw.members as any[]) || []);
                 const sub = (raw.submission as Record<string, any>) || {};
                 const scores = (team.round_scores as Record<string, any>) || {};
-                const r1 = Number(scores.round1 ?? 0);
-                const r2 = Number(scores.round2 ?? 0);
+                const teamId = team.team_id || '';
+
+                const evals = masterEvalMap.get(teamId);
+                const r1Evals = evals ? (evals.get('round1') || evals.get('r1') || evals.get('round-1') || evals.get('round_1')) : undefined;
+                const r1EvalScore = r1Evals && r1Evals.length > 0 ? Number((r1Evals.reduce((a, b) => a + b, 0) / r1Evals.length).toFixed(1)) : 0;
+
+                const r2Evals = evals ? (evals.get('round2') || evals.get('r2') || evals.get('round-2') || evals.get('round_2')) : undefined;
+                const r2EvalScore = r2Evals && r2Evals.length > 0 ? Number((r2Evals.reduce((a, b) => a + b, 0) / r2Evals.length).toFixed(1)) : 0;
+
+                const r1 = getTeamRoundScore(scores, ['round1', 'r1', 'round-1', 'round_1'], r1EvalScore);
+                const r2 = getTeamRoundScore(scores, ['round2', 'r2', 'round-2', 'round_2'], r2EvalScore);
+                const totalScore = Number((r1 + r2).toFixed(1));
 
                 csvContent += [
-                    escapeCsv(team.team_id || ''),
+                    escapeCsv(teamId),
                     escapeCsv(team.transaction_id || ''),
                     escapeCsv(team.team_name || raw.teamName || ''),
                     escapeCsv(team.track || ''),
@@ -395,7 +473,7 @@ export async function GET(req: Request) {
                     escapeCsv(team.is_final_submission || sub.isFinal ? 'Yes' : 'No'),
                     r1,
                     r2,
-                    r1 + r2
+                    totalScore
                 ].join(',') + '\n';
             }
         }

@@ -28,6 +28,18 @@ function safeHttpUrl(value: unknown): string | null {
     }
 }
 
+interface JudgeEvaluationRecord {
+    id: string;
+    teamId: string;
+    teamName: string;
+    roundId: string;
+    roundTitle: string;
+    totalScore: number | null;
+    status: string;
+    submittedAt: string | null;
+    feedback: string;
+}
+
 export default function JudgeDashboard() {
     const { isLoading } = useHackathon();
     const { user } = useAuth();
@@ -40,10 +52,40 @@ export default function JudgeDashboard() {
     const [currentScores, setCurrentScores] = useState<Record<string, number>>({});
     const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [myEvaluations, setMyEvaluations] = useState<JudgeEvaluationRecord[]>([]);
+    const [isLoadingEvaluations, setIsLoadingEvaluations] = useState(false);
+    const [alreadyEvaluatedInfo, setAlreadyEvaluatedInfo] = useState<{ teamId: string; teamName: string; roundTitle: string; score: number | null } | null>(null);
 
     const currentJudge = user?.role === 'judge' && user.id
         ? { id: user.id, generatedId: user.id, name: user.name || user.id }
         : null;
+
+    const draftStorageKey = (tId: string, rId: string) => `tricity_judge_draft_${tId}_${rId}`;
+
+    // Load judge's evaluation history
+    const fetchJudgeEvaluations = async () => {
+        if (!currentJudge) return;
+        setIsLoadingEvaluations(true);
+        try {
+            const res = await fetch('/api/judging/evaluations');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && Array.isArray(data.evaluations)) {
+                    setMyEvaluations(data.evaluations);
+                }
+            }
+        } catch (err) {
+            console.warn('Failed to load judge evaluations:', err);
+        } finally {
+            setIsLoadingEvaluations(false);
+        }
+    };
+
+    useEffect(() => {
+        if (currentJudge) {
+            void fetchJudgeEvaluations();
+        }
+    }, [currentJudge?.id]);
 
     const returnToTeamLookup = () => {
         setActiveProject(null);
@@ -52,6 +94,7 @@ export default function JudgeDashboard() {
         setDraftStatus('idle');
         setCurrentScores({});
         setComment('');
+        void fetchJudgeEvaluations();
     };
 
     const handleScoreChange = (criterionId: string, value: number) => {
@@ -68,6 +111,7 @@ export default function JudgeDashboard() {
             return;
         }
 
+        setAlreadyEvaluatedInfo(null);
         setIsStarting(true);
         try {
             const response = await fetch('/api/judging/evaluations', {
@@ -76,7 +120,19 @@ export default function JudgeDashboard() {
                 body: JSON.stringify({ teamId: teamIdInput.trim() })
             });
             const result = await response.json();
-            if (!response.ok || !result.success) throw new Error(result.error || 'Could not start evaluation.');
+            if (!response.ok || !result.success) {
+                if (result.allSubmitted) {
+                    setAlreadyEvaluatedInfo({
+                        teamId: result.teamId,
+                        teamName: result.teamName,
+                        roundTitle: result.roundTitle,
+                        score: result.totalScore
+                    });
+                    toast.info(`Team ${result.teamId} is already fully evaluated.`);
+                    return;
+                }
+                throw new Error(result.error || 'Could not start evaluation.');
+            }
 
             setEvaluationId(result.evaluation.id);
             setEvaluationRound(result.round);
@@ -96,8 +152,30 @@ export default function JudgeDashboard() {
                 roundScores: {},
                 submission: { ...result.team.submission, isFinal: result.team.isFinalSubmission }
             });
-            setCurrentScores(result.evaluation.criteriaScores || {});
-            setComment(result.evaluation.feedback || '');
+
+            // Restore from server or local device draft
+            let initialScores = result.evaluation.criteriaScores || {};
+            let initialComment = result.evaluation.feedback || '';
+            if (typeof window !== 'undefined') {
+                try {
+                    const localRaw = localStorage.getItem(draftStorageKey(result.team.teamId, result.round.id));
+                    if (localRaw) {
+                        const localDraft = JSON.parse(localRaw);
+                        if (Object.keys(initialScores).length === 0 && localDraft.scores && Object.keys(localDraft.scores).length > 0) {
+                            initialScores = localDraft.scores;
+                            toast.info('Restored saved scoring draft from this device.');
+                        }
+                        if (!initialComment.trim() && localDraft.comment) {
+                            initialComment = localDraft.comment;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Local draft restore error:', e);
+                }
+            }
+
+            setCurrentScores(initialScores);
+            setComment(initialComment);
             setDraftStatus('saved');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error: unknown) {
@@ -107,8 +185,23 @@ export default function JudgeDashboard() {
         }
     };
 
+    // Auto-save draft to both server and localStorage
     useEffect(() => {
-        if (!evaluationId || !evaluationRound) return;
+        if (!evaluationId || !evaluationRound || !activeProject) return;
+
+        // Save immediately to local device storage
+        if (typeof window !== 'undefined') {
+            try {
+                localStorage.setItem(draftStorageKey(activeProject.teamId, evaluationRound.id), JSON.stringify({
+                    scores: currentScores,
+                    comment,
+                    updatedAt: Date.now()
+                }));
+            } catch (e) {
+                console.warn('LocalStorage save error:', e);
+            }
+        }
+
         let active = true;
         const saveDraft = async () => {
             if (active) setDraftStatus('saving');
@@ -125,13 +218,13 @@ export default function JudgeDashboard() {
             }
         };
         const saveTimer = setTimeout(() => void saveDraft(), 600);
-        const heartbeat = setInterval(() => void saveDraft(), 5 * 60 * 1000);
+        const heartbeat = setInterval(() => void saveDraft(), 3 * 60 * 1000);
         return () => {
             active = false;
             clearTimeout(saveTimer);
             clearInterval(heartbeat);
         };
-    }, [evaluationId, evaluationRound, currentScores, comment]);
+    }, [evaluationId, evaluationRound, activeProject, currentScores, comment]);
 
     const handleScoreSubmit = async () => {
         if (!activeProject || !evaluationRound || !evaluationId || !currentJudge) return;
@@ -149,7 +242,17 @@ export default function JudgeDashboard() {
             });
             const result = await response.json();
             if (!response.ok || !result.success) throw new Error(result.error || 'Evaluation was not saved.');
-            toast.success(`Evaluation submitted: ${activeProject.name}`);
+
+            // Clear local draft upon confirmed server save
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.removeItem(draftStorageKey(activeProject.teamId, evaluationRound.id));
+                } catch (e) {
+                    console.warn('Failed to clear local draft:', e);
+                }
+            }
+
+            toast.success(`Evaluation submitted successfully: ${activeProject.name}`);
             setActiveProject(null);
             setEvaluationRound(null);
             setEvaluationId(null);
@@ -157,8 +260,9 @@ export default function JudgeDashboard() {
             setComment("");
             setDraftStatus('idle');
             setTeamIdInput('');
+            void fetchJudgeEvaluations();
         } catch (error: unknown) {
-            toast.error(error instanceof Error ? error.message : 'Evaluation was not saved. Your draft remains available.');
+            toast.error(error instanceof Error ? error.message : 'Evaluation was not saved. Your draft remains safely backed up on this device.');
         } finally {
             setIsSubmitting(false);
         }
@@ -190,25 +294,131 @@ export default function JudgeDashboard() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="mx-auto max-w-2xl space-y-6"
+                        className="mx-auto max-w-3xl space-y-6"
                     >
                         {currentJudge && <div className="inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-white">{currentJudge.name}</div>}
+
+                        {/* Already Evaluated Notice Banner */}
+                        {alreadyEvaluatedInfo && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="rounded-2xl border border-emerald-500/30 bg-emerald-950/40 p-5 backdrop-blur-md"
+                            >
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex items-start gap-3">
+                                        <CheckCircle2 className="h-6 w-6 text-emerald-400 shrink-0 mt-0.5" />
+                                        <div>
+                                            <h3 className="text-sm font-black uppercase tracking-wider text-emerald-300">
+                                                Team Already Evaluated & Recorded
+                                            </h3>
+                                            <p className="mt-1 text-xs text-emerald-200/80">
+                                                <span className="font-mono font-bold text-white">{alreadyEvaluatedInfo.teamId}</span> ({alreadyEvaluatedInfo.teamName}) has already been evaluated for <span className="font-bold text-white">{alreadyEvaluatedInfo.roundTitle}</span>.
+                                            </p>
+                                            {alreadyEvaluatedInfo.score !== null && (
+                                                <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-500/20 px-3 py-1 text-xs font-mono font-black text-emerald-200">
+                                                    Submitted Score: {alreadyEvaluatedInfo.score} pts
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setAlreadyEvaluatedInfo(null)}
+                                        className="text-emerald-400/60 hover:text-emerald-300 text-xs font-bold uppercase"
+                                    >
+                                        Dismiss
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+
                         <form onSubmit={event => { event.preventDefault(); void handleStartEvaluation(); }} className="rounded-2xl border border-white/10 bg-white/[.045] p-6 md:p-8">
                             <h2 className="text-xl font-black uppercase italic text-white">Start evaluation</h2>
+                            <p className="mt-1 text-xs text-white/50">Enter the assigned Team ID to open the scoring rubric and project details.</p>
                             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                                 <input
                                     autoComplete="off"
                                     value={teamIdInput}
                                     onChange={event => setTeamIdInput(event.target.value.toUpperCase())}
-                                    placeholder="Enter team ID"
+                                    placeholder="Enter team ID (e.g. TC-101)"
                                     aria-label="Team ID"
                                     className="h-12 min-w-0 flex-1 rounded-xl border border-white/10 bg-black/30 px-4 font-mono text-sm font-bold uppercase text-white outline-none focus:border-[#FFEE00]"
                                 />
-                                <button type="submit" disabled={isStarting || !teamIdInput.trim()} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#FFEE00] px-5 text-xs font-black uppercase tracking-wider text-black disabled:cursor-wait disabled:opacity-50">
+                                <button type="submit" disabled={isStarting || !teamIdInput.trim()} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#FFEE00] px-6 text-xs font-black uppercase tracking-wider text-black disabled:cursor-wait disabled:opacity-50 hover:bg-[#e6d600] transition-colors">
                                     <ClipboardCheck size={16} /> {isStarting ? 'Checking...' : 'Start scoring'}
                                 </button>
                             </div>
                         </form>
+
+                        {/* Submitted Evaluations List */}
+                        <div className="rounded-2xl border border-white/10 bg-white/[.03] p-6 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm font-black uppercase tracking-wider text-white">Your Submitted Evaluations</h3>
+                                    <span className="rounded-full bg-white/10 px-2 py-0.5 font-mono text-[10px] font-bold text-white/70">
+                                        {myEvaluations.filter(e => e.status === 'submitted').length}
+                                    </span>
+                                </div>
+                                <button
+                                    onClick={() => void fetchJudgeEvaluations()}
+                                    disabled={isLoadingEvaluations}
+                                    className="text-[11px] font-bold text-white/40 hover:text-white transition-colors"
+                                >
+                                    {isLoadingEvaluations ? 'Refreshing...' : 'Refresh'}
+                                </button>
+                            </div>
+
+                            {myEvaluations.filter(e => e.status === 'submitted').length === 0 ? (
+                                <p className="text-xs text-white/40 italic py-4 text-center">
+                                    No evaluations submitted yet. Enter a team ID above to evaluate a team.
+                                </p>
+                            ) : (
+                                <div className="grid gap-2.5 max-h-[360px] overflow-y-auto pr-1">
+                                    {myEvaluations.filter(e => e.status === 'submitted').map(ev => (
+                                        <div
+                                            key={ev.id}
+                                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-white/5 bg-white/[.02] p-3.5 hover:bg-white/[.05] transition-colors"
+                                        >
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-mono text-xs font-black text-[#FFEE00] bg-[#FFEE00]/10 px-1.5 py-0.5 rounded border border-[#FFEE00]/20">
+                                                        {ev.teamId}
+                                                    </span>
+                                                    <span className="text-xs font-bold text-white truncate max-w-[200px] sm:max-w-[280px]">
+                                                        {ev.teamName}
+                                                    </span>
+                                                    <span className="text-[10px] text-white/40 font-medium hidden sm:inline">
+                                                        • {ev.roundTitle}
+                                                    </span>
+                                                </div>
+                                                {ev.feedback && (
+                                                    <p className="mt-1 text-[11px] text-white/50 italic line-clamp-1">
+                                                        &ldquo;{ev.feedback}&rdquo;
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                                                <div className="text-right">
+                                                    <div className="text-xs font-mono font-black text-emerald-400">
+                                                        {ev.totalScore !== null ? `${ev.totalScore} pts` : 'Submitted'}
+                                                    </div>
+                                                    {ev.submittedAt && (
+                                                        <div className="text-[9px] text-white/30 font-medium">
+                                                            {new Date(ev.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">
+                                                    <CheckCircle2 size={12} />
+                                                    <span>Recorded</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </motion.div>
                 ) : (
                     <motion.div
