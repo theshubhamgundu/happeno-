@@ -147,6 +147,13 @@ export default function TeamDashboard() {
     
     const [editingPI, setEditingPI] = useState(false);
     const [editingTS, setEditingTS] = useState(false);
+
+    // Help request state
+    const [showHelpForm, setShowHelpForm] = useState(false);
+    const [helpCategory, setHelpCategory] = useState("Technical");
+    const [helpDescription, setHelpDescription] = useState("");
+    const [helpTable, setHelpTable] = useState("");
+    const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
     
     const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || null, [projects, user]);
 
