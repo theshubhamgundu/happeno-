@@ -1487,6 +1487,8 @@ export default function AdminDashboard() {
                                         onScan={handleCheckinScan}
                                         onClose={() => { setShowCheckinScanner(false); setCheckinResult(null); }}
                                         showCloseButton={true}
+                                        continuous={true}
+                                        embedded={true}
                                     />
                                 </div>
                             ) : (

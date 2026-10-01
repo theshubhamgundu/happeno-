@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import {
     Menu, X, LogOut, User, LayoutDashboard, Award,
     BarChart3, Users, GanttChartSquare, ChevronRight, QrCode, Lock,
-    ShieldCheck, Phone, Coffee
+    ShieldCheck, Phone, Coffee, LifeBuoy
 } from "lucide-react";
 import Link from "next/link";
 import { useHackathon } from "@/context/HackathonContext";
@@ -65,7 +65,8 @@ export const DashboardLayout = ({ children, type, title }: DashboardLayoutProps)
             { href: "/dashboard/judge", icon: LayoutDashboard, label: "Grading Pool" },
         ],
         volunteer: [
-            { href: "/dashboard/volunteer", icon: LayoutDashboard, label: "Operations" },
+            { href: "/dashboard/volunteer", icon: LayoutDashboard, label: "Scanner & Check-in" },
+            { href: "/dashboard/volunteer/tickets", icon: LifeBuoy, label: "Mentor Queue" },
         ],
         admin: [
             { href: "/dashboard/admin", icon: BarChart3, label: "Command" },

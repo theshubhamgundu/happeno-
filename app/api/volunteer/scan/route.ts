@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
     const session = getSession(req);
-    if (!hasRole(session, ['volunteer']) || !session.id) {
-        return NextResponse.json({ success: false, error: 'Volunteer authentication required.' }, { status: 401 });
+    if (!hasRole(session, ['volunteer', 'admin']) || !session.id) {
+        return NextResponse.json({ success: false, error: 'Volunteer or Admin authentication required.' }, { status: 401 });
     }
 
     try {
