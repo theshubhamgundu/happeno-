@@ -27,6 +27,12 @@ import {
     X,
     KeyRound,
     Copy,
+    FileSpreadsheet,
+    Headphones,
+    MessageSquare,
+    ScanLine,
+    Clock,
+    CheckCircle,
     type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
@@ -36,6 +42,7 @@ import { EVENT_MEALS } from "@/lib/meals";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Papa from "papaparse";
+import { QRScanner } from "@/components/QRScanner";
 import type { JudgingRound } from "@/lib/judging-rounds";
 
 export default function AdminDashboard() {
@@ -57,7 +64,7 @@ export default function AdminDashboard() {
         bulkAssignMealPlan
     } = useHackathon();
 
-    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings'>('teams');
+    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin'>('teams');
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
     const [emergencyForm, setEmergencyForm] = useState({ name: "", phone: "" });
@@ -71,6 +78,29 @@ export default function AdminDashboard() {
 
     const [showBulkMealModal, setShowBulkMealModal] = useState(false);
     const [selectedBulkMeals, setSelectedBulkMeals] = useState<string[]>([]);
+
+    // Help Tickets State
+    interface HelpTicket {
+        id: string;
+        teamId: string;
+        teamName: string;
+        category: string;
+        description: string;
+        tableNumber?: string;
+        status: 'open' | 'accepted' | 'resolved';
+        acceptedBy?: string;
+        createdAt: string;
+        updatedAt: string;
+    }
+    const [helpTickets, setHelpTickets] = useState<HelpTicket[]>([]);
+    const [isLoadingTickets, setIsLoadingTickets] = useState(false);
+
+    // Check-in Scanner State
+    const [showCheckinScanner, setShowCheckinScanner] = useState(false);
+    const [checkinResult, setCheckinResult] = useState<{ teamName: string; teamId: string; status: string } | null>(null);
+
+    // CSV Export State
+    const [isExporting, setIsExporting] = useState<string | null>(null);
     const [isBulkAssigning, setIsBulkAssigning] = useState(false);
 
     useEffect(() => {
@@ -78,7 +108,10 @@ export default function AdminDashboard() {
             entries: 'teams',
             judges: 'judges',
             volunteers: 'volunteers',
-            meals: 'settings'
+            meals: 'settings',
+            helpdesk: 'helpdesk',
+            exports: 'exports',
+            checkin: 'checkin'
         } as const;
         const selectSection = (section: string) => {
             setActiveTab(sectionToTab[section as keyof typeof sectionToTab] || 'teams');
@@ -95,6 +128,111 @@ export default function AdminDashboard() {
             window.removeEventListener('admin-section-change', handleSidebarNavigation);
         };
     }, []);
+
+    // Fetch help tickets
+    const fetchHelpTickets = async () => {
+        setIsLoadingTickets(true);
+        try {
+            const res = await fetch('/api/help-tickets');
+            if (res.ok) {
+                const data = await res.json();
+                setHelpTickets(data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch help tickets:', err);
+        } finally {
+            setIsLoadingTickets(false);
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === 'helpdesk') {
+            fetchHelpTickets();
+            const interval = setInterval(fetchHelpTickets, 10000); // Poll every 10s
+            return () => clearInterval(interval);
+        }
+    }, [activeTab]);
+
+    const handleTicketAction = async (ticketId: string, action: 'accept' | 'resolve' | 'cancel') => {
+        try {
+            const res = await fetch('/api/help-tickets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ticketId, action })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setHelpTickets(data.tickets);
+                toast.success(`Ticket ${action === 'accept' ? 'accepted' : action === 'resolve' ? 'resolved' : 'cancelled'}!`);
+            } else {
+                toast.error(data.error || 'Failed to update ticket.');
+            }
+        } catch {
+            toast.error('Could not update ticket.');
+        }
+    };
+
+    // CSV Export handler
+    const handleCSVExport = async (type: string, label: string) => {
+        setIsExporting(type);
+        try {
+            const res = await fetch(`/api/admin/export-csv?type=${type}`);
+            if (!res.ok) throw new Error('Export failed');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tricity_${type}_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            toast.success(`${label} exported successfully!`);
+        } catch {
+            toast.error(`Failed to export ${label}.`);
+        } finally {
+            setIsExporting(null);
+        }
+    };
+
+    // Admin check-in scanner handler
+    const handleCheckinScan = async (data: string): Promise<boolean> => {
+        let teamId = data.trim();
+        try {
+            const parsed = JSON.parse(data);
+            teamId = String(parsed.teamId || parsed.registrationId || teamId).trim();
+        } catch { }
+        if (!teamId) {
+            toast.error('Invalid QR code.');
+            return false;
+        }
+        try {
+            const response = await fetch('/api/volunteer/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ teamId, passType: 'legacy', memberId: '' })
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                toast.error(payload.error || 'Scan could not be verified.');
+                setCheckinResult({ teamName: 'Unknown', teamId, status: 'ERROR' });
+                return false;
+            }
+            const result = payload.result as Record<string, unknown>;
+            const teamName = String(result.teamName || 'Team');
+            const status = String(result.status || 'UNKNOWN');
+            setCheckinResult({ teamName, teamId: String(result.teamId || teamId), status });
+            if (status === 'PERMITTED') {
+                toast.success(`${teamName} checked in successfully!`);
+            } else if (status === 'ALREADY_CHECKED_IN') {
+                toast.warning(`${teamName} was already checked in.`);
+            }
+            return true;
+        } catch {
+            toast.error('Scanner could not reach the server.');
+            return false;
+        }
+    };
     
     // Pagination state for scalability
     const [currentPage, setCurrentPage] = useState(1);
@@ -488,11 +626,40 @@ export default function AdminDashboard() {
     return (
         <DashboardLayout type="admin" title="Admin workspace">
             <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
-                <section className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+                <section className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                     <MetricCard label="Registered entries" value={dashboardStats.total} icon={Users} tone="purple" />
                     <MetricCard label="Participating entries" value={dashboardStats.active} icon={CheckCircle2} tone="green" />
+                    <MetricCard label="Checked in" value={projects.filter(p => p.isCheckedIn).length} icon={ScanLine} tone="blue" />
+                    <MetricCard label="Open help tickets" value={helpTickets.filter(t => t.status === 'open').length} icon={Headphones} tone="amber" />
                     <MetricCard label="Meals claim rate" value={dashboardStats.mealsIncluded > 0 ? `${Math.round((dashboardStats.mealsClaimed / dashboardStats.mealsIncluded) * 100)}%` : "0%"} icon={Coffee} tone="red" />
+                    <MetricCard label="Judges active" value={judges.length} icon={ShieldCheck} tone="orange" />
                 </section>
+
+                {/* Quick Access Toolbar */}
+                <div className="flex flex-wrap gap-2">
+                    {[
+                        { key: 'teams', label: 'Entries', icon: Users },
+                        { key: 'judges', label: 'Judges', icon: ShieldCheck },
+                        { key: 'volunteers', label: 'Volunteers', icon: Users },
+                        { key: 'settings', label: 'Meals', icon: Coffee },
+                        { key: 'helpdesk', label: 'Help Desk', icon: Headphones },
+                        { key: 'exports', label: 'CSV Exports', icon: FileSpreadsheet },
+                        { key: 'checkin', label: 'QR Check-in', icon: ScanLine },
+                    ].map(tab => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key as typeof activeTab)}
+                            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+                                activeTab === tab.key
+                                    ? 'bg-[#14b8a6] text-black shadow-[0_0_20px_rgba(20,184,166,0.15)]'
+                                    : 'bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white'
+                            }`}
+                        >
+                            <tab.icon size={14} />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
 
             {/* Registrations Tab */}
             {activeTab === 'teams' && (
@@ -981,6 +1148,270 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* ═══════════ HELP DESK TAB ═══════════ */}
+            {activeTab === 'helpdesk' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
+                        <div>
+                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Help Desk Queue</h2>
+                            <p className="mt-1 text-xs text-white/45">Live mentor/help requests from participants. Refreshes every 10 seconds.</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button onClick={fetchHelpTickets} className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-white/10">
+                                Refresh
+                            </button>
+                            <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" /> {helpTickets.filter(t => t.status === 'open').length} open</div>
+                        </div>
+                    </div>
+
+                    {isLoadingTickets && helpTickets.length === 0 ? (
+                        <div className="flex items-center justify-center py-20">
+                            <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                        </div>
+                    ) : helpTickets.length === 0 ? (
+                        <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                            <Headphones size={48} className="mx-auto mb-4 text-white/10" />
+                            <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No help requests yet</p>
+                            <p className="text-white/20 text-xs mt-2">Participants can submit requests from their dashboard.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {helpTickets.map(ticket => (
+                                <div key={ticket.id} className={`p-6 rounded-2xl border transition-all ${
+                                    ticket.status === 'open' ? 'bg-amber-500/5 border-amber-500/20' :
+                                    ticket.status === 'accepted' ? 'bg-blue-500/5 border-blue-500/20' :
+                                    'bg-green-500/5 border-green-500/20 opacity-60'
+                                }`}>
+                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                                                ticket.status === 'open' ? 'bg-amber-500/20 text-amber-400' :
+                                                ticket.status === 'accepted' ? 'bg-blue-500/20 text-blue-400' :
+                                                'bg-green-500/20 text-green-400'
+                                            }`}>
+                                                {ticket.status === 'open' ? <Clock size={20} /> :
+                                                 ticket.status === 'accepted' ? <MessageSquare size={20} /> :
+                                                 <CheckCircle size={20} />}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <h4 className="text-lg font-black italic uppercase tracking-tight text-white">{ticket.teamName}</h4>
+                                                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-white/10 text-white/50">{ticket.teamId}</span>
+                                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded ${
+                                                        ticket.category === 'Technical' ? 'bg-blue-500/20 text-blue-300' :
+                                                        ticket.category === 'WiFi/Infra' ? 'bg-red-500/20 text-red-300' :
+                                                        'bg-purple-500/20 text-purple-300'
+                                                    }`}>{ticket.category}</span>
+                                                </div>
+                                                <p className="text-sm text-white/60 mt-1">{ticket.description}</p>
+                                                {ticket.tableNumber && <p className="text-[10px] text-white/40 mt-1 font-bold">📍 Table: {ticket.tableNumber}</p>}
+                                                <p className="text-[9px] text-white/30 mt-1">{new Date(ticket.createdAt).toLocaleTimeString()}{ticket.acceptedBy ? ` • Accepted by ${ticket.acceptedBy}` : ''}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            {ticket.status === 'open' && (
+                                                <button
+                                                    onClick={() => handleTicketAction(ticket.id, 'accept')}
+                                                    className="px-4 py-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-wider hover:bg-blue-500/30 transition"
+                                                >
+                                                    Accept
+                                                </button>
+                                            )}
+                                            {(ticket.status === 'open' || ticket.status === 'accepted') && (
+                                                <button
+                                                    onClick={() => handleTicketAction(ticket.id, 'resolve')}
+                                                    className="px-4 py-2 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-[10px] font-black uppercase tracking-wider hover:bg-green-500/30 transition"
+                                                >
+                                                    Resolve
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => handleTicketAction(ticket.id, 'cancel')}
+                                                className="px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ═══════════ CSV EXPORTS TAB ═══════════ */}
+            {activeTab === 'exports' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
+                        <div>
+                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Data Exports</h2>
+                            <p className="mt-1 text-xs text-white/45">Download event data as CSV files. Opens instantly in Excel, Google Sheets, or any spreadsheet app.</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {[
+                            { type: 'teams', label: 'All Teams', desc: 'Team ID, name, track, captain, college, check-in status', icon: Users, color: 'teal' },
+                            { type: 'judges', label: 'Judges Directory', desc: 'Judge ID, name, specialization', icon: ShieldCheck, color: 'purple' },
+                            { type: 'volunteers', label: 'Volunteers Directory', desc: 'Volunteer ID, name, phone, role', icon: Users, color: 'blue' },
+                            { type: 'emails', label: 'All Participant Emails', desc: 'Every participant email for mail merges, newsletters', icon: ClipboardList, color: 'amber' },
+                            { type: 'dietary', label: 'Dietary Restrictions', desc: 'Participant dietary notes for catering coordination', icon: Coffee, color: 'red' },
+                        ].map(exp => (
+                            <button
+                                key={exp.type}
+                                onClick={() => handleCSVExport(exp.type, exp.label)}
+                                disabled={isExporting !== null}
+                                className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
+                            >
+                                <div className="flex items-start justify-between">
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                        exp.color === 'teal' ? 'bg-teal-500/20 text-teal-400' :
+                                        exp.color === 'purple' ? 'bg-purple-500/20 text-purple-400' :
+                                        exp.color === 'blue' ? 'bg-blue-500/20 text-blue-400' :
+                                        exp.color === 'amber' ? 'bg-amber-500/20 text-amber-400' :
+                                        'bg-red-500/20 text-red-400'
+                                    }`}>
+                                        <exp.icon size={22} />
+                                    </div>
+                                    {isExporting === exp.type ? (
+                                        <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                    )}
+                                </div>
+                                <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
+                                <p className="mt-1 text-xs text-white/40">{exp.desc}</p>
+                                <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                    <FileSpreadsheet size={12} />
+                                    Download CSV
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* ═══════════ QR CHECK-IN TAB ═══════════ */}
+            {activeTab === 'checkin' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
+                        <div>
+                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">QR Check-in Scanner</h2>
+                            <p className="mt-1 text-xs text-white/45">Scan participant QR codes to mark them as checked-in at the venue.</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Checked In</span>
+                                <span className="text-xl font-black italic text-[#14b8a6]">{projects.filter(p => p.isCheckedIn).length}</span>
+                                <span className="text-white/30 font-bold">/</span>
+                                <span className="text-lg font-black text-white/50">{projects.length}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Scanner Panel */}
+                        <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 overflow-hidden">
+                            {showCheckinScanner ? (
+                                <div className="space-y-4">
+                                    <QRScanner
+                                        onScan={handleCheckinScan}
+                                        onClose={() => { setShowCheckinScanner(false); setCheckinResult(null); }}
+                                        showCloseButton={true}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-16 space-y-6">
+                                    <div className="w-24 h-24 rounded-3xl bg-[#14b8a6]/10 border border-[#14b8a6]/20 flex items-center justify-center">
+                                        <ScanLine size={48} className="text-[#14b8a6]" />
+                                    </div>
+                                    <div className="text-center">
+                                        <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Ready to Scan</h3>
+                                        <p className="text-xs text-white/40 mt-1">Open the camera to start scanning participant QR codes</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowCheckinScanner(true)}
+                                        className="px-8 py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(20,184,166,0.2)]"
+                                    >
+                                        Open Scanner
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Recent Check-ins */}
+                        <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+                            <h3 className="text-lg font-black italic uppercase tracking-tight text-white mb-4">Recent Check-ins</h3>
+                            <div className="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
+                                {projects.filter(p => p.isCheckedIn).length === 0 ? (
+                                    <div className="py-12 text-center">
+                                        <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No teams checked in yet</p>
+                                    </div>
+                                ) : (
+                                    projects
+                                        .filter(p => p.isCheckedIn)
+                                        .sort((a, b) => {
+                                            const aTime = a.checkedInAt ? new Date(a.checkedInAt).getTime() : 0;
+                                            const bTime = b.checkedInAt ? new Date(b.checkedInAt).getTime() : 0;
+                                            return bTime - aTime;
+                                        })
+                                        .slice(0, 50)
+                                        .map(team => (
+                                            <div key={team.id} className="flex items-center gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10">
+                                                <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">
+                                                    <CheckCircle size={16} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-bold text-white truncate">{team.team}</p>
+                                                    <p className="text-[10px] text-white/40">{team.teamId}{team.checkedInAt ? ` • ${new Date(team.checkedInAt).toLocaleTimeString()}` : ''}</p>
+                                                </div>
+                                            </div>
+                                        ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Scan result feedback */}
+                    <AnimatePresence>
+                        {checkinResult && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                className={`p-6 rounded-2xl border ${
+                                    checkinResult.status === 'PERMITTED' ? 'bg-green-500/10 border-green-500/20' :
+                                    checkinResult.status === 'ALREADY_CHECKED_IN' ? 'bg-amber-500/10 border-amber-500/20' :
+                                    'bg-red-500/10 border-red-500/20'
+                                }`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                        checkinResult.status === 'PERMITTED' ? 'bg-green-500 text-white' :
+                                        checkinResult.status === 'ALREADY_CHECKED_IN' ? 'bg-amber-500 text-white' :
+                                        'bg-red-500 text-white'
+                                    }`}>
+                                        {checkinResult.status === 'PERMITTED' ? <CheckCircle size={24} /> :
+                                         checkinResult.status === 'ALREADY_CHECKED_IN' ? <AlertTriangle size={24} /> :
+                                         <X size={24} />}
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xl font-black italic uppercase tracking-tight text-white">{checkinResult.teamName}</h4>
+                                        <p className="text-sm text-white/60">
+                                            {checkinResult.status === 'PERMITTED' ? 'Successfully checked in!' :
+                                             checkinResult.status === 'ALREADY_CHECKED_IN' ? 'This team was already checked in.' :
+                                             'Check-in failed.'}
+                                        </p>
+                                    </div>
+                                    <button onClick={() => setCheckinResult(null)} className="ml-auto p-2 text-white/30 hover:text-white"><X size={20} /></button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             )}
 

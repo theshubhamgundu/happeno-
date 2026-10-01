@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation, Headphones, Send } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
@@ -230,6 +230,39 @@ export default function TeamDashboard() {
         ), { duration: Infinity, position: 'top-center' });
     };
 
+    const handleSubmitHelp = async () => {
+        if (!helpDescription.trim()) {
+            toast.error('Please describe your issue.');
+            return;
+        }
+        setIsSubmittingHelp(true);
+        try {
+            const res = await fetch('/api/help-tickets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    category: helpCategory,
+                    description: helpDescription,
+                    tableNumber: helpTable,
+                    teamName: team?.team || 'Unknown Team'
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success('Help request sent! A volunteer will be with you shortly.');
+                setShowHelpForm(false);
+                setHelpDescription('');
+                setHelpTable('');
+            } else {
+                toast.error(data.error || 'Failed to submit help request.');
+            }
+        } catch {
+            toast.error('Could not reach the server.');
+        } finally {
+            setIsSubmittingHelp(false);
+        }
+    };
+
     if (isLoading) return <DashboardLayout type="team" title="Your project"><div className="grid min-h-[420px] place-items-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#df6d59] border-t-transparent" /></div></DashboardLayout>;
     if (!team) return <DashboardLayout type="team" title="Your project"><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><h2 className="text-lg font-semibold">No team is linked to this account</h2><p className="mt-2 text-sm text-slate-500">Please complete registration or contact the event team.</p></div></DashboardLayout>;
 
@@ -381,7 +414,7 @@ export default function TeamDashboard() {
                     </section>
                 </div>
 
-                {/* Column 3 (Right): Team roster */}
+                {/* Column 3 (Right): Team roster + Help Request */}
                 <div className="lg:col-span-3 flex flex-col gap-4">
                     {/* Team Members */}
                     <section className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -402,6 +435,80 @@ export default function TeamDashboard() {
                                 </div>
                             ))}
                         </div>
+                    </section>
+
+                    {/* Request Help Card */}
+                    <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-sm font-bold text-amber-900">Need Help?</h3>
+                            <span className="grid h-7 w-7 place-items-center rounded-lg bg-amber-100 text-amber-600"><Headphones size={14} /></span>
+                        </div>
+                        {!showHelpForm ? (
+                            <div>
+                                <p className="text-xs text-amber-700 mb-3">Stuck on something? Request a mentor or report an issue and a volunteer will come to your table.</p>
+                                <button
+                                    onClick={() => setShowHelpForm(true)}
+                                    className="w-full py-2.5 rounded-lg bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Headphones size={14} /> Request Help
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1 block">Category</label>
+                                    <select
+                                        value={helpCategory}
+                                        onChange={e => setHelpCategory(e.target.value)}
+                                        className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-amber-400"
+                                    >
+                                        <option value="Technical">Technical (Code/Bug)</option>
+                                        <option value="Mentor">Need a Mentor</option>
+                                        <option value="WiFi/Infra">WiFi / Infrastructure</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1 block">Describe your issue</label>
+                                    <textarea
+                                        value={helpDescription}
+                                        onChange={e => setHelpDescription(e.target.value)}
+                                        placeholder="e.g. Our backend API is returning 500 errors..."
+                                        rows={3}
+                                        className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-amber-400 resize-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1 block">Table / Location (optional)</label>
+                                    <input
+                                        value={helpTable}
+                                        onChange={e => setHelpTable(e.target.value)}
+                                        placeholder="e.g. Table 12, Room B"
+                                        className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-amber-400"
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setShowHelpForm(false)}
+                                        className="flex-1 py-2 rounded-lg border border-amber-200 text-xs font-bold text-amber-700 hover:bg-amber-100 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleSubmitHelp}
+                                        disabled={isSubmittingHelp || !helpDescription.trim()}
+                                        className="flex-1 py-2 rounded-lg bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isSubmittingHelp ? (
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <Send size={12} />
+                                        )}
+                                        Send Request
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </section>
 
                 </div>
