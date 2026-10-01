@@ -39,11 +39,20 @@ import {
     ArrowRightLeft,
     DoorOpen,
     Wifi,
+    QrCode,
+    Edit3,
+    Mail,
+    Pause,
+    PlayCircle,
+    RefreshCw,
+    Sun,
+    Moon,
     type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useHackathon } from "@/context/HackathonContext";
+import QRCode from "qrcode";
 import { EVENT_MEALS } from "@/lib/meals";
 import { TRACKS } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
@@ -70,7 +79,8 @@ export default function AdminDashboard() {
         updateEnabledMeals,
         bulkAssignMealPlan,
         deleteTeams,
-        bulkUpdateTeams
+        bulkUpdateTeams,
+        checkInTeam
     } = useHackathon();
 
     const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
@@ -326,16 +336,33 @@ export default function AdminDashboard() {
 
             const teamName = (p.team || "Unknown Team").toLowerCase();
             const captainName = (p.captain || "N/A").toLowerCase();
+            const captainMobile = (p.captainMobile || "").toLowerCase();
+            const college = (p.college || "").toLowerCase();
+            const teamId = (p.teamId || String(p.id || "")).toLowerCase();
 
             const matchesTeam = teamName.includes(query);
-            const matchesId = (p.teamId || "").toLowerCase().includes(query);
+            const matchesId = teamId.includes(query);
             const matchesCaptain = captainName.includes(query);
+            const matchesMobile = captainMobile.includes(query);
+            const matchesCollege = college.includes(query);
 
             // Handle numeric-only search (e.g., "101" -> matches "VH-101")
             const isNumeric = /^\d+$/.test(query);
-            const matchesPrefixId = isNumeric && (p.teamId || "").toLowerCase().includes(`tricity_${query}`);
+            const matchesPrefixId = isNumeric && teamId.includes(`tricity_${query}`);
 
-            return matchesTeam || matchesId || matchesCaptain || matchesPrefixId;
+            // Search member names, emails, and phones
+            const members = Array.isArray(p.members) ? p.members : [];
+            const matchesMembers = members.some(m => {
+                if (typeof m === 'string') return m.toLowerCase().includes(query);
+                return (
+                    (m.fullName || "").toLowerCase().includes(query) ||
+                    (m.email || "").toLowerCase().includes(query) ||
+                    (m.phone || "").toLowerCase().includes(query) ||
+                    (m.college || "").toLowerCase().includes(query)
+                );
+            });
+
+            return matchesTeam || matchesId || matchesCaptain || matchesMobile || matchesCollege || matchesPrefixId || matchesMembers;
         });
     }, [projects, searchQuery]);
 
@@ -479,9 +506,233 @@ export default function AdminDashboard() {
         };
     }, [projects]);
 
+    // --- HELP DESK & PASS MODAL ---
+    const [passModalTeam, setPassModalTeam] = useState<any | null>(null);
+    const [passQrDataUrl, setPassQrDataUrl] = useState<string>('');
+    const [isCheckingInFromPass, setIsCheckingInFromPass] = useState(false);
+    const [passTheme, setPassTheme] = useState<'light' | 'dark'>('light');
+
+    useEffect(() => {
+        if (!passModalTeam) {
+            setPassQrDataUrl('');
+            return;
+        }
+        const teamId = passModalTeam.teamId || String(passModalTeam.id);
+        QRCode.toDataURL(teamId, {
+            width: 340,
+            margin: 1,
+            color: { dark: '#0f172a', light: '#ffffff' }
+        }).then(setPassQrDataUrl).catch(console.error);
+    }, [passModalTeam]);
+
+    // --- EDIT TEAM CONTACT MODAL ---
+    const [editModalTeam, setEditModalTeam] = useState<any | null>(null);
+    const [editFormData, setEditFormData] = useState({
+        teamName: '',
+        captain: '',
+        email: '',
+        captainMobile: '',
+        college: '',
+        track: '',
+        room: '',
+        resendPass: false
+    });
+    const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+    const openEditModal = (team: any) => {
+        setEditModalTeam(team);
+        setEditFormData({
+            teamName: team.team || team.name || '',
+            captain: team.captain || '',
+            email: team.members?.[0]?.email || team.email || '',
+            captainMobile: team.captainMobile || team.members?.[0]?.phone || '',
+            college: team.college || '',
+            track: team.track || '',
+            room: team.room || '',
+            resendPass: false
+        });
+    };
+
+    const handleSaveTeamEdit = async () => {
+        if (!editModalTeam) return;
+        setIsSavingEdit(true);
+        try {
+            const teamId = editModalTeam.teamId || String(editModalTeam.id);
+            const res = await fetch('/api/admin/edit-team', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    teamId,
+                    ...editFormData
+                })
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Failed to update team');
+
+            toast.success(data.message || 'Team updated successfully');
+            if (data.temporaryPassword) {
+                setCredentialResetResult({
+                    teamId,
+                    teamName: editFormData.teamName,
+                    leadEmail: editFormData.email,
+                    temporaryPassword: data.temporaryPassword,
+                    emailAccepted: Boolean(data.emailAccepted)
+                });
+            }
+            setEditModalTeam(null);
+            setTimeout(() => window.location.reload(), 1500);
+        } catch (err: any) {
+            toast.error(err.message || 'Error updating team');
+        } finally {
+            setIsSavingEdit(false);
+        }
+    };
+
+    // --- PURGE DEMO DATA MODAL ---
+    const [showPurgeModal, setShowPurgeModal] = useState(false);
+    const [purgeConfirmText, setPurgeConfirmText] = useState('');
+    const [isPurging, setIsPurging] = useState(false);
+
+    const handlePurgeDemo = async () => {
+        if (purgeConfirmText !== 'PURGE_ALL_MOCK_REGISTRATIONS') {
+            toast.error('Confirmation token does not match.');
+            return;
+        }
+        setIsPurging(true);
+        try {
+            const res = await fetch('/api/admin/purge-demo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ confirmation: purgeConfirmText })
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Failed to purge demo data');
+            toast.success(data.message);
+            setShowPurgeModal(false);
+            setPurgeConfirmText('');
+            setTimeout(() => window.location.reload(), 1200);
+        } catch (err: any) {
+            toast.error(err.message || 'Purge failed');
+        } finally {
+            setIsPurging(false);
+        }
+    };
+
+    // --- PASS & CREDENTIAL DISPATCHER MODAL ---
+    const [showDispatchModal, setShowDispatchModal] = useState(false);
+    const [dispatchStatus, setDispatchStatus] = useState<{ total: number; pending: number; issued: number } | null>(null);
+    const [isDispatching, setIsDispatching] = useState(false);
+    const [isDispatchPaused, setIsDispatchPaused] = useState(false);
+    const dispatchPausedRef = useRef(false);
+    const [dispatchStats, setDispatchStats] = useState({ processed: 0, success: 0, failed: 0, remaining: 0 });
+    const [dispatchLogs, setDispatchLogs] = useState<string[]>([]);
+
+    const fetchDispatchStatus = async () => {
+        try {
+            const res = await fetch('/api/admin/dispatch-credentials');
+            const data = await res.json();
+            if (data.success) {
+                setDispatchStatus({ total: data.total, pending: data.pending, issued: data.issued });
+                setDispatchStats(prev => ({ ...prev, remaining: data.pending }));
+            }
+        } catch (e) {
+            console.error('Failed to fetch dispatch status:', e);
+        }
+    };
+
+    const handleOpenDispatchModal = () => {
+        setShowDispatchModal(true);
+        void fetchDispatchStatus();
+    };
+
+    const handleStartDispatch = async () => {
+        setIsDispatching(true);
+        setIsDispatchPaused(false);
+        dispatchPausedRef.current = false;
+
+        let keepRunning = true;
+        let batchCount = 0;
+
+        while (keepRunning) {
+            if (dispatchPausedRef.current) {
+                setDispatchLogs(prev => [`[PAUSED] Dispatcher paused by admin.`, ...prev.slice(0, 40)]);
+                break;
+            }
+
+            try {
+                batchCount++;
+                const res = await fetch('/api/admin/dispatch-credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ batchSize: 15 })
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    toast.error(data.error || 'Batch failed');
+                    setDispatchLogs(prev => [`[ERROR] Batch ${batchCount} failed: ${data.error}`, ...prev.slice(0, 40)]);
+                    break;
+                }
+
+                if (data.processed === 0) {
+                    toast.success('All passes and credentials have been dispatched!');
+                    setDispatchLogs(prev => [`[COMPLETE] All registered teams have been issued passes!`, ...prev.slice(0, 40)]);
+                    keepRunning = false;
+                    break;
+                }
+
+                setDispatchStats(prev => ({
+                    processed: prev.processed + data.processed,
+                    success: prev.success + data.successCount,
+                    failed: prev.failed + data.failureCount,
+                    remaining: data.remaining
+                }));
+
+                const logSummary = `Batch ${batchCount}: Dispatched ${data.processed} teams (${data.successCount} sent, ${data.failureCount} failed) â€” ${data.remaining} remaining`;
+                setDispatchLogs(prev => [logSummary, ...prev.slice(0, 40)]);
+
+                if (data.remaining === 0) {
+                    toast.success('All passes have been dispatched successfully!');
+                    keepRunning = false;
+                    break;
+                }
+
+                // 600ms cooldown between batches to maintain healthy SMTP connection pools
+                await new Promise(resolve => setTimeout(resolve, 600));
+
+            } catch (err: any) {
+                console.error('Dispatch loop error:', err);
+                setDispatchLogs(prev => [`[ERROR] Connection error: ${err.message}`, ...prev.slice(0, 40)]);
+                break;
+            }
+        }
+
+        setIsDispatching(false);
+        void fetchDispatchStatus();
+    };
+
+    const handleTogglePauseDispatch = () => {
+        if (isDispatchPaused) {
+            setIsDispatchPaused(false);
+            dispatchPausedRef.current = false;
+            void handleStartDispatch();
+        } else {
+            setIsDispatchPaused(true);
+            dispatchPausedRef.current = true;
+        }
+    };
+
     // --- CSV IMPORT LOGIC ---
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isImporting, setIsImporting] = useState(false);
+    const [importProgress, setImportProgress] = useState<{
+        isImporting: boolean;
+        currentChunk: number;
+        totalChunks: number;
+        processedTeams: number;
+        totalTeams: number;
+    } | null>(null);
+
     const [resettingTeamId, setResettingTeamId] = useState<string | null>(null);
     const [credentialResetResult, setCredentialResetResult] = useState<{
         teamId: string;
@@ -492,7 +743,7 @@ export default function AdminDashboard() {
     } | null>(null);
 
     const handleResetTeamCredentials = async (teamId: string, teamName: string) => {
-        const confirmed = window.confirm(`Reset login for ${teamName}? The current password will stop working immediately, and a new password will be emailed to the registered lead.`);
+        const confirmed = window.confirm(`Reset login credentials for ${teamName}? A new temporary password will be generated and shown immediately on your screen.`);
         if (!confirmed) return;
 
         setResettingTeamId(teamId);
@@ -524,8 +775,8 @@ export default function AdminDashboard() {
                 temporaryPassword: result.temporaryPassword,
                 emailAccepted: Boolean(result.emailAccepted)
             });
-            if (result.emailAccepted) toast.success(result.message || 'SMTP accepted the credentials email.');
-            else toast.warning(result.message || 'SMTP did not accept the email. Share the new password through a verified channel.');
+            if (result.emailAccepted) toast.success('Password generated & emailed to lead.');
+            else toast.warning('Password generated. SMTP failed to deliver; share password directly with lead.');
         } catch (error: unknown) {
             toast.error(error instanceof Error ? error.message : 'Could not reset team credentials.');
         } finally {
@@ -639,24 +890,46 @@ export default function AdminDashboard() {
                         throw new Error('No valid participant rows were found in the CSV.');
                     }
 
-                    toast.loading(`Importing ${registrations.length} teams...`, { id: loadingToast });
+                    // High-speed Chunked Ingestion (100 teams per batch)
+                    const CHUNK_SIZE = 100;
+                    const totalChunks = Math.ceil(registrations.length / CHUNK_SIZE);
+                    let totalImported = 0;
 
-                    const importRes = await fetch('/api/admin/import-registrations', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ registrations })
+                    setImportProgress({
+                        isImporting: true,
+                        currentChunk: 0,
+                        totalChunks,
+                        processedTeams: 0,
+                        totalTeams: registrations.length
                     });
-                    const importData = await importRes.json();
 
-                    if (!importData.success) throw new Error(importData.error || 'Import failed');
+                    toast.loading(`Importing ${registrations.length} teams in ${totalChunks} fast chunks...`, { id: loadingToast });
 
-                    if (importData.emailFailures > 0) {
-                        toast.warning(`Imported ${importData.imported} teams; ${importData.emailsSent} emails sent, ${importData.emailFailures} failed.`, { id: loadingToast });
-                    } else {
-                        toast.success(`Successfully imported ${importData.imported} teams and sent ${importData.emailsSent} emails.`, { id: loadingToast });
+                    for (let i = 0; i < totalChunks; i++) {
+                        const chunk = registrations.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+                        setImportProgress({
+                            isImporting: true,
+                            currentChunk: i + 1,
+                            totalChunks,
+                            processedTeams: Math.min((i + 1) * CHUNK_SIZE, registrations.length),
+                            totalTeams: registrations.length
+                        });
+
+                        const importRes = await fetch('/api/admin/import-registrations', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ registrations: chunk, skipEmail: true })
+                        });
+                        const importData = await importRes.json();
+
+                        if (!importData.success) {
+                            throw new Error(importData.error || `Chunk ${i + 1} failed`);
+                        }
+                        totalImported += importData.imported || chunk.length;
                     }
 
-                    setTimeout(() => window.location.reload(), 2000);
+                    toast.success(`Successfully imported ${totalImported} teams! Open the Pass Dispatcher to send passes.`, { id: loadingToast, duration: 6000 });
+                    setTimeout(() => window.location.reload(), 2500);
                 } catch (error: unknown) {
                     console.error('CSV Import Error:', error);
                     const message = error instanceof Error ? error.message : 'Failed to process CSV file';
@@ -767,31 +1040,6 @@ export default function AdminDashboard() {
                     <MetricCard label="Judges active" value={judges.length} icon={ShieldCheck} tone="orange" />
                 </section>
 
-                {/* Quick Access Toolbar */}
-                <div className="flex flex-wrap gap-2">
-                    {[
-                        { key: 'teams', label: 'Entries', icon: Users },
-                        { key: 'judges', label: 'Judges', icon: ShieldCheck },
-                        { key: 'volunteers', label: 'Volunteers', icon: Users },
-                        { key: 'settings', label: 'Meals', icon: Coffee },
-                        { key: 'helpdesk', label: 'Help Desk', icon: Headphones },
-                        { key: 'exports', label: 'CSV Exports', icon: FileSpreadsheet },
-                        { key: 'checkin', label: 'QR Check-in', icon: ScanLine },
-                    ].map(tab => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all ${
-                                activeTab === tab.key
-                                    ? 'bg-[#14b8a6] text-black shadow-[0_0_20px_rgba(20,184,166,0.15)]'
-                                    : 'bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white'
-                            }`}
-                        >
-                            <tab.icon size={14} />
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
 
             {/* Registrations Tab */}
             {activeTab === 'teams' && (
@@ -862,7 +1110,27 @@ export default function AdminDashboard() {
                             onClick={() => setShowBulkMealModal(true)}
                             className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-amber-400 transition hover:border-amber-500/70 hover:bg-amber-500/30"
                         >
-                            <Coffee size={18} /> Bulk Meal Assign
+                            <Coffee size={18} /> Bulk Meals
+                        </button>
+
+                        {/* Dispatch Passes & Credentials Button */}
+                        <button
+                            onClick={handleOpenDispatchModal}
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-emerald-400 transition hover:border-emerald-500/70 hover:bg-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                        >
+                            <Mail size={18} /> Dispatch Passes
+                        </button>
+
+                        {/* Purge Demo Data Button */}
+                        <button
+                            onClick={() => {
+                                setPurgeConfirmText('');
+                                setShowPurgeModal(true);
+                            }}
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 text-[10px] font-black uppercase tracking-wider text-red-400 transition hover:border-red-500/60 hover:bg-red-500/20"
+                            title="Wipe mock/demo data before importing real CSV"
+                        >
+                            <Trash2 size={16} /> Purge Demo
                         </button>
                     </div>
 
@@ -982,17 +1250,49 @@ export default function AdminDashboard() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex items-center gap-2 flex-wrap" onClick={(e) => e.stopPropagation()}>
+                                                {/* On-Screen Pass & QR Modal */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPassModalTeam(team)}
+                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#14b8a6]/40 bg-[#14b8a6]/10 hover:bg-[#14b8a6]/20 text-[#14b8a6] text-[10px] font-black uppercase tracking-wider transition-all"
+                                                    title="View Official Digital Pass & QR on screen"
+                                                >
+                                                    <QrCode size={14} /> Pass
+                                                </button>
+
+                                                {/* Quick Edit Details Modal */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openEditModal(team)}
+                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-wider transition-all"
+                                                    title="Correct email typos, phone, name, or resend pass"
+                                                >
+                                                    <Edit3 size={14} /> Edit
+                                                </button>
+
+                                                {/* Reset Login Credentials */}
+                                                <button
+                                                    type="button"
+                                                    disabled={!team.teamId || resettingTeamId === team.teamId}
+                                                    onClick={() => { if (team.teamId) void handleResetTeamCredentials(team.teamId, team.team); }}
+                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-wider transition-all disabled:opacity-50"
+                                                    title="Generate new temporary password and show on screen"
+                                                >
+                                                    <KeyRound size={14} /> {resettingTeamId === team.teamId ? '...' : 'Reset'}
+                                                </button>
+
+                                                {/* Delete Team */}
                                                 <button
                                                     type="button"
                                                     onClick={() => {
                                                         setSelectedTeamIds([teamKey]);
                                                         setShowDeleteModal(true);
                                                     }}
-                                                    className="p-2.5 rounded-xl border border-white/10 hover:border-red-500/40 text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                                    className="p-2 rounded-xl border border-white/10 hover:border-red-500/40 text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all"
                                                     title="Delete this team"
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <Trash2 size={15} />
                                                 </button>
                                             </div>
                                         </div>
@@ -2309,6 +2609,717 @@ export default function AdminDashboard() {
                                     {isBulkProcessing ? 'Assigning...' : `Assign to ${selectedTeamIds.length} Teams`}
                                 </button>
                             </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ ON-SCREEN DIGITAL PASS MODAL ═══════════ */}
+            <AnimatePresence>
+                {passModalTeam && (
+                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            transition={{ duration: 0.2 }}
+                            className={`w-full max-w-md ${
+                                passTheme === 'light'
+                                    ? 'bg-white text-slate-900 border border-slate-200 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)]'
+                                    : 'bg-[#0a0216] text-white border-2 border-[#14b8a6]/40 shadow-[0_0_60px_rgba(20,184,166,0.25)]'
+                            } rounded-[2.2rem] p-6 sm:p-7 overflow-hidden relative`}
+                        >
+                            {/* VIP Lanyard Notch */}
+                            <div className={`w-14 h-1.5 rounded-full mx-auto -mt-2 mb-4 ${
+                                passTheme === 'light' ? 'bg-slate-300' : 'bg-white/20'
+                            }`} />
+
+                            <div className={`flex items-center justify-between pb-4 border-b mb-4 ${
+                                passTheme === 'light' ? 'border-slate-200' : 'border-white/10'
+                            }`}>
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
+                                        passTheme === 'light'
+                                            ? 'bg-teal-50 border-teal-200 text-teal-700 shadow-sm'
+                                            : 'bg-[#14b8a6]/20 border-[#14b8a6]/40 text-[#14b8a6] shadow-[0_0_15px_rgba(20,184,166,0.25)]'
+                                    }`}>
+                                        <QrCode size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 className={`text-lg font-black uppercase italic tracking-tight leading-tight ${
+                                            passTheme === 'light' ? 'text-slate-900' : 'text-white'
+                                        }`}>
+                                            Event Digital Pass
+                                        </h3>
+                                        <p className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mt-0.5 ${
+                                            passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                        }`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${
+                                                passTheme === 'light' ? 'bg-teal-600' : 'bg-[#14b8a6]'
+                                            }`} />
+                                            Tri-City AI Hackathon 2026
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setPassTheme(passTheme === 'light' ? 'dark' : 'light')}
+                                        className={`w-8 h-8 rounded-full border flex items-center justify-center transition cursor-pointer ${
+                                            passTheme === 'light'
+                                                ? 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-600'
+                                                : 'border-white/15 bg-white/10 hover:bg-white/20 text-white/80'
+                                        }`}
+                                        title={`Switch to ${passTheme === 'light' ? 'Dark' : 'Light'} Pass`}
+                                    >
+                                        {passTheme === 'light' ? <Moon size={15} /> : <Sun size={15} />}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPassModalTeam(null)}
+                                        className={`w-8 h-8 rounded-full border flex items-center justify-center transition cursor-pointer ${
+                                            passTheme === 'light'
+                                                ? 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-600'
+                                                : 'border-white/10 text-white/60 hover:text-white'
+                                        }`}
+                                        style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.08)' } : undefined}
+                                        title="Close Pass"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Pass Card with QR */}
+                            <div
+                                className={`border rounded-2xl p-5 mb-4 text-center relative overflow-hidden shadow-sm ${
+                                    passTheme === 'light' ? 'border-slate-200' : 'border-white/10 shadow-inner'
+                                }`}
+                                style={
+                                    passTheme === 'light'
+                                        ? { background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)' }
+                                        : { background: 'linear-gradient(180deg, rgba(25, 10, 46, 0.8) 0%, rgba(12, 3, 24, 0.95) 100%)' }
+                                }
+                            >
+                                {/* Sci-fi Corner Brackets around QR */}
+                                <div className="relative inline-block mb-3.5">
+                                    <div className={`absolute -top-1.5 -left-1.5 w-4 h-4 border-t-2 border-l-2 rounded-tl pointer-events-none ${
+                                        passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                    }`} />
+                                    <div className={`absolute -top-1.5 -right-1.5 w-4 h-4 border-t-2 border-r-2 rounded-tr pointer-events-none ${
+                                        passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                    }`} />
+                                    <div className={`absolute -bottom-1.5 -left-1.5 w-4 h-4 border-b-2 border-l-2 rounded-bl pointer-events-none ${
+                                        passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                    }`} />
+                                    <div className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 border-b-2 border-r-2 rounded-br pointer-events-none ${
+                                        passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                    }`} />
+
+                                    <div className={`p-3 bg-white rounded-2xl border ${
+                                        passTheme === 'light'
+                                            ? 'border-slate-200/90 shadow-sm'
+                                            : 'border-white/10 shadow-[0_0_30px_rgba(20,184,166,0.25)]'
+                                    }`}>
+                                        {passQrDataUrl ? (
+                                            <img src={passQrDataUrl} alt="Check-in QR" className="w-44 h-44 sm:w-52 sm:h-52 mx-auto object-contain block" />
+                                        ) : (
+                                            <div className="w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center text-slate-400">
+                                                <div className="h-6 w-6 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className={`text-[10px] font-mono tracking-widest uppercase font-black mb-1.5 ${
+                                    passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                }`}>
+                                    OFFICIAL ENTRY BADGE
+                                </div>
+
+                                <h4 className={`text-2xl font-black italic uppercase tracking-tight leading-tight ${
+                                    passTheme === 'light' ? 'text-slate-900' : 'text-white'
+                                }`}>
+                                    {passModalTeam.team || passModalTeam.name}
+                                </h4>
+
+                                <div className={`inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full border shadow-xs ${
+                                    passTheme === 'light'
+                                        ? 'bg-teal-50 border-teal-200/90 text-teal-800'
+                                        : 'border-[#14b8a6]/40 text-[#14b8a6]'
+                                }`} style={passTheme === 'dark' ? { backgroundColor: 'rgba(20, 184, 166, 0.12)' } : undefined}>
+                                    <span className="font-mono text-xs font-black tracking-wider">{passModalTeam.teamId || passModalTeam.id}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            void navigator.clipboard.writeText(passModalTeam.teamId || passModalTeam.id);
+                                            toast.success("Team ID copied!");
+                                        }}
+                                        className={`transition p-0.5 ${
+                                            passTheme === 'light' ? 'text-teal-600 hover:text-teal-900' : 'text-[#14b8a6]/70 hover:text-white'
+                                        }`}
+                                        title="Copy Team ID"
+                                    >
+                                        <Copy size={13} />
+                                    </button>
+                                </div>
+
+                                {/* Details Grid */}
+                                <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4 pt-4 border-t text-left text-xs ${
+                                    passTheme === 'light' ? 'border-slate-200' : 'border-white/10'
+                                }`}>
+                                    <div
+                                        className={`rounded-xl p-3 border ${
+                                            passTheme === 'light' ? 'bg-slate-100/70 border-slate-200' : 'border-white/10'
+                                        }`}
+                                        style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.04)' } : undefined}
+                                    >
+                                        <span className={`text-[9px] uppercase tracking-wider font-black block mb-0.5 ${
+                                            passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                        }`}>
+                                            Team Lead
+                                        </span>
+                                        <span className={`font-bold text-sm block leading-tight ${
+                                            passTheme === 'light' ? 'text-slate-900' : 'text-white'
+                                        }`}>
+                                            {passModalTeam.captain || 'N/A'}
+                                        </span>
+                                        {passModalTeam.captainMobile && (
+                                            <span className={`text-[11px] font-mono block mt-1 ${
+                                                passTheme === 'light' ? 'text-slate-600' : 'text-white/60'
+                                            }`}>
+                                                {passModalTeam.captainMobile}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div
+                                        className={`rounded-xl p-3 border ${
+                                            passTheme === 'light' ? 'bg-slate-100/70 border-slate-200' : 'border-white/10'
+                                        }`}
+                                        style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.04)' } : undefined}
+                                    >
+                                        <span className={`text-[9px] uppercase tracking-wider font-black block mb-0.5 ${
+                                            passTheme === 'light' ? 'text-purple-700' : 'text-purple-400'
+                                        }`}>
+                                            Track & Room
+                                        </span>
+                                        <span className={`font-bold text-xs block leading-snug break-words ${
+                                            passTheme === 'light' ? 'text-slate-900' : 'text-white'
+                                        }`}>
+                                            {passModalTeam.track || 'General Track'}
+                                        </span>
+                                        <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                                            <span className={`text-[10px] uppercase font-semibold ${
+                                                passTheme === 'light' ? 'text-slate-500' : 'text-white/50'
+                                            }`}>
+                                                Location:
+                                            </span>
+                                            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
+                                                passModalTeam.room 
+                                                    ? (passTheme === 'light' 
+                                                        ? 'bg-amber-100 text-amber-900 border-amber-300' 
+                                                        : 'bg-amber-400/15 text-amber-300 border-amber-400/30')
+                                                    : (passTheme === 'light'
+                                                        ? 'bg-slate-100 text-slate-500 border-slate-200'
+                                                        : 'bg-white/5 text-white/50 border-white/10')
+                                            }`}>
+                                                {passModalTeam.room ? `Room ${passModalTeam.room}` : 'Unassigned'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Status Badge */}
+                                <div className="mt-3.5 flex items-center justify-center">
+                                    {passModalTeam.isCheckedIn ? (
+                                        <span className={`px-4 py-1.5 rounded-full border text-xs font-black uppercase tracking-wider flex items-center gap-2 ${
+                                            passTheme === 'light'
+                                                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs'
+                                                : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
+                                        }`}>
+                                            <span className={`w-2 h-2 rounded-full animate-pulse ${
+                                                passTheme === 'light' ? 'bg-emerald-600' : 'bg-emerald-400'
+                                            }`} />
+                                            <CheckCircle size={15} /> Checked In & Verified
+                                        </span>
+                                    ) : (
+                                        <span className={`px-4 py-1.5 rounded-full border text-xs font-black uppercase tracking-wider flex items-center gap-2 ${
+                                            passTheme === 'light'
+                                                ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-xs'
+                                                : 'bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+                                        }`}>
+                                            <span className={`w-2 h-2 rounded-full animate-ping ${
+                                                passTheme === 'light' ? 'bg-amber-500' : 'bg-amber-400'
+                                            }`} />
+                                            <Clock size={15} /> Pending Check-In
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                                {!passModalTeam.isCheckedIn && (
+                                    <button
+                                        type="button"
+                                        disabled={isCheckingInFromPass}
+                                        onClick={async () => {
+                                            setIsCheckingInFromPass(true);
+                                            try {
+                                                const ok = await checkInTeam(passModalTeam.id);
+                                                if (ok) {
+                                                    setPassModalTeam((prev: any) => prev ? { ...prev, isCheckedIn: true } : null);
+                                                    toast.success("Team marked as checked-in successfully!");
+                                                }
+                                            } finally {
+                                                setIsCheckingInFromPass(false);
+                                            }
+                                        }}
+                                        className={`w-full py-3.5 rounded-xl active:scale-95 font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md ${
+                                            passTheme === 'light'
+                                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25'
+                                                : 'bg-gradient-to-r from-emerald-500 via-[#14b8a6] to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-[0_0_25px_rgba(20,184,166,0.35)]'
+                                        }`}
+                                    >
+                                        <CheckCircle size={16} /> {isCheckingInFromPass ? 'Checking in...' : 'Check-In Team Now'}
+                                    </button>
+                                )}
+
+                                {passQrDataUrl && (
+                                    <a
+                                        href={passQrDataUrl}
+                                        download={`tricity-pass-${passModalTeam.teamId || passModalTeam.id}.png`}
+                                        className={`w-full py-3.5 rounded-xl border font-bold uppercase tracking-wider text-xs transition text-center flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
+                                            passTheme === 'light'
+                                                ? 'border-slate-300 bg-slate-900 hover:bg-slate-800 text-white'
+                                                : 'border-white/15 text-white hover:border-[#14b8a6]/50 hover:text-[#14b8a6]'
+                                        }`}
+                                        style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.06)' } : undefined}
+                                    >
+                                        <Download size={15} /> Download Pass Image
+                                    </a>
+                                )}
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ EDIT TEAM CONTACT MODAL ═══════════ */}
+            <AnimatePresence>
+                {editModalTeam && (
+                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-blue-500/40 rounded-[2rem] p-6 sm:p-7 shadow-2xl overflow-hidden">
+                            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center">
+                                        <Edit3 size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Edit Team Contact</h3>
+                                        <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">{editModalTeam.teamId || editModalTeam.id}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setEditModalTeam(null)}
+                                    className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
+                                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                                    title="Close"
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={(e) => { e.preventDefault(); void handleSaveTeamEdit(); }} className="space-y-3.5">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Team Name</label>
+                                    <input
+                                        type="text"
+                                        value={editFormData.teamName}
+                                        onChange={e => setEditFormData({ ...editFormData, teamName: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Captain / Lead Name</label>
+                                        <input
+                                            type="text"
+                                            value={editFormData.captain}
+                                            onChange={e => setEditFormData({ ...editFormData, captain: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Captain Mobile Number</label>
+                                        <input
+                                            type="text"
+                                            value={editFormData.captainMobile}
+                                            onChange={e => setEditFormData({ ...editFormData, captainMobile: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-mono font-semibold"
+                                            placeholder="10-digit mobile"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                        Captain Email Address <span className="text-amber-400 text-[9px]">(Fix typos here)</span>
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={editFormData.email}
+                                        onChange={e => setEditFormData({ ...editFormData, email: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-mono font-semibold"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">College</label>
+                                        <input
+                                            type="text"
+                                            value={editFormData.college}
+                                            onChange={e => setEditFormData({ ...editFormData, college: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Assigned Room</label>
+                                        <input
+                                            type="text"
+                                            value={editFormData.room}
+                                            onChange={e => setEditFormData({ ...editFormData, room: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                            placeholder="e.g. Lab 3 / Desk 12"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                                    <label className="flex items-center gap-2.5 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={editFormData.resendPass}
+                                            onChange={e => setEditFormData({ ...editFormData, resendPass: e.target.checked })}
+                                            className="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer"
+                                        />
+                                        <span className="text-xs text-amber-200 font-semibold">
+                                            Generate new credentials & email fresh pass to this address immediately
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditModalTeam(null)}
+                                        className="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSavingEdit}
+                                        className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                                    >
+                                        {isSavingEdit ? 'Saving...' : 'Save & Update'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ CREDENTIAL REVEAL MODAL ═══════════ */}
+            <AnimatePresence>
+                {credentialResetResult && (
+                    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md bg-[#0D0219] border-2 border-amber-400/50 rounded-[2rem] p-6 sm:p-7 shadow-[0_0_40px_rgba(251,191,36,0.25)] overflow-hidden">
+                            <div className="flex items-center gap-3.5 mb-4">
+                                <div className="w-11 h-11 rounded-2xl bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center shrink-0">
+                                    <KeyRound size={22} />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Login Credentials Issued</h3>
+                                    <p className="text-[10px] text-amber-300 font-bold uppercase tracking-widest">{credentialResetResult.teamName}</p>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-white/70 leading-relaxed mb-4">
+                                A fresh login password has been generated for team <strong className="text-white">{credentialResetResult.teamId}</strong>.
+                            </p>
+
+                            <div className="p-4 rounded-xl bg-black/50 border border-amber-400/30 space-y-2 mb-4">
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Team ID:</span>
+                                    <span className="text-[#14b8a6] font-mono font-bold">{credentialResetResult.teamId}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">New Password:</span>
+                                    <span className="text-amber-300 font-mono font-black text-sm select-all bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                                        {credentialResetResult.temporaryPassword}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs pt-1 border-t border-white/5">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Recipient:</span>
+                                    <span className="text-white/70 font-mono truncate max-w-[200px]">{credentialResetResult.leadEmail}</span>
+                                </div>
+                            </div>
+
+                            {/* Email delivery indicator */}
+                            <div className={`p-2.5 rounded-xl border text-xs mb-5 flex items-center gap-2 ${credentialResetResult.emailAccepted ? 'bg-green-500/10 border-green-500/30 text-green-300' : 'bg-amber-500/10 border-amber-500/30 text-amber-300'}`}>
+                                {credentialResetResult.emailAccepted ? <CheckCircle size={15} /> : <AlertTriangle size={15} />}
+                                <span className="text-[11px] leading-tight">
+                                    {credentialResetResult.emailAccepted
+                                        ? 'Email successfully accepted by SMTP server for delivery.'
+                                        : 'SMTP failed or offline. Give this password directly to the team lead.'}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        void navigator.clipboard.writeText(`Team ID: ${credentialResetResult.teamId}\nPassword: ${credentialResetResult.temporaryPassword}\nLogin: https://tricity.online/login`);
+                                        toast.success("Credentials copied to clipboard!");
+                                    }}
+                                    className="flex-1 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-black font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+                                >
+                                    <Copy size={14} /> Copy Credentials
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setCredentialResetResult(null)}
+                                    className="py-3 px-5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                >
+                                    Dismiss
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ PURGE DEMO REGISTRATIONS MODAL ═══════════ */}
+            <AnimatePresence>
+                {showPurgeModal && (
+                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-red-500/40 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center shrink-0">
+                                    <AlertTriangle size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Purge Demo Registrations</h3>
+                                    <p className="text-xs text-red-400 font-bold uppercase tracking-widest mt-0.5">Pre-Import Database Wipe</p>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-white/70 leading-relaxed mb-4">
+                                This will completely wipe all demo / mock registrations in Supabase to give you a pristine database prior to importing the official agency CSV. Admin accounts, settings, and judging configs will remain intact.
+                            </p>
+
+                            <div className="mb-5">
+                                <label className="text-[10px] font-black uppercase text-red-300 tracking-wider block mb-1.5">
+                                    Type <span className="font-mono text-white bg-red-950/60 px-1.5 py-0.5 rounded border border-red-500/30">PURGE_ALL_MOCK_REGISTRATIONS</span> to confirm:
+                                </label>
+                                <input
+                                    type="text"
+                                    value={purgeConfirmText}
+                                    onChange={e => setPurgeConfirmText(e.target.value)}
+                                    placeholder="PURGE_ALL_MOCK_REGISTRATIONS"
+                                    className="w-full bg-white/5 border border-red-500/30 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 outline-none focus:border-red-500 font-mono font-bold"
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPurgeModal(false)}
+                                    disabled={isPurging}
+                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handlePurgeDemo}
+                                    disabled={isPurging || purgeConfirmText !== 'PURGE_ALL_MOCK_REGISTRATIONS'}
+                                    className="flex-1 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-40 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
+                                >
+                                    {isPurging ? 'Purging...' : 'Wipe Database Clean'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ PASS & CREDENTIAL DISPATCHER MODAL ═══════════ */}
+            <AnimatePresence>
+                {showDispatchModal && (
+                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl bg-[#0D0219] border-2 border-emerald-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(16,185,129,0.2)] overflow-hidden">
+                            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+                                <div className="flex items-center gap-3.5">
+                                    <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                                        <Mail size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black uppercase italic tracking-tight text-white">Pass & Credential Dispatcher</h3>
+                                        <p className="text-xs text-emerald-400 font-bold uppercase tracking-widest mt-0.5">High-Volume Batch Email Delivery</p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (isDispatching) {
+                                            toast.warning("Please pause or let the current batch finish before closing.");
+                                            return;
+                                        }
+                                        setShowDispatchModal(false);
+                                    }}
+                                    className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
+                                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                                    title="Close"
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+
+                            {/* Status Metrics */}
+                            <div className="grid grid-cols-3 gap-3 mb-5">
+                                <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                                    <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold block mb-1">Total Teams</span>
+                                    <span className="text-2xl font-black text-white italic">{dispatchStatus?.total ?? projects.length}</span>
+                                </div>
+                                <div className="bg-emerald-500/10 rounded-2xl p-4 border border-emerald-500/20 text-center">
+                                    <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block mb-1">Passes Issued</span>
+                                    <span className="text-2xl font-black text-emerald-400 italic">{dispatchStatus?.issued ?? 0}</span>
+                                </div>
+                                <div className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/20 text-center">
+                                    <span className="text-[10px] uppercase tracking-wider text-amber-300 font-bold block mb-1">Pending Delivery</span>
+                                    <span className="text-2xl font-black text-amber-300 italic">{dispatchStatus?.pending ?? projects.length}</span>
+                                </div>
+                            </div>
+
+                            {/* Progress Bar */}
+                            <div className="mb-5 bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
+                                <div className="flex justify-between text-xs font-bold">
+                                    <span className="text-white/60">Dispatch Progress</span>
+                                    <span className="text-emerald-400">
+                                        {dispatchStatus?.total ? Math.round(((dispatchStatus.issued) / dispatchStatus.total) * 100) : 0}% Delivered
+                                    </span>
+                                </div>
+                                <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                                    <div
+                                        className="bg-gradient-to-r from-emerald-500 to-[#14b8a6] h-full transition-all duration-300 rounded-full"
+                                        style={{
+                                            width: `${dispatchStatus?.total ? Math.min(100, Math.round(((dispatchStatus.issued) / dispatchStatus.total) * 100)) : 0}%`
+                                        }}
+                                    />
+                                </div>
+                                <div className="flex justify-between text-[11px] text-white/40 font-mono pt-1">
+                                    <span>Processed: {dispatchStats.processed}</span>
+                                    <span className="text-emerald-400">Sent: {dispatchStats.success}</span>
+                                    <span className="text-red-400">Failed: {dispatchStats.failed}</span>
+                                </div>
+                            </div>
+
+                            {/* Real-time Activity Logs */}
+                            <div className="mb-6">
+                                <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold block mb-2">Live Delivery Log</span>
+                                <div className="h-36 overflow-y-auto custom-scrollbar p-3 rounded-xl bg-black/50 border border-white/5 font-mono text-[11px] text-white/60 space-y-1">
+                                    {dispatchLogs.length === 0 ? (
+                                        <div className="text-white/30 italic text-center py-10">Click &ldquo;Start Dispatch&rdquo; below to begin sending passes in controlled batches.</div>
+                                    ) : (
+                                        dispatchLogs.map((log, idx) => (
+                                            <div key={idx} className="leading-tight py-0.5 border-b border-white/5 last:border-0 truncate">
+                                                {log}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Controller Buttons */}
+                            <div className="flex items-center gap-3">
+                                {!isDispatching ? (
+                                    <button
+                                        type="button"
+                                        onClick={handleStartDispatch}
+                                        disabled={dispatchStatus?.pending === 0}
+                                        className="flex-1 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:opacity-40"
+                                    >
+                                        <PlayCircle size={16} /> Start Safe Batch Dispatch
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={handleTogglePauseDispatch}
+                                        className={`flex-1 py-3.5 rounded-xl font-black italic text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 ${isDispatchPaused ? 'bg-emerald-500 hover:bg-emerald-600 text-black' : 'bg-amber-500 hover:bg-amber-600 text-black'}`}
+                                    >
+                                        {isDispatchPaused ? <PlayCircle size={16} /> : <Pause size={16} />}
+                                        {isDispatchPaused ? 'Resume Dispatch' : 'Pause Dispatcher'}
+                                    </button>
+                                )}
+
+                                <button
+                                    type="button"
+                                    onClick={() => void fetchDispatchStatus()}
+                                    className="py-3.5 px-4 rounded-xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition"
+                                    title="Refresh counts"
+                                >
+                                    <RefreshCw size={16} />
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ CHUNKED CSV IMPORT PROGRESS MODAL ═══════════ */}
+            <AnimatePresence>
+                {importProgress?.isImporting && (
+                    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md bg-[#0D0219] border-2 border-purple-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(168,85,247,0.25)] text-center">
+                            <div className="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                                <Upload size={26} />
+                            </div>
+                            <h3 className="text-xl font-black uppercase italic tracking-tight text-white">Importing Registrations</h3>
+                            <p className="text-xs text-purple-300 font-bold uppercase tracking-widest mt-1 mb-5">
+                                Chunk {importProgress.currentChunk} of {importProgress.totalChunks}
+                            </p>
+
+                            <div className="space-y-2 mb-6 text-left">
+                                <div className="flex justify-between text-xs font-bold">
+                                    <span className="text-white/60">Ingesting into database...</span>
+                                    <span className="text-purple-400">{Math.round((importProgress.processedTeams / importProgress.totalTeams) * 100)}%</span>
+                                </div>
+                                <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                                    <div
+                                        className="bg-gradient-to-r from-purple-500 to-[#14b8a6] h-full transition-all duration-300 rounded-full"
+                                        style={{
+                                            width: `${Math.round((importProgress.processedTeams / importProgress.totalTeams) * 100)}%`
+                                        }}
+                                    />
+                                </div>
+                                <p className="text-[11px] text-white/40 text-center font-mono">
+                                    {importProgress.processedTeams} / {importProgress.totalTeams} teams imported
+                                </p>
+                            </div>
+
+                            <p className="text-[11px] text-white/40 italic">
+                                Please keep this tab open while teams are written to Supabase.
+                            </p>
                         </motion.div>
                     </div>
                 )}

@@ -129,8 +129,9 @@ export async function POST(req: Request) {
     }
 
     try {
-        const body = await req.json() as { registrations?: unknown };
+        const body = await req.json() as { registrations?: unknown; skipEmail?: boolean };
         const incomingRegs = body.registrations;
+        const skipEmail = Boolean(body.skipEmail);
 
         if (!incomingRegs || !Array.isArray(incomingRegs)) {
             return NextResponse.json({ error: 'Invalid payload format. Expected { "registrations": [...] }' }, { status: 400 });
@@ -206,6 +207,16 @@ export async function POST(req: Request) {
         if (error) {
             console.error('❌ Supabase Insert Error:', error);
             return NextResponse.json({ error: 'Failed to insert registrations', details: error.message }, { status: 500 });
+        }
+
+        if (skipEmail) {
+            return NextResponse.json({
+                success: true,
+                imported: data?.length || 0,
+                emailsSent: 0,
+                emailFailures: 0,
+                message: `Successfully imported ${data?.length || 0} registrations into database.`
+            });
         }
 
         let emailsSent = 0;

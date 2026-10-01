@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import {
     Menu, X, LogOut, User, LayoutDashboard, Award,
     BarChart3, Users, GanttChartSquare, ChevronRight, QrCode, Lock,
-    ShieldCheck, Phone, Coffee, LifeBuoy
+    ShieldCheck, Phone, Coffee, LifeBuoy, Headphones, FileSpreadsheet, ScanLine
 } from "lucide-react";
 import Link from "next/link";
 import { useHackathon } from "@/context/HackathonContext";
@@ -16,6 +16,9 @@ const adminOperationItems = [
     { href: "/dashboard/admin#judges", section: "judges", icon: ShieldCheck, label: "Judges" },
     { href: "/dashboard/admin#volunteers", section: "volunteers", icon: Phone, label: "Volunteers" },
     { href: "/dashboard/admin#meals", section: "meals", icon: Coffee, label: "Meals" },
+    { href: "/dashboard/admin#helpdesk", section: "helpdesk", icon: Headphones, label: "Help Desk" },
+    { href: "/dashboard/admin#exports", section: "exports", icon: FileSpreadsheet, label: "CSV Exports" },
+    { href: "/dashboard/admin#checkin", section: "checkin", icon: ScanLine, label: "QR Check-in" },
 ];
 
 interface DashboardLayoutProps {
