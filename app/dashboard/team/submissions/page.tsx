@@ -16,14 +16,14 @@ export default function TeamSubmissions() {
     const [values, setValues] = useState<Record<SubmissionKey, string>>({ repo: "", video: "", presentation: "", demo: "" });
     const [saving, setSaving] = useState<SubmissionKey | null>(null);
 
-    const [isInitialized, setIsInitialized] = useState(false);
-
     useEffect(() => { 
-        if (team?.submission && !isInitialized) { 
-            setValues({ repo: team.submission.github || "", video: team.submission.demo || "", presentation: team.submission.presentation || "", demo: team.submission.deployment || "" }); 
-            setIsInitialized(true);
-        } 
-    }, [team, isInitialized]);
+        setValues({ 
+            repo: team?.submission?.github || "", 
+            video: team?.submission?.demo || "", 
+            presentation: team?.submission?.presentation || "", 
+            demo: team?.submission?.deployment || "" 
+        }); 
+    }, [team?.submission?.github, team?.submission?.demo, team?.submission?.presentation, team?.submission?.deployment]);
 
     const save = async (key: SubmissionKey) => {
         if (!team) return;

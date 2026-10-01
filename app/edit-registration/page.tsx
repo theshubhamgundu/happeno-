@@ -397,6 +397,14 @@ function EditRegistrationInner() {
     };
 
     const handleGenerateMergeCode = async () => {
+        if (editedTeam && editedTeam.members.length === 3) {
+            toast.error('Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).');
+            return;
+        }
+        if (editedTeam && editedTeam.members.length >= 4) {
+            toast.error('Your team is already at full Quad capacity (4 members). Merging is not allowed.');
+            return;
+        }
         setIsGeneratingCode(true);
         try {
             const res = await fetch('/api/team/roster-action', {
@@ -421,6 +429,14 @@ function EditRegistrationInner() {
     const handleSubmitMergeCode = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputMergeCode.trim()) return;
+        if (editedTeam && editedTeam.members.length === 3) {
+            toast.error('Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).');
+            return;
+        }
+        if (editedTeam && editedTeam.members.length >= 4) {
+            toast.error('Your team is already at full Quad capacity (4 members). Merging is not allowed.');
+            return;
+        }
         setIsSubmittingMerge(true);
         try {
             const res = await fetch('/api/team/roster-action', {
@@ -958,7 +974,7 @@ function EditRegistrationInner() {
                                             <span className="text-[11px] text-slate-500">
                                                 {team.isRosterLocked || editedTeam?.isRosterLocked
                                                     ? 'Team details are permanently locked.'
-                                                    : 'Allowed team sizes: Solo (1), Duo (2), or Quad (4). Tri (3) is prohibited.'}
+                                                    : 'Review and update your team member information below.'}
                                             </span>
                                         </div>
 
@@ -1002,36 +1018,6 @@ function EditRegistrationInner() {
                                                         </span>
                                                     )}
                                                 </div>
-
-                                                {idx > 0 && !(team.isRosterLocked || editedTeam?.isRosterLocked) && (
-                                                    <div className="flex items-center gap-2">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setReplacingSlotIndex(idx);
-                                                                setReplacementForm({
-                                                                    fullName: '',
-                                                                    email: '',
-                                                                    phone: '',
-                                                                    college: editedTeam.college || '',
-                                                                    department: '',
-                                                                    year: ''
-                                                                });
-                                                            }}
-                                                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-bold transition cursor-pointer"
-                                                        >
-                                                            <UserPlus size={12} /> Replace
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveTeammate(idx)}
-                                                            className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-[11px] font-bold transition cursor-pointer"
-                                                            title="Remove teammate"
-                                                        >
-                                                            <Trash2 size={12} /> Remove
-                                                        </button>
-                                                    </div>
-                                                )}
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
@@ -1040,7 +1026,9 @@ function EditRegistrationInner() {
                                                         Full Name
                                                     </label>
                                                     <input
+                                                        id={`member-name-${idx}`}
                                                         type="text"
+                                                        placeholder="Full Name"
                                                         disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
                                                         value={m.fullName || ''}
                                                         onChange={e => {
@@ -1057,7 +1045,9 @@ function EditRegistrationInner() {
                                                         Email Address
                                                     </label>
                                                     <input
+                                                        id={`member-email-${idx}`}
                                                         type="email"
+                                                        placeholder="Email Address"
                                                         disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
                                                         value={m.email || ''}
                                                         onChange={e => {
@@ -1074,7 +1064,9 @@ function EditRegistrationInner() {
                                                         Mobile Number
                                                     </label>
                                                     <input
+                                                        id={`member-phone-${idx}`}
                                                         type="text"
+                                                        placeholder="Mobile Number"
                                                         disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
                                                         value={m.phone || ''}
                                                         onChange={e => {
@@ -1103,31 +1095,7 @@ function EditRegistrationInner() {
                                             <h3 className="text-base font-extrabold uppercase tracking-tight text-slate-900">
                                                 Merge Teams
                                             </h3>
-                                            <p className="text-[11px] text-purple-700">
-                                                Combine into a Duo (2) or Quad (4) team
-                                            </p>
                                         </div>
-                                    </div>
-
-                                    {/* Merge Rules Callout */}
-                                    <div className="p-3.5 rounded-2xl bg-white border border-purple-100 text-xs space-y-1.5 shadow-sm">
-                                        <span className="text-[10px] font-bold uppercase text-purple-900 tracking-wider block">
-                                            Agency Merge Rules
-                                        </span>
-                                        <div className="space-y-1 text-[11px] text-slate-600">
-                                            <div className="flex items-center gap-1.5 text-emerald-700 font-semibold">
-                                                <Check size={13} /> Solo (1) + Solo (1) = Duo (2)
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-emerald-700 font-semibold">
-                                                <Check size={13} /> Duo (2) + Duo (2) = Quad (4)
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-rose-600 font-semibold">
-                                                <X size={13} /> Solo (1) + Duo (2) = 3 members (Prohibited)
-                                            </div>
-                                        </div>
-                                        <p className="text-[10px] text-slate-400 pt-1.5 border-t border-slate-100 leading-relaxed">
-                                            *If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).
-                                        </p>
                                     </div>
 
                                     {team.isRosterLocked || editedTeam?.isRosterLocked ? (
@@ -1138,26 +1106,6 @@ function EditRegistrationInner() {
                                             </div>
                                             <p className="text-[11px] text-slate-500 leading-relaxed">
                                                 Your team registration has been finalized and permanently locked. Merges are disabled for finalized registrations.
-                                            </p>
-                                        </div>
-                                    ) : editedTeam?.members.length === 4 ? (
-                                        <div className="p-4 rounded-2xl bg-white border border-emerald-200 text-emerald-800 text-xs shadow-sm space-y-1">
-                                            <p className="font-bold flex items-center gap-1.5">
-                                                <CheckCircle2 size={14} className="text-emerald-600" />
-                                                Full Quad Capacity (4 Members)
-                                            </p>
-                                            <p className="text-[11px] text-slate-500 leading-relaxed">
-                                                Your team is already at max capacity. Merging is not applicable.
-                                            </p>
-                                        </div>
-                                    ) : editedTeam?.members.length === 3 ? (
-                                        <div className="p-4 rounded-2xl bg-white border border-amber-300 text-amber-900 text-xs shadow-sm space-y-1.5">
-                                            <p className="font-bold flex items-center gap-1.5 text-amber-950">
-                                                <AlertTriangle size={14} className="text-amber-600" />
-                                                Cannot Merge As 3 Members
-                                            </p>
-                                            <p className="text-[11px] text-amber-800 leading-relaxed">
-                                                External agency rules require Solo (1), Duo (2), or Quad (4) teams. Please add a 4th teammate to form a Quad, or adjust to 2 members before initiating a merge.
                                             </p>
                                         </div>
                                     ) : (
@@ -1728,7 +1676,7 @@ function EditRegistrationInner() {
                                             Add Teammate
                                         </h3>
                                         <p className="text-[10px] text-teal-700 font-bold uppercase tracking-wider">
-                                            Build Duo (2) or Quad (4) Team
+                                            Enter Member Details
                                         </p>
                                     </div>
                                 </div>

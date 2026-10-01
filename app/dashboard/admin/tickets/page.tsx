@@ -203,12 +203,12 @@ export default function AdminTickets() {
                     onClick={() => setFilter('all')}
                     className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all border flex items-center gap-2 ${
                         filter === 'all'
-                            ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                            ? 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-600/20'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                 >
                     <span>Active Queue</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${filter === 'all' ? 'bg-teal-400 text-black' : 'bg-slate-100 text-slate-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${filter === 'all' ? 'bg-white text-teal-800' : 'bg-slate-100 text-slate-700'}`}>
                         {tickets.filter(t => t.status !== 'resolved').length}
                     </span>
                 </button>
@@ -217,12 +217,12 @@ export default function AdminTickets() {
                     onClick={() => setFilter('assigned')}
                     className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all border flex items-center gap-2 ${
                         filter === 'assigned'
-                            ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                            ? 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-600/20'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                 >
                     <span>My Claims</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${filter === 'assigned' ? 'bg-teal-400 text-black' : 'bg-slate-100 text-slate-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${filter === 'assigned' ? 'bg-white text-teal-800' : 'bg-slate-100 text-slate-700'}`}>
                         {myCount}
                     </span>
                 </button>
@@ -231,12 +231,12 @@ export default function AdminTickets() {
                     onClick={() => setFilter('resolved')}
                     className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all border flex items-center gap-2 ${
                         filter === 'resolved'
-                            ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                            ? 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-600/20'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                 >
                     <span>Resolved</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${filter === 'resolved' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${filter === 'resolved' ? 'bg-white text-teal-800' : 'bg-slate-100 text-slate-700'}`}>
                         {resolvedCount}
                     </span>
                 </button>

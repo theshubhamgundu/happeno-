@@ -270,7 +270,7 @@ export async function POST(req: Request) {
             }
             if (memberCount === 3) {
                 return NextResponse.json({
-                    error: 'External agency rules require Solo (1), Duo (2), or Quad (4) teams. 3-member teams cannot merge directly. Please add a 4th teammate to form a Quad, or adjust to 2 members before merging.'
+                    error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).'
                 }, { status: 400 });
             }
 
@@ -303,7 +303,7 @@ export async function POST(req: Request) {
             }
             if (targetMemberCount === 3) {
                 return NextResponse.json({
-                    error: 'External agency rules require Solo (1), Duo (2), or Quad (4) teams. 3-member teams cannot merge directly. Please add a 4th teammate to form a Quad, or adjust to 2 members.'
+                    error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).'
                 }, { status: 400 });
             }
 
@@ -371,7 +371,7 @@ export async function POST(req: Request) {
 
                 if (mergedMembers.length === 3) {
                     return NextResponse.json({
-                        error: 'Cannot merge into a 3-member team. External agency rules strictly require Solo (1), Duo (2), or Quad (4) teams only.'
+                        error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).'
                     }, { status: 400 });
                 }
 
@@ -404,7 +404,6 @@ export async function POST(req: Request) {
                 if (srcErr) throw srcErr;
 
                 // Archive Target Team (marks as MERGED)
-                const targetRawData = (targetTeam.raw_data && typeof targetTeam.raw_data === 'object') ? targetTeam.raw_data : {};
                 await supabase
                     .from('registrations')
                     .update({

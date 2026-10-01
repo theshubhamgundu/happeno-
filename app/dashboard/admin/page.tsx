@@ -53,6 +53,7 @@ import {
     GitMerge,
     History,
     Phone,
+    RotateCcw,
     type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
@@ -443,6 +444,42 @@ export default function AdminDashboard() {
             if (selectedTeamIds.length > 0) setSelectedTeamIds([]);
         } finally {
             setIsBulkAssigning(false);
+        }
+    };
+
+    // ═══════════ CLEAR SUBMISSIONS STATE & HANDLER ═══════════
+    const [showClearSubmissionsModal, setShowClearSubmissionsModal] = useState(false);
+    const [clearSubmissionsTarget, setClearSubmissionsTarget] = useState<'all' | 'selected'>('all');
+    const [clearIdeationToo, setClearIdeationToo] = useState(false);
+    const [isClearingSubmissions, setIsClearingSubmissions] = useState(false);
+
+    const handleClearSubmissions = async () => {
+        setIsClearingSubmissions(true);
+        try {
+            const teamIds = clearSubmissionsTarget === 'all' ? 'all' : selectedTeamIds;
+            const res = await fetch('/api/admin/bulk-teams', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'clear_submissions',
+                    teamIds,
+                    clearIdeation: clearIdeationToo
+                })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                toast.success(data.message || 'Submissions successfully cleared! Participant dashboards are now fresh.');
+                setShowClearSubmissionsModal(false);
+                if (clearSubmissionsTarget === 'selected') setSelectedTeamIds([]);
+                if (refreshTeams) await refreshTeams();
+            } else {
+                toast.error(data.error || 'Failed to clear submissions.');
+            }
+        } catch {
+            toast.error('Network error while clearing submissions.');
+        } finally {
+            setIsClearingSubmissions(false);
         }
     };
 
@@ -1350,6 +1387,18 @@ export default function AdminDashboard() {
                         >
                             <Trash2 size={16} /> Purge Demo
                         </button>
+
+                        {/* Clear Submissions Button */}
+                        <button
+                            onClick={() => {
+                                setClearSubmissionsTarget('all');
+                                setShowClearSubmissionsModal(true);
+                            }}
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 text-[10px] font-black uppercase tracking-wider text-amber-300 transition hover:border-amber-500/60 hover:bg-amber-500/20"
+                            title="Clear project deliverables and links so participant dashboards feel fresh"
+                        >
+                            <RotateCcw size={16} /> Clear Submissions
+                        </button>
                     </div>
 
                     {/* Bulk Selection Header Bar */}
@@ -2029,14 +2078,14 @@ export default function AdminDashboard() {
                                     {helpTickets.map(ticket => (
                                         <div key={ticket.id} className={`p-6 rounded-2xl border transition-all ${
                                             ticket.status === 'open' ? 'bg-amber-500/5 border-amber-500/20' :
-                                            ticket.status === 'accepted' ? 'bg-blue-500/5 border-blue-500/20' :
+                                            ticket.status === 'accepted' ? 'bg-teal-500/10 border-teal-500/30' :
                                             'bg-green-500/5 border-green-500/20 opacity-60'
                                         }`}>
                                             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                                                 <div className="flex items-start gap-4">
                                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                                                         ticket.status === 'open' ? 'bg-amber-500/20 text-amber-400' :
-                                                        ticket.status === 'accepted' ? 'bg-blue-500/20 text-blue-400' :
+                                                        ticket.status === 'accepted' ? 'bg-teal-500/20 text-teal-300' :
                                                         'bg-green-500/20 text-green-400'
                                                     }`}>
                                                         {ticket.status === 'open' ? <Clock size={20} /> :
@@ -2056,7 +2105,7 @@ export default function AdminDashboard() {
                                                                 </span>
                                                             )}
                                                             <span className={`text-[9px] font-black px-2 py-0.5 rounded ${
-                                                                ticket.category === 'Technical' ? 'bg-blue-500/20 text-blue-300' :
+                                                                ticket.category === 'Technical' ? 'bg-teal-500/20 text-teal-300' :
                                                                 ticket.category === 'WiFi/Infra' ? 'bg-red-500/20 text-red-300' :
                                                                 ticket.category === 'Email Query' ? 'bg-teal-500/20 text-teal-300' :
                                                                 'bg-purple-500/20 text-purple-300'
@@ -2121,7 +2170,7 @@ export default function AdminDashboard() {
                                                     {ticket.status === 'open' && (
                                                         <button
                                                             onClick={() => handleTicketAction(ticket.id, 'accept')}
-                                                            className="px-4 py-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-wider hover:bg-blue-500/30 transition cursor-pointer"
+                                                            className="px-4 py-2 rounded-xl bg-teal-500/20 border border-teal-500/30 text-teal-300 text-[10px] font-black uppercase tracking-wider hover:bg-teal-500/30 transition cursor-pointer"
                                                         >
                                                             Accept
                                                         </button>
@@ -2894,6 +2943,18 @@ export default function AdminDashboard() {
                                 </button>
                             )}
 
+                            {/* Clear Submissions */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setClearSubmissionsTarget('selected');
+                                    setShowClearSubmissionsModal(true);
+                                }}
+                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                            >
+                                <RotateCcw size={14} /> Clear Submissions ({selectedTeamIds.length})
+                            </button>
+
                             {/* Bulk Delete */}
                             <button
                                 type="button"
@@ -3661,6 +3722,89 @@ export default function AdminDashboard() {
                                     className="flex-1 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-40 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
                                 >
                                     {isPurging ? 'Purging...' : 'Wipe Database Clean'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ CLEAR SUBMISSIONS MODAL ═══════════ */}
+            <AnimatePresence>
+                {showClearSubmissionsModal && (
+                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-amber-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(245,158,11,0.2)] overflow-hidden">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+                                    <RotateCcw size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
+                                        Clear Team Submissions
+                                    </h3>
+                                    <p className="text-xs text-amber-400 font-bold uppercase tracking-widest mt-0.5">
+                                        {clearSubmissionsTarget === 'all'
+                                            ? `All ${projects.length} Teams Across Event`
+                                            : `${selectedTeamIds.length} Selected Team${selectedTeamIds.length === 1 ? '' : 's'}`}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-white/70 leading-relaxed mb-5">
+                                This will wipe deliverable links and reset submission status so that participant dashboards feel clean, fresh, and ready for official project uploads.
+                            </p>
+
+                            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3 mb-5 text-xs">
+                                <div className="flex items-start gap-2.5 text-white/80">
+                                    <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                                    <span>
+                                        Clears GitHub repository, demo video, presentation slide deck, and live product URLs.
+                                    </span>
+                                </div>
+                                <div className="flex items-start gap-2.5 text-white/80">
+                                    <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                                    <span>
+                                        Resets project status back to <strong>In progress</strong>.
+                                    </span>
+                                </div>
+
+                                <label className="flex items-center gap-3 pt-3 mt-2 border-t border-white/10 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={clearIdeationToo}
+                                        onChange={e => setClearIdeationToo(e.target.checked)}
+                                        className="w-4 h-4 rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0 cursor-pointer"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="font-bold text-white block">Also reset Problem Statement & Tech Stack locks</span>
+                                        <span className="text-[11px] text-white/40 block">Participants can pick fresh problem statements from scratch</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowClearSubmissionsModal(false)}
+                                    disabled={isClearingSubmissions}
+                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleClearSubmissions}
+                                    disabled={isClearingSubmissions}
+                                    className="flex-1 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition disabled:opacity-40 shadow-[0_0_20px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    {isClearingSubmissions ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                                            <span>Clearing...</span>
+                                        </>
+                                    ) : (
+                                        <span>Yes, Clear Submissions</span>
+                                    )}
                                 </button>
                             </div>
                         </motion.div>
