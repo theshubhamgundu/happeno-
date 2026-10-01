@@ -35,12 +35,17 @@ import {
     ScanLine,
     Clock,
     CheckCircle,
+    Check,
+    ArrowRightLeft,
+    DoorOpen,
+    Wifi,
     type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useHackathon } from "@/context/HackathonContext";
 import { EVENT_MEALS } from "@/lib/meals";
+import { TRACKS } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Papa from "papaparse";
@@ -63,8 +68,21 @@ export default function AdminDashboard() {
         updateEmergencyContact,
         enabledMeals,
         updateEnabledMeals,
-        bulkAssignMealPlan
+        bulkAssignMealPlan,
+        deleteTeams,
+        bulkUpdateTeams
     } = useHackathon();
+
+    const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showMoveTrackModal, setShowMoveTrackModal] = useState(false);
+    const [selectedTargetTrack, setSelectedTargetTrack] = useState<string>(() => TRACKS[0] || "AI/ML");
+    const [customTargetTrack, setCustomTargetTrack] = useState("");
+    const [showMoveRoomModal, setShowMoveRoomModal] = useState(false);
+    const [targetRoom, setTargetRoom] = useState("");
+    const [targetWifiSSID, setTargetWifiSSID] = useState("");
+    const [targetWifiPass, setTargetWifiPass] = useState("");
+    const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
     const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin'>('teams');
     const [searchQuery, setSearchQuery] = useState("");
@@ -289,12 +307,123 @@ export default function AdminDashboard() {
         }
         setIsBulkAssigning(true);
         try {
-            const allProjectIds = projects.map(p => p.id);
-            await bulkAssignMealPlan(allProjectIds, selectedBulkMeals, true);
+            const targetIds = selectedTeamIds.length > 0 
+                ? selectedTeamIds 
+                : projects.map(p => p.id);
+            await bulkAssignMealPlan(targetIds, selectedBulkMeals, true);
             setShowBulkMealModal(false);
             setSelectedBulkMeals([]);
+            if (selectedTeamIds.length > 0) setSelectedTeamIds([]);
         } finally {
             setIsBulkAssigning(false);
+        }
+    };
+
+    const toggleSelectTeam = (id: string) => {
+        setSelectedTeamIds(prev => 
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        );
+    };
+
+    const isAllPageSelected = useMemo(() => {
+        if (paginatedTeams.length === 0) return false;
+        return paginatedTeams.every(t => selectedTeamIds.includes(t.teamId || String(t.id)));
+    }, [paginatedTeams, selectedTeamIds]);
+
+    const isAllFilteredSelected = useMemo(() => {
+        if (filteredTeams.length === 0) return false;
+        return filteredTeams.every(t => selectedTeamIds.includes(t.teamId || String(t.id)));
+    }, [filteredTeams, selectedTeamIds]);
+
+    const handleToggleSelectAllPage = () => {
+        const pageIds = paginatedTeams.map(t => t.teamId || String(t.id));
+        if (isAllPageSelected) {
+            setSelectedTeamIds(prev => prev.filter(id => !pageIds.includes(id)));
+        } else {
+            setSelectedTeamIds(prev => Array.from(new Set([...prev, ...pageIds])));
+        }
+    };
+
+    const handleSelectAllFiltered = () => {
+        const allIds = filteredTeams.map(t => t.teamId || String(t.id));
+        if (isAllFilteredSelected) {
+            setSelectedTeamIds([]);
+        } else {
+            setSelectedTeamIds(allIds);
+        }
+    };
+
+    const clearSelection = () => {
+        setSelectedTeamIds([]);
+    };
+
+    const handleConfirmBulkDelete = async () => {
+        if (selectedTeamIds.length === 0) return;
+        setIsBulkProcessing(true);
+        try {
+            const ok = await deleteTeams(selectedTeamIds);
+            if (ok) {
+                setSelectedTeamIds([]);
+                setShowDeleteModal(false);
+            }
+        } finally {
+            setIsBulkProcessing(false);
+        }
+    };
+
+    const handleConfirmMoveTrack = async () => {
+        const finalTrack = customTargetTrack.trim() || selectedTargetTrack;
+        if (!finalTrack) {
+            toast.error("Please specify a track.");
+            return;
+        }
+        setIsBulkProcessing(true);
+        try {
+            const ok = await bulkUpdateTeams(selectedTeamIds, { track: finalTrack });
+            if (ok) {
+                setSelectedTeamIds([]);
+                setShowMoveTrackModal(false);
+                setCustomTargetTrack("");
+            }
+        } finally {
+            setIsBulkProcessing(false);
+        }
+    };
+
+    const handleConfirmMoveRoom = async () => {
+        if (!targetRoom.trim()) {
+            toast.error("Please specify a room or hall.");
+            return;
+        }
+        setIsBulkProcessing(true);
+        try {
+            const ok = await bulkUpdateTeams(selectedTeamIds, {
+                room: targetRoom.trim(),
+                roomWifiSSID: targetWifiSSID.trim(),
+                roomWifiPass: targetWifiPass.trim()
+            });
+            if (ok) {
+                setSelectedTeamIds([]);
+                setShowMoveRoomModal(false);
+                setTargetRoom("");
+                setTargetWifiSSID("");
+                setTargetWifiPass("");
+            }
+        } finally {
+            setIsBulkProcessing(false);
+        }
+    };
+
+    const handleBulkCheckIn = async () => {
+        setIsBulkProcessing(true);
+        try {
+            const ok = await bulkUpdateTeams(selectedTeamIds, { isCheckedIn: true });
+            if (ok) {
+                toast.success(`Checked in ${selectedTeamIds.length} teams.`);
+                setSelectedTeamIds([]);
+            }
+        } finally {
+            setIsBulkProcessing(false);
         }
     };
 
@@ -736,33 +865,136 @@ export default function AdminDashboard() {
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6">
-                        {paginatedTeams.map((team) => (
-                            <div
-                                key={team.id}
-                                className={`bg-white/5 border border-white/10 rounded-[2rem] transition-all hover:bg-white/[0.07] cursor-pointer overflow-hidden ${expandedTeamId === team.id ? 'bg-white/[0.08] shadow-2xl' : 'opacity-80'}`}
-                                onClick={() => setExpandedTeamId(expandedTeamId === team.id ? null : team.id)}
+                    {/* Bulk Selection Header Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                        <div className="flex items-center gap-3">
+                            <button
+                                type="button"
+                                onClick={handleToggleSelectAllPage}
+                                className={`w-7 h-7 rounded-xl border flex items-center justify-center transition-all ${
+                                    isAllPageSelected
+                                        ? 'bg-[#14b8a6] border-[#14b8a6] text-black shadow-[0_0_12px_rgba(20,184,166,0.5)]'
+                                        : selectedTeamIds.length > 0
+                                            ? 'bg-[#14b8a6]/20 border-[#14b8a6] text-[#14b8a6]'
+                                            : 'border-white/20 bg-white/5 hover:border-white/40 text-transparent'
+                                }`}
+                                title={isAllPageSelected ? "Deselect this page" : "Select all on this page"}
                             >
-                                <div className="p-8">
-                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-black bg-slate-900/20 text-slate-900">
-                                                {team.team ? team.team[0] : "?"}
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center flex-wrap gap-2">
-                                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{team.team}</h3>
-                                                    <span className="text-[10px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{team.teamId}</span>
-                                                </div>
-                                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track} • {team.college}</p>
-                                            </div>
-                                        </div>
+                                {isAllPageSelected ? (
+                                    <Check size={16} className="stroke-[3] text-black" />
+                                ) : selectedTeamIds.length > 0 ? (
+                                    <span className="w-2.5 h-0.5 bg-[#14b8a6] rounded-full" />
+                                ) : null}
+                            </button>
+                            <div>
+                                <span className="text-xs font-black uppercase italic tracking-wider text-white block">
+                                    {selectedTeamIds.length > 0 ? (
+                                        <span className="text-[#14b8a6]">{selectedTeamIds.length} of {filteredTeams.length} Selected</span>
+                                    ) : (
+                                        <span className="text-white/60">Bulk Actions & Direct Select</span>
+                                    )}
+                                </span>
+                                <span className="text-[10px] text-white/35 font-semibold">
+                                    Select teams for bulk deletion, track moving, room assignments, and check-in
+                                </span>
+                            </div>
+                        </div>
 
-                                        <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
-                                            <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 flex-wrap text-xs">
+                            <button
+                                type="button"
+                                onClick={handleToggleSelectAllPage}
+                                className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold transition-all text-[11px]"
+                            >
+                                {isAllPageSelected ? "Deselect Page" : `Select Page (${paginatedTeams.length})`}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleSelectAllFiltered}
+                                className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold transition-all text-[11px]"
+                            >
+                                {isAllFilteredSelected ? "Deselect All" : `Select All Matching (${filteredTeams.length})`}
+                            </button>
+                            {selectedTeamIds.length > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={clearSelection}
+                                    className="px-3 py-1.5 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 font-bold transition-all text-[11px]"
+                                >
+                                    Clear Selection
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6">
+                        {paginatedTeams.map((team) => {
+                            const teamKey = team.teamId || String(team.id);
+                            const isSelected = selectedTeamIds.includes(teamKey);
+
+                            return (
+                                <div
+                                    key={team.id}
+                                    className={`border rounded-[2rem] transition-all cursor-pointer overflow-hidden ${
+                                        isSelected
+                                            ? 'bg-[#14b8a6]/[0.06] border-[#14b8a6]/60 shadow-[0_0_20px_rgba(20,184,166,0.15)]'
+                                            : expandedTeamId === team.id
+                                                ? 'bg-white/[0.08] border-white/20 shadow-2xl'
+                                                : 'bg-white/5 border-white/10 hover:bg-white/[0.07] opacity-90'
+                                    }`}
+                                    onClick={() => setExpandedTeamId(expandedTeamId === team.id ? null : team.id)}
+                                >
+                                    <div className="p-8">
+                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                                            <div className="flex items-center gap-5">
+                                                {/* Selection Checkbox */}
+                                                <div
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        toggleSelectTeam(teamKey);
+                                                    }}
+                                                    className={`w-7 h-7 rounded-xl border flex items-center justify-center cursor-pointer transition-all shrink-0 ${
+                                                        isSelected
+                                                            ? 'bg-[#14b8a6] border-[#14b8a6] text-black shadow-[0_0_12px_rgba(20,184,166,0.6)]'
+                                                            : 'border-white/20 bg-white/5 hover:border-white/40 text-transparent'
+                                                    }`}
+                                                    title={isSelected ? "Deselect team" : "Select team"}
+                                                >
+                                                    <Check size={16} className={`stroke-[3] ${isSelected ? 'text-black' : 'opacity-0'}`} />
+                                                </div>
+
+                                                <div className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-black bg-slate-900/20 text-slate-900 shrink-0">
+                                                    {team.team ? team.team[0] : "?"}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center flex-wrap gap-2">
+                                                        <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{team.team}</h3>
+                                                        <span className="text-[10px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{team.teamId}</span>
+                                                        {team.isCheckedIn && (
+                                                            <span className="text-[9px] font-black uppercase text-green-400 px-2 py-0.5 border border-green-500/30 rounded bg-green-500/10">Checked In ✓</span>
+                                                        )}
+                                                        {team.room && (
+                                                            <span className="text-[9px] font-black uppercase text-amber-300 px-2 py-0.5 border border-amber-400/30 rounded bg-amber-400/10">Room: {team.room}</span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track} • {team.college}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedTeamIds([teamKey]);
+                                                        setShowDeleteModal(true);
+                                                    }}
+                                                    className="p-2.5 rounded-xl border border-white/10 hover:border-red-500/40 text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                                    title="Delete this team"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
                                         </div>
-                                    </div>
 
                                     <AnimatePresence>
                                         {expandedTeamId === team.id && (
@@ -1767,7 +1999,312 @@ export default function AdminDashboard() {
                                     disabled={isBulkAssigning || selectedBulkMeals.length === 0}
                                     className="w-full py-4 rounded-xl font-black uppercase italic tracking-widest transition-all bg-[#14b8a6] text-black hover:bg-[#14b8a6]/80 disabled:opacity-50"
                                 >
-                                    {isBulkAssigning ? 'ASSIGNING...' : `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ALL`}
+                                    {isBulkAssigning ? 'ASSIGNING...' : selectedTeamIds.length > 0 ? `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ${selectedTeamIds.length} TEAMS` : `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ALL`}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ FLOATING BULK ACTIONS TOOLBAR ═══════════ */}
+            <AnimatePresence>
+                {selectedTeamIds.length > 0 && (
+                    <motion.div
+                        initial={{ y: 100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 100, opacity: 0 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-4xl bg-[#0D0219]/95 border-2 border-[#14b8a6]/50 rounded-2xl p-4 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl flex flex-wrap items-center justify-between gap-4"
+                    >
+                        <div className="flex items-center gap-3">
+                            <span className="w-9 h-9 rounded-xl bg-[#14b8a6] text-black font-black flex items-center justify-center text-sm shadow-[0_0_15px_rgba(20,184,166,0.5)]">
+                                {selectedTeamIds.length}
+                            </span>
+                            <div>
+                                <span className="text-white font-black text-sm uppercase italic tracking-wider block">
+                                    {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'} Selected
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={clearSelection}
+                                    className="text-[10px] text-white/50 hover:text-white underline uppercase tracking-widest transition-colors"
+                                >
+                                    Deselect all
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                            {/* Move Track */}
+                            <button
+                                type="button"
+                                onClick={() => setShowMoveTrackModal(true)}
+                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 hover:bg-blue-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                            >
+                                <ArrowRightLeft size={14} /> Move Track
+                            </button>
+
+                            {/* Assign Room */}
+                            <button
+                                type="button"
+                                onClick={() => setShowMoveRoomModal(true)}
+                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                            >
+                                <DoorOpen size={14} /> Assign Room
+                            </button>
+
+                            {/* Bulk Check-In */}
+                            <button
+                                type="button"
+                                onClick={handleBulkCheckIn}
+                                disabled={isBulkProcessing}
+                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#14b8a6]/20 border border-[#14b8a6]/40 text-[#14b8a6] hover:bg-[#14b8a6]/30 text-xs font-black uppercase italic tracking-wider transition-all disabled:opacity-50"
+                            >
+                                <CheckCircle2 size={14} /> Check In ({selectedTeamIds.length})
+                            </button>
+
+                            {/* Assign Meals */}
+                            <button
+                                type="button"
+                                onClick={() => setShowBulkMealModal(true)}
+                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                            >
+                                <Coffee size={14} /> Assign Meals
+                            </button>
+
+                            {/* Merge (if >= 2 selected) */}
+                            {selectedTeamIds.length >= 2 && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedMergeTeams(selectedTeamIds);
+                                        setShowMergeModal(true);
+                                    }}
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 hover:bg-purple-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                                >
+                                    <Users size={14} /> Merge ({selectedTeamIds.length})
+                                </button>
+                            )}
+
+                            {/* Bulk Delete */}
+                            <button
+                                type="button"
+                                onClick={() => setShowDeleteModal(true)}
+                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                            >
+                                <Trash2 size={14} /> Delete
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ BULK DELETE MODAL ═══════════ */}
+            <AnimatePresence>
+                {showDeleteModal && (
+                    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-red-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                            <div className="flex items-center gap-4 mb-5">
+                                <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center shrink-0">
+                                    <Trash2 size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
+                                        Delete {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'}?
+                                    </h3>
+                                    <p className="text-xs text-red-400 font-bold uppercase tracking-widest mt-0.5">Irreversible Permanent Deletion</p>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-white/70 leading-relaxed mb-4">
+                                This action will permanently remove the <strong className="text-white">{selectedTeamIds.length}</strong> selected registration{selectedTeamIds.length === 1 ? '' : 's'} from the database. All associated member rosters, login credentials, evaluation scores, and final submissions will be permanently purged.
+                            </p>
+
+                            <div className="max-h-36 overflow-y-auto custom-scrollbar p-3 rounded-xl bg-black/40 border border-white/5 space-y-1.5 mb-6 text-xs font-mono text-white/60">
+                                {selectedTeamIds.slice(0, 10).map(id => {
+                                    const t = projects.find(p => (p.teamId || String(p.id)) === id);
+                                    return (
+                                        <div key={id} className="flex justify-between items-center py-0.5 border-b border-white/5 last:border-0">
+                                            <span className="text-white truncate">{t?.team || t?.name || id}</span>
+                                            <span className="text-[#14b8a6] text-[10px] ml-2 shrink-0">{id}</span>
+                                        </div>
+                                    );
+                                })}
+                                {selectedTeamIds.length > 10 && (
+                                    <div className="text-[10px] text-white/40 italic pt-1">
+                                        ...and {selectedTeamIds.length - 10} more teams
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowDeleteModal(false)}
+                                    disabled={isBulkProcessing}
+                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleConfirmBulkDelete}
+                                    disabled={isBulkProcessing}
+                                    className="flex-1 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
+                                >
+                                    {isBulkProcessing ? 'Deleting...' : `Yes, Delete (${selectedTeamIds.length})`}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ MOVE TRACK MODAL ═══════════ */}
+            <AnimatePresence>
+                {showMoveTrackModal && (
+                    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-blue-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                            <div className="flex items-center gap-4 mb-5">
+                                <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center justify-center shrink-0">
+                                    <ArrowRightLeft size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
+                                        Move {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'}
+                                    </h3>
+                                    <p className="text-xs text-blue-400 font-bold uppercase tracking-widest mt-0.5">Bulk Track Reassignment</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 mb-6">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Select Target Track</label>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
+                                        {TRACKS.map(track => (
+                                            <button
+                                                key={track}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedTargetTrack(track);
+                                                    setCustomTargetTrack("");
+                                                }}
+                                                className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${
+                                                    selectedTargetTrack === track && !customTargetTrack
+                                                        ? 'bg-blue-500/20 border-blue-400 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                                                        : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                                                }`}
+                                            >
+                                                {track}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Or Custom Track Name</label>
+                                    <input
+                                        type="text"
+                                        value={customTargetTrack}
+                                        onChange={(e) => setCustomTargetTrack(e.target.value)}
+                                        placeholder="e.g. Web3 & DeFi, Robotics, etc."
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-blue-400 transition-all font-semibold"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMoveTrackModal(false)}
+                                    disabled={isBulkProcessing}
+                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleConfirmMoveTrack}
+                                    disabled={isBulkProcessing}
+                                    className="flex-1 py-3.5 rounded-xl bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+                                >
+                                    {isBulkProcessing ? 'Moving...' : `Apply to ${selectedTeamIds.length} Teams`}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ ASSIGN ROOM MODAL ═══════════ */}
+            <AnimatePresence>
+                {showMoveRoomModal && (
+                    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-emerald-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                            <div className="flex items-center gap-4 mb-5">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                                    <DoorOpen size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
+                                        Assign Room ({selectedTeamIds.length} Teams)
+                                    </h3>
+                                    <p className="text-xs text-emerald-400 font-bold uppercase tracking-widest mt-0.5">Venue Location Allocation</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 mb-6">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Room / Hall Location *</label>
+                                    <input
+                                        type="text"
+                                        value={targetRoom}
+                                        onChange={(e) => setTargetRoom(e.target.value)}
+                                        placeholder="e.g. Auditorium 2 - Row B, Lab 401"
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Wi-Fi Network SSID (Optional)</label>
+                                        <input
+                                            type="text"
+                                            value={targetWifiSSID}
+                                            onChange={(e) => setTargetWifiSSID(e.target.value)}
+                                            placeholder="e.g. TRICITY_HACK_5G"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Wi-Fi Password (Optional)</label>
+                                        <input
+                                            type="text"
+                                            value={targetWifiPass}
+                                            onChange={(e) => setTargetWifiPass(e.target.value)}
+                                            placeholder="e.g. hack2026pass"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMoveRoomModal(false)}
+                                    disabled={isBulkProcessing}
+                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleConfirmMoveRoom}
+                                    disabled={isBulkProcessing || !targetRoom.trim()}
+                                    className="flex-1 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                                >
+                                    {isBulkProcessing ? 'Assigning...' : `Assign to ${selectedTeamIds.length} Teams`}
                                 </button>
                             </div>
                         </motion.div>

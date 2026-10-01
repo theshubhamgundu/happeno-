@@ -68,6 +68,8 @@ interface HackathonContextType {
     resetMemberMeal: (projectId: any, memberId: string, mealKey: string) => Promise<void>;
     bulkAssignMealPlan: (projectIds: any[], mealKeys: string[], included: boolean) => Promise<void>;
     toggleMealAccess: (projectId: any, mealKey: string, included: boolean) => Promise<void>;
+    deleteTeams: (teamIds: string[]) => Promise<boolean>;
+    bulkUpdateTeams: (teamIds: string[], updates: { track?: string; room?: string; roomWifiSSID?: string; roomWifiPass?: string; isCheckedIn?: boolean }) => Promise<boolean>;
 }
 
 export interface Member {
@@ -854,6 +856,64 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const deleteTeams = async (teamIds: string[]): Promise<boolean> => {
+        try {
+            const res = await fetch('/api/admin/bulk-teams', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'delete', teamIds })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Failed to delete teams');
+            }
+            const idSet = new Set(teamIds.map(id => String(id).toUpperCase()));
+            setProjects(prev => prev.filter(p => !idSet.has(String(p.teamId || '').toUpperCase()) && !idSet.has(String(p.id || '').toUpperCase())));
+            toast.success(`Deleted ${teamIds.length} team${teamIds.length === 1 ? '' : 's'}.`);
+            return true;
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Failed to delete teams.';
+            console.error('Delete teams failed:', err);
+            toast.error(msg);
+            return false;
+        }
+    };
+
+    const bulkUpdateTeams = async (teamIds: string[], updates: { track?: string; room?: string; roomWifiSSID?: string; roomWifiPass?: string; isCheckedIn?: boolean }): Promise<boolean> => {
+        try {
+            const res = await fetch('/api/admin/bulk-teams', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update', teamIds, updates })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Failed to update teams');
+            }
+            const idSet = new Set(teamIds.map(id => String(id).toUpperCase()));
+            setProjects(prev => prev.map(p => {
+                if (idSet.has(String(p.teamId || '').toUpperCase()) || idSet.has(String(p.id || '').toUpperCase())) {
+                    return {
+                        ...p,
+                        ...updates,
+                        ...(updates.isCheckedIn !== undefined ? {
+                            isCheckedIn: updates.isCheckedIn,
+                            checkedInAt: updates.isCheckedIn ? (p.checkedInAt || new Date().toISOString()) : null
+                        } : {})
+                    };
+                }
+                return p;
+            }));
+            toast.success(`Updated ${teamIds.length} team${teamIds.length === 1 ? '' : 's'}.`);
+            return true;
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Failed to update teams.';
+            console.error('Bulk update teams failed:', err);
+            toast.error(msg);
+            return false;
+        }
+    };
+
     return (
         <HackathonContext.Provider
             value={{
@@ -888,7 +948,9 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 claimMemberMeal,
                 resetMemberMeal,
                 bulkAssignMealPlan,
-                toggleMealAccess
+                toggleMealAccess,
+                deleteTeams,
+                bulkUpdateTeams
             }}
         >
             {children}
