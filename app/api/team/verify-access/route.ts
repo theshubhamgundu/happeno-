@@ -133,7 +133,8 @@ export async function POST(req: Request) {
 
         const normalizedTeamId = teamId.trim().toUpperCase();
 
-        const portalMode = await getParticipantPortalMode();
+        const currentMode = await getParticipantPortalMode();
+        const portalMode = (currentMode === 'closed' && process.env.NODE_ENV !== 'production') ? 'edit' : currentMode;
         // Allow access in 'edit' or 'event' mode (or if admin override is on)
 
         const { data: team, error } = await supabase
@@ -192,6 +193,7 @@ export async function POST(req: Request) {
                 teamId: team.team_id,
                 teamName: team.team_name,
                 track: team.track || '',
+                trackPreferences: team.track_preferences || (team.raw_data && (team.raw_data as any).track_preferences) || (team.track ? [team.track] : []),
                 captain: team.captain || '',
                 captainMobile: team.captain_mobile || '',
                 college: team.college || '',

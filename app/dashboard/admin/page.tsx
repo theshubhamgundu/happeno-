@@ -1292,7 +1292,7 @@ export default function AdminDashboard() {
                         {/* Merge Teams */}
                         <button
                             onClick={() => setShowMergeModal(true)}
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-blue-400 transition hover:border-blue-500/70 hover:bg-blue-500/30"
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/10 px-5 text-[10px] font-bold uppercase tracking-wider text-teal-700 transition hover:border-teal-500/70 hover:bg-teal-500/20"
                         >
                             <Users size={18} /> Merge Teams
                         </button>
@@ -1478,7 +1478,7 @@ export default function AdminDashboard() {
                                                 <button
                                                     type="button"
                                                     onClick={() => openEditModal(team)}
-                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-wider transition-all"
+                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-teal-500/40 bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 text-[10px] font-bold uppercase tracking-wider transition-all"
                                                     title="Correct email typos, phone, name, or resend pass"
                                                 >
                                                     <Edit3 size={14} /> Edit
@@ -4111,20 +4111,20 @@ export default function AdminDashboard() {
 
 function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: number | string; icon: LucideIcon; tone: "purple" | "amber" | "green" | "blue" | "orange" | "red" }) {
     const tones = {
-        purple: "bg-slate-900/15 text-slate-900 border-slate-800/20",
-        amber: "bg-amber-500/15 text-amber-300 border-amber-400/20",
-        green: "bg-emerald-500/15 text-emerald-300 border-emerald-400/20",
-        blue: "bg-sky-500/15 text-sky-300 border-sky-400/20",
-        orange: "bg-slate-900/15 text-slate-900 border-slate-800/20",
-        red: "bg-slate-900/15 text-slate-900 border-slate-800/20",
+        purple: "bg-purple-50 text-purple-700 border-purple-200",
+        amber: "bg-amber-50 text-amber-700 border-amber-200",
+        green: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        blue: "bg-teal-50 text-teal-700 border-teal-200",
+        orange: "bg-orange-50 text-orange-700 border-orange-200",
+        red: "bg-rose-50 text-rose-700 border-rose-200",
     };
 
     return (
-        <article className="rounded-2xl border border-white/10 bg-white/[0.045] p-4 shadow-lg transition hover:-translate-y-0.5 hover:bg-white/[0.07]">
+        <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
             <div className="flex items-start justify-between gap-3">
                 <div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.14em] text-white/45">{label}</p>
-                    <p className="mt-2 text-2xl font-black tracking-tight text-white">{value}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">{label}</p>
+                    <p className="mt-2 text-2xl font-black tracking-tight text-slate-900">{value}</p>
                 </div>
                 <span className={`flex h-9 w-9 items-center justify-center rounded-xl border ${tones[tone]}`}><Icon size={17} /></span>
             </div>

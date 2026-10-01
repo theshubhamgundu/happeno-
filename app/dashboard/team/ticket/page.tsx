@@ -120,7 +120,7 @@ export default function TeamTicket() {
                                         <p className="text-sm font-semibold">Team Check-in Pass</p>
                                     </div>
                                 </div>
-                                <span className={`rounded-full px-3 py-1.5 text-xs font-semibold ${team.checkedInAt || team.isCheckedIn ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>
+                                <span className={`rounded-full px-3 py-1.5 text-xs font-semibold ${team.checkedInAt || team.isCheckedIn ? 'bg-emerald-50 text-emerald-700' : 'bg-teal-50 text-teal-700 border border-teal-200'}`}>
                                     {team.checkedInAt || team.isCheckedIn ? '✓ Checked In' : 'Valid'}
                                 </span>
                             </div>

@@ -316,26 +316,26 @@ export default function VolunteerDashboard() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setInspectedTeam(null)}
-                            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                         />
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="relative w-full max-w-lg bg-[#0D0219] border-2 border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl z-[260] overflow-hidden"
+                            className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl z-[260] overflow-hidden text-slate-900"
                         >
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">
+                                    <h3 className="text-2xl font-black italic uppercase tracking-tight text-slate-900">
                                         {inspectedTeam.team || inspectedTeam.name}
                                     </h3>
-                                    <span className="text-xs font-mono font-bold text-[#14b8a6] mt-0.5 block">
+                                    <span className="text-xs font-mono font-bold text-teal-700 mt-0.5 block">
                                         ID: {inspectedTeam.teamId || inspectedTeam.id}
                                     </span>
                                 </div>
                                 <button
                                     onClick={() => setInspectedTeam(null)}
-                                    className="p-2 text-white/30 hover:text-white rounded-xl hover:bg-white/5 transition-colors"
+                                    className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
@@ -343,14 +343,14 @@ export default function VolunteerDashboard() {
 
                             <div className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1 text-xs">
                                 {/* Captain info */}
-                                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
-                                    <span className="text-[10px] font-black uppercase text-white/40 block">Team Lead / Captain</span>
-                                    <div className="text-sm font-bold text-white">{inspectedTeam.captain || 'Unassigned'}</div>
+                                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                                    <span className="text-[10px] font-bold uppercase text-slate-500 block">Team Lead / Captain</span>
+                                    <div className="text-sm font-bold text-slate-900">{inspectedTeam.captain || 'Unassigned'}</div>
                                     {inspectedTeam.captainMobile && (
-                                        <div className="text-white/70 font-mono">{inspectedTeam.captainMobile}</div>
+                                        <div className="text-slate-600 font-mono text-xs">{inspectedTeam.captainMobile}</div>
                                     )}
                                     {inspectedTeam.college && (
-                                        <div className="text-white/50">{inspectedTeam.college}</div>
+                                        <div className="text-slate-500">{inspectedTeam.college}</div>
                                     )}
                                 </div>
 
@@ -358,15 +358,15 @@ export default function VolunteerDashboard() {
                                 {(inspectedTeam.room || inspectedTeam.track) && (
                                     <div className="grid grid-cols-2 gap-3">
                                         {inspectedTeam.room && (
-                                            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                                                <span className="text-[9px] font-black uppercase text-white/40 block">Assigned Room</span>
-                                                <span className="text-xs font-black text-white">{inspectedTeam.room}</span>
+                                            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                                <span className="text-[9px] font-bold uppercase text-slate-400 block">Assigned Room</span>
+                                                <span className="text-xs font-bold text-slate-800">{inspectedTeam.room}</span>
                                             </div>
                                         )}
                                         {inspectedTeam.track && (
-                                            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                                                <span className="text-[9px] font-black uppercase text-white/40 block">Track</span>
-                                                <span className="text-xs font-black text-[#14b8a6]">{inspectedTeam.track}</span>
+                                            <div className="p-3 rounded-xl bg-teal-50 border border-teal-200">
+                                                <span className="text-[9px] font-bold uppercase text-teal-700 block">Track</span>
+                                                <span className="text-xs font-bold text-teal-800">{inspectedTeam.track}</span>
                                             </div>
                                         )}
                                     </div>
@@ -374,19 +374,19 @@ export default function VolunteerDashboard() {
 
                                 {/* Roster */}
                                 <div className="space-y-2">
-                                    <span className="text-[10px] font-black uppercase text-white/40 block">
+                                    <span className="text-[10px] font-bold uppercase text-slate-500 block">
                                         Team Members ({inspectedTeam.members?.length || 0})
                                     </span>
                                     {inspectedTeam.members?.map((member, idx) => {
                                         const name = typeof member === 'string' ? member : member.fullName;
                                         const email = typeof member === 'string' ? '' : member.email;
                                         return (
-                                            <div key={idx} className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between">
+                                            <div key={idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                                                 <div>
-                                                    <span className="font-bold text-white block">{name}</span>
-                                                    {email && <span className="text-[10px] text-white/40">{email}</span>}
+                                                    <span className="font-bold text-slate-800 block">{name}</span>
+                                                    {email && <span className="text-[10px] text-slate-500">{email}</span>}
                                                 </div>
-                                                <span className="text-[9px] font-mono text-white/30">#{idx + 1}</span>
+                                                <span className="text-[10px] font-mono font-semibold text-slate-400">#{idx + 1}</span>
                                             </div>
                                         );
                                     })}
@@ -394,19 +394,19 @@ export default function VolunteerDashboard() {
                             </div>
 
                             {/* Check in action in modal */}
-                            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+                            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
                                 {!inspectedTeam.isCheckedIn ? (
                                     <button
                                         onClick={async () => {
                                             await confirmInspectionCheckIn(inspectedTeam.id, inspectedTeam.team || inspectedTeam.name);
                                             setInspectedTeam(null);
                                         }}
-                                        className="w-full py-3 rounded-xl bg-[#14b8a6] hover:bg-[#0d9488] active:scale-95 text-black font-black uppercase italic text-xs tracking-wider transition-all"
+                                        className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 active:scale-95 text-white font-bold uppercase text-xs tracking-wider transition-all shadow-sm"
                                     >
                                         Check In Team Now
                                     </button>
                                 ) : (
-                                    <div className="w-full py-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 font-black italic uppercase text-xs text-center">
+                                    <div className="w-full py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold uppercase text-xs text-center">
                                         Team Already Checked In ✓
                                     </div>
                                 )}

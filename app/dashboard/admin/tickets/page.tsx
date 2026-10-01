@@ -65,14 +65,14 @@ function getCategoryIcon(category: string) {
 function getCategoryColor(category: string): { bg: string; text: string; border: string } {
     switch (category.toLowerCase()) {
         case "technical":
-            return { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/20" };
+            return { bg: "bg-teal-50", text: "text-teal-700", border: "border-teal-200" };
         case "mentor":
-            return { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" };
+            return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200" };
         case "wifi/infra":
         case "wifi":
-            return { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/20" };
+            return { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" };
         default:
-            return { bg: "bg-slate-500/10", text: "text-slate-300", border: "border-slate-500/20" };
+            return { bg: "bg-slate-100", text: "text-slate-700", border: "border-slate-200" };
     }
 }
 

@@ -44,7 +44,7 @@ interface ExistingMemberChoice {
 const AVATAR_GRADIENTS = [
     "bg-gradient-to-br from-[#14b8a6] to-teal-700 border-slate-900 text-white shadow-md",
     "bg-gradient-to-br from-indigo-500 to-purple-700 border-slate-900 text-white shadow-md",
-    "bg-gradient-to-br from-blue-500 to-cyan-600 border-slate-900 text-white shadow-md",
+    "bg-gradient-to-br from-teal-500 to-cyan-600 border-slate-900 text-white shadow-md",
     "bg-gradient-to-br from-rose-500 to-pink-600 border-slate-900 text-white shadow-md",
     "bg-gradient-to-br from-violet-500 to-fuchsia-600 border-slate-900 text-white shadow-md",
     "bg-gradient-to-br from-emerald-500 to-green-600 border-slate-900 text-white shadow-md",
@@ -222,11 +222,11 @@ export default function UsersManagement() {
         });
 
         const COLORS = [
-            { color: "text-cyan-400", border: "border-cyan-400/20", bg: "bg-cyan-400/10", glow: "rgba(0,200,255,0.15)", accent: "#00C8FF" },
-            { color: "text-blue-400", border: "border-blue-400/20", bg: "bg-blue-400/10", glow: "rgba(0,100,255,0.15)", accent: "#0064FF" },
-            { color: "text-slate-900", border: "border-slate-800/20", bg: "bg-slate-900/10", glow: "rgba(186,69,232,0.15)", accent: "#BA45E8" },
-            { color: "text-slate-900", border: "border-slate-800/20", bg: "bg-slate-900/10", glow: "rgba(236,72,153,0.15)", accent: "#EC4899" },
-            { color: "text-green-400", border: "border-green-400/20", bg: "bg-green-400/10", glow: "rgba(34,197,94,0.15)", accent: "#22C55E" },
+            { color: "text-teal-700", border: "border-teal-200", bg: "bg-teal-50", glow: "rgba(20,184,166,0.15)", accent: "#0d9488" },
+            { color: "text-emerald-700", border: "border-emerald-200", bg: "bg-emerald-50", glow: "rgba(16,185,129,0.15)", accent: "#059669" },
+            { color: "text-purple-700", border: "border-purple-200", bg: "bg-purple-50", glow: "rgba(186,69,232,0.15)", accent: "#7c3aed" },
+            { color: "text-amber-700", border: "border-amber-200", bg: "bg-amber-50", glow: "rgba(245,158,11,0.15)", accent: "#d97706" },
+            { color: "text-slate-700", border: "border-slate-200", bg: "bg-slate-100", glow: "rgba(100,116,139,0.15)", accent: "#475569" },
         ];
 
         return Object.entries(trackMap).map(([track, data], i) => ({
@@ -241,29 +241,29 @@ export default function UsersManagement() {
 
     if (isLoading) {
         return (
-            <DashboardLayout type="admin" title="Operational Surveillance">
+            <DashboardLayout type="admin" title="Hacker Directory">
                 <div className="h-[80vh] flex flex-col items-center justify-center space-y-4">
-                    <div className="w-12 h-12 border-4 border-slate-800 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-white/40 font-kanit font-bold uppercase tracking-widest animate-pulse">Syncing User Directory...</p>
+                    <div className="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-slate-500 font-bold uppercase tracking-widest animate-pulse">Syncing User Directory...</p>
                 </div>
             </DashboardLayout>
         );
     }
 
     return (
-        <DashboardLayout type="admin" title="Hacker Surveillance">
-            <div className="max-w-[1600px] mx-auto space-y-10 pb-20">
+        <DashboardLayout type="admin" title="Hacker Directory">
+            <div className="max-w-[1600px] mx-auto space-y-8 pb-20">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-white/40 hover:text-[#14b8a6] transition-colors font-bold text-xs uppercase tracking-widest mb-4">
+                        <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-colors font-bold text-xs uppercase tracking-widest mb-3">
                             <ArrowLeft size={14} /> Back to Dashboard
                         </Link>
-                        <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-white leading-none">
-                            Hacker <span className="text-[#14b8a6]">Directory</span>
+                        <h1 className="text-3xl md:text-5xl font-black italic uppercase tracking-tight text-slate-900 leading-none">
+                            Hacker <span className="text-teal-600">Directory</span>
                         </h1>
-                        <p className="text-white/40 font-bold uppercase tracking-[0.2em] mt-4 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                        <p className="text-slate-500 font-bold uppercase tracking-[0.16em] mt-3 flex items-center gap-2 text-xs">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                             {allUsers.length} Operational Units Detected
                         </p>
                     </div>
@@ -271,43 +271,40 @@ export default function UsersManagement() {
                     <div className="flex gap-4">
                         <button
                             onClick={handleExportCSV}
-                            className="p-4 rounded-2xl bg-[#14b8a6] text-black border border-[#14b8a6]/20 hover:scale-[1.02] active:scale-95 transition-all shadow-xl flex items-center gap-2 font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(20,184,166,0.2)]"
+                            className="p-3.5 px-5 rounded-xl bg-teal-600 text-white hover:bg-teal-700 active:scale-95 transition-all shadow-sm flex items-center gap-2 font-bold uppercase text-xs tracking-wider"
                         >
                             <Download size={16} /> Export CSV
                         </button>
                     </div>
                 </div>
 
-
-
                 {/* Filters & Search */}
-                <div className="flex flex-col lg:flex-row gap-6 items-center">
+                <div className="flex flex-col lg:flex-row gap-4 items-center">
                     <div className="relative flex-grow group w-full">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#14b8a6] transition-colors" size={20} />
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-600 transition-colors" size={18} />
                         <input
                             type="text"
-                            placeholder="SEARCH BY HACKER, EMAIL, OR COLLEGE..."
+                            placeholder="Search by hacker, email, or college..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-[2rem] py-5 pl-16 pr-8 text-white font-bold italic uppercase outline-none focus:border-[#14b8a6] focus:bg-white/10 transition-all placeholder:text-white/10 tracking-widest text-sm"
+                            className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-14 pr-6 text-slate-900 font-semibold outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all placeholder:text-slate-400 tracking-wide text-sm shadow-sm"
                         />
                     </div>
-
                 </div>
 
                 {/* User Table */}
-                <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden backdrop-blur-xl relative">
+                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm relative">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-white/10 bg-white/[0.02]">
-                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Team Name & Track</th>
-                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Members</th>
-                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Status</th>
-                                    <th className="p-8 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] text-right">Actions</th>
+                                <tr className="border-b border-slate-200 bg-slate-50/70">
+                                    <th className="p-5 pl-7 text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Team Name & Track</th>
+                                    <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Members</th>
+                                    <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Status</th>
+                                    <th className="p-5 pr-7 text-[10px] font-black text-slate-500 uppercase tracking-[0.16em] text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-slate-100">
                                 <AnimatePresence mode="popLayout">
                                     {filteredProjects.map((project: Project, idx: number) => {
                                         const isExpanded = expandedTeamId === project.id;
@@ -318,47 +315,47 @@ export default function UsersManagement() {
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0 }}
-                                                className={`group hover:bg-white/[0.03] transition-colors cursor-pointer ${isExpanded ? 'bg-white/[0.02]' : ''}`}
+                                                className={`group hover:bg-slate-50 transition-colors cursor-pointer ${isExpanded ? 'bg-slate-50/60' : ''}`}
                                                 onClick={() => setExpandedTeamId(isExpanded ? null : project.id)}
                                             >
-                                                <td className="p-8">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-900/20 to-[#14b8a6]/20 flex items-center justify-center text-[#14b8a6] font-black border border-white/10">
-                                                            <Users size={20} />
+                                                <td className="p-5 pl-7">
+                                                    <div className="flex items-center gap-3.5">
+                                                        <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 font-bold border border-teal-100">
+                                                            <Users size={18} />
                                                         </div>
                                                         <div>
-                                                            <p className="text-white font-black italic uppercase tracking-tight group-hover:text-[#14b8a6] transition-colors text-lg">{project.team || 'Unknown Team'}</p>
-                                                            <div className="flex items-center gap-2 mt-1">
-                                                                <span className="text-[10px] text-[#14b8a6]/60 font-bold uppercase tracking-widest">{project.teamId}</span>
-                                                                <span className="w-1 h-1 rounded-full bg-white/20" />
-                                                                <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{project.track || 'TBD'}</span>
+                                                            <p className="text-slate-900 font-bold tracking-tight group-hover:text-teal-700 transition-colors text-base">{project.team || 'Unknown Team'}</p>
+                                                            <div className="flex items-center gap-2 mt-0.5">
+                                                                <span className="text-[10px] text-teal-700 font-bold uppercase tracking-wider">{project.teamId}</span>
+                                                                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{project.track || 'TBD'}</span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="p-8">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="flex -space-x-2.5">
+                                                <td className="p-5">
+                                                    <div className="flex items-center gap-2.5">
+                                                        <div className="flex -space-x-2">
                                                             {project.members.slice(0, 4).map((m, i) => (
-                                                                <div key={i} className={`w-8 h-8 rounded-full ${AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} border-2 flex items-center justify-center text-[11px] font-black text-white z-[${4 - i}]`}>
+                                                                <div key={i} className={`w-7 h-7 rounded-full ${AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-sm`}>
                                                                     {(typeof m === 'string' ? m : m.fullName)?.[0]?.toUpperCase() || '?'}
                                                                 </div>
                                                             ))}
                                                         </div>
-                                                        <span className="text-xs font-bold text-white/60">{project.members.length} Members</span>
+                                                        <span className="text-xs font-bold text-slate-600">{project.members.length} Members</span>
                                                     </div>
                                                 </td>
-                                                <td className="p-8">
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.1em] bg-green-500/10 text-green-400 border border-green-500/30">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                                                <td className="p-5">
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                                         {project.status || 'REGISTERED'}
                                                     </span>
                                                 </td>
-                                                <td className="p-8 text-right">
+                                                <td className="p-5 pr-7 text-right">
                                                     <button 
-                                                        className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 group-hover:text-white transition-all inline-flex items-center justify-center"
+                                                        className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 group-hover:text-slate-800 transition-all inline-flex items-center justify-center"
                                                     >
-                                                        {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                                                        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                                     </button>
                                                 </td>
                                             </motion.tr>
@@ -369,12 +366,12 @@ export default function UsersManagement() {
                                                         initial={{ opacity: 0, height: 0 }}
                                                         animate={{ opacity: 1, height: 'auto' }}
                                                         exit={{ opacity: 0, height: 0 }}
-                                                        className="bg-black/40 border-b border-white/5"
+                                                        className="bg-slate-50/40 border-b border-slate-200"
                                                     >
                                                         <td colSpan={4} className="p-0">
-                                                            <div className="p-8 pl-24 space-y-4">
+                                                            <div className="p-6 pl-14 sm:pl-20 space-y-4">
                                                                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                                                                    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Team Participants ({project.members.length}/{MAX_TEAM_MEMBERS})</p>
+                                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.16em]">Team Participants ({project.members.length}/{MAX_TEAM_MEMBERS})</p>
                                                                     <button
                                                                         onClick={(event) => {
                                                                             event.stopPropagation();
@@ -386,35 +383,35 @@ export default function UsersManagement() {
                                                                         }}
                                                                         disabled={project.members.length >= MAX_TEAM_MEMBERS}
                                                                         title={project.members.length >= MAX_TEAM_MEMBERS ? `Teams are limited to ${MAX_TEAM_MEMBERS} participants` : 'Add participant'}
-                                                                        className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#5eead4] bg-[#14b8a6] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[#062d2a] shadow-md shadow-black/20 transition hover:bg-[#5eead4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:border-white/20 disabled:bg-white/10 disabled:text-white/40 disabled:shadow-none"
+                                                                        className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-teal-600 bg-teal-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none"
                                                                     >
-                                                                        <Plus size={16} strokeWidth={3} /> {project.members.length >= MAX_TEAM_MEMBERS ? 'Team full' : 'Add participant'}
+                                                                        <Plus size={14} /> {project.members.length >= MAX_TEAM_MEMBERS ? 'Team full' : 'Add participant'}
                                                                     </button>
                                                                 </div>
-                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                                                                     {project.members.map((member, mIdx) => {
                                                                         const m = typeof member === 'string' ? { fullName: member } as Member : member;
                                                                         return (
-                                                                            <div key={mIdx} className="bg-white/5 border border-white/5 rounded-2xl p-5 flex items-start justify-between group/member hover:bg-white/10 transition-colors">
-                                                                                <div className="flex gap-4">
-                                                                                    <div className={`w-10 h-10 rounded-full ${AVATAR_GRADIENTS[mIdx % AVATAR_GRADIENTS.length]} flex items-center justify-center text-white font-black text-sm border border-white/20 shadow-md`}>
+                                                                            <div key={mIdx} className="bg-white border border-slate-200 rounded-xl p-4 flex items-start justify-between group/member hover:border-slate-300 transition-colors shadow-sm">
+                                                                                <div className="flex gap-3.5">
+                                                                                    <div className={`w-9 h-9 rounded-full ${AVATAR_GRADIENTS[mIdx % AVATAR_GRADIENTS.length]} flex items-center justify-center text-white font-bold text-xs shadow-sm`}>
                                                                                         {m.fullName?.[0]?.toUpperCase() || '?'}
                                                                                     </div>
                                                                                     <div>
-                                                                                        <p className="text-sm font-black italic uppercase tracking-tight text-white">{m.fullName || 'Unknown'}</p>
+                                                                                        <p className="text-sm font-bold text-slate-900">{m.fullName || 'Unknown'}</p>
                                                                                         <div className="flex items-center gap-2 mt-1">
-                                                                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">{m.email || 'NO_EMAIL'}</p>
-                                                                                            <span className="w-1 h-1 rounded-full bg-white/20" />
-                                                                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">{m.phone || 'NO_PHONE'}</p>
+                                                                                            <p className="text-[10px] text-slate-500 font-medium">{m.email || 'NO_EMAIL'}</p>
+                                                                                            <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                                                                            <p className="text-[10px] text-slate-500 font-medium">{m.phone || 'NO_PHONE'}</p>
                                                                                         </div>
-                                                                                        <div className="flex items-center gap-2 mt-3">
-                                                                                            <span className="text-[9px] text-blue-400 font-bold uppercase tracking-widest">{m.college || 'Unknown College'}</span>
-                                                                                            <span className="px-2 py-0.5 bg-white/5 rounded text-[8px] font-bold text-white/50">{m.year || 'N/A'}</span>
-                                                                                            <span className="px-2 py-0.5 bg-white/5 rounded text-[8px] font-bold text-white/50">{m.department || 'N/A'}</span>
+                                                                                        <div className="flex items-center gap-2 mt-2.5">
+                                                                                            <span className="text-[10px] text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200 uppercase tracking-wide">{m.college || 'Unknown College'}</span>
+                                                                                            <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-semibold text-slate-600">{m.year || 'N/A'}</span>
+                                                                                            <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-semibold text-slate-600">{m.department || 'N/A'}</span>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div className="flex gap-2 opacity-100 md:flex-col md:opacity-0 md:group-hover/member:opacity-100 transition-opacity">
+                                                                                <div className="flex gap-1.5 opacity-100 md:flex-col md:opacity-0 md:group-hover/member:opacity-100 transition-opacity">
                                                                                     <button 
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
@@ -429,22 +426,22 @@ export default function UsersManagement() {
                                                                                             setEditFormData(userObj);
                                                                                             setEditingLocation({ teamId: String(project.id), memberIndex: mIdx });
                                                                                         }}
-                                                                                        className="p-2 rounded-lg bg-white/5 text-[#14b8a6]/60 hover:text-[#14b8a6] hover:bg-[#14b8a6]/10 transition-colors"
+                                                                                        className="p-1.5 rounded-lg bg-slate-100 text-teal-700 hover:bg-teal-50 transition-colors"
                                                                                         title="Edit Participant"
                                                                                     >
-                                                                                        <Edit size={12} />
+                                                                                        <Edit size={13} />
                                                                                     </button>
-                                                                                    <button
+                                                                                    <button 
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
                                                                                             if (project.members.length <= 1 || !window.confirm(`Remove ${m.fullName || 'this participant'} from ${project.team}?`)) return;
                                                                                             void removeTeamMember(project.id, mIdx);
                                                                                         }}
                                                                                         disabled={project.members.length <= 1}
-                                                                                        className="p-2 rounded-lg bg-white/5 text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+                                                                                        className="p-1.5 rounded-lg bg-slate-100 text-rose-600 hover:bg-rose-50 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                                                                                         title={project.members.length <= 1 ? 'A team must have at least one participant' : 'Remove Participant'}
                                                                                     >
-                                                                                        <Trash2 size={12} />
+                                                                                        <Trash2 size={13} />
                                                                                     </button>
                                                                                 </div>
                                                                             </div>
@@ -453,12 +450,12 @@ export default function UsersManagement() {
                                                                 </div>
 
                                                                 {/* Meal Pass Toggle Section */}
-                                                                <div className="mt-8 border-t border-white/10 pt-6">
-                                                                    <div className="flex items-center gap-3 mb-4">
-                                                                        <Coffee size={16} className="text-amber-500" />
-                                                                        <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Food & Snack Passes</p>
+                                                                <div className="mt-6 border-t border-slate-200 pt-5">
+                                                                    <div className="flex items-center gap-2 mb-3">
+                                                                        <Coffee size={15} className="text-amber-600" />
+                                                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Food & Snack Passes</p>
                                                                     </div>
-                                                                    <div className="flex flex-wrap gap-3">
+                                                                    <div className="flex flex-wrap gap-2.5">
                                                                         {EVENT_MEALS.map((meal) => {
                                                                             // Check if ANY member has access to this meal (we'll treat it as team-wide access for this UI)
                                                                             const memberStates = project.memberMealState || {};
@@ -469,15 +466,15 @@ export default function UsersManagement() {
                                                                             const isClaimed = hasAnyClaimed;
                                                                             
                                                                             return (
-                                                                                <div key={meal.key} className={`flex items-center gap-3 p-3 rounded-xl border ${isIncluded ? 'bg-amber-500/10 border-amber-500/30' : 'bg-white/5 border-white/10'} transition-colors`}>
+                                                                                <div key={meal.key} className={`flex items-center gap-3 p-2.5 px-3 rounded-xl border ${isIncluded ? 'bg-amber-50/80 border-amber-200' : 'bg-white border-slate-200'} transition-colors`}>
                                                                                     <div className="flex flex-col">
-                                                                                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">{meal.shortLabel}</span>
+                                                                                        <span className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">{meal.shortLabel}</span>
                                                                                         {isClaimed ? (
-                                                                                            <span className="text-[8px] font-bold text-green-400 uppercase">Claimed</span>
+                                                                                            <span className="text-[8px] font-bold text-emerald-700 uppercase">Claimed</span>
                                                                                         ) : isIncluded ? (
-                                                                                            <span className="text-[8px] font-bold text-amber-500 uppercase">Pending</span>
+                                                                                            <span className="text-[8px] font-bold text-amber-700 uppercase">Pending</span>
                                                                                         ) : (
-                                                                                            <span className="text-[8px] font-bold text-white/30 uppercase">No Access</span>
+                                                                                            <span className="text-[8px] font-bold text-slate-400 uppercase">No Access</span>
                                                                                         )}
                                                                                     </div>
                                                                                     
@@ -487,7 +484,7 @@ export default function UsersManagement() {
                                                                                             toggleMealAccess(project.id, meal.key, !isIncluded);
                                                                                         }}
                                                                                         disabled={isClaimed}
-                                                                                        className={`w-10 h-6 rounded-full p-1 transition-colors flex ${isIncluded ? 'bg-amber-500 justify-end' : 'bg-white/20 justify-start'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:ring-2 hover:ring-white/20'}`}
+                                                                                        className={`w-9 h-5 rounded-full p-0.5 transition-colors flex ${isIncluded ? 'bg-amber-500 justify-end' : 'bg-slate-200 justify-start'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:ring-2 hover:ring-amber-200'}`}
                                                                                     >
                                                                                         <motion.div 
                                                                                             layout 
@@ -512,11 +509,11 @@ export default function UsersManagement() {
                                 </AnimatePresence>
                                 {filteredProjects.length === 0 && (
                                     <tr>
-                                        <td colSpan={5} className="p-20 text-center">
-                                            <div className="flex flex-col items-center opacity-20">
-                                                <Search size={48} className="mb-4" />
-                                                <p className="font-kanit font-black italic uppercase tracking-widest text-xl">No Hostiles Detected</p>
-                                                <p className="text-xs font-bold mt-2">Try adjusting your surveillance parameters</p>
+                                        <td colSpan={5} className="p-16 text-center">
+                                            <div className="flex flex-col items-center opacity-40">
+                                                <Search size={40} className="mb-3 text-slate-400" />
+                                                <p className="font-bold uppercase tracking-widest text-slate-700 text-sm">No Teams Found</p>
+                                                <p className="text-xs text-slate-500 mt-1">Try adjusting your search criteria</p>
                                             </div>
                                         </td>
                                     </tr>

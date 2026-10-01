@@ -216,7 +216,7 @@ export default function RegistrationsCountPage() {
                         <h3 className="text-2xl font-bold text-slate-900">Registration Activity</h3>
                     </div>
 
-                    <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm group hover:border-blue-500/30 transition-all cursor-default lg:col-span-2 flex items-center justify-between">
+                    <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm group hover:border-teal-500/30 transition-all cursor-default lg:col-span-2 flex items-center justify-between">
                         <div>
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Confirmed Participation</p>
                             <div className="flex items-baseline gap-2">
@@ -224,7 +224,7 @@ export default function RegistrationsCountPage() {
                                 <span className="text-sm font-semibold text-slate-500">Verified Teams</span>
                             </div>
                         </div>
-                        <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                        <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-600 group-hover:scale-110 transition-transform">
                             <Users size={24} />
                         </div>
                     </div>
@@ -240,7 +240,7 @@ export default function RegistrationsCountPage() {
                                 placeholder="Filter by Team, ID, or Captain..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-11 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/5 focus:border-blue-500/30 transition-all"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-11 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/10 focus:border-teal-500/30 transition-all"
                             />
                         </div>
                         <div className="flex items-center gap-2">

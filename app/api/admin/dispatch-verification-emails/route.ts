@@ -104,7 +104,7 @@ export async function POST(req: Request) {
                                     </div>
 
                                     <p style="font-size: 11px; color: #64748b; line-height: 1.5;">
-                                        <em>Note: Please do not call organizer personal phone numbers. All roster modifications and merges are handled directly via this self-service link. If you need special assistance, submit a query via the Help Desk widget on the page.</em>
+                                        <em>Note: All roster modifications and merges are handled directly via this self-service link. If you need any assistance, submit a query via the Help Desk widget on the page and our coordinators will contact you to help.</em>
                                     </p>
                                 </div>
                             </div>

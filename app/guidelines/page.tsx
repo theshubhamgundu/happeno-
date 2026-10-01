@@ -178,8 +178,8 @@ export default function GuidelinesPage() {
                                 <p className="text-sm text-white/80">A second progress review with feedback from evaluators and mentors.</p>
                             </div>
 
-                            <div className="relative pl-8 border-l-2 border-blue-500/20">
-                                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#0B0114] border-2 border-blue-500" />
+                            <div className="relative pl-8 border-l-2 border-teal-500/20">
+                                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#0B0114] border-2 border-teal-500" />
                                 <h4 className="text-white font-bold text-sm tracking-widest mb-1 italic">Progress Check-in Ã¢â‚¬Â¢ 10:00 Ã¢â‚¬â€œ 11:00 PM</h4>
                                 <p className="text-sm text-white/80 italic">Idea suggestions round: Evaluators and mentors will provide guidance and technical feedback.</p>
                             </div>

@@ -426,22 +426,22 @@ export default function JudgeDashboard() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="mx-auto max-w-xl space-y-6 pt-4 sm:pt-10"
+                        className="mx-auto max-w-xl space-y-6 pt-4 sm:pt-6"
                     >
                         {/* Status bar: Evaluator name & sync status */}
                         <div className="flex items-center justify-between gap-3 px-1">
                             {currentJudge && (
-                                <div className="inline-flex items-center gap-2 text-xs font-bold text-slate-400">
-                                    <UserCircle2 size={15} className="text-[#FFEE00]" />
-                                    <span>Evaluator: <strong className="text-white">{currentJudge.name}</strong></span>
+                                <div className="inline-flex items-center gap-2 text-xs font-bold text-slate-500">
+                                    <UserCircle2 size={16} className="text-teal-600" />
+                                    <span>Evaluator: <strong className="text-slate-800">{currentJudge.name}</strong></span>
                                 </div>
                             )}
                             <div className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
                                 !isOnline
-                                    ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                                    ? "border-amber-300 bg-amber-50 text-amber-800"
                                     : offlineQueue.length > 0
-                                    ? "border-[#FFEE00]/40 bg-[#FFEE00]/10 text-[#FFEE00]"
-                                    : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                                    ? "border-amber-300 bg-amber-50 text-amber-800"
+                                    : "border-emerald-200 bg-emerald-50 text-emerald-800"
                             }`}>
                                 {!isOnline ? (
                                     <>
@@ -464,16 +464,16 @@ export default function JudgeDashboard() {
 
                         {/* Offline Queue Pending Sync Banner */}
                         {offlineQueue.length > 0 && (
-                            <div className="rounded-2xl border border-amber-500/30 bg-amber-950/40 p-4 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+                            <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 shrink-0">
+                                    <div className="p-2 rounded-xl bg-amber-100 text-amber-800 shrink-0">
                                         <CloudUpload size={20} />
                                     </div>
                                     <div>
-                                        <h4 className="text-xs font-black uppercase tracking-wider text-amber-200">
+                                        <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900">
                                             {offlineQueue.length} Evaluation{offlineQueue.length === 1 ? '' : 's'} Stored Locally on this Phone
                                         </h4>
-                                        <p className="text-[11px] text-amber-100/70">
+                                        <p className="text-[11px] text-amber-800/80">
                                             Saved safely during poor connection. They will auto-upload the instant network stabilizes.
                                         </p>
                                     </div>
@@ -481,7 +481,7 @@ export default function JudgeDashboard() {
                                 <button
                                     onClick={() => void processOfflineQueue()}
                                     disabled={isSyncingQueue || !isOnline}
-                                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#FFEE00] px-4 py-2 text-xs font-black text-black hover:bg-[#e6d600] disabled:opacity-50 transition-colors shrink-0"
+                                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-xs font-bold text-slate-900 hover:bg-amber-300 disabled:opacity-50 transition-colors shrink-0 shadow-sm"
                                 >
                                     <RefreshCw size={13} className={isSyncingQueue ? "animate-spin" : ""} />
                                     {isSyncingQueue ? "Syncing..." : "Sync Now"}
@@ -494,20 +494,20 @@ export default function JudgeDashboard() {
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="rounded-2xl border border-emerald-500/30 bg-emerald-950/40 p-5 backdrop-blur-md"
+                                className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 shadow-sm"
                             >
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex items-start gap-3">
-                                        <CheckCircle2 className="h-6 w-6 text-emerald-400 shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
                                         <div>
-                                            <h3 className="text-sm font-black uppercase tracking-wider text-emerald-300">
+                                            <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-900">
                                                 Team Already Evaluated & Recorded
                                             </h3>
-                                            <p className="mt-1 text-xs text-emerald-200/80">
-                                                <span className="font-mono font-bold text-white">{alreadyEvaluatedInfo.teamId}</span> ({alreadyEvaluatedInfo.teamName}) has already been evaluated for <span className="font-bold text-white">{alreadyEvaluatedInfo.roundTitle}</span>.
+                                            <p className="mt-1 text-xs text-emerald-800">
+                                                <span className="font-mono font-bold text-slate-900">{alreadyEvaluatedInfo.teamId}</span> ({alreadyEvaluatedInfo.teamName}) has already been evaluated for <span className="font-bold text-slate-900">{alreadyEvaluatedInfo.roundTitle}</span>.
                                             </p>
                                             {alreadyEvaluatedInfo.score !== null && (
-                                                <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-500/20 px-3 py-1 text-xs font-mono font-black text-emerald-200">
+                                                <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-100 px-3 py-1 text-xs font-mono font-bold text-emerald-900">
                                                     Submitted Score: {alreadyEvaluatedInfo.score} pts
                                                 </div>
                                             )}
@@ -515,7 +515,7 @@ export default function JudgeDashboard() {
                                     </div>
                                     <button
                                         onClick={() => setAlreadyEvaluatedInfo(null)}
-                                        className="text-emerald-400/60 hover:text-emerald-300 text-xs font-bold uppercase"
+                                        className="text-emerald-700 hover:text-emerald-900 text-xs font-bold uppercase"
                                     >
                                         Dismiss
                                     </button>
@@ -526,13 +526,13 @@ export default function JudgeDashboard() {
                         {/* Direct Team ID Input Form */}
                         <form
                             onSubmit={event => { event.preventDefault(); void handleStartEvaluation(); }}
-                            className="rounded-3xl border border-white/10 bg-white/[.04] p-6 sm:p-10 shadow-2xl backdrop-blur-xl space-y-6"
+                            className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-sm space-y-6"
                         >
-                            <div className="space-y-2">
-                                <h2 className="text-2xl sm:text-3xl font-black uppercase italic text-white tracking-tight">
+                            <div className="space-y-1.5">
+                                <h2 className="text-2xl sm:text-3xl font-black uppercase italic text-slate-900 tracking-tight">
                                     Start Evaluation
                                 </h2>
-                                <p className="text-xs sm:text-sm text-white/50 leading-relaxed">
+                                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
                                     Enter the assigned Team ID to open the scoring rubric and project details.
                                 </p>
                             </div>
@@ -545,12 +545,12 @@ export default function JudgeDashboard() {
                                     onChange={event => setTeamIdInput(event.target.value.toUpperCase())}
                                     placeholder="Enter Team ID (e.g. TC-101)"
                                     aria-label="Team ID"
-                                    className="h-14 w-full rounded-2xl border border-white/15 bg-black/40 px-5 font-mono text-lg sm:text-xl font-bold uppercase tracking-wider text-white placeholder:text-white/20 outline-none focus:border-[#FFEE00] focus:ring-2 focus:ring-[#FFEE00]/20 transition-all"
+                                    className="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 font-mono text-lg sm:text-xl font-bold uppercase tracking-wider text-slate-900 placeholder:text-slate-400 outline-none focus:border-teal-500 focus:bg-white focus:ring-2 focus:ring-teal-500/10 transition-all"
                                 />
                                 <button
                                     type="submit"
                                     disabled={isStarting || !teamIdInput.trim()}
-                                    className="h-14 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-[#FFEE00] px-6 text-sm font-black uppercase tracking-wider text-black disabled:cursor-not-allowed disabled:opacity-40 hover:bg-[#e6d600] active:scale-[0.99] transition-all shadow-[0_4px_20px_rgba(255,238,0,0.25)]"
+                                    className="h-14 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-600 px-6 text-sm font-bold uppercase tracking-wider text-white disabled:cursor-not-allowed disabled:opacity-40 hover:bg-teal-700 active:scale-[0.99] transition-all shadow-sm"
                                 >
                                     <ClipboardCheck size={18} />
                                     {isStarting ? 'Loading Project Details...' : 'Start Evaluation'}
@@ -570,46 +570,42 @@ export default function JudgeDashboard() {
                         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
                             <button
                                 onClick={returnToTeamLookup}
-                                className="flex items-center gap-2 self-start text-white/40 hover:text-white transition-colors group"
+                                className="flex items-center gap-2 self-start text-slate-500 hover:text-slate-900 transition-colors group"
                             >
-                                <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                                <span className="text-xs font-black uppercase tracking-widest">Back to Projects</span>
+                                <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                                <span className="text-xs font-bold uppercase tracking-wider">Back to Projects</span>
                             </button>
-                            <div className="flex max-w-full flex-wrap items-center gap-2 px-3 py-2 bg-slate-900/10 border border-slate-800/20 rounded-xl">
-                                <Target size={16} className="text-slate-900" />
-                                <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                            <div className="flex max-w-full flex-wrap items-center gap-2 px-3 py-1.5 bg-teal-50 border border-teal-200 rounded-xl">
+                                <Target size={15} className="text-teal-700" />
+                                <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">
                                     {evaluationRound.title} Evaluation Active
                                 </span>
                             </div>
                         </div>
 
                         {/* Project Information Card */}
-                        <div className="bg-white/5 border border-white/10 rounded-2xl md:rounded-[3rem] p-4 sm:p-6 md:p-12 relative overflow-hidden shadow-2xl">
-                            <div className="absolute top-0 right-0 w-96 h-96 bg-[#FFEE00]/5 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2" />
-
-                            <div className="relative z-10 space-y-8 md:space-y-10">
-                                <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
-                                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-3xl bg-gradient-to-br from-[#FFEE00] to-[#FFB800] p-[2px] shrink-0">
-                                        <div className="w-full h-full bg-black rounded-[calc(1.5rem-2px)] flex items-center justify-center text-2xl md:text-3xl font-black italic text-[#FFEE00]">
-                                            {activeProject.name[0]}
-                                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 relative overflow-hidden shadow-sm">
+                            <div className="relative z-10 space-y-6 md:space-y-8">
+                                <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-5 text-center md:text-left">
+                                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-2xl font-black text-teal-700 shrink-0 shadow-sm">
+                                        {activeProject.name[0]}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h2 className="text-2xl sm:text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-white leading-tight break-words">
+                                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black italic uppercase tracking-tight text-slate-900 leading-tight break-words">
                                             {activeProject.name}
                                         </h2>
                                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2">
-                                            <span className="text-[9px] md:text-xs font-bold text-[#FFEE00] uppercase tracking-widest bg-[#FFEE00]/10 px-2 py-0.5 rounded border border-[#FFEE00]/20">ID: {activeProject.teamId}</span>
-                                            {activeProject.track && <span className="text-[9px] md:text-xs font-bold text-white/45 uppercase tracking-widest">{activeProject.track}</span>}
+                                            <span className="text-[10px] md:text-xs font-bold text-teal-800 uppercase tracking-wider bg-teal-50 px-2.5 py-0.5 rounded border border-teal-200">ID: {activeProject.teamId}</span>
+                                            {activeProject.track && <span className="text-[10px] md:text-xs font-bold text-slate-600 uppercase tracking-wider bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200">{activeProject.track}</span>}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <Users size={16} className="text-slate-900" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Participants</span>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Users size={15} className="text-teal-700" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Participants</span>
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2">
                                             {activeProject.members?.map((member, i) => {
@@ -617,11 +613,11 @@ export default function JudgeDashboard() {
                                                 const isCaptain = displayName === activeProject.captain;
 
                                                 return (
-                                                    <div key={i} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg flex items-center gap-2">
-                                                        <UserCircle2 size={12} className="text-white/20 shrink-0" />
-                                                        <span className="text-[10px] md:text-xs font-bold text-white/80 truncate">{displayName}</span>
+                                                    <div key={i} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg flex items-center gap-2">
+                                                        <UserCircle2 size={13} className="text-slate-400 shrink-0" />
+                                                        <span className="text-xs font-semibold text-slate-700 truncate">{displayName}</span>
                                                         {isCaptain && (
-                                                            <span className="text-[7px] font-black bg-[#FFEE00] text-black px-1 rounded shrink-0">C</span>
+                                                            <span className="text-[8px] font-bold bg-teal-600 text-white px-1.5 py-0.2 rounded shrink-0">C</span>
                                                         )}
                                                     </div>
                                                 );
@@ -629,33 +625,33 @@ export default function JudgeDashboard() {
                                         </div>
                                     </div>
                                     <div>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <Info size={16} className="text-blue-400" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Project Title</span>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Info size={15} className="text-teal-700" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Project Title</span>
                                         </div>
-                                        <p className="text-xl text-white/90 leading-relaxed italic font-medium">
+                                        <p className="text-base sm:text-lg text-slate-800 leading-relaxed italic font-semibold">
                                             &ldquo;{activeProject.problemStatement}&rdquo;
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 gap-6 border-t border-white/10 pt-6 lg:grid-cols-2">
+                                <div className="grid grid-cols-1 gap-6 border-t border-slate-100 pt-6 lg:grid-cols-2">
                                     <div>
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-white/40">Proposed idea</h3>
-                                        <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-white/75">{activeProject.proposedIdea || 'No proposed idea submitted.'}</p>
+                                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Proposed idea</h3>
+                                        <p className="mt-1.5 whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-slate-600">{activeProject.proposedIdea || 'No proposed idea submitted.'}</p>
                                     </div>
                                     <div>
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-white/40">Technology stack</h3>
-                                        <div className="mt-2 flex flex-wrap gap-2">
+                                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Technology stack</h3>
+                                        <div className="mt-1.5 flex flex-wrap gap-1.5">
                                             {Object.entries(activeProject.techStack || {}).flatMap(([category, items]) =>
-                                                (items || []).map(item => <span key={`${category}-${item}`} className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-white/70">{category}: {item}</span>)
+                                                (items || []).map(item => <span key={`${category}-${item}`} className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-700">{category}: {item}</span>)
                                             )}
-                                            {!Object.values(activeProject.techStack || {}).some(items => items?.length) && <span className="text-sm text-white/35">No technology stack submitted.</span>}
+                                            {!Object.values(activeProject.techStack || {}).some(items => items?.length) && <span className="text-xs text-slate-400">No technology stack submitted.</span>}
                                         </div>
                                     </div>
                                     <div className="lg:col-span-2">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-white/40">Project links</h3>
-                                        <div className="mt-2 flex flex-wrap gap-2">
+                                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Project links</h3>
+                                        <div className="mt-1.5 flex flex-wrap gap-2">
                                             {[
                                                 ['Source code', activeProject.submission?.github],
                                                 ['Presentation', activeProject.submission?.presentation],
@@ -663,7 +659,7 @@ export default function JudgeDashboard() {
                                                 ['Live product', activeProject.submission?.deployment]
                                             ].map(([label, value]) => {
                                                 const href = safeHttpUrl(value);
-                                                return href ? <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-[#FFEE00] hover:bg-white/10">{label}</a> : null;
+                                                return href ? <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-teal-700 hover:bg-teal-50 hover:border-teal-300 transition shadow-sm">{label}</a> : null;
                                             })}
                                         </div>
                                     </div>
@@ -672,41 +668,39 @@ export default function JudgeDashboard() {
                         </div>
 
                         {/* Evaluation Form */}
-                        <div className="bg-[#0B0114] border border-white/10 rounded-2xl md:rounded-[3.5rem] p-4 sm:p-5 md:p-14 space-y-8 md:space-y-16 relative overflow-hidden shadow-2xl">
-                            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-800/10 to-transparent -translate-y-1/2" />
-
-                            <div className="relative z-10 space-y-8 md:space-y-12">
+                        <div className="bg-white border border-slate-200 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-12 space-y-8 md:space-y-12 shadow-sm">
+                            <div className="space-y-8 md:space-y-10">
                                 {evaluationRound.criteria.map((criterion, i) => (
                                     <div key={criterion.id} className="group">
-                                        <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-8">
+                                        <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6">
                                             {/* Number badge */}
-                                            <div className="w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-base md:text-2xl font-black text-white/20 group-hover:text-slate-900/40 group-hover:border-slate-800/20 transition-all shrink-0">
+                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-sm md:text-base font-bold text-slate-400 group-hover:text-teal-700 group-hover:border-teal-200 transition-all shrink-0">
                                                 {String(i + 1).padStart(2, '0')}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex flex-col gap-3">
                                                     <div>
-                                                        <h4 className="text-lg md:text-2xl font-black italic uppercase tracking-tight text-white mb-1">{criterion.label}</h4>
-                                                        <p className="text-white/40 text-xs md:text-sm leading-relaxed">{criterion.desc}</p>
+                                                        <h4 className="text-base md:text-xl font-bold italic uppercase tracking-tight text-slate-900 mb-1">{criterion.label}</h4>
+                                                        <p className="text-slate-500 text-xs md:text-sm leading-relaxed">{criterion.desc}</p>
                                                     </div>
                                                     {/* Score Picker — ten scores in a compact, touch-friendly grid */}
                                                     <div className="grid w-full grid-cols-5 gap-1.5">
                                                         {Array.from({ length: 10 }, (_, index) => index + 1).map(v => {
                                                             const selected = currentScores[criterion.id] === v;
                                                             const selectedColor = v <= 3
-                                                                ? "bg-slate-900/20 border-slate-800 text-slate-900"
+                                                                ? "bg-rose-50 border-rose-400 text-rose-700"
                                                                 : v <= 6
-                                                                    ? "bg-yellow-500/20 border-yellow-500 text-yellow-300"
+                                                                    ? "bg-amber-50 border-amber-400 text-amber-700"
                                                                     : v <= 8
-                                                                        ? "bg-blue-500/20 border-blue-500 text-blue-300"
-                                                                        : "bg-green-500/20 border-green-500 text-green-300";
+                                                                        ? "bg-teal-50 border-teal-500 text-teal-700"
+                                                                        : "bg-emerald-50 border-emerald-500 text-emerald-700";
                                                             const hoverColor = v <= 3
-                                                                ? "hover:bg-slate-800/20 hover:border-slate-800/40 hover:text-slate-900"
+                                                                ? "hover:bg-rose-50 hover:border-rose-300 hover:text-rose-700"
                                                                 : v <= 6
-                                                                    ? "hover:bg-yellow-500/20 hover:border-yellow-500/40 hover:text-yellow-300"
+                                                                    ? "hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700"
                                                                     : v <= 8
-                                                                        ? "hover:bg-blue-500/20 hover:border-blue-500/40 hover:text-blue-300"
-                                                                        : "hover:bg-green-500/20 hover:border-green-500/40 hover:text-green-300";
+                                                                        ? "hover:bg-teal-50 hover:border-teal-300 hover:text-teal-700"
+                                                                        : "hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700";
                                                             const label = v === 1 ? "Poor" : v === 5 ? "Fair" : v === 8 ? "Good" : v === 10 ? "Best" : "";
                                                             return (
                                                                 <button
@@ -715,13 +709,13 @@ export default function JudgeDashboard() {
                                                                     aria-label={`Score ${v} out of 10${label ? `, ${label}` : ""}`}
                                                                     aria-pressed={selected}
                                                                     onClick={() => handleScoreChange(criterion.id, v)}
-                                                                    className={`flex min-h-12 flex-col items-center justify-center rounded-xl border-2 px-1 py-2 transition-all active:scale-95 ${selected
+                                                                    className={`flex min-h-11 flex-col items-center justify-center rounded-xl border-2 px-1 py-1.5 transition-all active:scale-95 ${selected
                                                                         ? selectedColor
-                                                                        : `bg-white/5 border-white/10 text-white/30 ${hoverColor}`
+                                                                        : `bg-slate-50 border-slate-200 text-slate-600 ${hoverColor}`
                                                                         }`}
                                                                 >
-                                                                    <span className="text-base md:text-xl font-black leading-none">{v}</span>
-                                                                    {label && <span className="mt-0.5 text-[7px] font-bold uppercase leading-none tracking-wide">{label}</span>}
+                                                                    <span className="text-sm md:text-lg font-bold leading-none">{v}</span>
+                                                                    {label && <span className="mt-0.5 text-[8px] font-bold uppercase leading-none tracking-wide">{label}</span>}
                                                                 </button>
                                                             );
                                                         })}
@@ -730,27 +724,27 @@ export default function JudgeDashboard() {
                                             </div>
                                         </div>
                                         {i < evaluationRound.criteria.length - 1 && (
-                                            <div className="mt-6 md:mt-12 h-[1px] w-full bg-white/5" />
+                                            <div className="mt-6 md:mt-8 h-[1px] w-full bg-slate-100" />
                                         )}
                                     </div>
                                 ))}
                             </div>
 
                             {/* Feedback Area */}
-                            <div className="pt-8 md:pt-16 border-t border-white/10">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <div className="p-3 rounded-xl bg-slate-900/10 border border-slate-800/20">
-                                        <MessageSquare size={20} className="text-slate-900" />
+                            <div className="pt-6 md:pt-10 border-t border-slate-100">
+                                <div className="flex items-center gap-2.5 mb-4">
+                                    <div className="p-2 rounded-xl bg-teal-50 text-teal-700 border border-teal-100">
+                                        <MessageSquare size={16} />
                                     </div>
-                                    <h4 className="text-xl sm:text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-white">Additional Feedback <span className="text-slate-900 text-xs sm:text-sm normal-case font-bold ml-1 sm:ml-2">(Required)</span></h4>
+                                    <h4 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-slate-900">Additional Feedback <span className="text-teal-700 text-xs normal-case font-bold ml-1">(Required)</span></h4>
                                 </div>
                                 <textarea
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
                                     placeholder="Add constructive comments here..."
-                                    className="w-full h-32 md:h-48 bg-white/5 border-2 border-white/10 rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 text-sm md:text-xl font-medium text-white placeholder:text-white/10 focus:outline-none focus:border-slate-800/50 transition-all resize-none shadow-inner"
+                                    className="w-full h-28 md:h-36 bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 md:p-5 text-sm md:text-base font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-500 focus:bg-white transition-all resize-none shadow-sm"
                                 />
-                                <p aria-live="polite" className={`mt-3 text-xs ${draftStatus === 'error' ? 'text-rose-300' : 'text-white/45'}`}>
+                                <p aria-live="polite" className={`mt-2 text-xs ${draftStatus === 'error' ? 'text-rose-600' : 'text-slate-400'}`}>
                                     {draftStatus === 'saving' ? 'Saving draft…' : draftStatus === 'saved' ? 'Draft saved' : draftStatus === 'error' ? 'Draft save failed. Keep this page open and retry before submitting.' : ''}
                                 </p>
                             </div>
@@ -760,25 +754,25 @@ export default function JudgeDashboard() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="rounded-2xl border border-amber-500/40 bg-amber-950/40 p-5 backdrop-blur-md space-y-3"
+                                    className="rounded-2xl border border-amber-200 bg-amber-50/80 p-5 space-y-3 shadow-sm"
                                 >
                                     <div className="flex items-start gap-3">
-                                        <WifiOff className="h-6 w-6 text-amber-400 shrink-0 mt-0.5" />
+                                        <WifiOff className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                                         <div className="min-w-0 flex-1">
-                                            <h4 className="text-sm font-black uppercase tracking-wider text-amber-300">
+                                            <h4 className="text-sm font-bold uppercase tracking-wider text-amber-900">
                                                 Weak / Offline Connection — Scores Safely Saved!
                                             </h4>
-                                            <p className="mt-1 text-xs text-amber-100/80 leading-relaxed">
-                                                Your evaluation for <strong className="text-white font-bold">{offlineSubmitNotice.teamName}</strong> (Score: {offlineSubmitNotice.totalScore} pts) is safely preserved in this phone&apos;s memory. You won&apos;t lose anything even if you close the app.
+                                            <p className="mt-1 text-xs text-amber-800 leading-relaxed">
+                                                Your evaluation for <strong className="text-slate-900 font-bold">{offlineSubmitNotice.teamName}</strong> (Score: {offlineSubmitNotice.totalScore} pts) is safely preserved in this phone&apos;s memory. You won&apos;t lose anything even if you close the app.
                                             </p>
-                                            <div className="mt-4 flex flex-wrap gap-2.5">
+                                            <div className="mt-3 flex flex-wrap gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={() => void handleScoreSubmit()}
                                                     disabled={isSubmitting}
-                                                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-xs font-black text-black hover:bg-amber-300 transition-colors"
+                                                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-xs font-bold text-slate-900 hover:bg-amber-300 transition-colors shadow-sm"
                                                 >
-                                                    <RefreshCw size={14} className={isSubmitting ? "animate-spin" : ""} /> Retry Upload Now
+                                                    <RefreshCw size={13} className={isSubmitting ? "animate-spin" : ""} /> Retry Upload Now
                                                 </button>
                                                 <button
                                                     type="button"
@@ -793,9 +787,9 @@ export default function JudgeDashboard() {
                                                         setTeamIdInput('');
                                                         setOfflineSubmitNotice(null);
                                                     }}
-                                                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-black text-white hover:bg-white/20 transition-colors"
+                                                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
                                                 >
-                                                    <ClipboardCheck size={14} /> Queue & Score Next Team
+                                                    <ClipboardCheck size={13} /> Queue & Score Next Team
                                                 </button>
                                             </div>
                                         </div>
@@ -804,20 +798,20 @@ export default function JudgeDashboard() {
                             )}
 
                             {/* Action Console */}
-                            <div className="pt-6 md:pt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 md:gap-8">
+                            <div className="pt-4 md:pt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4">
                                 <button
                                     onClick={returnToTeamLookup}
-                                    className="w-full sm:w-auto h-12 md:h-16 px-6 sm:px-10 rounded-xl md:rounded-2xl font-black uppercase tracking-[0.2em] text-white/40 hover:text-white hover:bg-white/5 transition-all text-xs"
+                                    className="w-full sm:w-auto h-11 px-6 rounded-xl font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all text-xs"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleScoreSubmit}
                                     disabled={isSubmitting || evaluationRound.criteria.some(criterion => !currentScores[criterion.id]) || !comment.trim()}
-                                    className="w-full sm:w-auto h-12 md:h-16 px-6 sm:px-12 md:px-16 bg-[#FFEE00] hover:bg-[#E6D600] text-black font-black uppercase tracking-[0.12em] sm:tracking-[0.2em] rounded-xl md:rounded-2xl transition-all shadow-[0_4px_0_#9333ea] md:shadow-[0_6px_0_#9333ea] active:shadow-none active:translate-y-1 disabled:opacity-30 disabled:grayscale disabled:pointer-events-none group"
+                                    className="w-full sm:w-auto h-11 px-8 bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed group"
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        {isSubmitting ? 'Submitting…' : 'Submit Evaluation'} <CheckCircle2 size={18} />
+                                    <span className="flex items-center justify-center gap-2 text-xs">
+                                        {isSubmitting ? 'Submitting…' : 'Submit Evaluation'} <CheckCircle2 size={16} />
                                     </span>
                                 </button>
                             </div>

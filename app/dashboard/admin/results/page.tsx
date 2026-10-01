@@ -95,14 +95,14 @@ export default function AdminResults() {
     return (
         <DashboardLayout type="admin" title="Leaderboard">
             <main className="mx-auto max-w-[1500px] space-y-6 pb-10">
-                <section className="rounded-[2rem] border border-white/10 bg-[linear-gradient(120deg,rgba(91,34,135,.5),rgba(10,8,22,.92))] p-6 md:p-8">
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
                     <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
                         <div>
-                            <p className="mb-2 text-[10px] font-black uppercase tracking-[.24em] text-[#14b8a6]">Evaluation results</p>
-                            <h1 className="font-kanit text-3xl font-black italic uppercase text-white md:text-5xl">Leaderboard</h1>
-                            <p className="mt-2 max-w-2xl text-sm text-white/55">Rankings use each team’s average percentage across completed evaluation rounds. Teams with no evaluation are kept separate, never ranked as zero.</p>
+                            <p className="mb-1 text-[10px] font-black uppercase tracking-[.2em] text-teal-600">Evaluation results</p>
+                            <h1 className="text-2xl font-black italic uppercase text-slate-900 md:text-4xl tracking-tight">Leaderboard</h1>
+                            <p className="mt-2 max-w-2xl text-xs text-slate-500">Rankings use each team’s average percentage across completed evaluation rounds. Teams with no evaluation are kept separate, never ranked as zero.</p>
                         </div>
-                        <button onClick={exportLeaderboard} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#14b8a6] px-5 py-3 text-xs font-black uppercase tracking-wider text-black transition hover:bg-white">
+                        <button onClick={exportLeaderboard} className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-teal-700 shadow-sm">
                             <Download size={16} /> Export current view
                         </button>
                     </div>
@@ -110,38 +110,38 @@ export default function AdminResults() {
 
                 <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
                     <Stat label="Registered teams" value={totals.total} />
-                    <Stat label="Ranked teams" value={totals.ranked} accent="text-[#14b8a6]" />
-                    <Stat label="Awaiting evaluation" value={totals.pending} accent="text-slate-900" />
-                    <Stat label="All rounds complete" value={totals.complete} accent="text-emerald-300" />
+                    <Stat label="Ranked teams" value={totals.ranked} accent="text-teal-700" />
+                    <Stat label="Awaiting evaluation" value={totals.pending} accent="text-amber-600" />
+                    <Stat label="All rounds complete" value={totals.complete} accent="text-emerald-700" />
                 </section>
 
-                <section className="rounded-[1.5rem] border border-white/10 bg-[#10091c]/75 p-4 md:p-5">
+                <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
                     <div className="flex flex-col gap-3 lg:flex-row">
                         <div className="relative flex-1">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={18} />
-                            <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search team, ID, captain, or project" className="h-12 w-full rounded-xl border border-white/10 bg-black/20 py-3 pl-11 pr-4 text-sm text-white outline-none placeholder:text-white/25 focus:border-[#14b8a6]/60" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                            <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search team, ID, captain, or project" className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-11 pr-4 text-xs font-semibold text-slate-900 outline-none placeholder:text-slate-400 focus:border-teal-500 focus:bg-white transition" />
                         </div>
-                        <select value={track} onChange={event => setTrack(event.target.value)} className="h-12 rounded-xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none focus:border-[#14b8a6]/60">
+                        <select value={track} onChange={event => setTrack(event.target.value)} className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-xs font-semibold text-slate-800 outline-none focus:border-teal-500">
                             <option value="all">All tracks</option>
                             {tracks.map(item => <option key={item} value={item}>{item}</option>)}
                         </select>
-                        <div className="flex rounded-xl border border-white/10 bg-black/20 p-1">
+                        <div className="flex rounded-xl border border-slate-200 bg-slate-100 p-1">
                             {([['ranked', 'Ranked'], ['all', 'All'], ['pending', 'Pending']] as const).map(([id, label]) => (
-                                <button key={id} onClick={() => setView(id)} className={`rounded-lg px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${view === id ? "bg-[#14b8a6] text-black" : "text-white/45 hover:text-white"}`}>{label}</button>
+                                <button key={id} onClick={() => setView(id)} className={`rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition ${view === id ? "bg-teal-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>{label}</button>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                <section className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0b0713]/70">
+                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full min-w-[900px] text-left">
-                            <thead className="bg-white/[.045] text-[10px] font-black uppercase tracking-[.16em] text-white/40">
+                            <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase tracking-[.16em] text-slate-500">
                                 <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{roundConfigs.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title}</th>)}<th className="px-4 py-4 text-center">Overall</th><th className="px-5 py-4 text-right">Details</th></tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-slate-100">
                                 {displayedRows.map((row, index) => <LeaderboardRow key={row.project.id} row={row} rounds={roundConfigs} rank={row.score.overallPercent === null ? null : index + 1} onSelect={() => setSelectedProject(row.project)} />)}
-                                {!displayedRows.length && <tr><td colSpan={roundConfigs.length + 4} className="px-5 py-20 text-center text-sm text-white/35">No teams match this view.</td></tr>}
+                                {!displayedRows.length && <tr><td colSpan={roundConfigs.length + 4} className="px-5 py-16 text-center text-xs text-slate-400 font-semibold">No teams match this view.</td></tr>}
                             </tbody>
                         </table>
                     </div>
@@ -153,28 +153,28 @@ export default function AdminResults() {
     );
 }
 
-function Stat({ label, value, accent = "text-white" }: { label: string; value: number; accent?: string }) {
-    return <div className="rounded-2xl border border-white/10 bg-white/[.045] p-4"><p className="text-[9px] font-black uppercase tracking-[.14em] text-white/45">{label}</p><p className={`mt-2 text-2xl font-black ${accent}`}>{value}</p></div>;
+function Stat({ label, value, accent = "text-slate-900" }: { label: string; value: number; accent?: string }) {
+    return <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><p className="text-[9px] font-black uppercase tracking-[.14em] text-slate-400">{label}</p><p className={`mt-1.5 text-2xl font-black ${accent}`}>{value}</p></div>;
 }
 
 function LeaderboardRow({ row, rounds, rank, onSelect }: { row: { project: Project; score: ScoreSummary }; rounds: JudgingRound[]; rank: number | null; onSelect: () => void }) {
-    return <tr className="border-t border-white/5 text-sm transition hover:bg-white/[.035]">
-        <td className="px-5 py-4"><span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-lg text-xs font-black ${rank && rank <= 3 ? "bg-[#14b8a6] text-black" : "bg-white/5 text-white/55"}`}>{rank ? `#${rank}` : "—"}</span></td>
-        <td className="px-5 py-4"><p className="font-black uppercase text-white">{row.project.team || "Untitled team"}</p><p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{row.project.teamId} · {row.project.track || "No track"}</p></td>
+    return <tr className="text-sm transition hover:bg-slate-50/80">
+        <td className="px-5 py-4"><span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-lg text-xs font-bold ${rank && rank <= 3 ? "bg-teal-50 text-teal-800 border border-teal-200" : "bg-slate-100 text-slate-600"}`}>{rank ? `#${rank}` : "—"}</span></td>
+        <td className="px-5 py-4"><p className="font-bold text-slate-900">{row.project.team || "Untitled team"}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{row.project.teamId} · {row.project.track || "No track"}</p></td>
         {rounds.map(round => <td key={round.id} className="px-4 py-4 text-center"><ScoreCell value={row.score.roundPercents[round.id]} evaluations={row.score.evaluations[round.id]} /></td>)}
         <td className="px-4 py-4 text-center"><ScoreCell value={row.score.overallPercent} evaluations={row.score.completedRounds} bold /></td>
-        <td className="px-5 py-4 text-right"><button onClick={onSelect} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white/65 transition hover:border-[#14b8a6]/50 hover:text-[#14b8a6]"><MessageSquare size={14} /> Review</button></td>
+        <td className="px-5 py-4 text-right"><button onClick={onSelect} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:border-teal-300 hover:text-teal-700 hover:bg-teal-50 shadow-sm"><MessageSquare size={13} /> Review</button></td>
     </tr>;
 }
 
 function ScoreCell({ value, evaluations, bold = false }: { value: number | null; evaluations: number; bold?: boolean }) {
-    if (value === null) return <span className="text-xs text-white/25">Not evaluated</span>;
-    return <div><span className={`${bold ? "text-lg" : "text-sm"} font-black text-white`}>{value.toFixed(1)}%</span><p className="mt-1 text-[9px] font-bold uppercase tracking-wider text-white/35">{evaluations} review{evaluations === 1 ? "" : "s"}</p></div>;
+    if (value === null) return <span className="text-xs text-slate-300 font-medium">Not evaluated</span>;
+    return <div><span className={`${bold ? "text-base text-teal-800" : "text-sm text-slate-900"} font-black`}>{value.toFixed(1)}%</span><p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-400">{evaluations} review{evaluations === 1 ? "" : "s"}</p></div>;
 }
 
 function ProjectDetails({ project, judges, rounds, onClose }: { project: Project; judges: { generatedId: string; name: string }[]; rounds: JudgingRound[]; onClose: () => void }) {
-    return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"><div className="max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-white/10 bg-[#0b0713] p-6 shadow-2xl md:p-8">
-        <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5"><div><p className="text-[10px] font-black uppercase tracking-[.2em] text-[#14b8a6]">Evaluation record</p><h2 className="mt-2 text-2xl font-black uppercase italic text-white">{project.team}</h2><p className="mt-1 text-xs text-white/45">{project.teamId} · {project.name || "Project title not submitted"}</p></div><button onClick={onClose} className="rounded-xl border border-white/10 p-3 text-white/50 hover:bg-white/10 hover:text-white"><X size={18} /></button></div>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">{rounds.map(round => { const entries = Object.entries(project.roundScores?.[round.id] ?? {}); return <section key={round.id} className="rounded-2xl border border-white/10 bg-white/[.035] p-5"><div className="mb-4 flex items-start justify-between gap-3"><div><h3 className="font-black text-white">{round.title}</h3><p className="text-xs text-white/40">{round.subtitle}</p></div><span className="text-[10px] font-bold text-white/40">{entries.length} evaluation{entries.length === 1 ? '' : 's'}</span></div>{entries.length ? <div className="space-y-3">{entries.map(([judgeId, score]) => <div key={judgeId} className="rounded-xl bg-black/20 p-3"><div className="flex justify-between gap-3"><span className="text-xs font-bold text-white/75">{judges.find(judge => judge.generatedId === judgeId)?.name ?? judgeId}</span><span className="text-xs font-black text-[#14b8a6]">{Number(score).toFixed(1)} / {maxScore(round)}</span></div>{project.roundComments?.[round.id]?.[judgeId] && <p className="mt-2 text-xs leading-relaxed text-white/50">{project.roundComments[round.id][judgeId]}</p>}</div>)}</div> : <p className="text-sm text-white/30">No evaluation submitted.</p>}</section>; })}</div>
+    return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"><div className="max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl md:p-8">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-5"><div><p className="text-[10px] font-black uppercase tracking-[.2em] text-teal-600">Evaluation record</p><h2 className="mt-1 text-2xl font-black uppercase italic text-slate-900">{project.team}</h2><p className="mt-1 text-xs text-slate-500">{project.teamId} · {project.name || "Project title not submitted"}</p></div><button onClick={onClose} className="rounded-xl border border-slate-200 p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700"><X size={18} /></button></div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">{rounds.map(round => { const entries = Object.entries(project.roundScores?.[round.id] ?? {}); return <section key={round.id} className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5"><div className="mb-4 flex items-start justify-between gap-3"><div><h3 className="font-bold text-slate-900">{round.title}</h3><p className="text-xs text-slate-400">{round.subtitle}</p></div><span className="text-[10px] font-bold text-slate-500">{entries.length} evaluation{entries.length === 1 ? '' : 's'}</span></div>{entries.length ? <div className="space-y-3">{entries.map(([judgeId, score]) => <div key={judgeId} className="rounded-xl bg-white border border-slate-200 p-3 shadow-sm"><div className="flex justify-between gap-3"><span className="text-xs font-bold text-slate-700">{judges.find(judge => judge.generatedId === judgeId)?.name ?? judgeId}</span><span className="text-xs font-black text-teal-700">{Number(score).toFixed(1)} / {maxScore(round)}</span></div>{project.roundComments?.[round.id]?.[judgeId] && <p className="mt-2 text-xs leading-relaxed text-slate-600">{project.roundComments[round.id][judgeId]}</p>}</div>)}</div> : <p className="text-xs text-slate-400">No evaluation submitted.</p>}</section>; })}</div>
     </div></div>;
 }

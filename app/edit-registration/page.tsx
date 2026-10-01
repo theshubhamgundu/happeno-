@@ -175,17 +175,44 @@ function EditRegistrationInner() {
         }
     };
 
+    const toggleTrackPreference = (trackName: string) => {
+        if (!editedTeam) return;
+        const currentPrefs: string[] = editedTeam.trackPreferences || (editedTeam.track ? [editedTeam.track] : []);
+        
+        if (currentPrefs.includes(trackName)) {
+            const updated = currentPrefs.filter(t => t !== trackName);
+            setEditedTeam({
+                ...editedTeam,
+                trackPreferences: updated,
+                track: updated[0] || ''
+            });
+        } else {
+            if (currentPrefs.length >= 3) {
+                toast.error('You can select up to 3 track preferences. Deselect one first to change.');
+                return;
+            }
+            const updated = [...currentPrefs, trackName];
+            setEditedTeam({
+                ...editedTeam,
+                trackPreferences: updated,
+                track: updated[0] || trackName
+            });
+        }
+    };
+
     const handleSaveRosterEdits = async () => {
         if (!editedTeam) return;
         setIsSaving(true);
         try {
+            const selectedPrefs = editedTeam.trackPreferences || (editedTeam.track ? [editedTeam.track] : []);
             const res = await fetch('/api/team/roster-action', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'update_details',
                     teamName: editedTeam.teamName,
-                    track: editedTeam.track,
+                    track: selectedPrefs[0] || editedTeam.track,
+                    trackPreferences: selectedPrefs,
                     college: editedTeam.college,
                     members: editedTeam.members
                 })
@@ -194,7 +221,9 @@ function EditRegistrationInner() {
             const data = await res.json();
             if (data.success) {
                 toast.success('Roster details updated and saved successfully!');
-                setTeam(JSON.parse(JSON.stringify(editedTeam)));
+                const updatedTeam = { ...editedTeam, track: selectedPrefs[0] || editedTeam.track, trackPreferences: selectedPrefs };
+                setEditedTeam(updatedTeam);
+                setTeam(JSON.parse(JSON.stringify(updatedTeam)));
             } else {
                 toast.error(data.error || 'Failed to update roster.');
             }
@@ -366,15 +395,15 @@ function EditRegistrationInner() {
     };
 
     return (
-        <div className="min-h-screen bg-[#06000F] text-slate-100 font-sans selection:bg-[#14b8a6] selection:text-black">
+        <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-teal-500 selection:text-white">
             {/* Top Navigation Bar */}
-            <header className="border-b border-white/10 bg-black/40 backdrop-blur-xl sticky top-0 z-40">
+            <header className="border-b border-slate-200 bg-white/90 backdrop-blur-xl sticky top-0 z-40 shadow-sm">
                 <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2.5 group">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#14b8a6] to-purple-600 flex items-center justify-center font-black text-black text-sm">
+                        <div className="w-8 h-8 rounded-xl bg-teal-600 flex items-center justify-center font-black text-white text-sm shadow-sm">
                             TC
                         </div>
-                        <span className="font-kanit font-black italic tracking-wider text-white text-lg group-hover:text-[#14b8a6] transition">
+                        <span className="font-kanit font-black italic tracking-wider text-slate-900 text-lg group-hover:text-teal-600 transition">
                             TRI-CITY 2026
                         </span>
                     </Link>
@@ -383,16 +412,16 @@ function EditRegistrationInner() {
                         <button
                             type="button"
                             onClick={() => setShowHelpModal(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-bold text-white/80 transition cursor-pointer"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition cursor-pointer"
                         >
-                            <HelpCircle size={14} className="text-[#14b8a6]" />
+                            <HelpCircle size={14} className="text-teal-600" />
                             First-Timer FAQs
                         </button>
                         {team && (
                             <button
                                 type="button"
                                 onClick={() => { setTeam(null); setEditedTeam(null); }}
-                                className="px-3 py-1.5 rounded-xl border border-white/10 text-white/50 hover:text-white text-xs font-bold transition cursor-pointer"
+                                className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-bold transition cursor-pointer hover:bg-slate-50"
                             >
                                 Log out
                             </button>
@@ -408,43 +437,41 @@ function EditRegistrationInner() {
                         <motion.div
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="p-8 rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-2xl relative overflow-hidden"
+                            className="p-8 rounded-[2rem] border border-slate-200 bg-white shadow-sm relative overflow-hidden"
                         >
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-[#14b8a6]/10 rounded-full blur-3xl pointer-events-none" />
-
                             <div className="text-center mb-6">
-                                <div className="inline-flex w-14 h-14 rounded-2xl bg-[#14b8a6]/15 border border-[#14b8a6]/30 text-[#14b8a6] items-center justify-center mb-3">
+                                <div className="inline-flex w-14 h-14 rounded-2xl bg-teal-50 border border-teal-100 text-teal-600 items-center justify-center mb-3">
                                     <ShieldCheck size={28} />
                                 </div>
-                                <h1 className="text-2xl font-black italic uppercase tracking-tight text-white">
+                                <h1 className="text-2xl font-extrabold uppercase tracking-tight text-slate-900">
                                     Team Correction Portal
                                 </h1>
-                                <p className="text-xs text-white/50 mt-1.5">
+                                <p className="text-xs text-slate-500 mt-1.5 font-medium">
                                     Active for external registrations: October 5–6, 2026
                                 </p>
                             </div>
 
                             {/* 48-Hour Live Window Banner */}
-                            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs mb-6 flex items-start gap-2.5">
-                                <Clock size={16} className="shrink-0 text-amber-400 mt-0.5" />
+                            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs mb-6 flex items-start gap-2.5">
+                                <Clock size={16} className="shrink-0 text-amber-600 mt-0.5" />
                                 <div className="leading-relaxed">
-                                    <p className="font-bold">48-Hour Roster Window Active</p>
-                                    <p className="text-white/70 text-[11px] mt-0.5">
+                                    <p className="font-bold text-amber-900">48-Hour Roster Window Active</p>
+                                    <p className="text-amber-800 text-[11px] mt-0.5">
                                         Team leads can cross-check names, replace absent members, or merge solo/duo teams. Rosters permanently lock on October 6 at 11:59 PM.
                                     </p>
                                 </div>
                             </div>
 
                             {authError && (
-                                <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs mb-5 flex items-center gap-2.5">
-                                    <AlertCircle size={16} className="shrink-0 text-red-400" />
+                                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs mb-5 flex items-center gap-2.5">
+                                    <AlertCircle size={16} className="shrink-0 text-rose-500" />
                                     <span>{authError}</span>
                                 </div>
                             )}
 
                             <form onSubmit={handleManualLogin} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1.5">
                                         Assigned Team ID
                                     </label>
                                     <input
@@ -452,13 +479,13 @@ function EditRegistrationInner() {
                                         placeholder="e.g. TC-1042"
                                         value={teamIdInput}
                                         onChange={e => setTeamIdInput(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono uppercase tracking-wider outline-none focus:border-[#14b8a6] transition"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 font-mono uppercase tracking-wider outline-none focus:border-teal-500 focus:bg-white transition"
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1.5">
                                         Registered Captain Email or Phone
                                     </label>
                                     <input
@@ -466,10 +493,10 @@ function EditRegistrationInner() {
                                         placeholder="Lead email or 10-digit mobile"
                                         value={captainContactInput}
                                         onChange={e => setCaptainContactInput(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-[#14b8a6] transition"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
                                         required
                                     />
-                                    <p className="text-[10px] text-white/40 mt-1">
+                                    <p className="text-[10px] text-slate-400 mt-1">
                                         Must match the details submitted during agency registration.
                                     </p>
                                 </div>
@@ -477,7 +504,7 @@ function EditRegistrationInner() {
                                 <button
                                     type="submit"
                                     disabled={isVerifying}
-                                    className="w-full py-3.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,184,166,0.3)] mt-2"
+                                    className="w-full py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm mt-2"
                                 >
                                     {isVerifying ? (
                                         <>
@@ -491,11 +518,11 @@ function EditRegistrationInner() {
                                 </button>
                             </form>
 
-                            <div className="mt-6 pt-5 border-t border-white/10 text-center">
+                            <div className="mt-6 pt-5 border-t border-slate-100 text-center">
                                 <button
                                     type="button"
                                     onClick={() => setShowLookupModal(true)}
-                                    className="text-xs text-[#14b8a6] hover:underline font-bold"
+                                    className="text-xs text-teal-600 hover:underline font-bold"
                                 >
                                     Forgot your Team ID? Search by Email / Phone
                                 </button>
@@ -506,21 +533,21 @@ function EditRegistrationInner() {
                     /* ══════════════ VIEW 2: AUTHENTICATED TEAM CORRECTION HUB ══════════════ */
                     <div className="space-y-6">
                         {/* Countdown / Window Banner */}
-                        <div className="p-5 rounded-3xl bg-gradient-to-r from-teal-500/15 to-purple-600/15 border border-[#14b8a6]/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="p-5 rounded-3xl bg-teal-50/80 border border-teal-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
                             <div className="flex items-center gap-3.5">
-                                <div className="w-12 h-12 rounded-2xl bg-[#14b8a6]/20 border border-[#14b8a6]/40 text-[#14b8a6] flex items-center justify-center shrink-0">
+                                <div className="w-12 h-12 rounded-2xl bg-teal-100 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0">
                                     <Clock size={24} />
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <h2 className="font-kanit font-black italic uppercase text-lg text-white">
+                                        <h2 className="font-kanit font-extrabold uppercase text-lg text-slate-900">
                                             Roster Correction Window Active
                                         </h2>
-                                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase">
+                                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
                                             Open until Oct 6, 11:59 PM
                                         </span>
                                     </div>
-                                    <p className="text-xs text-white/60 mt-0.5">
+                                    <p className="text-xs text-slate-600 mt-0.5">
                                         Review team spelling, replace inactive members, or merge teams. Full digital QR passes unlock on <strong>October 10 at 08:00 AM</strong>.
                                     </p>
                                 </div>
@@ -530,7 +557,7 @@ function EditRegistrationInner() {
                                 type="button"
                                 onClick={handleSaveRosterEdits}
                                 disabled={isSaving}
-                                className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase italic tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0 shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+                                className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0 shadow-sm"
                             >
                                 <Save size={15} className={isSaving ? 'animate-spin' : ''} />
                                 {isSaving ? 'Saving Changes...' : 'Save All Changes'}
@@ -539,16 +566,16 @@ function EditRegistrationInner() {
 
                         {/* Pending Merge Alert Banner (If Another Team Requested Merge) */}
                         {pendingMerge && (
-                            <div className="p-5 rounded-3xl bg-purple-500/20 border-2 border-purple-500/50 shadow-[0_0_30px_rgba(168,85,247,0.2)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="p-5 rounded-3xl bg-purple-50 border-2 border-purple-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex items-center gap-3.5">
-                                    <div className="w-11 h-11 rounded-2xl bg-purple-500/30 text-purple-300 flex items-center justify-center shrink-0">
+                                    <div className="w-11 h-11 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
                                         <GitMerge size={22} />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-white text-sm">
+                                        <h3 className="font-bold text-slate-900 text-sm">
                                             Incoming Merge Request from &quot;{pendingMerge.targetTeamName}&quot;
                                         </h3>
-                                        <p className="text-xs text-purple-200/70 mt-0.5">
+                                        <p className="text-xs text-purple-900/80 mt-0.5">
                                             Team Lead <strong>{pendingMerge.targetCaptain}</strong> entered your merge code. Combined team will have <strong>{pendingMerge.sourceMemberCount + pendingMerge.targetMemberCount} / 4 members</strong>.
                                         </p>
                                     </div>
@@ -559,7 +586,7 @@ function EditRegistrationInner() {
                                         type="button"
                                         disabled={isRespondingMerge}
                                         onClick={() => void handleRespondMerge('APPROVE')}
-                                        className="px-5 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-black uppercase italic text-xs tracking-wider transition cursor-pointer disabled:opacity-50"
+                                        className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer disabled:opacity-50 shadow-sm"
                                     >
                                         {isRespondingMerge ? 'Processing...' : 'Approve & Merge'}
                                     </button>
@@ -567,7 +594,7 @@ function EditRegistrationInner() {
                                         type="button"
                                         disabled={isRespondingMerge}
                                         onClick={() => void handleRespondMerge('REJECT')}
-                                        className="px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-xs font-bold transition cursor-pointer"
+                                        className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer"
                                     >
                                         Reject
                                     </button>
@@ -579,79 +606,133 @@ function EditRegistrationInner() {
                             {/* Column 1 & 2: Team Roster & Details */}
                             <div className="lg:col-span-2 space-y-6">
                                 {/* Team Info Card */}
-                                <div className="p-6 rounded-3xl border border-white/10 bg-white/[0.03] space-y-4">
-                                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                                <div className="p-6 rounded-3xl border border-slate-200 bg-white shadow-sm space-y-4">
+                                    <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-[#14b8a6] flex items-center justify-center font-black">
+                                            <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center font-black border border-teal-100">
                                                 <Users size={20} />
                                             </div>
                                             <div>
-                                                <h3 className="text-lg font-black uppercase italic tracking-tight text-white">
+                                                <h3 className="text-lg font-extrabold uppercase tracking-tight text-slate-900">
                                                     Team Information
                                                 </h3>
-                                                <span className="font-mono text-xs text-[#14b8a6] font-bold">
+                                                <span className="font-mono text-xs text-teal-700 font-bold">
                                                     ID: {team.teamId}
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <span className="px-3 py-1 rounded-full bg-white/10 text-white/70 text-[10px] font-black uppercase">
+                                        <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold uppercase tracking-wider">
                                             {team.members.length} / 4 Members
                                         </span>
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1.5">
                                                 Team Name
                                             </label>
                                             <input
                                                 type="text"
                                                 value={editedTeam?.teamName || ''}
                                                 onChange={e => editedTeam && setEditedTeam({ ...editedTeam, teamName: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white font-bold outline-none focus:border-[#14b8a6] transition"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold outline-none focus:border-teal-500 focus:bg-white transition"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
-                                                Innovation Track
+                                            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1.5">
+                                                College / Institution
                                             </label>
-                                            <select
-                                                value={editedTeam?.track || ''}
-                                                onChange={e => editedTeam && setEditedTeam({ ...editedTeam, track: e.target.value })}
-                                                className="w-full bg-[#0D0219] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white font-bold outline-none focus:border-[#14b8a6] transition"
-                                            >
-                                                {TRACKS.map(t => (
-                                                    <option key={t} value={t} className="bg-[#0D0219] text-white">
-                                                        {t}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            <input
+                                                type="text"
+                                                value={editedTeam?.college || ''}
+                                                onChange={e => editedTeam && setEditedTeam({ ...editedTeam, college: e.target.value })}
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
+                                            />
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
-                                            College / Institution
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={editedTeam?.college || ''}
-                                            onChange={e => editedTeam && setEditedTeam({ ...editedTeam, college: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#14b8a6] transition"
-                                        />
+                                    {/* Multi-Track Selection (Up to 3) */}
+                                    <div className="pt-2">
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">
+                                                Innovation Track Preferences (Select up to 3)
+                                            </label>
+                                            <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+                                                {(editedTeam?.trackPreferences || (editedTeam?.track ? [editedTeam.track] : [])).length} / 3 Selected
+                                            </span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 mb-2.5">
+                                            Click to pick up to 3 tracks in order of preference. Your 1st choice is your primary track.
+                                        </p>
+
+                                        {/* Selected Track Badges */}
+                                        {(editedTeam?.trackPreferences || (editedTeam?.track ? [editedTeam.track] : [])).length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mb-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                                                {(editedTeam?.trackPreferences || (editedTeam?.track ? [editedTeam.track] : [])).map((tr, rankIdx) => (
+                                                    <div
+                                                        key={tr}
+                                                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-600 text-white text-xs font-bold shadow-sm"
+                                                    >
+                                                        <span className="w-4 h-4 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px] font-mono">
+                                                            {rankIdx + 1}
+                                                        </span>
+                                                        <span>{tr}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => toggleTrackPreference(tr)}
+                                                            className="hover:bg-white/20 rounded p-0.5 transition cursor-pointer"
+                                                            title="Remove preference"
+                                                        >
+                                                            <X size={13} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Track Choices Grid */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                            {TRACKS.map(t => {
+                                                const currentPrefs: string[] = editedTeam?.trackPreferences || (editedTeam?.track ? [editedTeam.track] : []);
+                                                const rank = currentPrefs.indexOf(t);
+                                                const isSelected = rank !== -1;
+
+                                                return (
+                                                    <button
+                                                        key={t}
+                                                        type="button"
+                                                        onClick={() => toggleTrackPreference(t)}
+                                                        className={`flex items-center justify-between p-3 rounded-xl border text-left transition cursor-pointer text-xs font-semibold ${
+                                                            isSelected
+                                                                ? 'border-teal-500 bg-teal-50 text-teal-900 ring-1 ring-teal-500 shadow-sm'
+                                                                : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                                                        }`}
+                                                    >
+                                                        <span className="truncate pr-2">{t}</span>
+                                                        {isSelected ? (
+                                                            <span className="shrink-0 px-2 py-0.5 rounded-full bg-teal-600 text-white text-[10px] font-bold">
+                                                                #{rank + 1}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="shrink-0 text-slate-400 font-bold text-sm">+</span>
+                                                        )}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Member Cards List */}
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between px-1">
-                                        <h3 className="text-sm font-black uppercase italic tracking-wider text-white flex items-center gap-2">
-                                            <User size={16} className="text-[#14b8a6]" />
+                                        <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                                            <User size={16} className="text-teal-600" />
                                             Registered Team Members
                                         </h3>
-                                        <span className="text-[11px] text-white/40">
+                                        <span className="text-[11px] text-slate-500">
                                             Max 2 member replacements allowed per team
                                         </span>
                                     </div>
@@ -659,18 +740,18 @@ function EditRegistrationInner() {
                                     {editedTeam?.members.map((m, idx) => (
                                         <div
                                             key={idx}
-                                            className="p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition space-y-3"
+                                            className="p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 shadow-sm transition space-y-3"
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2.5">
-                                                    <span className="w-6 h-6 rounded-lg bg-white/10 text-white/70 font-mono text-xs flex items-center justify-center font-bold">
+                                                    <span className="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-mono text-xs flex items-center justify-center font-bold">
                                                         {idx + 1}
                                                     </span>
-                                                    <h4 className="font-bold text-sm text-white">
+                                                    <h4 className="font-bold text-sm text-slate-900">
                                                         {idx === 0 ? `${m.fullName || 'Lead'} (Team Captain)` : m.fullName || `Member ${idx + 1}`}
                                                     </h4>
                                                     {m.replacedAt && (
-                                                        <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[9px] font-black uppercase">
+                                                        <span className="px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200 text-[9px] font-bold uppercase">
                                                             Replaced
                                                         </span>
                                                     )}
@@ -690,7 +771,7 @@ function EditRegistrationInner() {
                                                                 year: ''
                                                             });
                                                         }}
-                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-[11px] font-bold transition cursor-pointer"
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-bold transition cursor-pointer"
                                                     >
                                                         <UserPlus size={13} /> Replace Member
                                                     </button>
@@ -699,7 +780,7 @@ function EditRegistrationInner() {
 
                                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                                                 <div>
-                                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                                    <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                                         Full Name
                                                     </label>
                                                     <input
@@ -710,12 +791,12 @@ function EditRegistrationInner() {
                                                             copy[idx].fullName = e.target.value;
                                                             setEditedTeam({ ...editedTeam, members: copy });
                                                         }}
-                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#14b8a6]"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
                                                     />
                                                 </div>
 
                                                 <div>
-                                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                                    <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                                         Email Address
                                                     </label>
                                                     <input
@@ -726,12 +807,12 @@ function EditRegistrationInner() {
                                                             copy[idx].email = e.target.value;
                                                             setEditedTeam({ ...editedTeam, members: copy });
                                                         }}
-                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#14b8a6]"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
                                                     />
                                                 </div>
 
                                                 <div>
-                                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                                    <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                                         Mobile Number
                                                     </label>
                                                     <input
@@ -742,7 +823,7 @@ function EditRegistrationInner() {
                                                             copy[idx].phone = e.target.value;
                                                             setEditedTeam({ ...editedTeam, members: copy });
                                                         }}
-                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono outline-none focus:border-[#14b8a6]"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-teal-500 focus:bg-white"
                                                     />
                                                 </div>
                                             </div>
@@ -754,31 +835,31 @@ function EditRegistrationInner() {
                             {/* Column 3: Team Merge Hub & Anti-Spam FAQ */}
                             <div className="space-y-6">
                                 {/* Peer-to-Peer Merge Tool */}
-                                <div className="p-6 rounded-3xl border border-purple-500/30 bg-purple-950/20 backdrop-blur-md space-y-4">
+                                <div className="p-6 rounded-3xl border border-purple-200 bg-purple-50/50 shadow-sm space-y-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 flex items-center justify-center">
+                                        <div className="w-10 h-10 rounded-xl bg-purple-100 border border-purple-200 text-purple-700 flex items-center justify-center">
                                             <GitMerge size={20} />
                                         </div>
                                         <div>
-                                            <h3 className="text-base font-black uppercase italic tracking-tight text-white">
+                                            <h3 className="text-base font-extrabold uppercase tracking-tight text-slate-900">
                                                 Merge Teams
                                             </h3>
-                                            <p className="text-[11px] text-purple-300/70">
+                                            <p className="text-[11px] text-purple-700">
                                                 Combine with another solo or duo team
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* Sub-Feature A: Generate Code */}
-                                    <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2.5">
-                                        <span className="text-[10px] font-black uppercase text-white/40 tracking-wider block">
+                                    <div className="p-4 rounded-2xl bg-white border border-purple-100 space-y-2.5 shadow-sm">
+                                        <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">
                                             Option 1: Invite Another Team
                                         </span>
                                         {generatedCode ? (
-                                            <div className="p-3 rounded-xl bg-[#14b8a6]/10 border border-[#14b8a6]/40 flex items-center justify-between">
+                                            <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-between">
                                                 <div>
-                                                    <span className="text-[10px] text-white/40 block font-bold">Your Merge Code:</span>
-                                                    <span className="font-mono text-xl font-black text-[#14b8a6] tracking-widest">
+                                                    <span className="text-[10px] text-slate-500 block font-bold">Your Merge Code:</span>
+                                                    <span className="font-mono text-xl font-black text-teal-700 tracking-widest">
                                                         {generatedCode}
                                                     </span>
                                                 </div>
@@ -788,7 +869,7 @@ function EditRegistrationInner() {
                                                         void navigator.clipboard.writeText(generatedCode);
                                                         toast.success('Merge code copied to clipboard!');
                                                     }}
-                                                    className="px-3 py-1.5 rounded-lg bg-[#14b8a6] text-black font-black text-[10px] uppercase flex items-center gap-1 cursor-pointer"
+                                                    className="px-3 py-1.5 rounded-lg bg-teal-600 text-white font-bold text-[10px] uppercase flex items-center gap-1 cursor-pointer hover:bg-teal-700"
                                                 >
                                                     <Copy size={12} /> Copy
                                                 </button>
@@ -798,19 +879,19 @@ function EditRegistrationInner() {
                                                 type="button"
                                                 disabled={isGeneratingCode}
                                                 onClick={handleGenerateMergeCode}
-                                                className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition cursor-pointer"
+                                                className="w-full py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer"
                                             >
                                                 {isGeneratingCode ? 'Creating Code...' : 'Generate 30-Min Merge Code'}
                                             </button>
                                         )}
-                                        <p className="text-[10px] text-white/40">
+                                        <p className="text-[10px] text-slate-500">
                                             Share this code with the other Team Lead. Once they enter it, you will get an approval prompt.
                                         </p>
                                     </div>
 
                                     {/* Sub-Feature B: Enter Code */}
-                                    <form onSubmit={handleSubmitMergeCode} className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2.5">
-                                        <span className="text-[10px] font-black uppercase text-white/40 tracking-wider block">
+                                    <form onSubmit={handleSubmitMergeCode} className="p-4 rounded-2xl bg-white border border-purple-100 space-y-2.5 shadow-sm">
+                                        <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">
                                             Option 2: Enter Their Merge Code
                                         </span>
                                         <div className="flex gap-2">
@@ -819,12 +900,12 @@ function EditRegistrationInner() {
                                                 placeholder="e.g. MG-8492"
                                                 value={inputMergeCode}
                                                 onChange={e => setInputMergeCode(e.target.value)}
-                                                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white uppercase outline-none focus:border-purple-400"
+                                                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 uppercase outline-none focus:border-purple-500 focus:bg-white"
                                             />
                                             <button
                                                 type="submit"
                                                 disabled={isSubmittingMerge || !inputMergeCode.trim()}
-                                                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs uppercase transition cursor-pointer disabled:opacity-50"
+                                                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase transition cursor-pointer disabled:opacity-50 shadow-sm"
                                             >
                                                 {isSubmittingMerge ? '...' : 'Request'}
                                             </button>
@@ -832,37 +913,23 @@ function EditRegistrationInner() {
                                     </form>
                                 </div>
 
-                                {/* First-Timer FAQ Shield Widget */}
-                                <div className="p-6 rounded-3xl border border-white/10 bg-white/[0.03] space-y-4">
-                                    <div className="flex items-center gap-2.5 text-xs font-black uppercase text-white/60 tracking-wider">
-                                        <HelpCircle size={16} className="text-[#14b8a6]" />
-                                        <span>First-Timer Guide</span>
+                                {/* Coordinator Support Widget */}
+                                <div className="p-6 rounded-3xl border border-slate-200 bg-white shadow-sm space-y-4">
+                                    <div className="flex items-center gap-2.5 text-xs font-bold uppercase text-slate-700 tracking-wider">
+                                        <HelpCircle size={16} className="text-teal-600" />
+                                        <span>Coordinator Support</span>
                                     </div>
 
                                     <div className="space-y-2 text-xs">
-                                        <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                                            <p className="font-bold text-white mb-1">When do we get our Digital Passes?</p>
-                                            <p className="text-white/60 text-[11px] leading-relaxed">
-                                                On October 7, after all rosters are locked. QR badges and meal passes will be emailed to your lead.
-                                            </p>
-                                        </div>
-
-                                        <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                                            <p className="font-bold text-white mb-1">Can our team have 3 members?</p>
-                                            <p className="text-white/60 text-[11px] leading-relaxed">
-                                                Yes! Teams can have anywhere between 2 and 4 members. You do not have to find a 4th if you already have 3.
-                                            </p>
-                                        </div>
-
-                                        <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                                            <p className="font-bold text-white mb-1">Need special assistance?</p>
-                                            <p className="text-white/60 text-[11px] leading-relaxed mb-2">
-                                                Please submit an in-app ticket below instead of calling organizer phone numbers.
+                                        <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                                            <p className="font-bold text-slate-900 mb-1">Need assistance?</p>
+                                            <p className="text-slate-600 text-[11px] leading-relaxed mb-3">
+                                                Submit an in-app ticket below and our coordinators will contact you directly to assist with your request.
                                             </p>
                                             <button
                                                 type="button"
                                                 onClick={() => setShowHelpModal(true)}
-                                                className="w-full py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-[#14b8a6] font-bold text-[11px] transition cursor-pointer"
+                                                className="w-full py-2.5 rounded-lg bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-700 font-bold text-[11px] transition cursor-pointer"
                                             >
                                                 Open Help Desk Ticket
                                             </button>
@@ -878,23 +945,23 @@ function EditRegistrationInner() {
             {/* ══════════════ MODAL 1: REPLACE MEMBER MODAL ══════════════ */}
             <AnimatePresence>
                 {replacingSlotIndex !== null && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="w-full max-w-md bg-[#0D0219] border-2 border-amber-500/40 rounded-[2rem] p-6 shadow-2xl overflow-hidden"
+                            className="w-full max-w-md bg-white border border-slate-200 rounded-[2rem] p-6 shadow-2xl overflow-hidden text-slate-900"
                         >
-                            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+                            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center">
+                                    <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
                                         <UserPlus size={18} />
                                     </div>
                                     <div>
-                                        <h3 className="font-black uppercase italic tracking-tight text-white text-base">
+                                        <h3 className="font-bold uppercase tracking-tight text-slate-900 text-base">
                                             Replace Member #{replacingSlotIndex + 1}
                                         </h3>
-                                        <p className="text-[10px] text-amber-400 font-bold uppercase tracking-widest">
+                                        <p className="text-[10px] text-amber-600 font-bold uppercase tracking-widest">
                                             Anti-Fraud Substitution
                                         </p>
                                     </div>
@@ -902,19 +969,19 @@ function EditRegistrationInner() {
                                 <button
                                     type="button"
                                     onClick={() => setReplacingSlotIndex(null)}
-                                    className="p-1.5 rounded-full hover:bg-white/10 text-white/50 hover:text-white"
+                                    className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
                                 >
                                     <X size={18} />
                                 </button>
                             </div>
 
-                            <p className="text-xs text-white/60 mb-4 leading-relaxed">
+                            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
                                 Enter the new teammate’s details below. An automated security notice will be emailed to the previous participant.
                             </p>
 
                             <div className="space-y-3">
                                 <div>
-                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                    <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                         New Member Full Name
                                     </label>
                                     <input
@@ -922,13 +989,13 @@ function EditRegistrationInner() {
                                         placeholder="Full Name"
                                         value={replacementForm.fullName}
                                         onChange={e => setReplacementForm({ ...replacementForm, fullName: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                    <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                         New Member Email Address
                                     </label>
                                     <input
@@ -936,14 +1003,14 @@ function EditRegistrationInner() {
                                         placeholder="student@college.edu"
                                         value={replacementForm.email}
                                         onChange={e => setReplacementForm({ ...replacementForm, email: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                                         required
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                        <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                             Mobile Number
                                         </label>
                                         <input
@@ -951,12 +1018,12 @@ function EditRegistrationInner() {
                                             placeholder="10-digit number"
                                             value={replacementForm.phone}
                                             onChange={e => setReplacementForm({ ...replacementForm, phone: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                        <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                             College
                                         </label>
                                         <input
@@ -964,7 +1031,7 @@ function EditRegistrationInner() {
                                             placeholder="College Name"
                                             value={replacementForm.college}
                                             onChange={e => setReplacementForm({ ...replacementForm, college: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                                         />
                                     </div>
                                 </div>
@@ -973,7 +1040,7 @@ function EditRegistrationInner() {
                                     <button
                                         type="button"
                                         onClick={() => setReplacingSlotIndex(null)}
-                                        className="flex-1 py-2.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                        className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs uppercase hover:bg-slate-50 transition"
                                     >
                                         Cancel
                                     </button>
@@ -981,7 +1048,7 @@ function EditRegistrationInner() {
                                         type="button"
                                         disabled={isReplacing || !replacementForm.fullName || !replacementForm.email}
                                         onClick={handleExecuteMemberReplacement}
-                                        className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-black uppercase italic text-xs tracking-wider transition cursor-pointer disabled:opacity-50"
+                                        className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer disabled:opacity-50 shadow-sm"
                                     >
                                         {isReplacing ? 'Updating...' : 'Confirm Replacement'}
                                     </button>
@@ -995,26 +1062,26 @@ function EditRegistrationInner() {
             {/* ══════════════ MODAL 2: FORGOT TEAM ID LOOKUP TOOL ══════════════ */}
             <AnimatePresence>
                 {showLookupModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="w-full max-w-md bg-[#0D0219] border border-white/10 rounded-[2rem] p-6 shadow-2xl"
+                            className="w-full max-w-md bg-white border border-slate-200 rounded-[2rem] p-6 shadow-2xl text-slate-900"
                         >
-                            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+                            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="w-9 h-9 rounded-xl bg-[#14b8a6]/20 text-[#14b8a6] flex items-center justify-center">
+                                    <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
                                         <Search size={18} />
                                     </div>
-                                    <h3 className="font-black uppercase italic tracking-tight text-white text-base">
+                                    <h3 className="font-bold uppercase tracking-tight text-slate-900 text-base">
                                         Find Your Team ID
                                     </h3>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => setShowLookupModal(false)}
-                                    className="p-1.5 rounded-full hover:bg-white/10 text-white/50 hover:text-white"
+                                    className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
                                 >
                                     <X size={18} />
                                 </button>
@@ -1022,7 +1089,7 @@ function EditRegistrationInner() {
 
                             <form onSubmit={handleLookupTeam} className="space-y-3 mb-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                         Enter Registered Email or Mobile Number
                                     </label>
                                     <div className="flex gap-2">
@@ -1031,13 +1098,13 @@ function EditRegistrationInner() {
                                             placeholder="e.g. captain@college.edu or 9876543210"
                                             value={lookupQuery}
                                             onChange={e => setLookupQuery(e.target.value)}
-                                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#14b8a6]"
+                                            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
                                             required
                                         />
                                         <button
                                             type="submit"
                                             disabled={lookupLoading}
-                                            className="px-4 py-2 rounded-xl bg-[#14b8a6] text-black font-black text-xs uppercase"
+                                            className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs uppercase"
                                         >
                                             {lookupLoading ? '...' : 'Search'}
                                         </button>
@@ -1055,13 +1122,13 @@ function EditRegistrationInner() {
                                                 setShowLookupModal(false);
                                                 toast.success(`Selected Team ID ${r.teamId}`);
                                             }}
-                                            className="p-3 rounded-xl bg-white/5 hover:bg-[#14b8a6]/10 border border-white/10 hover:border-[#14b8a6]/40 transition cursor-pointer flex items-center justify-between"
+                                            className="p-3 rounded-xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200 hover:border-teal-300 transition cursor-pointer flex items-center justify-between"
                                         >
                                             <div>
-                                                <span className="font-bold text-sm text-white block">{r.teamName}</span>
-                                                <span className="text-[11px] text-white/50">{r.captainName} • {r.maskedEmail}</span>
+                                                <span className="font-bold text-sm text-slate-900 block">{r.teamName}</span>
+                                                <span className="text-[11px] text-slate-500">{r.captainName} • {r.maskedEmail}</span>
                                             </div>
-                                            <span className="font-mono text-xs font-black text-[#14b8a6] bg-[#14b8a6]/20 px-2 py-0.5 rounded">
+                                            <span className="font-mono text-xs font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded">
                                                 {r.teamId}
                                             </span>
                                         </div>
@@ -1081,26 +1148,26 @@ function EditRegistrationInner() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="w-full max-w-md bg-[#0D0219] border border-white/10 rounded-[2rem] p-6 shadow-2xl"
+                            className="w-full max-w-md bg-white border border-slate-200 rounded-[2rem] p-6 shadow-2xl text-slate-900"
                         >
-                            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+                            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                                    <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
                                         <HelpCircle size={18} />
                                     </div>
                                     <div>
-                                        <h3 className="font-black uppercase italic tracking-tight text-white text-base">
-                                            First-Timer Support Desk
+                                        <h3 className="font-bold uppercase tracking-tight text-slate-900 text-base">
+                                            Coordinator Support Desk
                                         </h3>
-                                        <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">
-                                            Fast Response from Organizers
+                                        <p className="text-[10px] text-teal-700 font-bold uppercase tracking-widest">
+                                            Our coordinators will contact you to assist
                                         </p>
                                     </div>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => setShowHelpModal(false)}
-                                    className="p-1.5 rounded-full hover:bg-white/10 text-white/50 hover:text-white"
+                                    className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
                                 >
                                     <X size={18} />
                                 </button>
@@ -1108,23 +1175,23 @@ function EditRegistrationInner() {
 
                             <form onSubmit={handleSubmitSupportTicket} className="space-y-3.5">
                                 <div>
-                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                         Issue Category
                                     </label>
                                     <select
                                         value={helpCategory}
                                         onChange={e => setHelpCategory(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-blue-400"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
                                     >
-                                        <option value="Roster Query" className="bg-[#0D0219]">Roster & Teammate Change</option>
-                                        <option value="Team Merge" className="bg-[#0D0219]">Team Merge Question</option>
-                                        <option value="Pass & QR" className="bg-[#0D0219]">Digital Pass / Event Dates</option>
-                                        <option value="Other" className="bg-[#0D0219]">General Hackathon Question</option>
+                                        <option value="Roster Query">Roster & Teammate Change</option>
+                                        <option value="Team Merge">Team Merge Question</option>
+                                        <option value="Pass & QR">Digital Pass / Event Dates</option>
+                                        <option value="Other">General Hackathon Question</option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label className="text-[9px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                         Describe your issue
                                     </label>
                                     <textarea
@@ -1132,7 +1199,7 @@ function EditRegistrationInner() {
                                         placeholder="Please provide details (e.g. My teammate dropped out and I need to add X)..."
                                         value={helpText}
                                         onChange={e => setHelpText(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-blue-400"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition leading-relaxed"
                                         required
                                     />
                                 </div>
@@ -1141,14 +1208,14 @@ function EditRegistrationInner() {
                                     <button
                                         type="button"
                                         onClick={() => setShowHelpModal(false)}
-                                        className="flex-1 py-2.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                        className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs uppercase hover:bg-slate-50 transition"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isSubmittingHelp || !helpText.trim()}
-                                        className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase italic text-xs tracking-wider transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                                        className="flex-1 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <Send size={13} className={isSubmittingHelp ? 'animate-spin' : ''} />
                                         {isSubmittingHelp ? 'Sending...' : 'Submit Query'}
@@ -1166,8 +1233,8 @@ function EditRegistrationInner() {
 export default function EditRegistrationPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-[#06000F] flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-teal-600 border-t-transparent rounded-full animate-spin" />
             </div>
         }>
             <EditRegistrationInner />
