@@ -56,32 +56,58 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Team not found in database.' }, { status: 404 });
         }
 
-        const rawData = (team.raw_data && typeof team.raw_data === 'object') ? team.raw_data : {};
+        const rawData = (team.raw_data && typeof team.raw_data === 'object') ? (team.raw_data as any) : {};
         const replacementCount = Number(rawData.member_replacements_count || 0);
+        const isRosterLocked = Boolean(rawData.roster_locked || rawData.locked || team.is_locked);
 
-        // ══════════════ ACTION 1: UPDATE DETAILS (Name, Track, College, Member Info) ══════════════
+        // One-time edit enforcement: if already locked and not admin, reject all mutations
+        if (isRosterLocked && !hasRole(session, ['admin'])) {
+            return NextResponse.json({
+                error: 'Your team registration has already been finalized and locked. Only one edit submission is permitted.'
+            }, { status: 403 });
+        }
+
+        // ══════════════ ACTION 1: UPDATE DETAILS & 1-TIME LOCK ══════════════
         if (action === 'update_details') {
-            const { teamName, track, trackPreferences, college, members } = body;
+            const { teamName, track, trackPreferences, college, members, finalizeAndLock, lockRoster } = body;
 
-            if (members && (!Array.isArray(members) || members.length > MAX_TEAM_MEMBERS)) {
-                return NextResponse.json({ error: `Teams cannot exceed ${MAX_TEAM_MEMBERS} members.` }, { status: 400 });
+            if (members && Array.isArray(members)) {
+                if (members.length === 3) {
+                    return NextResponse.json({
+                        error: 'Hackathon rules strictly permit Solo (1), Duo (2), or Quad (4) teams. 3-member teams (Tri) are not allowed. Please add a 4th teammate to form a Quad, or adjust to 2 members before saving.'
+                    }, { status: 400 });
+                }
+                if (members.length === 0 || members.length > MAX_TEAM_MEMBERS) {
+                    return NextResponse.json({
+                        error: `Teams must have 1, 2, or 4 members (cannot exceed ${MAX_TEAM_MEMBERS}).`
+                    }, { status: 400 });
+                }
             }
 
             const updates: Record<string, unknown> = {};
             if (teamName) updates.team_name = String(teamName).trim();
+            
+            const updatedRawData = { ...rawData };
+
             if (Array.isArray(trackPreferences) && trackPreferences.length > 0) {
                 const cleanPrefs = trackPreferences.slice(0, 3).map(String);
                 updates.track_preferences = cleanPrefs;
                 updates.track = cleanPrefs[0];
-                updates.raw_data = {
-                    ...rawData,
-                    track_preferences: cleanPrefs
-                };
+                updatedRawData.track_preferences = cleanPrefs;
             } else if (track) {
                 updates.track = String(track).trim();
             }
             if (college) updates.college = String(college).trim();
             if (members) updates.members = members;
+
+            const shouldLock = Boolean(finalizeAndLock || lockRoster);
+            if (shouldLock) {
+                updatedRawData.roster_locked = true;
+                updatedRawData.roster_locked_at = new Date().toISOString();
+                updatedRawData.roster_edit_count = Number(rawData.roster_edit_count || 0) + 1;
+            }
+
+            updates.raw_data = updatedRawData;
 
             const { error: updateErr } = await supabase
                 .from('registrations')
@@ -92,17 +118,22 @@ export async function POST(req: Request) {
 
             await recordRosterAudit({
                 teamId,
-                action: 'UPDATE_DETAILS',
+                action: shouldLock ? 'FINALIZE_AND_LOCK' : 'UPDATE_DETAILS',
                 ip,
                 actor: team.email || team.captain || teamId,
-                summary: `Updated team details & roster members.`,
+                summary: shouldLock
+                    ? `Finalized and locked team registration (1-time edit).`
+                    : `Updated team details & roster members.`,
                 previousState: { team_name: team.team_name, track: team.track, members: team.members },
                 newState: updates
             });
 
             return NextResponse.json({
                 success: true,
-                message: 'Team details updated successfully!'
+                isRosterLocked: shouldLock,
+                message: shouldLock
+                    ? 'Your team registration has been finalized and permanently locked!'
+                    : 'Team details updated successfully!'
             });
         }
 
@@ -232,6 +263,17 @@ export async function POST(req: Request) {
         // ══════════════ ACTION 3: GENERATE MERGE INVITE CODE ══════════════
         if (action === 'create_merge_code') {
             const memberCount = (team.members && Array.isArray(team.members)) ? team.members.length : 1;
+            if (memberCount >= 4) {
+                return NextResponse.json({
+                    error: 'Your team already has 4 members (Quad) and cannot merge further.'
+                }, { status: 400 });
+            }
+            if (memberCount === 3) {
+                return NextResponse.json({
+                    error: 'External agency rules require Solo (1), Duo (2), or Quad (4) teams. 3-member teams cannot merge directly. Please add a 4th teammate to form a Quad, or adjust to 2 members before merging.'
+                }, { status: 400 });
+            }
+
             const code = await createMergeInvite({
                 id: team.team_id,
                 name: team.team_name,
@@ -256,6 +298,15 @@ export async function POST(req: Request) {
             }
 
             const targetMemberCount = (team.members && Array.isArray(team.members)) ? team.members.length : 1;
+            if (targetMemberCount >= 4) {
+                return NextResponse.json({ error: 'Your team is already at max capacity (4 members).' }, { status: 400 });
+            }
+            if (targetMemberCount === 3) {
+                return NextResponse.json({
+                    error: 'External agency rules require Solo (1), Duo (2), or Quad (4) teams. 3-member teams cannot merge directly. Please add a 4th teammate to form a Quad, or adjust to 2 members.'
+                }, { status: 400 });
+            }
+
             const result = await submitMergeRequest(code, {
                 id: team.team_id,
                 name: team.team_name,
@@ -307,9 +358,22 @@ export async function POST(req: Request) {
                     return NextResponse.json({ error: 'Target team could not be found.' }, { status: 404 });
                 }
 
+                const targetRawData = (targetTeam.raw_data && typeof targetTeam.raw_data === 'object') ? (targetTeam.raw_data as any) : {};
+                if (targetRawData.roster_locked && !hasRole(session, ['admin'])) {
+                    return NextResponse.json({
+                        error: `Target Team "${targetTeam.team_name}" has already finalized and locked their registration.`
+                    }, { status: 403 });
+                }
+
                 const sourceMembers = Array.isArray(team.members) ? team.members : [];
                 const targetMembers = Array.isArray(targetTeam.members) ? targetTeam.members : [];
                 const mergedMembers = [...sourceMembers, ...targetMembers];
+
+                if (mergedMembers.length === 3) {
+                    return NextResponse.json({
+                        error: 'Cannot merge into a 3-member team. External agency rules strictly require Solo (1), Duo (2), or Quad (4) teams only.'
+                    }, { status: 400 });
+                }
 
                 if (mergedMembers.length > MAX_TEAM_MEMBERS) {
                     return NextResponse.json({

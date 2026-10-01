@@ -186,6 +186,10 @@ export async function POST(req: Request) {
         // Check for any pending merge proposals awaiting this team's response
         const pendingMerge = await getPendingMergeForTeam(normalizedTeamId);
 
+        const rawData = (team.raw_data && typeof team.raw_data === 'object') ? (team.raw_data as any) : {};
+        const isRosterLocked = Boolean(rawData.roster_locked || rawData.locked || team.is_locked);
+        const rosterLockedAt = rawData.roster_locked_at || null;
+
         // Set session cookie for this verified team
         const responseData = {
             success: true,
@@ -203,7 +207,9 @@ export async function POST(req: Request) {
                 problemStatement: team.problem_statement || '',
                 createdAt: team.created_at,
                 room: team.room || '',
-                isCheckedIn: team.is_checked_in || false
+                isCheckedIn: team.is_checked_in || false,
+                isRosterLocked,
+                rosterLockedAt
             },
             portalMode,
             pendingMerge

@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import {
     ArrowLeft, Search, Save, Users, User, Edit3, CheckCircle2,
     AlertCircle, Loader2, KeyRound, ShieldCheck, Clock, Copy,
-    GitMerge, UserPlus, HelpCircle, Send, Check, X, Sparkles, ChevronRight, Phone, Mail
+    GitMerge, UserPlus, HelpCircle, Send, Check, X, Sparkles, ChevronRight, Phone, Mail,
+    Lock, Plus, Trash2, AlertTriangle
 } from "lucide-react";
 import { TRACKS } from "@/lib/constants";
 
@@ -26,6 +27,7 @@ interface TeamData {
     teamId: string;
     teamName: string;
     track: string;
+    trackPreferences?: string[];
     captain: string;
     captainMobile: string;
     college: string;
@@ -34,6 +36,8 @@ interface TeamData {
     status: string;
     problemStatement?: string;
     createdAt?: string;
+    isRosterLocked?: boolean;
+    rosterLockedAt?: string | null;
 }
 
 interface PendingMerge {
@@ -96,6 +100,20 @@ function EditRegistrationInner() {
     const [helpCategory, setHelpCategory] = useState('Roster Query');
     const [helpText, setHelpText] = useState('');
     const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
+
+    // 1-Time Edit Lock Confirmation State
+    const [showLockConfirmModal, setShowLockConfirmModal] = useState(false);
+
+    // Add Teammate Modal State (for Solo -> Duo or 3 -> Quad)
+    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+    const [newMemberForm, setNewMemberForm] = useState({
+        fullName: '',
+        email: '',
+        phone: '',
+        college: '',
+        department: '',
+        year: ''
+    });
 
     // Auto-login if arriving via official magic link
     useEffect(() => {
@@ -200,7 +218,44 @@ function EditRegistrationInner() {
         }
     };
 
-    const handleSaveRosterEdits = async () => {
+    const handlePreSubmitValidation = () => {
+        if (!editedTeam) return;
+        if (team?.isRosterLocked || editedTeam?.isRosterLocked) {
+            toast.info('Your registration is already finalized and locked.');
+            return;
+        }
+
+        // External Agency Rule: Solo (1), Duo (2), or Quad (4) ONLY
+        if (editedTeam.members.length === 3) {
+            toast.error('External agency rules strictly require Solo (1), Duo (2), or Quad (4) teams. 3-member teams (Tri) are not allowed. Please add a 4th teammate to form a Quad, or remove a member to form a Duo before finalizing.');
+            return;
+        }
+
+        if (editedTeam.members.length === 0 || editedTeam.members.length > 4) {
+            toast.error('Invalid team size. Teams must have 1, 2, or 4 members.');
+            return;
+        }
+
+        // Validate member details
+        for (let i = 0; i < editedTeam.members.length; i++) {
+            const m = editedTeam.members[i];
+            if (!m.fullName?.trim() || !m.email?.trim()) {
+                toast.error(`Please provide the name and email address for Member #${i + 1}.`);
+                return;
+            }
+        }
+
+        // Validate track selection
+        const prefs = editedTeam.trackPreferences || (editedTeam.track ? [editedTeam.track] : []);
+        if (prefs.length === 0) {
+            toast.error('Please select at least 1 Innovation Track preference.');
+            return;
+        }
+
+        setShowLockConfirmModal(true);
+    };
+
+    const handleFinalizeAndLock = async () => {
         if (!editedTeam) return;
         setIsSaving(true);
         try {
@@ -210,6 +265,7 @@ function EditRegistrationInner() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'update_details',
+                    finalizeAndLock: true,
                     teamName: editedTeam.teamName,
                     track: selectedPrefs[0] || editedTeam.track,
                     trackPreferences: selectedPrefs,
@@ -220,18 +276,61 @@ function EditRegistrationInner() {
 
             const data = await res.json();
             if (data.success) {
-                toast.success('Roster details updated and saved successfully!');
-                const updatedTeam = { ...editedTeam, track: selectedPrefs[0] || editedTeam.track, trackPreferences: selectedPrefs };
+                toast.success('Your registration has been finalized and permanently locked!');
+                const updatedTeam = {
+                    ...editedTeam,
+                    track: selectedPrefs[0] || editedTeam.track,
+                    trackPreferences: selectedPrefs,
+                    isRosterLocked: true,
+                    rosterLockedAt: new Date().toISOString()
+                };
                 setEditedTeam(updatedTeam);
                 setTeam(JSON.parse(JSON.stringify(updatedTeam)));
+                setShowLockConfirmModal(false);
             } else {
-                toast.error(data.error || 'Failed to update roster.');
+                toast.error(data.error || 'Failed to finalize registration.');
             }
         } catch {
-            toast.error('Network error saving changes.');
+            toast.error('Network error finalizing registration.');
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const handleAddTeammate = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editedTeam) return;
+        if (editedTeam.members.length >= 4) {
+            toast.error('Maximum team limit of 4 members reached.');
+            return;
+        }
+        if (!newMemberForm.fullName.trim() || !newMemberForm.email.trim()) {
+            toast.error('Please provide a full name and email address.');
+            return;
+        }
+
+        const newMember: MemberData = {
+            fullName: newMemberForm.fullName.trim(),
+            email: newMemberForm.email.trim(),
+            phone: newMemberForm.phone.trim(),
+            college: newMemberForm.college.trim() || editedTeam.college || '',
+            department: newMemberForm.department.trim(),
+            year: newMemberForm.year.trim()
+        };
+
+        const updatedMembers = [...editedTeam.members, newMember];
+        setEditedTeam({ ...editedTeam, members: updatedMembers });
+        setShowAddMemberModal(false);
+        setNewMemberForm({ fullName: '', email: '', phone: '', college: '', department: '', year: '' });
+        toast.success(`Added ${newMember.fullName}! Team now has ${updatedMembers.length} members.`);
+    };
+
+    const handleRemoveTeammate = (indexToRemove: number) => {
+        if (!editedTeam || indexToRemove === 0) return;
+        const memberName = editedTeam.members[indexToRemove]?.fullName || `Member #${indexToRemove + 1}`;
+        const updated = editedTeam.members.filter((_, idx) => idx !== indexToRemove);
+        setEditedTeam({ ...editedTeam, members: updated });
+        toast.info(`Removed ${memberName}. Team now has ${updated.length} members.`);
     };
 
     const handleExecuteMemberReplacement = async () => {
@@ -415,7 +514,7 @@ function EditRegistrationInner() {
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition cursor-pointer"
                         >
                             <HelpCircle size={14} className="text-teal-600" />
-                            First-Timer FAQs
+                            Coordinator Support
                         </button>
                         {team && (
                             <button
@@ -532,37 +631,109 @@ function EditRegistrationInner() {
                 ) : (
                     /* ══════════════ VIEW 2: AUTHENTICATED TEAM CORRECTION HUB ══════════════ */
                     <div className="space-y-6">
-                        {/* Countdown / Window Banner */}
-                        <div className="p-5 rounded-3xl bg-teal-50/80 border border-teal-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
-                            <div className="flex items-center gap-3.5">
-                                <div className="w-12 h-12 rounded-2xl bg-teal-100 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0">
-                                    <Clock size={24} />
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                        <h2 className="font-kanit font-extrabold uppercase text-lg text-slate-900">
-                                            Roster Correction Window Active
-                                        </h2>
-                                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
-                                            Open until Oct 6, 11:59 PM
-                                        </span>
+                        {/* Top Banner: Either Roster Finalized & Locked OR 48-Hour Correction Window */}
+                        {team.isRosterLocked || editedTeam?.isRosterLocked ? (
+                            <div className="p-5 rounded-3xl bg-emerald-50 border-2 border-emerald-300 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+                                <div className="flex items-center gap-3.5">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-700 flex items-center justify-center shrink-0">
+                                        <Lock size={24} />
                                     </div>
-                                    <p className="text-xs text-slate-600 mt-0.5">
-                                        Review team spelling, replace inactive members, or merge teams. Full digital QR passes unlock on <strong>October 10 at 08:00 AM</strong>.
-                                    </p>
+                                    <div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h2 className="font-kanit font-extrabold uppercase text-lg text-slate-900">
+                                                Roster Finalized & Permanently Locked
+                                            </h2>
+                                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900 text-[10px] font-bold uppercase tracking-wider">
+                                                1-Time Edit Submitted
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-slate-600 mt-0.5">
+                                            Your team registration was successfully finalized and locked. No further modifications can be made. Digital check-in QR codes unlock on <strong>October 10 at 08:00 AM</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-emerald-200 text-emerald-800 text-xs font-bold shrink-0 shadow-sm">
+                                    <ShieldCheck size={16} className="text-emerald-600" />
+                                    <span>Read-Only Mode</span>
                                 </div>
                             </div>
+                        ) : (
+                            <div className="p-5 rounded-3xl bg-teal-50/80 border border-teal-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+                                <div className="flex items-center gap-3.5">
+                                    <div className="w-12 h-12 rounded-2xl bg-teal-100 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0">
+                                        <Clock size={24} />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h2 className="font-kanit font-extrabold uppercase text-lg text-slate-900">
+                                                Roster Correction Window Active
+                                            </h2>
+                                            <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
+                                                ⚠️ 1-Time Submission Only
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-slate-600 mt-0.5">
+                                            You can modify your team details, track preferences, or members <strong>once</strong>. Once submitted, your registration is permanently locked.
+                                        </p>
+                                    </div>
+                                </div>
 
-                            <button
-                                type="button"
-                                onClick={handleSaveRosterEdits}
-                                disabled={isSaving}
-                                className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0 shadow-sm"
-                            >
-                                <Save size={15} className={isSaving ? 'animate-spin' : ''} />
-                                {isSaving ? 'Saving Changes...' : 'Save All Changes'}
-                            </button>
-                        </div>
+                                <button
+                                    type="button"
+                                    onClick={handlePreSubmitValidation}
+                                    disabled={isSaving}
+                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0 shadow-sm"
+                                >
+                                    <Lock size={15} />
+                                    Finalize & Lock Roster
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Agency Rule Alert: 3-Member Teams Prohibited */}
+                        {editedTeam && editedTeam.members.length === 3 && !(team.isRosterLocked || editedTeam.isRosterLocked) && (
+                            <div className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-4 shadow-sm">
+                                <div className="w-11 h-11 rounded-2xl bg-amber-100 border border-amber-300 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                                    <AlertTriangle size={22} />
+                                </div>
+                                <div className="leading-relaxed">
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="font-extrabold uppercase tracking-tight text-amber-950 text-sm">
+                                            Action Required: 3-Member Teams (Tri) Are Not Permitted
+                                        </h3>
+                                        <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[9px] font-bold uppercase border border-rose-200">
+                                            Agency Rule
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-amber-900 mt-1">
+                                        External agency rules strictly require teams to be <strong>Solo (1)</strong>, <strong>Duo (2)</strong>, or <strong>Quad (4)</strong>. Teams cannot compete or be locked with 3 members.
+                                    </p>
+                                    <div className="flex items-center gap-3 mt-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setNewMemberForm({
+                                                    fullName: '',
+                                                    email: '',
+                                                    phone: '',
+                                                    college: editedTeam?.college || '',
+                                                    department: '',
+                                                    year: ''
+                                                });
+                                                setShowAddMemberModal(true);
+                                            }}
+                                            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase flex items-center gap-1.5 transition cursor-pointer shadow-sm"
+                                        >
+                                            <Plus size={14} /> Add 4th Teammate (Form Quad)
+                                        </button>
+                                        <span className="text-xs text-amber-800 font-medium">
+                                            or remove an inactive member to participate as a Duo (2)
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Pending Merge Alert Banner (If Another Team Requested Merge) */}
                         {pendingMerge && (
@@ -622,9 +793,28 @@ function EditRegistrationInner() {
                                             </div>
                                         </div>
 
-                                        <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold uppercase tracking-wider">
-                                            {team.members.length} / 4 Members
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            {editedTeam?.members.length === 1 && (
+                                                <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold uppercase tracking-wider">
+                                                    Solo (1 Member)
+                                                </span>
+                                            )}
+                                            {editedTeam?.members.length === 2 && (
+                                                <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 text-[10px] font-bold uppercase tracking-wider">
+                                                    Duo (2 Members)
+                                                </span>
+                                            )}
+                                            {editedTeam?.members.length === 4 && (
+                                                <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider">
+                                                    Quad (4 Members)
+                                                </span>
+                                            )}
+                                            {editedTeam?.members.length === 3 && (
+                                                <span className="px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-bold uppercase tracking-wider animate-pulse">
+                                                    3 Members (Invalid Size)
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -634,9 +824,10 @@ function EditRegistrationInner() {
                                             </label>
                                             <input
                                                 type="text"
+                                                disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
                                                 value={editedTeam?.teamName || ''}
                                                 onChange={e => editedTeam && setEditedTeam({ ...editedTeam, teamName: e.target.value })}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold outline-none focus:border-teal-500 focus:bg-white transition"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold outline-none focus:border-teal-500 focus:bg-white transition disabled:opacity-60 disabled:cursor-not-allowed"
                                             />
                                         </div>
 
@@ -646,9 +837,10 @@ function EditRegistrationInner() {
                                             </label>
                                             <input
                                                 type="text"
+                                                disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
                                                 value={editedTeam?.college || ''}
                                                 onChange={e => editedTeam && setEditedTeam({ ...editedTeam, college: e.target.value })}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition disabled:opacity-60 disabled:cursor-not-allowed"
                                             />
                                         </div>
                                     </div>
@@ -679,14 +871,16 @@ function EditRegistrationInner() {
                                                             {rankIdx + 1}
                                                         </span>
                                                         <span>{tr}</span>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => toggleTrackPreference(tr)}
-                                                            className="hover:bg-white/20 rounded p-0.5 transition cursor-pointer"
-                                                            title="Remove preference"
-                                                        >
-                                                            <X size={13} />
-                                                        </button>
+                                                        {!(team.isRosterLocked || editedTeam?.isRosterLocked) && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => toggleTrackPreference(tr)}
+                                                                className="hover:bg-white/20 rounded p-0.5 transition cursor-pointer"
+                                                                title="Remove preference"
+                                                            >
+                                                                <X size={13} />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -698,17 +892,19 @@ function EditRegistrationInner() {
                                                 const currentPrefs: string[] = editedTeam?.trackPreferences || (editedTeam?.track ? [editedTeam.track] : []);
                                                 const rank = currentPrefs.indexOf(t);
                                                 const isSelected = rank !== -1;
+                                                const isRosterLocked = Boolean(team.isRosterLocked || editedTeam?.isRosterLocked);
 
                                                 return (
                                                     <button
                                                         key={t}
                                                         type="button"
+                                                        disabled={isRosterLocked}
                                                         onClick={() => toggleTrackPreference(t)}
-                                                        className={`flex items-center justify-between p-3 rounded-xl border text-left transition cursor-pointer text-xs font-semibold ${
+                                                        className={`flex items-center justify-between p-3 rounded-xl border text-left transition text-xs font-semibold ${
                                                             isSelected
                                                                 ? 'border-teal-500 bg-teal-50 text-teal-900 ring-1 ring-teal-500 shadow-sm'
                                                                 : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-                                                        }`}
+                                                        } ${isRosterLocked ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                                                     >
                                                         <span className="truncate pr-2">{t}</span>
                                                         {isSelected ? (
@@ -728,13 +924,37 @@ function EditRegistrationInner() {
                                 {/* Member Cards List */}
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between px-1">
-                                        <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                                            <User size={16} className="text-teal-600" />
-                                            Registered Team Members
-                                        </h3>
-                                        <span className="text-[11px] text-slate-500">
-                                            Max 2 member replacements allowed per team
-                                        </span>
+                                        <div>
+                                            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                                                <User size={16} className="text-teal-600" />
+                                                Registered Team Members
+                                            </h3>
+                                            <span className="text-[11px] text-slate-500">
+                                                {team.isRosterLocked || editedTeam?.isRosterLocked
+                                                    ? 'Roster details are locked.'
+                                                    : 'Allowed team sizes: Solo (1), Duo (2), or Quad (4). Tri (3) is prohibited.'}
+                                            </span>
+                                        </div>
+
+                                        {!(team.isRosterLocked || editedTeam?.isRosterLocked) && (editedTeam?.members.length || 0) < 4 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setNewMemberForm({
+                                                        fullName: '',
+                                                        email: '',
+                                                        phone: '',
+                                                        college: editedTeam?.college || '',
+                                                        department: '',
+                                                        year: ''
+                                                    });
+                                                    setShowAddMemberModal(true);
+                                                }}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition cursor-pointer shadow-sm"
+                                            >
+                                                <Plus size={14} /> Add Teammate
+                                            </button>
+                                        )}
                                     </div>
 
                                     {editedTeam?.members.map((m, idx) => (
@@ -757,24 +977,34 @@ function EditRegistrationInner() {
                                                     )}
                                                 </div>
 
-                                                {idx > 0 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setReplacingSlotIndex(idx);
-                                                            setReplacementForm({
-                                                                fullName: '',
-                                                                email: '',
-                                                                phone: '',
-                                                                college: editedTeam.college || '',
-                                                                department: '',
-                                                                year: ''
-                                                            });
-                                                        }}
-                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-bold transition cursor-pointer"
-                                                    >
-                                                        <UserPlus size={13} /> Replace Member
-                                                    </button>
+                                                {idx > 0 && !(team.isRosterLocked || editedTeam?.isRosterLocked) && (
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setReplacingSlotIndex(idx);
+                                                                setReplacementForm({
+                                                                    fullName: '',
+                                                                    email: '',
+                                                                    phone: '',
+                                                                    college: editedTeam.college || '',
+                                                                    department: '',
+                                                                    year: ''
+                                                                });
+                                                            }}
+                                                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-bold transition cursor-pointer"
+                                                        >
+                                                            <UserPlus size={12} /> Replace
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveTeammate(idx)}
+                                                            className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-[11px] font-bold transition cursor-pointer"
+                                                            title="Remove teammate"
+                                                        >
+                                                            <Trash2 size={12} /> Remove
+                                                        </button>
+                                                    </div>
                                                 )}
                                             </div>
 
@@ -785,13 +1015,14 @@ function EditRegistrationInner() {
                                                     </label>
                                                     <input
                                                         type="text"
+                                                        disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
                                                         value={m.fullName || ''}
                                                         onChange={e => {
                                                             const copy = [...editedTeam.members];
                                                             copy[idx].fullName = e.target.value;
                                                             setEditedTeam({ ...editedTeam, members: copy });
                                                         }}
-                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
                                                     />
                                                 </div>
 
@@ -801,13 +1032,14 @@ function EditRegistrationInner() {
                                                     </label>
                                                     <input
                                                         type="email"
+                                                        disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
                                                         value={m.email || ''}
                                                         onChange={e => {
                                                             const copy = [...editedTeam.members];
                                                             copy[idx].email = e.target.value;
                                                             setEditedTeam({ ...editedTeam, members: copy });
                                                         }}
-                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
                                                     />
                                                 </div>
 
@@ -817,13 +1049,14 @@ function EditRegistrationInner() {
                                                     </label>
                                                     <input
                                                         type="text"
+                                                        disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
                                                         value={m.phone || ''}
                                                         onChange={e => {
                                                             const copy = [...editedTeam.members];
                                                             copy[idx].phone = e.target.value;
                                                             setEditedTeam({ ...editedTeam, members: copy });
                                                         }}
-                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-teal-500 focus:bg-white"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
                                                     />
                                                 </div>
                                             </div>
@@ -845,72 +1078,127 @@ function EditRegistrationInner() {
                                                 Merge Teams
                                             </h3>
                                             <p className="text-[11px] text-purple-700">
-                                                Combine with another solo or duo team
+                                                Combine into a Duo (2) or Quad (4) team
                                             </p>
                                         </div>
                                     </div>
 
-                                    {/* Sub-Feature A: Generate Code */}
-                                    <div className="p-4 rounded-2xl bg-white border border-purple-100 space-y-2.5 shadow-sm">
-                                        <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">
-                                            Option 1: Invite Another Team
+                                    {/* Merge Rules Callout */}
+                                    <div className="p-3.5 rounded-2xl bg-white border border-purple-100 text-xs space-y-1.5 shadow-sm">
+                                        <span className="text-[10px] font-bold uppercase text-purple-900 tracking-wider block">
+                                            Agency Merge Rules
                                         </span>
-                                        {generatedCode ? (
-                                            <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-between">
-                                                <div>
-                                                    <span className="text-[10px] text-slate-500 block font-bold">Your Merge Code:</span>
-                                                    <span className="font-mono text-xl font-black text-teal-700 tracking-widest">
-                                                        {generatedCode}
-                                                    </span>
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        void navigator.clipboard.writeText(generatedCode);
-                                                        toast.success('Merge code copied to clipboard!');
-                                                    }}
-                                                    className="px-3 py-1.5 rounded-lg bg-teal-600 text-white font-bold text-[10px] uppercase flex items-center gap-1 cursor-pointer hover:bg-teal-700"
-                                                >
-                                                    <Copy size={12} /> Copy
-                                                </button>
+                                        <div className="space-y-1 text-[11px] text-slate-600">
+                                            <div className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                                                <Check size={13} /> Solo (1) + Solo (1) = Duo (2)
                                             </div>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                disabled={isGeneratingCode}
-                                                onClick={handleGenerateMergeCode}
-                                                className="w-full py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer"
-                                            >
-                                                {isGeneratingCode ? 'Creating Code...' : 'Generate 30-Min Merge Code'}
-                                            </button>
-                                        )}
-                                        <p className="text-[10px] text-slate-500">
-                                            Share this code with the other Team Lead. Once they enter it, you will get an approval prompt.
+                                            <div className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                                                <Check size={13} /> Duo (2) + Duo (2) = Quad (4)
+                                            </div>
+                                            <div className="flex items-center gap-1.5 text-rose-600 font-semibold">
+                                                <X size={13} /> Solo (1) + Duo (2) = 3 members (Prohibited)
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 pt-1.5 border-t border-slate-100 leading-relaxed">
+                                            *If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).
                                         </p>
                                     </div>
 
-                                    {/* Sub-Feature B: Enter Code */}
-                                    <form onSubmit={handleSubmitMergeCode} className="p-4 rounded-2xl bg-white border border-purple-100 space-y-2.5 shadow-sm">
-                                        <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">
-                                            Option 2: Enter Their Merge Code
-                                        </span>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                placeholder="e.g. MG-8492"
-                                                value={inputMergeCode}
-                                                onChange={e => setInputMergeCode(e.target.value)}
-                                                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 uppercase outline-none focus:border-purple-500 focus:bg-white"
-                                            />
-                                            <button
-                                                type="submit"
-                                                disabled={isSubmittingMerge || !inputMergeCode.trim()}
-                                                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase transition cursor-pointer disabled:opacity-50 shadow-sm"
-                                            >
-                                                {isSubmittingMerge ? '...' : 'Request'}
-                                            </button>
+                                    {team.isRosterLocked || editedTeam?.isRosterLocked ? (
+                                        <div className="p-4 rounded-2xl bg-white border border-slate-200 text-slate-600 text-xs shadow-sm space-y-2">
+                                            <div className="flex items-center gap-2 font-bold text-slate-800">
+                                                <Lock size={15} className="text-teal-600" />
+                                                <span>Team Merging Locked</span>
+                                            </div>
+                                            <p className="text-[11px] text-slate-500 leading-relaxed">
+                                                Your team registration has been finalized and permanently locked. Merges are disabled for finalized registrations.
+                                            </p>
                                         </div>
-                                    </form>
+                                    ) : editedTeam?.members.length === 4 ? (
+                                        <div className="p-4 rounded-2xl bg-white border border-emerald-200 text-emerald-800 text-xs shadow-sm space-y-1">
+                                            <p className="font-bold flex items-center gap-1.5">
+                                                <CheckCircle2 size={14} className="text-emerald-600" />
+                                                Full Quad Capacity (4 Members)
+                                            </p>
+                                            <p className="text-[11px] text-slate-500 leading-relaxed">
+                                                Your team is already at max capacity. Merging is not applicable.
+                                            </p>
+                                        </div>
+                                    ) : editedTeam?.members.length === 3 ? (
+                                        <div className="p-4 rounded-2xl bg-white border border-amber-300 text-amber-900 text-xs shadow-sm space-y-1.5">
+                                            <p className="font-bold flex items-center gap-1.5 text-amber-950">
+                                                <AlertTriangle size={14} className="text-amber-600" />
+                                                Cannot Merge As 3 Members
+                                            </p>
+                                            <p className="text-[11px] text-amber-800 leading-relaxed">
+                                                External agency rules require Solo (1), Duo (2), or Quad (4) teams. Please add a 4th teammate to form a Quad, or adjust to 2 members before initiating a merge.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {/* Sub-Feature A: Generate Code */}
+                                            <div className="p-4 rounded-2xl bg-white border border-purple-100 space-y-2.5 shadow-sm">
+                                                <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">
+                                                    Option 1: Invite Another Team
+                                                </span>
+                                                {generatedCode ? (
+                                                    <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-[10px] text-slate-500 block font-bold">Your Merge Code:</span>
+                                                            <span className="font-mono text-xl font-black text-teal-700 tracking-widest">
+                                                                {generatedCode}
+                                                            </span>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                void navigator.clipboard.writeText(generatedCode);
+                                                                toast.success('Merge code copied to clipboard!');
+                                                            }}
+                                                            className="px-3 py-1.5 rounded-lg bg-teal-600 text-white font-bold text-[10px] uppercase flex items-center gap-1 cursor-pointer hover:bg-teal-700"
+                                                        >
+                                                            <Copy size={12} /> Copy
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        disabled={isGeneratingCode}
+                                                        onClick={handleGenerateMergeCode}
+                                                        className="w-full py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer"
+                                                    >
+                                                        {isGeneratingCode ? 'Creating Code...' : 'Generate 30-Min Merge Code'}
+                                                    </button>
+                                                )}
+                                                <p className="text-[10px] text-slate-500">
+                                                    Share this code with the other Team Lead. Once they enter it, you will receive an approval prompt.
+                                                </p>
+                                            </div>
+
+                                            {/* Sub-Feature B: Enter Code */}
+                                            <form onSubmit={handleSubmitMergeCode} className="p-4 rounded-2xl bg-white border border-purple-100 space-y-2.5 shadow-sm">
+                                                <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">
+                                                    Option 2: Enter Their Merge Code
+                                                </span>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="e.g. MG-8492"
+                                                        value={inputMergeCode}
+                                                        onChange={e => setInputMergeCode(e.target.value)}
+                                                        className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 uppercase outline-none focus:border-purple-500 focus:bg-white"
+                                                    />
+                                                    <button
+                                                        type="submit"
+                                                        disabled={isSubmittingMerge || !inputMergeCode.trim()}
+                                                        className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase transition cursor-pointer disabled:opacity-50 shadow-sm"
+                                                    >
+                                                        {isSubmittingMerge ? '...' : 'Request'}
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </>
+                                    )}
                                 </div>
 
                                 {/* Coordinator Support Widget */}
@@ -1219,6 +1507,235 @@ function EditRegistrationInner() {
                                     >
                                         <Send size={13} className={isSubmittingHelp ? 'animate-spin' : ''} />
                                         {isSubmittingHelp ? 'Sending...' : 'Submit Query'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ══════════════ MODAL 4: 1-TIME LOCK CONFIRMATION MODAL ══════════════ */}
+            <AnimatePresence>
+                {showLockConfirmModal && editedTeam && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-lg bg-white border border-slate-200 rounded-[2rem] p-6 sm:p-7 shadow-2xl text-slate-900"
+                        >
+                            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center font-bold">
+                                        <Lock size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-extrabold uppercase tracking-tight text-slate-900 text-base">
+                                            Finalize & Lock Registration
+                                        </h3>
+                                        <p className="text-[10px] text-amber-700 font-bold uppercase tracking-wider">
+                                            ⚠️ Permanent 1-Time Submission
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowLockConfirmModal(false)}
+                                    className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+                                    <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                                    <p className="leading-relaxed">
+                                        Please review your details carefully. <strong>You can only submit this form once.</strong> After locking, all roster edits, substitutions, and merges will be closed permanently.
+                                    </p>
+                                </div>
+
+                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+                                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                                        <span className="text-slate-500 font-bold uppercase text-[10px]">Team Name</span>
+                                        <span className="font-bold text-slate-900">{editedTeam.teamName}</span>
+                                    </div>
+
+                                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                                        <span className="text-slate-500 font-bold uppercase text-[10px]">Structure</span>
+                                        <span className="font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                                            {editedTeam.members.length === 1 ? 'Solo Team (1 Member)' : editedTeam.members.length === 2 ? 'Duo Team (2 Members)' : 'Quad Team (4 Members)'}
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <span className="text-slate-500 font-bold uppercase text-[10px] block mb-1">Roster Members ({editedTeam.members.length})</span>
+                                        <div className="space-y-1">
+                                            {editedTeam.members.map((m, idx) => (
+                                                <div key={idx} className="flex items-center justify-between text-[11px] text-slate-700 bg-white p-2 rounded-lg border border-slate-100">
+                                                    <span className="font-semibold">
+                                                        {idx + 1}. {m.fullName} {idx === 0 && '(Lead)'}
+                                                    </span>
+                                                    <span className="text-slate-500 font-mono text-[10px]">{m.email}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-1">
+                                        <span className="text-slate-500 font-bold uppercase text-[10px] block mb-1">Track Preferences</span>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {(editedTeam.trackPreferences || (editedTeam.track ? [editedTeam.track] : [])).map((t, idx) => (
+                                                <span key={t} className="px-2 py-0.5 rounded bg-teal-100 text-teal-800 text-[10px] font-bold">
+                                                    #{idx + 1} {t}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        disabled={isSaving}
+                                        onClick={() => setShowLockConfirmModal(false)}
+                                        className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs uppercase hover:bg-slate-50 transition cursor-pointer"
+                                    >
+                                        Review Details
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={isSaving}
+                                        onClick={handleFinalizeAndLock}
+                                        className="flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                                    >
+                                        <Lock size={14} className={isSaving ? 'animate-spin' : ''} />
+                                        {isSaving ? 'Locking...' : 'Confirm & Lock Roster'}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ══════════════ MODAL 5: ADD TEAMMATE MODAL ══════════════ */}
+            <AnimatePresence>
+                {showAddMemberModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-md bg-white border border-slate-200 rounded-[2rem] p-6 shadow-2xl text-slate-900"
+                        >
+                            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
+                                        <UserPlus size={18} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold uppercase tracking-tight text-slate-900 text-base">
+                                            Add Teammate
+                                        </h3>
+                                        <p className="text-[10px] text-teal-700 font-bold uppercase tracking-wider">
+                                            Build Duo (2) or Quad (4) Team
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddMemberModal(false)}
+                                    className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleAddTeammate} className="space-y-3.5">
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                        Full Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Teammate's full name"
+                                        value={newMemberForm.fullName}
+                                        onChange={e => setNewMemberForm({ ...newMemberForm, fullName: e.target.value })}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                        Email Address *
+                                    </label>
+                                    <input
+                                        type="email"
+                                        placeholder="teammate@college.edu"
+                                        value={newMemberForm.email}
+                                        onChange={e => setNewMemberForm({ ...newMemberForm, email: e.target.value })}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                        Mobile Number *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="10-digit mobile number"
+                                        value={newMemberForm.phone}
+                                        onChange={e => setNewMemberForm({ ...newMemberForm, phone: e.target.value })}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-teal-500 focus:bg-white"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                            Department
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. CSE / IT"
+                                            value={newMemberForm.department}
+                                            onChange={e => setNewMemberForm({ ...newMemberForm, department: e.target.value })}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                            Year
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. 3rd Year"
+                                            value={newMemberForm.year}
+                                            onChange={e => setNewMemberForm({ ...newMemberForm, year: e.target.value })}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAddMemberModal(false)}
+                                        className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs uppercase hover:bg-slate-50 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                                    >
+                                        <Plus size={14} /> Add to Roster
                                     </button>
                                 </div>
                             </form>

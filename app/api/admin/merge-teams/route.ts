@@ -54,6 +54,11 @@ export async function POST(req: Request) {
         const orderedSources = sourceIds.map(id => sourceTeams.find(team => team.team_id === id || team.transaction_id === id)!);
         const members = orderedSources.flatMap(team => Array.isArray(team.members) ? team.members : []);
         if (!members.length) return NextResponse.json({ error: 'The selected teams have no participants.' }, { status: 400 });
+        if (members.length === 3) {
+            return NextResponse.json({
+                error: 'External agency rules prohibit 3-member teams (Tri). Combined team must be 2 (Duo) or 4 (Quad) members.'
+            }, { status: 400 });
+        }
         if (members.length > MAX_TEAM_MEMBERS) {
             return NextResponse.json({ error: `A team can have at most ${MAX_TEAM_MEMBERS} participants.` }, { status: 400 });
         }

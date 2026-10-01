@@ -232,6 +232,13 @@ export async function submitMergeRequest(
     }
 
     const totalMembers = proposal.sourceMemberCount + targetTeam.memberCount;
+    if (totalMembers === 3) {
+        return {
+            success: false,
+            message: 'Cannot merge: External agency rules permit Solo (1), Duo (2), or Quad (4) teams only. 3-member teams are strictly prohibited. To form a Quad, a 4th teammate must be added before merging.'
+        };
+    }
+
     if (totalMembers > MAX_TEAM_MEMBERS) {
         return {
             success: false,
