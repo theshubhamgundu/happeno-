@@ -190,7 +190,7 @@ export default function RoleTestSwitcher() {
                                     </span>
                                 </div>
                                 <p className="text-[11px] text-slate-600 leading-relaxed">
-                                    Tests problem statement submission, github/demo URLs, team roster, and live digital pass.
+                                    Tests problem statement submission, github/demo URLs, team members, and live digital pass.
                                 </p>
                                 <div className="space-y-1.5 pt-2 border-t border-slate-100 text-[11px]">
                                     <div className="flex items-center justify-between text-slate-500">

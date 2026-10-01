@@ -287,7 +287,7 @@ export async function submitMergeRequest(
                             <p style="margin: 6px 0 0 0; font-size: 13px; color: #0d9488;"><strong>New Total:</strong> ${totalMembers} / ${MAX_TEAM_MEMBERS} members</p>
                         </div>
                         <p style="font-size: 13px; color: #64748b;">
-                            Please return to your <strong>Roster Correction Portal</strong> to <strong>Approve</strong> or <strong>Reject</strong> this merge. No changes will happen without your confirmation.
+                            Please return to your <strong>Team Edit Portal</strong> to <strong>Approve</strong> or <strong>Reject</strong> this merge. No changes will happen without your confirmation.
                         </p>
                     </div>
                 </div>

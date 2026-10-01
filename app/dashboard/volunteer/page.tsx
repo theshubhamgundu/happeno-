@@ -98,7 +98,7 @@ export default function VolunteerDashboard() {
             let isSuccess = false;
 
             if (status === 'PERMITTED' && passType !== 'member') {
-                msg = 'Check-in validated! Gate entry authorized.';
+                msg = 'Check-in validated! Gate entry authorized (8:00 AM – 11:00 AM window).';
                 isSuccess = true;
                 toast.success(`${teamName} checked in.`);
                 // Sync context state
@@ -108,11 +108,11 @@ export default function VolunteerDashboard() {
                     targetProject.checkedInAt = new Date().toISOString();
                 }
             } else if (status === 'ALREADY_CHECKED_IN') {
-                msg = 'Team has already checked in previously.';
+                msg = 'Team has already completed gate check-in.';
                 isSuccess = true; // still a valid pass, just warning
                 toast.warning(`${teamName} was already checked in.`);
             } else if (status === 'PERMITTED') {
-                msg = `${mealLabel} granted. Token logged.`;
+                msg = `${mealLabel} granted. Single-use token logged.`;
                 isSuccess = true;
                 toast.success(`${teamName}: ${mealLabel} claimed.`);
             } else if (status === 'DUPLICATE_SCAN') {
@@ -124,13 +124,13 @@ export default function VolunteerDashboard() {
                 isSuccess = false;
                 toast.error('All meals have already been claimed.');
             } else if (status === 'NEEDS_CHECKIN') {
-                msg = 'Must scan team leader pass before claiming meals.';
+                msg = 'Must scan team leader gate pass (8–11 AM) before claiming meals.';
                 isSuccess = false;
                 toast.error('Team must check in at gate first!');
             } else {
-                msg = 'Participant does not have this meal allocated.';
+                msg = 'Meal pass not purchased for this participant (Gate-only registration).';
                 isSuccess = false;
-                toast.error('Meal not included in plan.');
+                toast.error('No meal pass purchased for this participant.');
             }
 
             const newEntry: ScanAuditEntry = {

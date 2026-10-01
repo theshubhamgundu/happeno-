@@ -84,27 +84,27 @@ export async function POST(req: Request) {
                                         <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Assigned Team ID:</strong> <span style="font-family: monospace; color: #0d9488; font-size: 16px; font-weight: bold;">${team.team_id}</span></p>
                                         <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Team Name:</strong> ${team.team_name}</p>
                                         <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Registered Track:</strong> ${team.track || 'General'}</p>
-                                        <p style="margin: 12px 0 4px 0; font-size: 12px; font-weight: bold; text-transform: uppercase; color: #64748b;">Current Team Roster:</p>
+                                        <p style="margin: 12px 0 4px 0; font-size: 12px; font-weight: bold; text-transform: uppercase; color: #64748b;">Current Team Members:</p>
                                         <ul style="margin: 0; padding-left: 20px;">
                                             ${membersListHtml}
                                         </ul>
                                     </div>
 
                                     <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 10px; padding: 14px; margin: 18px 0;">
-                                        <h4 style="margin: 0 0 4px 0; color: #92400e; font-size: 13px;">⚠️ 48-Hour Roster Correction Window Active</h4>
+                                        <h4 style="margin: 0 0 4px 0; color: #92400e; font-size: 13px;">⚠️ 48-Hour Team Details Edit Window Active</h4>
                                         <p style="margin: 0; font-size: 12px; color: #78350f; line-height: 1.5;">
-                                            The Team Correction & Merge Window closes on <strong>October 6, 2026 at 11:59 PM</strong>. Please use the button below to fix typos, replace absent members, or merge with friends. After October 6, rosters will be permanently locked.
+                                            The Team Edit & Merge Window closes on <strong>October 6, 2026 at 11:59 PM</strong>. Please use the button below to fix name spelling, replace absent members, or merge teams. After October 6, all team details will be permanently locked.
                                         </p>
                                     </div>
 
                                     <div style="text-align: center; margin: 28px 0;">
                                         <a href="${magicUrl}" style="background: #14b8a6; color: #000000; font-weight: bold; text-decoration: none; padding: 14px 32px; border-radius: 10px; display: inline-block; font-size: 15px;">
-                                            Access Team Correction Portal
+                                            View & Edit Team Details
                                         </a>
                                     </div>
 
                                     <p style="font-size: 11px; color: #64748b; line-height: 1.5;">
-                                        <em>Note: All roster modifications and merges are handled directly via this self-service link. If you need any assistance, submit a query via the Help Desk widget on the page and our coordinators will contact you to help.</em>
+                                        <em>Note: All team member changes and merges are handled directly via this self-service link. If you need any assistance, submit a query via the Help Desk widget on the page and our coordinators will contact you to help.</em>
                                     </p>
                                 </div>
                             </div>

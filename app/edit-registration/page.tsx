@@ -97,7 +97,7 @@ function EditRegistrationInner() {
 
     // Support Ticket State
     const [showHelpModal, setShowHelpModal] = useState(false);
-    const [helpCategory, setHelpCategory] = useState('Roster Query');
+    const [helpCategory, setHelpCategory] = useState('Team Details Query');
     const [helpText, setHelpText] = useState('');
     const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
 
@@ -472,7 +472,7 @@ function EditRegistrationInner() {
                     action: 'create_ticket',
                     fromEmail: team?.email || 'participant@portal',
                     fromName: team?.captain || 'Participant',
-                    subject: `[Roster Query] ${helpCategory} - ${team?.teamName || 'Team'}`,
+                    subject: `[Team Details Query] ${helpCategory} - ${team?.teamName || 'Team'}`,
                     snippet: helpText.trim(),
                     teamId: team?.teamId || 'GUEST',
                     teamName: team?.teamName || 'Unknown Team'
@@ -554,9 +554,9 @@ function EditRegistrationInner() {
                             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs mb-6 flex items-start gap-2.5">
                                 <Clock size={16} className="shrink-0 text-amber-600 mt-0.5" />
                                 <div className="leading-relaxed">
-                                    <p className="font-bold text-amber-900">48-Hour Roster Window Active</p>
+                                    <p className="font-bold text-amber-900">48-Hour Team Details Edit Window Active</p>
                                     <p className="text-amber-800 text-[11px] mt-0.5">
-                                        Team leads can cross-check names, replace absent members, or merge solo/duo teams. Rosters permanently lock on October 6 at 11:59 PM.
+                                        Team leads can check names, replace absent members, or merge teams. All team details permanently lock on October 6 at 11:59 PM.
                                     </p>
                                 </div>
                             </div>
@@ -611,7 +611,7 @@ function EditRegistrationInner() {
                                         </>
                                     ) : (
                                         <>
-                                            Access Roster Hub <ChevronRight size={14} />
+                                            View & Edit Team Details <ChevronRight size={14} />
                                         </>
                                     )}
                                 </button>
@@ -641,7 +641,7 @@ function EditRegistrationInner() {
                                     <div>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <h2 className="font-kanit font-extrabold uppercase text-lg text-slate-900">
-                                                Roster Finalized & Permanently Locked
+                                                Team Details Finalized & Permanently Locked
                                             </h2>
                                             <span className="px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900 text-[10px] font-bold uppercase tracking-wider">
                                                 1-Time Edit Submitted
@@ -667,7 +667,7 @@ function EditRegistrationInner() {
                                     <div>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <h2 className="font-kanit font-extrabold uppercase text-lg text-slate-900">
-                                                Roster Correction Window Active
+                                                Team Edit Window Active
                                             </h2>
                                             <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
                                                 ⚠️ 1-Time Submission Only
@@ -686,7 +686,7 @@ function EditRegistrationInner() {
                                     className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0 shadow-sm"
                                 >
                                     <Lock size={15} />
-                                    Finalize & Lock Roster
+                                    Finalize & Lock Team Details
                                 </button>
                             </div>
                         )}
@@ -931,7 +931,7 @@ function EditRegistrationInner() {
                                             </h3>
                                             <span className="text-[11px] text-slate-500">
                                                 {team.isRosterLocked || editedTeam?.isRosterLocked
-                                                    ? 'Roster details are locked.'
+                                                    ? 'Team details are permanently locked.'
                                                     : 'Allowed team sizes: Solo (1), Duo (2), or Quad (4). Tri (3) is prohibited.'}
                                             </span>
                                         </div>
@@ -1471,7 +1471,7 @@ function EditRegistrationInner() {
                                         onChange={e => setHelpCategory(e.target.value)}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
                                     >
-                                        <option value="Roster Query">Roster & Teammate Change</option>
+                                        <option value="Team Details Query">Team Members & Member Changes</option>
                                         <option value="Team Merge">Team Merge Question</option>
                                         <option value="Pass & QR">Digital Pass / Event Dates</option>
                                         <option value="Other">General Hackathon Question</option>
@@ -1552,7 +1552,7 @@ function EditRegistrationInner() {
                                 <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
                                     <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
                                     <p className="leading-relaxed">
-                                        Please review your details carefully. <strong>You can only submit this form once.</strong> After locking, all roster edits, substitutions, and merges will be closed permanently.
+                                        Please review your details carefully. <strong>You can only submit this form once.</strong> After locking, all team edits, substitutions, and merges will be closed permanently.
                                     </p>
                                 </div>
 
@@ -1570,7 +1570,7 @@ function EditRegistrationInner() {
                                     </div>
 
                                     <div>
-                                        <span className="text-slate-500 font-bold uppercase text-[10px] block mb-1">Roster Members ({editedTeam.members.length})</span>
+                                        <span className="text-slate-500 font-bold uppercase text-[10px] block mb-1">Team Members ({editedTeam.members.length})</span>
                                         <div className="space-y-1">
                                             {editedTeam.members.map((m, idx) => (
                                                 <div key={idx} className="flex items-center justify-between text-[11px] text-slate-700 bg-white p-2 rounded-lg border border-slate-100">
@@ -1611,7 +1611,7 @@ function EditRegistrationInner() {
                                         className="flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <Lock size={14} className={isSaving ? 'animate-spin' : ''} />
-                                        {isSaving ? 'Locking...' : 'Confirm & Lock Roster'}
+                                        {isSaving ? 'Locking...' : 'Confirm & Lock Team Details'}
                                     </button>
                                 </div>
                             </div>
@@ -1735,7 +1735,7 @@ function EditRegistrationInner() {
                                         type="submit"
                                         className="flex-1 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
                                     >
-                                        <Plus size={14} /> Add to Roster
+                                        <Plus size={14} /> Add Teammate
                                     </button>
                                 </div>
                             </form>

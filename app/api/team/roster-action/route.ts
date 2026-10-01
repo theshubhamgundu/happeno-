@@ -381,12 +381,18 @@ export async function POST(req: Request) {
                     }, { status: 400 });
                 }
 
+                // Preserve and merge member meal states
+                const sourceMealState = (team.member_meal_state && typeof team.member_meal_state === 'object') ? team.member_meal_state : {};
+                const targetMealState = (targetTeam.member_meal_state && typeof targetTeam.member_meal_state === 'object') ? targetTeam.member_meal_state : {};
+                const mergedMealState = { ...sourceMealState, ...targetMealState };
+
                 // Update Source Team (keeps active)
                 const { error: srcErr } = await supabase
                     .from('registrations')
                     .update({
                         members: mergedMembers,
                         team_name: `${team.team_name} & ${targetTeam.team_name}`.slice(0, 50),
+                        member_meal_state: mergedMealState,
                         raw_data: {
                             ...rawData,
                             merged_from_team_id: targetTeam.team_id,

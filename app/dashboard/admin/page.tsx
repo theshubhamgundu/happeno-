@@ -1285,7 +1285,7 @@ export default function AdminDashboard() {
                             }}
                             className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-500/70 hover:bg-teal-500/30 cursor-pointer"
                         >
-                            <GitMerge size={18} /> Roster Window & Audit
+                            <GitMerge size={18} /> Team Edit Window & Logs
                             <span className={`w-2 h-2 rounded-full ${rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' : 'bg-white/40'}`} />
                         </button>
                         
@@ -3909,10 +3909,10 @@ export default function AdminDashboard() {
                                     </div>
                                     <div>
                                         <h3 className="text-xl font-black uppercase italic tracking-tight text-white">
-                                            Roster Correction Window & Audit Trail
+                                            Team Edit Window & Activity Logs
                                         </h3>
                                         <p className="text-xs text-teal-400 font-bold uppercase tracking-widest mt-0.5">
-                                            Self-Service Control Hub (Oct 5–6 Window)
+                                            Self-Service Control Hub (Oct 5–6 Team Edit Window)
                                         </p>
                                     </div>
                                 </div>

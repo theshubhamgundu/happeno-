@@ -491,7 +491,7 @@ export default function TeamDashboard() {
                     {/* Team Members */}
                     <section className="rounded-2xl border border-slate-200 bg-white p-4">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-bold text-slate-800">Team Roster</h3>
+                            <h3 className="text-sm font-bold text-slate-800">Team Members</h3>
                             <span className="grid h-7 w-7 place-items-center rounded-lg bg-teal-50 text-teal-600"><Users size={14} /></span>
                         </div>
                         <div className="space-y-1.5">
