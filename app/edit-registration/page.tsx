@@ -98,8 +98,24 @@ function EditRegistrationInner() {
     // Support Ticket State
     const [showHelpModal, setShowHelpModal] = useState(false);
     const [helpCategory, setHelpCategory] = useState('Team Details Query');
+    const [helpTeamId, setHelpTeamId] = useState('');
+    const [helpContactName, setHelpContactName] = useState('');
+    const [helpContactPhone, setHelpContactPhone] = useState('');
+    const [helpContactEmail, setHelpContactEmail] = useState('');
     const [helpText, setHelpText] = useState('');
     const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
+
+    const openHelpModal = () => {
+        if (team) {
+            setHelpTeamId(team.teamId || '');
+            setHelpContactName(team.captain || '');
+            setHelpContactPhone(team.captainMobile || '');
+            setHelpContactEmail(team.email || '');
+        } else {
+            setHelpTeamId(teamIdInput.trim());
+        }
+        setShowHelpModal(true);
+    };
 
     // 1-Time Edit Lock Confirmation State
     const [showLockConfirmModal, setShowLockConfirmModal] = useState(false);
@@ -462,25 +478,35 @@ function EditRegistrationInner() {
 
     const handleSubmitSupportTicket = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!helpText.trim()) return;
+        if (!helpText.trim()) {
+            toast.error('Please describe your issue.');
+            return;
+        }
+        if (!helpContactPhone.trim()) {
+            toast.error('Please enter a phone number so coordinators can contact you.');
+            return;
+        }
+
         setIsSubmittingHelp(true);
         try {
-            const res = await fetch('/api/admin/inbound-email', {
+            const explicitTeamId = helpTeamId.trim() || team?.teamId || teamIdInput.trim() || '';
+            const res = await fetch('/api/help-tickets', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    action: 'create_ticket',
-                    fromEmail: team?.email || 'participant@portal',
-                    fromName: team?.captain || 'Participant',
-                    subject: `[Team Details Query] ${helpCategory} - ${team?.teamName || 'Team'}`,
-                    snippet: helpText.trim(),
-                    teamId: team?.teamId || 'GUEST',
-                    teamName: team?.teamName || 'Unknown Team'
+                    category: helpCategory,
+                    description: helpText.trim(),
+                    contactName: helpContactName.trim() || team?.captain || 'Participant',
+                    contactPhone: helpContactPhone.trim(),
+                    contactEmail: helpContactEmail.trim() || team?.email || '',
+                    teamId: explicitTeamId || 'NO_TEAM_ID',
+                    teamName: team?.teamName || (team?.captain ? `Team ${team.captain}` : helpContactName.trim() ? `Team ${helpContactName.trim()}` : (explicitTeamId ? `Team ${explicitTeamId}` : 'Visitor / Team')),
+                    source: 'edit_registration'
                 })
             });
             const data = await res.json();
             if (data.success) {
-                toast.success('Your support request has been logged! Our team will respond shortly.');
+                toast.success('Your support request has been logged! Our coordinators will contact you shortly.');
                 setHelpText('');
                 setShowHelpModal(false);
             } else {
@@ -510,7 +536,7 @@ function EditRegistrationInner() {
                     <div className="flex items-center gap-3">
                         <button
                             type="button"
-                            onClick={() => setShowHelpModal(true)}
+                            onClick={openHelpModal}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition cursor-pointer"
                         >
                             <HelpCircle size={14} className="text-teal-600" />
@@ -1216,7 +1242,7 @@ function EditRegistrationInner() {
                                             </p>
                                             <button
                                                 type="button"
-                                                onClick={() => setShowHelpModal(true)}
+                                                onClick={openHelpModal}
                                                 className="w-full py-2.5 rounded-lg bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-700 font-bold text-[11px] transition cursor-pointer"
                                             >
                                                 Open Help Desk Ticket
@@ -1462,28 +1488,85 @@ function EditRegistrationInner() {
                             </div>
 
                             <form onSubmit={handleSubmitSupportTicket} className="space-y-3.5">
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
-                                        Issue Category
-                                    </label>
-                                    <select
-                                        value={helpCategory}
-                                        onChange={e => setHelpCategory(e.target.value)}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
-                                    >
-                                        <option value="Team Details Query">Team Members & Member Changes</option>
-                                        <option value="Team Merge">Team Merge Question</option>
-                                        <option value="Pass & QR">Digital Pass / Event Dates</option>
-                                        <option value="Other">General Hackathon Question</option>
-                                    </select>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                            Issue Category
+                                        </label>
+                                        <select
+                                            value={helpCategory}
+                                            onChange={e => setHelpCategory(e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
+                                        >
+                                            <option value="Team Details Query">Team Members & Member Changes</option>
+                                            <option value="Team Merge">Team Merge Question</option>
+                                            <option value="Pass & QR">Digital Pass / Event Dates</option>
+                                            <option value="Other">General Hackathon Question</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                            Team ID <span className="text-slate-400 font-normal lowercase">(leave blank if unknown)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. TRI26221"
+                                            value={helpTeamId}
+                                            onChange={e => setHelpTeamId(e.target.value.toUpperCase())}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono uppercase text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* POC Contact Information */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                            Your Name / POC <span className="text-teal-600 font-bold">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Rahul Sharma"
+                                            value={helpContactName}
+                                            onChange={e => setHelpContactName(e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                            Mobile / WhatsApp <span className="text-teal-600 font-bold">*</span>
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            placeholder="e.g. +91 9876543210"
+                                            value={helpContactPhone}
+                                            onChange={e => setHelpContactPhone(e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
                                 <div>
                                     <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
-                                        Describe your issue
+                                        Email Address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        placeholder="e.g. captain@gmail.com"
+                                        value={helpContactEmail}
+                                        onChange={e => setHelpContactEmail(e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                        Describe your issue <span className="text-teal-600 font-bold">*</span>
                                     </label>
                                     <textarea
-                                        rows={4}
+                                        rows={3}
                                         placeholder="Please provide details (e.g. My teammate dropped out and I need to add X)..."
                                         value={helpText}
                                         onChange={e => setHelpText(e.target.value)}
@@ -1492,7 +1575,12 @@ function EditRegistrationInner() {
                                     />
                                 </div>
 
-                                <div className="flex items-center gap-3 pt-2">
+                                <div className="p-2.5 rounded-xl bg-teal-50/70 border border-teal-200/60 text-teal-800 text-[11px] flex items-center gap-2">
+                                    <Phone size={13} className="shrink-0 text-teal-600" />
+                                    <span>Coordinators will connect with you directly via WhatsApp or phone call.</span>
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-1">
                                     <button
                                         type="button"
                                         onClick={() => setShowHelpModal(false)}
@@ -1502,7 +1590,7 @@ function EditRegistrationInner() {
                                     </button>
                                     <button
                                         type="submit"
-                                        disabled={isSubmittingHelp || !helpText.trim()}
+                                        disabled={isSubmittingHelp || !helpText.trim() || !helpContactPhone.trim()}
                                         className="flex-1 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <Send size={13} className={isSubmittingHelp ? 'animate-spin' : ''} />

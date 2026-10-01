@@ -16,7 +16,9 @@ import {
     HelpCircle,
     Check,
     X,
-    LifeBuoy
+    LifeBuoy,
+    Phone,
+    Mail
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -30,6 +32,10 @@ export interface HelpTicket {
     category: string;
     description: string;
     tableNumber?: string;
+    contactName?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+    source?: 'edit_registration' | 'dashboard' | 'email';
     status: 'open' | 'accepted' | 'resolved';
     acceptedBy?: string;
     createdAt: string;
@@ -273,13 +279,25 @@ export default function AdminTickets() {
                                                 <span className="capitalize">{ticket.category}</span>
                                             </span>
 
-                                            <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
-                                                {ticket.teamId}
-                                            </span>
+                                            {ticket.teamId && ticket.teamId !== 'NO_TEAM_ID' && ticket.teamId !== 'GUEST' ? (
+                                                <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
+                                                    ID: {ticket.teamId}
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">
+                                                    No Team ID Entered
+                                                </span>
+                                            )}
 
                                             <span className="text-xs font-bold text-slate-800 truncate max-w-[200px]">
                                                 {ticket.teamName}
                                             </span>
+
+                                            {ticket.source === 'edit_registration' && (
+                                                <span className="text-[10px] font-black px-2.5 py-0.5 rounded-md bg-teal-50 border border-teal-200 text-teal-800 uppercase tracking-wider">
+                                                    Registration Portal
+                                                </span>
+                                            )}
 
                                             {ticket.tableNumber && (
                                                 <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-700">
@@ -297,6 +315,50 @@ export default function AdminTickets() {
                                         <p className="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-wrap">
                                             {ticket.description}
                                         </p>
+
+                                        {/* POC Contact Information & Direct Action Buttons */}
+                                        {(ticket.contactName || ticket.contactPhone || ticket.contactEmail) && (
+                                            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center gap-3 text-xs">
+                                                {ticket.contactName && (
+                                                    <span className="text-slate-800 font-bold flex items-center gap-1.5">
+                                                        <span className="text-slate-400 font-semibold text-[10px] uppercase tracking-wider">POC:</span>
+                                                        {ticket.contactName}
+                                                    </span>
+                                                )}
+                                                {ticket.contactPhone && (
+                                                    <div className="flex items-center gap-2">
+                                                        <a
+                                                            href={`tel:${ticket.contactPhone}`}
+                                                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 font-bold text-xs transition shadow-sm"
+                                                            title="Call Contact"
+                                                        >
+                                                            <Phone size={12} className="text-teal-600" />
+                                                            <span>Call: {ticket.contactPhone}</span>
+                                                        </a>
+                                                        <a
+                                                            href={`https://wa.me/${ticket.contactPhone.replace(/[^0-9]/g, '')}`}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs transition shadow-sm"
+                                                            title="Chat on WhatsApp"
+                                                        >
+                                                            <MessageSquare size={12} className="text-emerald-600" />
+                                                            <span>WhatsApp</span>
+                                                        </a>
+                                                    </div>
+                                                )}
+                                                {ticket.contactEmail && (
+                                                    <a
+                                                        href={`mailto:${ticket.contactEmail}`}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 text-xs transition"
+                                                        title="Email POC"
+                                                    >
+                                                        <Mail size={12} className="text-slate-400" />
+                                                        <span>{ticket.contactEmail}</span>
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
 
                                         {ticket.status === 'accepted' && (
                                             <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1.5 rounded-xl w-fit">

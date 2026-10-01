@@ -52,6 +52,7 @@ import {
     Reply,
     GitMerge,
     History,
+    Phone,
     type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
@@ -122,6 +123,10 @@ export default function AdminDashboard() {
         category: string;
         description: string;
         tableNumber?: string;
+        contactName?: string;
+        contactPhone?: string;
+        contactEmail?: string;
+        source?: 'edit_registration' | 'dashboard' | 'email';
         status: 'open' | 'accepted' | 'resolved';
         acceptedBy?: string;
         createdAt: string;
@@ -2041,17 +2046,75 @@ export default function AdminDashboard() {
                                                     <div>
                                                         <div className="flex items-center gap-2 flex-wrap">
                                                             <h4 className="text-lg font-black italic uppercase tracking-tight text-white">{ticket.teamName}</h4>
-                                                            <span className="text-[9px] font-black px-2 py-0.5 rounded bg-white/10 text-white/50">{ticket.teamId}</span>
+                                                            {ticket.teamId && ticket.teamId !== 'NO_TEAM_ID' && ticket.teamId !== 'GUEST' ? (
+                                                                <span className="text-[9px] font-mono font-black px-2 py-0.5 rounded bg-white/10 text-white/70 border border-white/15">
+                                                                    ID: {ticket.teamId}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                                                                    No Team ID Entered
+                                                                </span>
+                                                            )}
                                                             <span className={`text-[9px] font-black px-2 py-0.5 rounded ${
                                                                 ticket.category === 'Technical' ? 'bg-blue-500/20 text-blue-300' :
                                                                 ticket.category === 'WiFi/Infra' ? 'bg-red-500/20 text-red-300' :
                                                                 ticket.category === 'Email Query' ? 'bg-teal-500/20 text-teal-300' :
                                                                 'bg-purple-500/20 text-purple-300'
                                                             }`}>{ticket.category}</span>
+                                                            {ticket.source === 'edit_registration' && (
+                                                                <span className="text-[9px] font-black px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                                                                    Registration Portal
+                                                                </span>
+                                                            )}
                                                         </div>
                                                         <p className="text-sm text-white/70 mt-1 whitespace-pre-wrap">{ticket.description}</p>
                                                         {ticket.tableNumber && <p className="text-[10px] text-white/40 mt-1 font-bold">📍 Table: {ticket.tableNumber}</p>}
-                                                        <p className="text-[9px] text-white/30 mt-1">{new Date(ticket.createdAt).toLocaleTimeString()}{ticket.acceptedBy ? ` • Accepted by ${ticket.acceptedBy}` : ''}</p>
+
+                                                        {/* POC Contact Information & Quick Actions */}
+                                                        {(ticket.contactName || ticket.contactPhone || ticket.contactEmail) && (
+                                                            <div className="mt-2.5 p-2.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-wrap items-center gap-2.5 text-xs">
+                                                                {ticket.contactName && (
+                                                                    <span className="text-white/90 font-bold flex items-center gap-1.5">
+                                                                        <span className="text-white/40 font-semibold text-[10px] uppercase tracking-wider">POC:</span>
+                                                                        {ticket.contactName}
+                                                                    </span>
+                                                                )}
+                                                                {ticket.contactPhone && (
+                                                                    <div className="flex items-center gap-2">
+                                                                        <a
+                                                                            href={`tel:${ticket.contactPhone}`}
+                                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/30 text-teal-300 font-bold text-[11px] transition"
+                                                                            title="Call Contact"
+                                                                        >
+                                                                            <Phone size={11} />
+                                                                            <span>Call: {ticket.contactPhone}</span>
+                                                                        </a>
+                                                                        <a
+                                                                            href={`https://wa.me/${ticket.contactPhone.replace(/[^0-9]/g, '')}`}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-[11px] transition"
+                                                                            title="WhatsApp POC"
+                                                                        >
+                                                                            <MessageSquare size={11} />
+                                                                            <span>WhatsApp</span>
+                                                                        </a>
+                                                                    </div>
+                                                                )}
+                                                                {ticket.contactEmail && (
+                                                                    <a
+                                                                        href={`mailto:${ticket.contactEmail}`}
+                                                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white text-[11px] transition"
+                                                                        title="Email POC"
+                                                                    >
+                                                                        <Mail size={11} />
+                                                                        <span>{ticket.contactEmail}</span>
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        )}
+
+                                                        <p className="text-[9px] text-white/30 mt-1.5">{new Date(ticket.createdAt).toLocaleTimeString()}{ticket.acceptedBy ? ` • Accepted by ${ticket.acceptedBy}` : ''}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 shrink-0">

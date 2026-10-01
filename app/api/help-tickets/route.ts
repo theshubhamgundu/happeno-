@@ -14,6 +14,10 @@ export interface HelpTicket {
     category: string;
     description: string;
     tableNumber?: string;
+    contactName?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+    source?: 'edit_registration' | 'dashboard' | 'email';
     status: 'open' | 'accepted' | 'resolved';
     acceptedBy?: string;
     createdAt: string;
@@ -100,27 +104,26 @@ export async function GET(req: Request) {
     }
 }
 
-// POST: Create a new help ticket (team) or update status (admin/volunteer/team)
+// POST: Create a new help ticket (portal/team) or update status (admin/volunteer)
 export async function POST(req: Request) {
-    const session = getSession(req);
-    if (!hasRole(session, ['admin', 'volunteer', 'team'])) {
-        return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
-    }
-
     try {
         const body = await req.json();
         const tickets = await loadTickets();
+        const session = getSession(req);
 
-        // Team-initiated action
-        if (session.role === 'team') {
-            const { action, ticketId, category, description, tableNumber, teamName } = body;
+        // 1. Admin/Volunteer/Team updating or cancelling ticket status
+        const { ticketId, action } = body;
+        if (action && ['accept', 'resolve', 'cancel'].includes(action)) {
+            if (!hasRole(session, ['admin', 'volunteer', 'team'])) {
+                return NextResponse.json({ error: 'Authentication required to update ticket status.' }, { status: 401 });
+            }
 
-            // Team canceling their own ticket
-            if (action === 'cancel' && ticketId) {
-                const ticketIndex = tickets.findIndex(t => t.id === ticketId);
-                if (ticketIndex === -1) {
-                    return NextResponse.json({ error: 'Ticket not found.' }, { status: 404 });
-                }
+            const ticketIndex = tickets.findIndex(t => t.id === ticketId);
+            if (ticketIndex === -1) {
+                return NextResponse.json({ error: 'Ticket not found.' }, { status: 404 });
+            }
+
+            if (session.role === 'team' && action === 'cancel') {
                 if (tickets[ticketIndex].teamId !== session.teamId) {
                     return NextResponse.json({ error: 'Unauthorized to cancel this ticket.' }, { status: 403 });
                 }
@@ -129,62 +132,92 @@ export async function POST(req: Request) {
                 return NextResponse.json({ success: true, tickets: tickets.filter(t => t.teamId === session.teamId) });
             }
 
-            // Creating a new ticket
-            if (!category || !description) {
-                return NextResponse.json({ error: 'Category and description are required.' }, { status: 400 });
+            if (!hasRole(session, ['admin', 'volunteer'])) {
+                return NextResponse.json({ error: 'Admin or Volunteer authorization required.' }, { status: 403 });
             }
 
-            // Limit: max 3 open/accepted tickets per team
-            const activeTickets = tickets.filter(t => t.teamId === session.teamId && (t.status === 'open' || t.status === 'accepted'));
-            if (activeTickets.length >= 3) {
-                return NextResponse.json({ error: 'You already have 3 active help requests. Please wait for one to be resolved.' }, { status: 429 });
+            const staffName = session.name || session.id || 'Staff';
+
+            if (action === 'accept') {
+                tickets[ticketIndex].status = 'accepted';
+                tickets[ticketIndex].acceptedBy = staffName;
+                tickets[ticketIndex].updatedAt = new Date().toISOString();
+            } else if (action === 'resolve') {
+                tickets[ticketIndex].status = 'resolved';
+                tickets[ticketIndex].updatedAt = new Date().toISOString();
+            } else if (action === 'cancel') {
+                tickets.splice(ticketIndex, 1);
             }
 
-            const newTicket: HelpTicket = {
-                id: `HT-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-                teamId: session.teamId || '',
-                teamName: teamName || session.name || 'Unknown Team',
-                category,
-                description: String(description).trim(),
-                tableNumber: tableNumber ? String(tableNumber).trim() : '',
-                status: 'open',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-
-            tickets.unshift(newTicket);
             await persistTickets(tickets);
-
-            return NextResponse.json({ success: true, ticket: newTicket, tickets: tickets.filter(t => t.teamId === session.teamId) });
+            return NextResponse.json({ success: true, tickets });
         }
 
-        // Admin/Volunteer updating ticket status
-        const { ticketId, action } = body;
-        if (!ticketId || !['accept', 'resolve', 'cancel'].includes(action)) {
-            return NextResponse.json({ error: 'ticketId and action (accept/resolve/cancel) are required.' }, { status: 400 });
+        // 2. Creating a new ticket (From Team Dashboard or Coordinator Support Desk on Registration page)
+        const {
+            category,
+            description,
+            tableNumber,
+            teamId,
+            teamName,
+            contactName,
+            contactPhone,
+            contactEmail,
+            source
+        } = body;
+
+        if (!category || !description) {
+            return NextResponse.json({ error: 'Category and description are required.' }, { status: 400 });
         }
 
-        const ticketIndex = tickets.findIndex(t => t.id === ticketId);
-        if (ticketIndex === -1) {
-            return NextResponse.json({ error: 'Ticket not found.' }, { status: 404 });
+        // Determine effective team ID
+        // For edit_registration source, use what was explicitly provided; do not let a stale session cookie force a team ID
+        let effectiveTeamId = 'NO_TEAM_ID';
+        if (typeof teamId === 'string' && teamId.trim() && teamId.trim() !== 'GUEST' && teamId.trim() !== 'NO_TEAM_ID') {
+            effectiveTeamId = teamId.trim().toUpperCase();
+        } else if (source !== 'edit_registration' && session.role === 'team' && session.teamId) {
+            effectiveTeamId = session.teamId;
         }
 
-        const staffName = session.name || session.id || 'Staff';
+        const effectiveContactName = typeof contactName === 'string' && contactName.trim() ? contactName.trim() : (session.name || 'Participant');
+        const effectiveTeamName = typeof teamName === 'string' && teamName.trim() && teamName.trim() !== 'Visitor / Team'
+            ? teamName.trim()
+            : (effectiveTeamId !== 'NO_TEAM_ID' ? `Team ${effectiveTeamId}` : (effectiveContactName ? `Query (${effectiveContactName})` : 'Participant'));
+        const effectiveContactPhone = typeof contactPhone === 'string' ? contactPhone.trim() : '';
+        const effectiveContactEmail = typeof contactEmail === 'string' ? contactEmail.trim().toLowerCase() : '';
 
-        if (action === 'accept') {
-            tickets[ticketIndex].status = 'accepted';
-            tickets[ticketIndex].acceptedBy = staffName;
-            tickets[ticketIndex].updatedAt = new Date().toISOString();
-        } else if (action === 'resolve') {
-            tickets[ticketIndex].status = 'resolved';
-            tickets[ticketIndex].updatedAt = new Date().toISOString();
-        } else if (action === 'cancel') {
-            tickets.splice(ticketIndex, 1);
+        // Limit: max 5 open/accepted tickets per team
+        if (effectiveTeamId !== 'NO_TEAM_ID' && effectiveTeamId !== 'GUEST') {
+            const activeTickets = tickets.filter(t => t.teamId.toUpperCase() === effectiveTeamId.toUpperCase() && (t.status === 'open' || t.status === 'accepted'));
+            if (activeTickets.length >= 5) {
+                return NextResponse.json({ error: 'Your team already has active help requests. Coordinators will contact you shortly.' }, { status: 429 });
+            }
         }
 
+        const newTicket: HelpTicket = {
+            id: `HT-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            teamId: effectiveTeamId,
+            teamName: effectiveTeamName,
+            category,
+            description: String(description).trim(),
+            tableNumber: tableNumber ? String(tableNumber).trim() : '',
+            contactName: effectiveContactName,
+            contactPhone: effectiveContactPhone,
+            contactEmail: effectiveContactEmail,
+            source: source === 'edit_registration' ? 'edit_registration' : source === 'email' ? 'email' : 'dashboard',
+            status: 'open',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        tickets.unshift(newTicket);
         await persistTickets(tickets);
 
-        return NextResponse.json({ success: true, tickets });
+        return NextResponse.json({
+            success: true,
+            ticket: newTicket,
+            message: 'Your query has been logged! Our coordinators will contact you.'
+        });
     } catch (error) {
         console.error('Failed to process help ticket:', error);
         return NextResponse.json({ error: 'Could not process help ticket.' }, { status: 500 });
