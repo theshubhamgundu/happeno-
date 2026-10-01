@@ -264,27 +264,33 @@ export default function AdminDashboard() {
         };
     }, []);
 
-    // Fetch help tickets
-    const fetchHelpTickets = async () => {
-        setIsLoadingTickets(true);
+    // Fetch help tickets with background polling resilience
+    const fetchHelpTickets = async (isBackground = false) => {
+        if (!isBackground) setIsLoadingTickets(true);
         try {
             const res = await fetch('/api/help-tickets');
             if (res.ok) {
                 const data = await res.json();
-                setHelpTickets(data);
+                if (Array.isArray(data)) {
+                    setHelpTickets(data);
+                }
             }
-        } catch (err) {
-            console.error('Failed to fetch help tickets:', err);
+        } catch (err: unknown) {
+            if (!isBackground) {
+                console.warn('Help tickets fetch temporarily unavailable:', err);
+            }
         } finally {
-            setIsLoadingTickets(false);
+            if (!isBackground) setIsLoadingTickets(false);
         }
     };
 
     useEffect(() => {
         if (activeTab === 'helpdesk') {
-            fetchHelpTickets();
-            fetchInboundEmails();
-            const interval = setInterval(fetchHelpTickets, 10000); // Poll every 10s
+            void fetchHelpTickets(false);
+            void fetchInboundEmails();
+            const interval = setInterval(() => {
+                void fetchHelpTickets(true);
+            }, 10000); // Quiet background poll every 10s
             return () => clearInterval(interval);
         }
     }, [activeTab]);
