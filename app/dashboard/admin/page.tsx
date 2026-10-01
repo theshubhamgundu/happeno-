@@ -47,6 +47,9 @@ import {
     RefreshCw,
     Sun,
     Moon,
+    Inbox,
+    Send,
+    Reply,
     type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
@@ -125,6 +128,106 @@ export default function AdminDashboard() {
     const [helpTickets, setHelpTickets] = useState<HelpTicket[]>([]);
     const [isLoadingTickets, setIsLoadingTickets] = useState(false);
 
+    // Inbound cPanel Mailbox State
+    const [helpdeskSubTab, setHelpdeskSubTab] = useState<'tickets' | 'inbox'>('tickets');
+    const [inboundEmails, setInboundEmails] = useState<any[]>([]);
+    const [inboxStatus, setInboxStatus] = useState<{
+        total: number;
+        unseen: number;
+        connected: boolean;
+        host: string;
+        user: string;
+        lastChecked: string;
+    } | null>(null);
+    const [isLoadingEmails, setIsLoadingEmails] = useState(false);
+    const [emailError, setEmailError] = useState<string | null>(null);
+    const [replyModalEmail, setReplyModalEmail] = useState<any | null>(null);
+    const [replyText, setReplyText] = useState('');
+    const [isSendingReply, setIsSendingReply] = useState(false);
+    const [isConvertingTicket, setIsConvertingTicket] = useState<number | null>(null);
+
+    const fetchInboundEmails = async () => {
+        setIsLoadingEmails(true);
+        setEmailError(null);
+        try {
+            const res = await fetch('/api/admin/inbound-email');
+            const data = await res.json();
+            if (data.success) {
+                setInboundEmails(data.emails || []);
+                setInboxStatus(data.status || null);
+            } else {
+                setEmailError(data.error || 'Failed to connect to cPanel mailbox.');
+            }
+        } catch (err: any) {
+            setEmailError(err?.message || 'Could not reach server.');
+        } finally {
+            setIsLoadingEmails(false);
+        }
+    };
+
+    const handleConvertEmailToTicket = async (email: any) => {
+        setIsConvertingTicket(email.id);
+        try {
+            const res = await fetch('/api/admin/inbound-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'create_ticket',
+                    emailId: email.id,
+                    fromEmail: email.fromEmail,
+                    fromName: email.fromName,
+                    subject: email.subject,
+                    snippet: email.snippet,
+                    teamId: email.matchedTeamId || 'GUEST',
+                    teamName: email.matchedTeamName || email.fromName || email.fromEmail
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success(data.message || 'Help ticket created from email!');
+                void fetchHelpTickets();
+            } else {
+                toast.error(data.error || 'Failed to create ticket.');
+            }
+        } catch (err: any) {
+            toast.error(err?.message || 'Error creating ticket.');
+        } finally {
+            setIsConvertingTicket(null);
+        }
+    };
+
+    const handleSendEmailReply = async () => {
+        if (!replyModalEmail || !replyText.trim()) {
+            toast.error('Please enter a reply message.');
+            return;
+        }
+        setIsSendingReply(true);
+        try {
+            const res = await fetch('/api/admin/inbound-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'reply_email',
+                    to: replyModalEmail.fromEmail,
+                    subject: replyModalEmail.subject,
+                    replyText: replyText.trim()
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success(`Reply sent to ${replyModalEmail.fromEmail} successfully!`);
+                setReplyModalEmail(null);
+                setReplyText('');
+            } else {
+                toast.error(data.error || 'Failed to send reply.');
+            }
+        } catch (err: any) {
+            toast.error(err?.message || 'Error sending reply.');
+        } finally {
+            setIsSendingReply(false);
+        }
+    };
+
     // Check-in Scanner State
     const [showCheckinScanner, setShowCheckinScanner] = useState(false);
     const [checkinResult, setCheckinResult] = useState<{ teamName: string; teamId: string; status: string } | null>(null);
@@ -178,6 +281,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (activeTab === 'helpdesk') {
             fetchHelpTickets();
+            fetchInboundEmails();
             const interval = setInterval(fetchHelpTickets, 10000); // Poll every 10s
             return () => clearInterval(interval);
         }
@@ -1690,90 +1794,284 @@ export default function AdminDashboard() {
             {/* ═══════════ HELP DESK TAB ═══════════ */}
             {activeTab === 'helpdesk' && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
+                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5 lg:flex-row lg:items-center">
                         <div>
-                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Help Desk Queue</h2>
-                            <p className="mt-1 text-xs text-white/45">Live mentor/help requests from participants. Refreshes every 10 seconds.</p>
+                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
+                                <Headphones className="text-[#14b8a6]" size={26} />
+                                Help Desk & Inbound Inquiries
+                            </h2>
+                            <p className="mt-1 text-xs text-white/50">Manage live table requests and inbound email queries from participants.</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <button onClick={fetchHelpTickets} className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-white/10">
-                                Refresh
+
+                        {/* Sub-tab Selector */}
+                        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-black/40 border border-white/10">
+                            <button
+                                type="button"
+                                onClick={() => setHelpdeskSubTab('tickets')}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                                    helpdeskSubTab === 'tickets'
+                                        ? 'bg-[#14b8a6] text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]'
+                                        : 'text-white/60 hover:text-white'
+                                }`}
+                            >
+                                <Clock size={14} />
+                                Onsite Table Queue
+                                {helpTickets.filter(t => t.status === 'open').length > 0 && (
+                                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                                        helpdeskSubTab === 'tickets' ? 'bg-black text-[#14b8a6]' : 'bg-amber-400 text-black'
+                                    }`}>
+                                        {helpTickets.filter(t => t.status === 'open').length}
+                                    </span>
+                                )}
                             </button>
-                            <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" /> {helpTickets.filter(t => t.status === 'open').length} open</div>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setHelpdeskSubTab('inbox');
+                                    if (inboundEmails.length === 0) void fetchInboundEmails();
+                                }}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                                    helpdeskSubTab === 'inbox'
+                                        ? 'bg-[#14b8a6] text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]'
+                                        : 'text-white/60 hover:text-white'
+                                }`}
+                            >
+                                <Inbox size={14} />
+                                Inbound Mailbox
+                                {inboxStatus?.unseen ? (
+                                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                                        helpdeskSubTab === 'inbox' ? 'bg-black text-[#14b8a6]' : 'bg-teal-400 text-black'
+                                    }`}>
+                                        {inboxStatus.unseen}
+                                    </span>
+                                ) : null}
+                            </button>
                         </div>
                     </div>
 
-                    {isLoadingTickets && helpTickets.length === 0 ? (
-                        <div className="flex items-center justify-center py-20">
-                            <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
-                        </div>
-                    ) : helpTickets.length === 0 ? (
-                        <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
-                            <Headphones size={48} className="mx-auto mb-4 text-white/10" />
-                            <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No help requests yet</p>
-                            <p className="text-white/20 text-xs mt-2">Participants can submit requests from their dashboard.</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {helpTickets.map(ticket => (
-                                <div key={ticket.id} className={`p-6 rounded-2xl border transition-all ${
-                                    ticket.status === 'open' ? 'bg-amber-500/5 border-amber-500/20' :
-                                    ticket.status === 'accepted' ? 'bg-blue-500/5 border-blue-500/20' :
-                                    'bg-green-500/5 border-green-500/20 opacity-60'
-                                }`}>
-                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                                        <div className="flex items-start gap-4">
-                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                                                ticket.status === 'open' ? 'bg-amber-500/20 text-amber-400' :
-                                                ticket.status === 'accepted' ? 'bg-blue-500/20 text-blue-400' :
-                                                'bg-green-500/20 text-green-400'
-                                            }`}>
-                                                {ticket.status === 'open' ? <Clock size={20} /> :
-                                                 ticket.status === 'accepted' ? <MessageSquare size={20} /> :
-                                                 <CheckCircle size={20} />}
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-2 flex-wrap">
-                                                    <h4 className="text-lg font-black italic uppercase tracking-tight text-white">{ticket.teamName}</h4>
-                                                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-white/10 text-white/50">{ticket.teamId}</span>
-                                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded ${
-                                                        ticket.category === 'Technical' ? 'bg-blue-500/20 text-blue-300' :
-                                                        ticket.category === 'WiFi/Infra' ? 'bg-red-500/20 text-red-300' :
-                                                        'bg-purple-500/20 text-purple-300'
-                                                    }`}>{ticket.category}</span>
+                    {/* SUB-TAB 1: Onsite Table Queue */}
+                    {helpdeskSubTab === 'tickets' && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center px-1">
+                                <span className="text-xs text-white/50 font-bold uppercase tracking-wider">
+                                    Table Assistance Requests
+                                </span>
+                                <button
+                                    onClick={fetchHelpTickets}
+                                    className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-white/10 cursor-pointer"
+                                >
+                                    <RefreshCw size={12} className={isLoadingTickets ? 'animate-spin' : ''} /> Refresh
+                                </button>
+                            </div>
+
+                            {isLoadingTickets && helpTickets.length === 0 ? (
+                                <div className="flex items-center justify-center py-20">
+                                    <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                </div>
+                            ) : helpTickets.length === 0 ? (
+                                <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                                    <Headphones size={48} className="mx-auto mb-4 text-white/10" />
+                                    <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No active table requests</p>
+                                    <p className="text-white/20 text-xs mt-2">Participants can submit mentor and help requests directly from their portal.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {helpTickets.map(ticket => (
+                                        <div key={ticket.id} className={`p-6 rounded-2xl border transition-all ${
+                                            ticket.status === 'open' ? 'bg-amber-500/5 border-amber-500/20' :
+                                            ticket.status === 'accepted' ? 'bg-blue-500/5 border-blue-500/20' :
+                                            'bg-green-500/5 border-green-500/20 opacity-60'
+                                        }`}>
+                                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                                <div className="flex items-start gap-4">
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                                                        ticket.status === 'open' ? 'bg-amber-500/20 text-amber-400' :
+                                                        ticket.status === 'accepted' ? 'bg-blue-500/20 text-blue-400' :
+                                                        'bg-green-500/20 text-green-400'
+                                                    }`}>
+                                                        {ticket.status === 'open' ? <Clock size={20} /> :
+                                                         ticket.status === 'accepted' ? <MessageSquare size={20} /> :
+                                                         <CheckCircle size={20} />}
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <h4 className="text-lg font-black italic uppercase tracking-tight text-white">{ticket.teamName}</h4>
+                                                            <span className="text-[9px] font-black px-2 py-0.5 rounded bg-white/10 text-white/50">{ticket.teamId}</span>
+                                                            <span className={`text-[9px] font-black px-2 py-0.5 rounded ${
+                                                                ticket.category === 'Technical' ? 'bg-blue-500/20 text-blue-300' :
+                                                                ticket.category === 'WiFi/Infra' ? 'bg-red-500/20 text-red-300' :
+                                                                ticket.category === 'Email Query' ? 'bg-teal-500/20 text-teal-300' :
+                                                                'bg-purple-500/20 text-purple-300'
+                                                            }`}>{ticket.category}</span>
+                                                        </div>
+                                                        <p className="text-sm text-white/70 mt-1 whitespace-pre-wrap">{ticket.description}</p>
+                                                        {ticket.tableNumber && <p className="text-[10px] text-white/40 mt-1 font-bold">📍 Table: {ticket.tableNumber}</p>}
+                                                        <p className="text-[9px] text-white/30 mt-1">{new Date(ticket.createdAt).toLocaleTimeString()}{ticket.acceptedBy ? ` • Accepted by ${ticket.acceptedBy}` : ''}</p>
+                                                    </div>
                                                 </div>
-                                                <p className="text-sm text-white/60 mt-1">{ticket.description}</p>
-                                                {ticket.tableNumber && <p className="text-[10px] text-white/40 mt-1 font-bold">📍 Table: {ticket.tableNumber}</p>}
-                                                <p className="text-[9px] text-white/30 mt-1">{new Date(ticket.createdAt).toLocaleTimeString()}{ticket.acceptedBy ? ` • Accepted by ${ticket.acceptedBy}` : ''}</p>
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    {ticket.status === 'open' && (
+                                                        <button
+                                                            onClick={() => handleTicketAction(ticket.id, 'accept')}
+                                                            className="px-4 py-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-wider hover:bg-blue-500/30 transition cursor-pointer"
+                                                        >
+                                                            Accept
+                                                        </button>
+                                                    )}
+                                                    {(ticket.status === 'open' || ticket.status === 'accepted') && (
+                                                        <button
+                                                            onClick={() => handleTicketAction(ticket.id, 'resolve')}
+                                                            className="px-4 py-2 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-[10px] font-black uppercase tracking-wider hover:bg-green-500/30 transition cursor-pointer"
+                                                        >
+                                                            Resolve
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleTicketAction(ticket.id, 'cancel')}
+                                                        className="px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition cursor-pointer"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            {ticket.status === 'open' && (
-                                                <button
-                                                    onClick={() => handleTicketAction(ticket.id, 'accept')}
-                                                    className="px-4 py-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-wider hover:bg-blue-500/30 transition"
-                                                >
-                                                    Accept
-                                                </button>
-                                            )}
-                                            {(ticket.status === 'open' || ticket.status === 'accepted') && (
-                                                <button
-                                                    onClick={() => handleTicketAction(ticket.id, 'resolve')}
-                                                    className="px-4 py-2 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-[10px] font-black uppercase tracking-wider hover:bg-green-500/30 transition"
-                                                >
-                                                    Resolve
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => handleTicketAction(ticket.id, 'cancel')}
-                                                className="px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition"
-                                            >
-                                                <X size={14} />
-                                            </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* SUB-TAB 2: cPanel Inbound Mailbox */}
+                    {helpdeskSubTab === 'inbox' && (
+                        <div className="space-y-4">
+                            {/* Mailbox Status Banner */}
+                            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-400 flex items-center justify-center shrink-0">
+                                        <Inbox size={20} />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-mono text-xs font-bold text-white">business@centle.in</span>
+                                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">cPanel IMAP (SSL:993)</span>
                                         </div>
+                                        <p className="text-[11px] text-white/40 mt-0.5">
+                                            Server: {inboxStatus?.host || 'cloud-xent.crazzydns.com'} • {inboxStatus?.total ?? inboundEmails.length} messages ({inboxStatus?.unseen ?? 0} unread)
+                                        </p>
                                     </div>
                                 </div>
-                            ))}
+
+                                <button
+                                    type="button"
+                                    onClick={fetchInboundEmails}
+                                    disabled={isLoadingEmails}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0"
+                                >
+                                    <RefreshCw size={14} className={isLoadingEmails ? 'animate-spin' : ''} />
+                                    {isLoadingEmails ? 'Syncing...' : 'Sync Mailbox'}
+                                </button>
+                            </div>
+
+                            {/* Error State */}
+                            {emailError && (
+                                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center gap-3">
+                                    <AlertTriangle size={18} className="shrink-0 text-red-400" />
+                                    <div>
+                                        <p className="font-bold">IMAP Sync Error</p>
+                                        <p className="text-white/60 text-[11px] mt-0.5">{emailError}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Inbound Emails List */}
+                            {isLoadingEmails && inboundEmails.length === 0 ? (
+                                <div className="flex items-center justify-center py-20">
+                                    <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                </div>
+                            ) : inboundEmails.length === 0 ? (
+                                <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                                    <Inbox size={48} className="mx-auto mb-4 text-white/10" />
+                                    <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No emails in inbox</p>
+                                    <p className="text-white/20 text-xs mt-2">Replies to your passes or queries to business@centle.in will appear here.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {inboundEmails.map(email => (
+                                        <div
+                                            key={email.id}
+                                            className={`p-5 rounded-2xl border transition-all ${
+                                                email.isUnread
+                                                    ? 'bg-teal-500/[0.06] border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]'
+                                                    : 'bg-white/[0.02] border-white/10'
+                                            }`}
+                                        >
+                                            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                                                <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                                                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                                                        email.isUnread ? 'bg-[#14b8a6]/20 text-[#14b8a6] border border-[#14b8a6]/40' : 'bg-white/10 text-white/50'
+                                                    }`}>
+                                                        <Mail size={16} />
+                                                    </div>
+
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className="font-bold text-sm text-white">{email.fromName || email.fromEmail}</span>
+                                                            <span className="text-[11px] font-mono text-white/40">({email.fromEmail})</span>
+
+                                                            {/* Matched Team Pill */}
+                                                            {email.matchedTeamName && (
+                                                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
+                                                                    Team: {email.matchedTeamName} {email.matchedTeamId ? `(${email.matchedTeamId})` : ''}
+                                                                </span>
+                                                            )}
+
+                                                            {email.isUnread && (
+                                                                <span className="px-2 py-0.5 rounded-full bg-teal-400 text-black text-[9px] font-black uppercase">
+                                                                    New
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <h4 className="text-sm font-bold text-white mt-1.5 leading-snug">
+                                                            {email.subject}
+                                                        </h4>
+
+                                                        <p className="text-xs text-white/60 mt-1 line-clamp-2 leading-relaxed">
+                                                            {email.snippet || '(No message preview)'}
+                                                        </p>
+
+                                                        <p className="text-[10px] text-white/30 font-mono mt-2">
+                                                            {new Date(email.date).toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Action Buttons for Inbound Email */}
+                                                <div className="flex items-center gap-2 shrink-0 self-end lg:self-start">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setReplyModalEmail(email)}
+                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 text-[11px] font-bold transition cursor-pointer"
+                                                    >
+                                                        <Reply size={13} /> Reply
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        disabled={isConvertingTicket === email.id}
+                                                        onClick={() => void handleConvertEmailToTicket(email)}
+                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer disabled:opacity-40"
+                                                    >
+                                                        <Plus size={13} /> {isConvertingTicket === email.id ? 'Creating...' : 'Create Ticket'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -3320,6 +3618,131 @@ export default function AdminDashboard() {
                             <p className="text-[11px] text-white/40 italic">
                                 Please keep this tab open while teams are written to Supabase.
                             </p>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ EMAIL REPLY MODAL ═══════════ */}
+            <AnimatePresence>
+                {replyModalEmail && (
+                    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-xl bg-[#0D0219] border-2 border-blue-500/40 rounded-[2rem] p-6 sm:p-8 shadow-2xl overflow-hidden"
+                        >
+                            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center shrink-0">
+                                        <Reply size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Reply to Inbound Email</h3>
+                                        <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">
+                                            Sending via business@centle.in (cPanel SMTP)
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setReplyModalEmail(null)}
+                                    className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
+                                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                                    title="Close"
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+
+                            {/* Email Details Overview */}
+                            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 mb-4">
+                                <div className="flex items-center justify-between gap-2 flex-wrap text-xs">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">To:</span>
+                                    <span className="font-bold text-white font-mono">{replyModalEmail.fromEmail}</span>
+                                </div>
+                                {replyModalEmail.matchedTeamName && (
+                                    <div className="flex items-center justify-between gap-2 text-xs">
+                                        <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Registered Team:</span>
+                                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">
+                                            {replyModalEmail.matchedTeamName} {replyModalEmail.matchedTeamId ? `(${replyModalEmail.matchedTeamId})` : ''}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between gap-2 text-xs">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Subject:</span>
+                                    <span className="font-bold text-white/90 truncate max-w-sm">Re: {replyModalEmail.subject}</span>
+                                </div>
+                            </div>
+
+                            {/* Original Message Snippet */}
+                            <div className="mb-4">
+                                <label className="text-[10px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                    Original Message Snippet
+                                </label>
+                                <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs text-white/60 italic max-h-24 overflow-y-auto">
+                                    {replyModalEmail.snippet || '(No text preview available)'}
+                                </div>
+                            </div>
+
+                            {/* Quick Response Templates */}
+                            <div className="mb-4">
+                                <label className="text-[10px] font-black uppercase text-white/40 tracking-wider block mb-1.5">
+                                    Quick Response Templates
+                                </label>
+                                <div className="flex gap-2 flex-wrap">
+                                    <button
+                                        type="button"
+                                        onClick={() => setReplyText(`Hello,\n\nWe have verified your registration details. Your digital pass and login credentials have been re-issued. Please check your inbox or visit the onsite help desk if you need immediate printouts.\n\nBest regards,\nTri-City Organizing Committee`)}
+                                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
+                                    >
+                                        Pass Verification
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setReplyText(`Hello,\n\nThank you for reaching out! A volunteer or mentor has been notified. You can also raise an instant ticket at the Help Desk section of your team portal or visit Desk 1 at the venue.\n\nBest regards,\nTri-City Technical Support`)}
+                                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
+                                    >
+                                        Mentor/Desk Info
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Reply Input Form */}
+                            <form onSubmit={(e) => { e.preventDefault(); void handleSendEmailReply(); }} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                        Your Response Message
+                                    </label>
+                                    <textarea
+                                        rows={5}
+                                        value={replyText}
+                                        onChange={e => setReplyText(e.target.value)}
+                                        placeholder="Type your response to the participant here..."
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-blue-400 transition leading-relaxed"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setReplyModalEmail(null)}
+                                        className="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition cursor-pointer"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSendingReply || !replyText.trim()}
+                                        className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)] cursor-pointer"
+                                    >
+                                        <Send size={14} className={isSendingReply ? 'animate-spin' : ''} />
+                                        {isSendingReply ? 'Sending Reply...' : 'Send Email Response'}
+                                    </button>
+                                </div>
+                            </form>
                         </motion.div>
                     </div>
                 )}
