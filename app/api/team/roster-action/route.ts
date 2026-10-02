@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
@@ -278,7 +279,7 @@ export async function POST(req: Request) {
             }
             if (memberCount === 3) {
                 return NextResponse.json({
-                    error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).'
+                    error: 'Cannot merge: 3-member teams (Tri) are prohibited under agency rules. Merging is only permitted between Solo + Solo (forms Duo) or Duo + Duo (forms Quad).'
                 }, { status: 400 });
             }
 
@@ -311,7 +312,7 @@ export async function POST(req: Request) {
             }
             if (targetMemberCount === 3) {
                 return NextResponse.json({
-                    error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).'
+                    error: 'Cannot merge: 3-member teams (Tri) are prohibited under agency rules. Merging is only permitted between Solo + Solo (forms Duo) or Duo + Duo (forms Quad).'
                 }, { status: 400 });
             }
 
@@ -379,7 +380,7 @@ export async function POST(req: Request) {
 
                 if (mergedMembers.length === 3) {
                     return NextResponse.json({
-                        error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).'
+                        error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules strictly permit Solo (1), Duo (2), or Quad (4) teams only.'
                     }, { status: 400 });
                 }
 
@@ -389,37 +390,91 @@ export async function POST(req: Request) {
                     }, { status: 400 });
                 }
 
+                // Reserve a new unique team ID for the combined team
+                let comboTeamId = '';
+                try {
+                    const { data: nextId, error: idError } = await supabase.rpc('next_registration_team_id');
+                    if (!idError && typeof nextId === 'string' && nextId) {
+                        comboTeamId = nextId;
+                    }
+                } catch (rpcErr) {
+                    console.warn('RPC next_registration_team_id unavailable, using fallback:', rpcErr);
+                }
+
+                if (!comboTeamId) {
+                    const randSuffix = Math.floor(1000 + Math.random() * 9000);
+                    comboTeamId = `TC-${randSuffix}`;
+                }
+
                 // Preserve and merge member meal states
                 const sourceMealState = (team.member_meal_state && typeof team.member_meal_state === 'object') ? team.member_meal_state : {};
                 const targetMealState = (targetTeam.member_meal_state && typeof targetTeam.member_meal_state === 'object') ? targetTeam.member_meal_state : {};
                 const mergedMealState = { ...sourceMealState, ...targetMealState };
 
-                // Update Source Team (keeps active)
-                const { error: srcErr } = await supabase
+                // Combine track preferences
+                const sourceTracks = Array.isArray(team.track_preferences) && team.track_preferences.length
+                    ? team.track_preferences
+                    : (team.track ? [team.track] : []);
+                const targetTracks = Array.isArray(targetTeam.track_preferences) && targetTeam.track_preferences.length
+                    ? targetTeam.track_preferences
+                    : (targetTeam.track ? [targetTeam.track] : []);
+                const combinedTracks = [...new Set([...sourceTracks, ...targetTracks])].map(String).filter(Boolean);
+
+                const comboTeamName = `${team.team_name} & ${targetTeam.team_name}`.slice(0, 50);
+                const comboTransactionId = randomUUID();
+
+                // Create the brand new Combo Team record
+                // Primary Lead: Team A Captain (who initiated and hosted the merge code invite)
+                // Co-Lead / Member: Team B Captain (joined with details preserved)
+                const { error: insertErr } = await supabase
+                    .from('registrations')
+                    .insert({
+                        transaction_id: comboTransactionId,
+                        team_id: comboTeamId,
+                        team_name: comboTeamName,
+                        track: combinedTracks[0] || team.track || 'General',
+                        track_preferences: combinedTracks,
+                        college: team.college || targetTeam.college || '',
+                        captain: team.captain || sourceMembers[0]?.fullName || 'Team Lead',
+                        captain_mobile: team.captain_mobile || sourceMembers[0]?.phone || '',
+                        email: team.email || sourceMembers[0]?.email || '',
+                        entry_type: mergedMembers.length === 2 ? 'DUO' : 'SQUAD',
+                        members: mergedMembers,
+                        member_meal_state: mergedMealState,
+                        status: 'COMPLETED',
+                        raw_data: {
+                            merged_from_teams: [team.team_id, targetTeam.team_id],
+                            merged_at: new Date().toISOString(),
+                            source_team: { id: team.team_id, name: team.team_name, captain: team.captain, email: team.email, phone: team.captain_mobile },
+                            target_team: { id: targetTeam.team_id, name: targetTeam.team_name, captain: targetTeam.captain, email: targetTeam.email, phone: targetTeam.captain_mobile }
+                        }
+                    });
+
+                if (insertErr) throw insertErr;
+
+                // Archive Source Team A (marks as MERGED, pointing to new combo team)
+                await supabase
                     .from('registrations')
                     .update({
-                        members: mergedMembers,
-                        team_name: `${team.team_name} & ${targetTeam.team_name}`.slice(0, 50),
-                        member_meal_state: mergedMealState,
+                        status: 'MERGED',
+                        merged_into: comboTeamId,
                         raw_data: {
                             ...rawData,
-                            merged_from_team_id: targetTeam.team_id,
+                            merged_into_team_id: comboTeamId,
                             merged_at: new Date().toISOString()
                         }
                     })
                     .eq('team_id', team.team_id);
 
-                if (srcErr) throw srcErr;
-
-                // Archive Target Team (marks as MERGED)
+                // Archive Target Team B (marks as MERGED, pointing to new combo team)
                 await supabase
                     .from('registrations')
                     .update({
                         status: 'MERGED',
-                        merged_into: team.team_id,
+                        merged_into: comboTeamId,
                         raw_data: {
                             ...targetRawData,
-                            merged_into_team_id: team.team_id,
+                            merged_into_team_id: comboTeamId,
                             merged_at: new Date().toISOString()
                         }
                     })
@@ -432,18 +487,20 @@ export async function POST(req: Request) {
                 }
 
                 await recordRosterAudit({
-                    teamId: team.team_id,
+                    teamId: comboTeamId,
                     action: 'MERGE_TEAMS',
                     ip,
                     actor: team.email || team.captain || teamId,
-                    summary: `Successfully merged Team ${targetTeam.team_name} (${targetTeam.team_id}) into Team ${team.team_name} (${team.team_id}). Total members: ${mergedMembers.length}.`,
-                    previousState: { sourceMembersCount: sourceMembers.length, targetMembersCount: targetMembers.length },
-                    newState: { mergedTeamId: team.team_id, totalMembers: mergedMembers.length }
+                    summary: `Successfully merged Team ${team.team_name} (${team.team_id}) and Team ${targetTeam.team_name} (${targetTeam.team_id}) into new combo team "${comboTeamName}" (${comboTeamId}). Total members: ${mergedMembers.length}.`,
+                    previousState: { sourceTeamId: team.team_id, targetTeamId: targetTeam.team_id, sourceMembersCount: sourceMembers.length, targetMembersCount: targetMembers.length },
+                    newState: { comboTeamId, comboTeamName, totalMembers: mergedMembers.length }
                 });
 
                 return NextResponse.json({
                     success: true,
-                    message: `Teams successfully merged into "${team.team_name}" with ${mergedMembers.length} total members!`
+                    comboTeamId,
+                    comboTeamName,
+                    message: `Teams successfully merged into new combined team "${comboTeamName}" (${comboTeamId}) with ${mergedMembers.length} total members!`
                 });
             }
 

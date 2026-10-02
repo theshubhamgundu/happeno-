@@ -100,7 +100,10 @@ export async function POST(req: Request) {
 
         const { error: mergeError } = await supabase
             .from('registrations')
-            .update({ status: 'MERGED' })
+            .update({
+                status: 'MERGED',
+                merged_into: mergedTeam.team_id
+            })
             .in('transaction_id', orderedSources.map(team => team.transaction_id));
         if (mergeError) {
             await supabase.from('registrations').delete().eq('transaction_id', mergedTransactionId);

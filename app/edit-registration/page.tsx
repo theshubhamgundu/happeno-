@@ -120,17 +120,6 @@ function EditRegistrationInner() {
     // 1-Time Edit Lock Confirmation State
     const [showLockConfirmModal, setShowLockConfirmModal] = useState(false);
 
-    // Add Teammate Modal State (for Solo -> Duo or 3 -> Quad)
-    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
-    const [newMemberForm, setNewMemberForm] = useState({
-        fullName: '',
-        email: '',
-        phone: '',
-        college: '',
-        department: '',
-        year: ''
-    });
-
     // Auto-login if arriving via official magic link
     useEffect(() => {
         if (urlTeamId && urlToken) {
@@ -157,7 +146,11 @@ function EditRegistrationInner() {
                 setTeam(data.team);
                 setEditedTeam(JSON.parse(JSON.stringify(data.team)));
                 if (data.pendingMerge) setPendingMerge(data.pendingMerge);
-                toast.success(`Welcome Team "${data.team.teamName}"!`);
+                if (data.isRedirectedFromMerged) {
+                    toast.info(data.message || `Loaded merged team "${data.team.teamName}" (${data.team.teamId})`);
+                } else {
+                    toast.success(`Welcome Team "${data.team.teamName}"!`);
+                }
             } else {
                 setAuthError(data.error || 'Verification failed. Please check your Team ID and contact.');
             }
@@ -243,7 +236,7 @@ function EditRegistrationInner() {
 
         // External Agency Rule: Solo (1), Duo (2), or Quad (4) ONLY
         if (editedTeam.members.length === 3) {
-            toast.error('External agency rules strictly require Solo (1), Duo (2), or Quad (4) teams. 3-member teams (Tri) are not allowed. Please add a 4th teammate to form a Quad, or remove a member to form a Duo before finalizing.');
+            toast.error('External agency rules strictly require Solo (1), Duo (2), or Quad (4) teams. 3-member teams (Tri) are not permitted.');
             return;
         }
 
@@ -311,42 +304,6 @@ function EditRegistrationInner() {
         } finally {
             setIsSaving(false);
         }
-    };
-
-    const handleAddTeammate = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!editedTeam) return;
-        if (editedTeam.members.length >= 4) {
-            toast.error('Maximum team limit of 4 members reached.');
-            return;
-        }
-        if (!newMemberForm.fullName.trim() || !newMemberForm.email.trim()) {
-            toast.error('Please provide a full name and email address.');
-            return;
-        }
-
-        const newMember: MemberData = {
-            fullName: newMemberForm.fullName.trim(),
-            email: newMemberForm.email.trim(),
-            phone: newMemberForm.phone.trim(),
-            college: newMemberForm.college.trim() || editedTeam.college || '',
-            department: newMemberForm.department.trim(),
-            year: newMemberForm.year.trim()
-        };
-
-        const updatedMembers = [...editedTeam.members, newMember];
-        setEditedTeam({ ...editedTeam, members: updatedMembers });
-        setShowAddMemberModal(false);
-        setNewMemberForm({ fullName: '', email: '', phone: '', college: '', department: '', year: '' });
-        toast.success(`Added ${newMember.fullName}! Team now has ${updatedMembers.length} members.`);
-    };
-
-    const handleRemoveTeammate = (indexToRemove: number) => {
-        if (!editedTeam || indexToRemove === 0) return;
-        const memberName = editedTeam.members[indexToRemove]?.fullName || `Member #${indexToRemove + 1}`;
-        const updated = editedTeam.members.filter((_, idx) => idx !== indexToRemove);
-        setEditedTeam({ ...editedTeam, members: updated });
-        toast.info(`Removed ${memberName}. Team now has ${updated.length} members.`);
     };
 
     const handleExecuteMemberReplacement = async () => {
@@ -478,9 +435,10 @@ function EditRegistrationInner() {
             if (data.success) {
                 toast.success(data.message);
                 setPendingMerge(null);
-                // Refresh team data
-                if (team) {
-                    void verifyAndLoadTeam(team.teamId, '', team.captainMobile || team.email);
+                // Refresh team data (loads new combo team)
+                const targetIdToLoad = data.comboTeamId || team?.teamId;
+                if (targetIdToLoad) {
+                    void verifyAndLoadTeam(targetIdToLoad, '', team?.captainMobile || team?.email || '');
                 }
             } else {
                 toast.error(data.error || 'Failed to respond to merge.');
@@ -974,29 +932,9 @@ function EditRegistrationInner() {
                                             <span className="text-[11px] text-slate-500">
                                                 {team.isRosterLocked || editedTeam?.isRosterLocked
                                                     ? 'Team details are permanently locked.'
-                                                    : 'Review and update your team member information below.'}
+                                                    : 'Review and correct your registered team member information below.'}
                                             </span>
                                         </div>
-
-                                        {!(team.isRosterLocked || editedTeam?.isRosterLocked) && (editedTeam?.members.length || 0) < 4 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setNewMemberForm({
-                                                        fullName: '',
-                                                        email: '',
-                                                        phone: '',
-                                                        college: editedTeam?.college || '',
-                                                        department: '',
-                                                        year: ''
-                                                    });
-                                                    setShowAddMemberModal(true);
-                                                }}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition cursor-pointer shadow-sm"
-                                            >
-                                                <Plus size={14} /> Add Teammate
-                                            </button>
-                                        )}
                                     </div>
 
                                     {editedTeam?.members.map((m, idx) => (
@@ -1653,131 +1591,6 @@ function EditRegistrationInner() {
                             </div>
                         </motion.div>
                     </div>
-                )}
-            </AnimatePresence>
-
-            {/* ══════════════ MODAL 5: ADD TEAMMATE MODAL ══════════════ */}
-            <AnimatePresence>
-                {showAddMemberModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="w-full max-w-md bg-white border border-slate-200 rounded-[2rem] p-6 shadow-2xl text-slate-900"
-                        >
-                            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
-                                        <UserPlus size={18} />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold uppercase tracking-tight text-slate-900 text-base">
-                                            Add Teammate
-                                        </h3>
-                                        <p className="text-[10px] text-teal-700 font-bold uppercase tracking-wider">
-                                            Enter Member Details
-                                        </p>
-                                    </div>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddMemberModal(false)}
-                                    className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
-                                >
-                                    <X size={18} />
-                                </button>
-                            </div>
-
-                            <form onSubmit={handleAddTeammate} className="space-y-3.5">
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
-                                        Full Name *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Teammate's full name"
-                                        value={newMemberForm.fullName}
-                                        onChange={e => setNewMemberForm({ ...newMemberForm, fullName: e.target.value })}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
-                                        Email Address *
-                                    </label>
-                                    <input
-                                        type="email"
-                                        placeholder="teammate@college.edu"
-                                        value={newMemberForm.email}
-                                        onChange={e => setNewMemberForm({ ...newMemberForm, email: e.target.value })}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
-                                        Mobile Number *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="10-digit mobile number"
-                                        value={newMemberForm.phone}
-                                        onChange={e => setNewMemberForm({ ...newMemberForm, phone: e.target.value })}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-teal-500 focus:bg-white"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
-                                            Department
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. CSE / IT"
-                                            value={newMemberForm.department}
-                                            onChange={e => setNewMemberForm({ ...newMemberForm, department: e.target.value })}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
-                                            Year
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. 3rd Year"
-                                            value={newMemberForm.year}
-                                            onChange={e => setNewMemberForm({ ...newMemberForm, year: e.target.value })}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 pt-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowAddMemberModal(false)}
-                                        className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs uppercase hover:bg-slate-50 transition"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="flex-1 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
-                                    >
-                                        <Plus size={14} /> Add Teammate
-                                    </button>
-                                </div>
-                            </form>
-                        </motion.div>
-                    </div>
-                )}
             </AnimatePresence>
         </div>
     );

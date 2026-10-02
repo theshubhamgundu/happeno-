@@ -35,7 +35,7 @@ export async function POST(req: Request) {
             // Search in registrations
             const { data: matches, error } = await supabase
                 .from('registrations')
-                .select('team_id, team_name, captain, email, captain_mobile, members')
+                .select('team_id, team_name, captain, email, captain_mobile, members, status, merged_into, raw_data')
                 .or(`email.ilike.%${cleanQuery}%,captain_mobile.ilike.%${cleanQuery}%`)
                 .limit(5);
 
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
             if (results.length === 0) {
                 const { data: allTeams } = await supabase
                     .from('registrations')
-                    .select('team_id, team_name, captain, email, captain_mobile, members')
+                    .select('team_id, team_name, captain, email, captain_mobile, members, status, merged_into, raw_data')
                     .limit(2000);
 
                 if (allTeams) {
@@ -72,8 +72,37 @@ export async function POST(req: Request) {
                 }, { status: 404 });
             }
 
+            // Resolve any merged teams to their active combo team
+            const resolvedResults: typeof results = [];
+            const seenIds = new Set<string>();
+
+            for (const r of results) {
+                if (String(r.status).toUpperCase() === 'MERGED') {
+                    const raw = (r.raw_data && typeof r.raw_data === 'object') ? (r.raw_data as any) : {};
+                    const targetId = r.merged_into || raw.merged_into_team_id;
+                    if (targetId) {
+                        const { data: targetActive } = await supabase
+                            .from('registrations')
+                            .select('team_id, team_name, captain, email, captain_mobile, members, status, merged_into, raw_data')
+                            .eq('team_id', String(targetId).trim().toUpperCase())
+                            .maybeSingle();
+                        if (targetActive && !seenIds.has(targetActive.team_id)) {
+                            seenIds.add(targetActive.team_id);
+                            resolvedResults.push(targetActive);
+                            continue;
+                        }
+                    }
+                }
+                if (!seenIds.has(r.team_id)) {
+                    seenIds.add(r.team_id);
+                    resolvedResults.push(r);
+                }
+            }
+
+            const finalResults = resolvedResults.length > 0 ? resolvedResults : results;
+
             // Mask results for privacy
-            const masked = results.map(r => ({
+            const masked = finalResults.map(r => ({
                 teamId: r.team_id,
                 teamName: r.team_name,
                 captainName: r.captain,
@@ -82,7 +111,7 @@ export async function POST(req: Request) {
             }));
 
             // Optionally auto-dispatch magic link to the registered captain email if requested
-            if (body.sendMagicLink && results[0]?.email) {
+            if (body.sendMagicLink && finalResults[0]?.email) {
                 const team = results[0];
                 const token = generateRosterToken(team.team_id, team.email);
                 const magicUrl = `https://tricity.online/edit-registration?teamId=${encodeURIComponent(team.team_id)}&token=${encodeURIComponent(token)}`;
@@ -147,19 +176,56 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: `Team ID "${normalizedTeamId}" not found.` }, { status: 404 });
         }
 
-        if (['REJECTED', 'MERGED'].includes(String(team.status).toUpperCase())) {
+        let activeTeam = team;
+        let isRedirectedFromMerged = false;
+        const originalTeamId = normalizedTeamId;
+
+        // If this team was merged into another team, seamlessly follow the pointer to the active combo team
+        if (String(team.status).toUpperCase() === 'MERGED') {
+            const raw = (team.raw_data && typeof team.raw_data === 'object') ? (team.raw_data as any) : {};
+            const targetId = team.merged_into || raw.merged_into_team_id;
+
+            if (targetId) {
+                const { data: comboTeam, error: comboErr } = await supabase
+                    .from('registrations')
+                    .select('*')
+                    .eq('team_id', String(targetId).trim().toUpperCase())
+                    .maybeSingle();
+
+                if (comboTeam && !comboErr) {
+                    activeTeam = comboTeam;
+                    isRedirectedFromMerged = true;
+                }
+            }
+
+            if (!isRedirectedFromMerged) {
+                return NextResponse.json({
+                    success: false,
+                    error: `Team "${normalizedTeamId}" was merged, but the combined team record could not be found. Please contact support.`
+                }, { status: 404 });
+            }
+        } else if (String(team.status).toUpperCase() === 'REJECTED') {
             return NextResponse.json({
                 success: false,
-                error: `This team registration has been marked as ${team.status}. ${team.merged_into ? `Merged into Team ${team.merged_into}.` : ''}`
+                error: 'This team registration has been rejected.'
             }, { status: 403 });
         }
 
         let isVerified = false;
 
+        const phoneMatches = (p1?: string, p2?: string) => {
+            if (!p1 || !p2) return false;
+            const c1 = p1.replace(/\D/g, '').slice(-10);
+            const c2 = p2.replace(/\D/g, '').slice(-10);
+            return c1.length >= 7 && c2.length >= 7 && c1 === c2;
+        };
+
         // Verification Method 1: Magic Link Token
         if (token && typeof token === 'string') {
-            const matchesLeadEmail = verifyRosterToken(normalizedTeamId, team.email || '', token);
-            const matchesLeadPhone = verifyRosterToken(normalizedTeamId, team.captain_mobile || '', token);
+            const matchesLeadEmail = verifyRosterToken(normalizedTeamId, team.email || '', token) ||
+                                     verifyRosterToken(activeTeam.team_id, activeTeam.email || '', token);
+            const matchesLeadPhone = verifyRosterToken(normalizedTeamId, team.captain_mobile || '', token) ||
+                                     verifyRosterToken(activeTeam.team_id, activeTeam.captain_mobile || '', token);
             if (matchesLeadEmail || matchesLeadPhone) {
                 isVerified = true;
             }
@@ -168,11 +234,31 @@ export async function POST(req: Request) {
         // Verification Method 2: Captain Email or Phone Dual Factor
         if (!isVerified && captainContact && typeof captainContact === 'string') {
             const cleanContact = captainContact.trim().toLowerCase();
-            const teamEmail = (team.email || '').trim().toLowerCase();
-            const teamPhone = (team.captain_mobile || '').trim();
 
-            if (teamEmail === cleanContact || teamPhone.endsWith(cleanContact) || cleanContact.endsWith(teamPhone)) {
+            // Match against original queried team lead (allows old team captain to log in)
+            const origEmail = (team.email || '').trim().toLowerCase();
+            const origPhone = (team.captain_mobile || '').trim();
+            if (origEmail === cleanContact || phoneMatches(origPhone, cleanContact)) {
                 isVerified = true;
+            }
+
+            // Match against active combo team lead
+            const activeEmail = (activeTeam.email || '').trim().toLowerCase();
+            const activePhone = (activeTeam.captain_mobile || '').trim();
+            if (!isVerified && (activeEmail === cleanContact || phoneMatches(activePhone, cleanContact))) {
+                isVerified = true;
+            }
+
+            // Also match against any member of the combined team
+            if (!isVerified && Array.isArray(activeTeam.members)) {
+                for (const m of activeTeam.members) {
+                    const mEmail = (m?.email || '').trim().toLowerCase();
+                    const mPhone = (m?.phone || '').trim();
+                    if (mEmail === cleanContact || phoneMatches(mPhone, cleanContact)) {
+                        isVerified = true;
+                        break;
+                    }
+                }
             }
         }
 
@@ -184,30 +270,35 @@ export async function POST(req: Request) {
         }
 
         // Check for any pending merge proposals awaiting this team's response
-        const pendingMerge = await getPendingMergeForTeam(normalizedTeamId);
+        const pendingMerge = await getPendingMergeForTeam(activeTeam.team_id);
 
-        const rawData = (team.raw_data && typeof team.raw_data === 'object') ? (team.raw_data as any) : {};
-        const isRosterLocked = Boolean(rawData.roster_locked || rawData.locked || team.is_locked);
+        const rawData = (activeTeam.raw_data && typeof activeTeam.raw_data === 'object') ? (activeTeam.raw_data as any) : {};
+        const isRosterLocked = Boolean(rawData.roster_locked || rawData.locked || activeTeam.is_locked);
         const rosterLockedAt = rawData.roster_locked_at || null;
 
         // Set session cookie for this verified team
         const responseData = {
             success: true,
+            isRedirectedFromMerged,
+            originalTeamId,
+            message: isRedirectedFromMerged
+                ? `Team ${originalTeamId} has merged into "${activeTeam.team_name}" (${activeTeam.team_id}). Loaded merged team details!`
+                : undefined,
             team: {
-                teamId: team.team_id,
-                teamName: team.team_name,
-                track: team.track || '',
-                trackPreferences: team.track_preferences || (team.raw_data && (team.raw_data as any).track_preferences) || (team.track ? [team.track] : []),
-                captain: team.captain || '',
-                captainMobile: team.captain_mobile || '',
-                college: team.college || '',
-                email: team.email || '',
-                members: team.members || [],
-                status: team.status || 'PENDING',
-                problemStatement: team.problem_statement || '',
-                createdAt: team.created_at,
-                room: team.room || '',
-                isCheckedIn: team.is_checked_in || false,
+                teamId: activeTeam.team_id,
+                teamName: activeTeam.team_name,
+                track: activeTeam.track || '',
+                trackPreferences: activeTeam.track_preferences || (activeTeam.raw_data && (activeTeam.raw_data as any).track_preferences) || (activeTeam.track ? [activeTeam.track] : []),
+                captain: activeTeam.captain || '',
+                captainMobile: activeTeam.captain_mobile || '',
+                college: activeTeam.college || '',
+                email: activeTeam.email || '',
+                members: activeTeam.members || [],
+                status: activeTeam.status || 'PENDING',
+                problemStatement: activeTeam.problem_statement || '',
+                createdAt: activeTeam.created_at,
+                room: activeTeam.room || '',
+                isCheckedIn: activeTeam.is_checked_in || false,
                 isRosterLocked,
                 rosterLockedAt
             },
@@ -218,9 +309,9 @@ export async function POST(req: Request) {
         const response = NextResponse.json(responseData);
         return setSessionCookie(response, {
             role: 'team',
-            id: team.team_id,
-            teamId: team.team_id,
-            name: team.team_name,
+            id: activeTeam.team_id,
+            teamId: activeTeam.team_id,
+            name: activeTeam.team_name,
             portalMode
         });
 

@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
         const { data: databaseTeam, error: databaseError } = await supabase
             .from('registrations')
-            .select('team_id, team_name, password_hash, credentials_issued_at, status')
+            .select('team_id, team_name, password_hash, credentials_issued_at, status, merged_into, raw_data')
             .eq('team_id', normalizedTeamId)
             .maybeSingle();
 
@@ -49,18 +49,35 @@ export async function POST(req: Request) {
         if (!databaseTeam?.password_hash || !databaseTeam.credentials_issued_at || !(await verifyPassword(password, databaseTeam.password_hash))) {
             return NextResponse.json({ success: false, error: 'Invalid Participant ID or Password' }, { status: 401 });
         }
-        if (['PENDING', 'REJECTED', 'MERGED'].includes(String(databaseTeam.status).toUpperCase())) {
+
+        let activeTeam = databaseTeam;
+        if (String(databaseTeam.status).toUpperCase() === 'MERGED') {
+            const raw = (databaseTeam.raw_data && typeof databaseTeam.raw_data === 'object') ? (databaseTeam.raw_data as any) : {};
+            const targetId = databaseTeam.merged_into || raw.merged_into_team_id;
+            if (targetId) {
+                const { data: comboTeam } = await supabase
+                    .from('registrations')
+                    .select('team_id, team_name, password_hash, credentials_issued_at, status')
+                    .eq('team_id', String(targetId).trim().toUpperCase())
+                    .maybeSingle();
+                if (comboTeam) {
+                    activeTeam = comboTeam;
+                }
+            }
+        }
+
+        if (['PENDING', 'REJECTED'].includes(String(activeTeam.status).toUpperCase())) {
             return NextResponse.json({ success: false, error: 'Your registration is awaiting approval.' }, { status: 403 });
         }
 
         return setSessionCookie(
             NextResponse.json({
                 success: true,
-                teamId: databaseTeam.team_id,
-                teamName: databaseTeam.team_name,
+                teamId: activeTeam.team_id,
+                teamName: activeTeam.team_name,
                 portalMode
             }),
-            { role: 'team', id: databaseTeam.team_id, teamId: databaseTeam.team_id, name: databaseTeam.team_name, portalMode }
+            { role: 'team', id: activeTeam.team_id, teamId: activeTeam.team_id, name: activeTeam.team_name, portalMode }
         );
     } catch (error) {
         console.error('Team authentication failed:', error);
