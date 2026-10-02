@@ -66,13 +66,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     return { ...current, portalMode };
                 });
 
-                if (portalMode === 'closed' && (pathname.startsWith('/dashboard/team') || pathname === '/edit-registration')) {
+                if (portalMode === 'closed' && pathname.startsWith('/dashboard/team')) {
                     setUser(null);
                     router.replace('/login');
                 } else if (portalMode === 'edit' && pathname.startsWith('/dashboard/team')) {
                     router.replace('/edit-registration');
-                } else if (portalMode === 'event' && pathname === '/edit-registration') {
-                    router.replace('/dashboard/team');
                 }
             } catch (error) {
                 console.error('Participant portal mode refresh failed:', error);
