@@ -778,20 +778,10 @@ function EditRegistrationInner() {
                                     <div className="flex items-center gap-3 mt-3">
                                         <button
                                             type="button"
-                                            onClick={() => {
-                                                setNewMemberForm({
-                                                    fullName: '',
-                                                    email: '',
-                                                    phone: '',
-                                                    college: editedTeam?.college || '',
-                                                    department: '',
-                                                    year: ''
-                                                });
-                                                setShowAddMemberModal(true);
-                                            }}
+                                            onClick={openHelpModal}
                                             className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase flex items-center gap-1.5 transition cursor-pointer shadow-sm"
                                         >
-                                            <Plus size={14} /> Add 4th Teammate (Form Quad)
+                                            <Plus size={14} /> Contact Coordinator to Add 4th Teammate
                                         </button>
                                         <span className="text-xs text-amber-800 font-medium">
                                             or remove an inactive member to participate as a Duo (2)

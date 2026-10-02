@@ -57,7 +57,7 @@ export async function POST(req: Request) {
             if (targetId) {
                 const { data: comboTeam } = await supabase
                     .from('registrations')
-                    .select('team_id, team_name, password_hash, credentials_issued_at, status')
+                    .select('team_id, team_name, password_hash, credentials_issued_at, status, merged_into, raw_data')
                     .eq('team_id', String(targetId).trim().toUpperCase())
                     .maybeSingle();
                 if (comboTeam) {
