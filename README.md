@@ -51,7 +51,7 @@ PUBLIC_REGISTRATIONS_OPEN=false
 NEXT_PUBLIC_REGISTRATIONS_OPEN=false
 ```
 
-Apply `database_setup.sql` to the Supabase SQL editor before starting the app. The app uses one Supabase project for registrations, settings, judges, and volunteers; it no longer falls back to local JSON files. `AUTH_SESSION_SECRET` should be a long random value. `ADMIN_LOGIN_ID`, `ADMIN_PASSWORD`, `LIVESCORE_PASSWORD`, and `PUBLIC_REGISTRATIONS_OPEN` are server-only configuration. Set both registration flags to `true` to open the registration form and API.
+Apply `database_setup.sql` to the Supabase SQL editor before starting the app. The app uses one Supabase project for registrations, settings, judges, and volunteers; it no longer falls back to local JSON files. `AUTH_SESSION_SECRET` should be a long random value. `ADMIN_LOGIN_ID`, `ADMIN_PASSWORD`, `LIVESCORE_PASSWORD`, and `PUBLIC_REGISTRATIONS_OPEN` are server-only configuration. Set both registration flags to `true` to open the registration form and.
 
 To import the existing CSV/JSON records, configure the environment variables above and run `npm run migrate:data`. The importer is safe to rerun and upserts records by their IDs. Keep the source files until you have checked the imported row counts and sample records in Supabase. Configure the SMTP variables to enable email notifications; keep `SMTP_PASSWORD` secret and out of source control.
 
