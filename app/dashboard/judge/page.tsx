@@ -296,7 +296,7 @@ export default function JudgeDashboard() {
 
     // Auto-save draft to both server and localStorage
     useEffect(() => {
-        if (!evaluationId || !evaluationRound || !activeProject) return;
+        if (!evaluationId || !evaluationRound || !activeProject || !activeProject.teamId) return;
 
         // Save immediately to local device storage
         if (typeof window !== 'undefined') {
@@ -336,7 +336,7 @@ export default function JudgeDashboard() {
     }, [evaluationId, evaluationRound, activeProject, currentScores, comment]);
 
     const handleScoreSubmit = async () => {
-        if (!activeProject || !evaluationRound || !evaluationId || !currentJudge) return;
+        if (!activeProject || !activeProject.teamId || !evaluationRound || !evaluationId || !currentJudge) return;
         const values = evaluationRound.criteria.map(criterion => currentScores[criterion.id]);
         if (values.some(value => typeof value !== 'number' || value < 1 || value > 10) || !comment.trim()) {
             toast.error("Score every criterion from 1 to 10 and add feedback before submitting.");
@@ -390,7 +390,6 @@ export default function JudgeDashboard() {
             setComment("");
             setDraftStatus('idle');
             setTeamIdInput('');
-            void fetchJudgeEvaluations();
         } catch (error: unknown) {
             console.warn('Evaluation submit encountered network failure:', error);
             // Securely store in phone's persistent offline queue

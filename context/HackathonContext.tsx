@@ -168,6 +168,29 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
 
     const mountedRef = React.useRef(true);
 
+    const fetchServerTeams = async (isBackground = false) => {
+        if (user?.role === 'judge' || user?.role === 'volunteer') {
+            setProjects([]);
+            return;
+        }
+        try {
+            let url = '/api/teams';
+            if (user?.role === 'team' && user?.teamId) {
+                url += `?teamId=${user.teamId}`;
+            }
+
+            const response = await fetch(url, { cache: 'no-store' });
+            if (response.ok && mountedRef.current) {
+                const serverTeams = await response.json();
+                setProjects(serverTeams || []);
+            } else if (mountedRef.current && user?.role === 'team' && [401, 403].includes(response.status)) {
+                setProjects([]);
+            }
+        } catch (err) {
+            if (!isBackground) console.error("Failed to sync teams from server:", err);
+        }
+    };
+
     useEffect(() => {
         if (user?.role === 'team' && user.portalMode !== 'event') {
             setProjects([]);
@@ -204,34 +227,6 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 }
             } catch (err) {
                 if (!isBackground) console.error("Failed to fetch settings:", err);
-            }
-        };
-
-        // 2. Sync projects strictly from server
-        // OPTIMIZATION: If user is a team, only fetch THEIR team data to save Supabase resources
-        const fetchServerTeams = async (isBackground = false) => {
-            if (user?.role === 'judge' || user?.role === 'volunteer') {
-                setProjects([]);
-                return;
-            }
-            try {
-                let url = '/api/teams';
-                if (user?.role === 'team' && user?.teamId) {
-                    url += `?teamId=${user.teamId}`;
-                }
-
-                const response = await fetch(url, { cache: 'no-store' });
-                if (response.ok && mountedRef.current) {
-                    const serverTeams = await response.json();
-
-                    // If we are a team, we might want to merge with existing if it's a partial update,
-                    // but for now, replacing is fine since the state is scoped.
-                    setProjects(serverTeams || []);
-                } else if (mountedRef.current && user?.role === 'team' && [401, 403].includes(response.status)) {
-                    setProjects([]);
-                }
-            } catch (err) {
-                if (!isBackground) console.error("Failed to sync teams from server:", err);
             }
         };
 

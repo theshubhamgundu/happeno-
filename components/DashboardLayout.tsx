@@ -163,7 +163,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                     <div className={`mt-auto rounded-2xl border border-slate-200 bg-[#fafafa] ${isSidebarCollapsed ? "p-1.5" : "p-3"}`}>
                         <div className={`flex items-center gap-3 ${isSidebarCollapsed ? "justify-center" : ""}`}>
                             <div className="grid h-9 w-9 place-items-center rounded-full bg-[#fbe5df] text-[#c85847]"><User size={17} /></div>
-                            {!isSidebarCollapsed && <div className="min-w-0"><p className="truncate text-sm font-bold text-slate-800">{displayName}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{type === 'judge' ? 'evaluator' : type} access</p></div>}
+                            {!isSidebarCollapsed && <div className="min-w-0"><p className="truncate text-sm font-bold text-slate-800">{displayName}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{type} access</p></div>}
                         </div>
                     </div>
                 </aside>
@@ -176,7 +176,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                             <>
                                 <button onClick={() => setIsMobileMenuOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 lg:hidden"><Menu size={20} /></button>
                                 <div className="lg:hidden"><p className="text-sm font-black text-[#c85847]">TRICITY</p><p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Workspace</p></div>
-                                <div className="hidden lg:block"><p className="text-xs font-semibold text-slate-400">{type === 'judge' ? 'Evaluator' : type.charAt(0).toUpperCase() + type.slice(1)} workspace</p><p className="text-sm font-bold text-slate-700">TriCity AI Hackathon</p></div>
+                                <div className="hidden lg:block"><p className="text-xs font-semibold text-slate-400">{type.charAt(0).toUpperCase() + type.slice(1)} workspace</p><p className="text-sm font-bold text-slate-700">TriCity AI Hackathon</p></div>
                             </>
                         ) : (
                             <Link href="/" aria-label="TriCity home" className="flex items-center gap-2.5 rounded-xl transition hover:opacity-85">

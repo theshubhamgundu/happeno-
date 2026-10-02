@@ -14,6 +14,7 @@ import {
     User,
     QrCode,
     BarChart3,
+    LifeBuoy,
     Zap,
     GanttChartSquare,
     Menu,

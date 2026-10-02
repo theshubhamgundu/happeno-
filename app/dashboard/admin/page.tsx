@@ -87,7 +87,8 @@ export default function AdminDashboard() {
         bulkAssignMealPlan,
         deleteTeams,
         bulkUpdateTeams,
-        checkInTeam
+        checkInTeam,
+        refreshTeams
     } = useHackathon();
 
     const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
@@ -2059,7 +2060,7 @@ export default function AdminDashboard() {
                                     Table Assistance Requests
                                 </span>
                                 <button
-                                    onClick={fetchHelpTickets}
+                                    onClick={() => void fetchHelpTickets()}
                                     className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-white/10 cursor-pointer"
                                 >
                                     <RefreshCw size={12} className={isLoadingTickets ? 'animate-spin' : ''} /> Refresh

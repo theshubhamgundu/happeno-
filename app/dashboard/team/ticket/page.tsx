@@ -44,8 +44,9 @@ export default function TeamTicket() {
             const generateAll = async () => {
                 const qrs: Record<string, string> = {};
                 for (let i = 0; i < members.length; i++) {
-                    const memberId = getMemberId(members[i], i);
-                    const memberEmail = typeof members[i] === "object" ? members[i]?.email : undefined;
+                    const member = members[i];
+                    const memberId = getMemberId(member, i);
+                    const memberEmail = typeof member === "object" ? member.email : undefined;
                     const eligible = hasIndividualMealPass(team, memberId, memberEmail);
 
                     if (eligible) {

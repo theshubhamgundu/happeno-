@@ -40,7 +40,7 @@ export function verifyRosterToken(teamId: string, captainIdentifier: string, tok
 export interface RosterAuditEntry {
     id: string;
     teamId: string;
-    action: 'UPDATE_DETAILS' | 'REPLACE_MEMBER' | 'MERGE_TEAMS' | 'SWAP_REQUEST';
+    action: 'UPDATE_DETAILS' | 'FINALIZE_AND_LOCK' | 'REPLACE_MEMBER' | 'MERGE_TEAMS' | 'SWAP_REQUEST';
     timestamp: string;
     ip: string;
     actor: string;

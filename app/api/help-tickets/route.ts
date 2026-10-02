@@ -175,11 +175,11 @@ export async function POST(req: Request) {
         let effectiveTeamId = 'NO_TEAM_ID';
         if (typeof teamId === 'string' && teamId.trim() && teamId.trim() !== 'GUEST' && teamId.trim() !== 'NO_TEAM_ID') {
             effectiveTeamId = teamId.trim().toUpperCase();
-        } else if (source !== 'edit_registration' && session.role === 'team' && session.teamId) {
+        } else if (source !== 'edit_registration' && session?.role === 'team' && session.teamId) {
             effectiveTeamId = session.teamId;
         }
 
-        const effectiveContactName = typeof contactName === 'string' && contactName.trim() ? contactName.trim() : (session.name || 'Participant');
+        const effectiveContactName = typeof contactName === 'string' && contactName.trim() ? contactName.trim() : (session?.name || 'Participant');
         const effectiveTeamName = typeof teamName === 'string' && teamName.trim() && teamName.trim() !== 'Visitor / Team'
             ? teamName.trim()
             : (effectiveTeamId !== 'NO_TEAM_ID' ? `Team ${effectiveTeamId}` : (effectiveContactName ? `Query (${effectiveContactName})` : 'Participant'));
