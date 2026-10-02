@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
         const { data: databaseTeam, error: databaseError } = await supabase
             .from('registrations')
-            .select('team_id, team_name, password_hash, credentials_issued_at, status, merged_into, raw_data')
+            .select('team_id, team_name, password_hash, credentials_issued_at, status, raw_data')
             .eq('team_id', normalizedTeamId)
             .maybeSingle();
 
@@ -51,19 +51,19 @@ export async function POST(req: Request) {
         }
 
         let activeTeam = databaseTeam;
-        if (String(databaseTeam.status).toUpperCase() === 'MERGED') {
-            const raw = (databaseTeam.raw_data && typeof databaseTeam.raw_data === 'object') ? (databaseTeam.raw_data as any) : {};
-            const targetId = databaseTeam.merged_into || raw.merged_into_team_id;
-            if (targetId) {
-                const { data: comboTeam } = await supabase
-                    .from('registrations')
-                    .select('team_id, team_name, password_hash, credentials_issued_at, status, merged_into, raw_data')
-                    .eq('team_id', String(targetId).trim().toUpperCase())
-                    .maybeSingle();
-                if (comboTeam) {
-                    activeTeam = comboTeam;
-                }
-            }
+        const raw = (databaseTeam.raw_data && typeof databaseTeam.raw_data === 'object') ? (databaseTeam.raw_data as any) : {};
+        const targetId = raw.merged_into_team_id;
+        const comboQuery = supabase
+            .from('registrations')
+            .select('team_id, team_name, password_hash, credentials_issued_at, status, raw_data');
+        const { data: comboTeam } = targetId
+            ? await comboQuery.eq('team_id', String(targetId).trim().toUpperCase()).maybeSingle()
+            : await comboQuery
+                .eq('status', 'COMPLETED')
+                .contains('raw_data', { merged_from_teams: [normalizedTeamId] })
+                .maybeSingle();
+        if (comboTeam) {
+            activeTeam = comboTeam;
         }
 
         if (['PENDING', 'REJECTED'].includes(String(activeTeam.status).toUpperCase())) {

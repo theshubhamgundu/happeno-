@@ -488,11 +488,17 @@ function EditRegistrationInner() {
             });
             const data = await res.json();
             if (data.success) {
+                setPendingMerge(null);
+                if (decision === 'REJECT') {
+                    setShowMergeSuccessModal(false);
+                    toast.success(data.message || 'Merge proposal rejected.');
+                    return;
+                }
+
                 toast.success(data.message);
                 const hostOldId = team?.teamId || '';
                 const newId = data.comboTeamId || team?.teamId || '';
                 const newName = data.comboTeamName || '';
-                setPendingMerge(null);
                 setMergeCelebrationData({
                     isHost: true,
                     oldTeamId: hostOldId,

@@ -183,7 +183,7 @@ export async function POST(req: Request) {
         // If this team was merged into another team, seamlessly follow the pointer to the active combo team
         if (String(team.status).toUpperCase() === 'MERGED') {
             const raw = (team.raw_data && typeof team.raw_data === 'object') ? (team.raw_data as any) : {};
-            const targetId = team.merged_into || raw.merged_into_team_id;
+            const targetId = raw.merged_into_team_id;
 
             if (targetId) {
                 const { data: comboTeam, error: comboErr } = await supabase
@@ -192,6 +192,19 @@ export async function POST(req: Request) {
                     .eq('team_id', String(targetId).trim().toUpperCase())
                     .maybeSingle();
 
+                if (comboTeam && !comboErr) {
+                    activeTeam = comboTeam;
+                    isRedirectedFromMerged = true;
+                }
+            }
+
+            if (!isRedirectedFromMerged) {
+                const { data: comboTeam, error: comboErr } = await supabase
+                    .from('registrations')
+                    .select('*')
+                    .eq('status', 'COMPLETED')
+                    .contains('raw_data', { merged_from_teams: [normalizedTeamId] })
+                    .maybeSingle();
                 if (comboTeam && !comboErr) {
                     activeTeam = comboTeam;
                     isRedirectedFromMerged = true;

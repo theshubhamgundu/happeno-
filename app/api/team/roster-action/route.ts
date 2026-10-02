@@ -457,7 +457,6 @@ export async function POST(req: Request) {
                     .from('registrations')
                     .update({
                         status: 'MERGED',
-                        merged_into: comboTeamId,
                         raw_data: {
                             ...rawData,
                             merged_into_team_id: comboTeamId,
@@ -471,7 +470,6 @@ export async function POST(req: Request) {
                     .from('registrations')
                     .update({
                         status: 'MERGED',
-                        merged_into: comboTeamId,
                         raw_data: {
                             ...targetRawData,
                             merged_into_team_id: comboTeamId,
