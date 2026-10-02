@@ -29,7 +29,15 @@ export async function POST(req: Request) {
     // Verify window
     const portalMode = session.portalMode || await getParticipantPortalMode();
     const isDevelopment = process.env.NODE_ENV !== 'production';
-    if (!isDevelopment && portalMode !== 'edit' && !hasRole(session, ['admin'])) {
+    let requestedAction = '';
+    try {
+        const previewBody = await req.clone().json();
+        requestedAction = typeof previewBody?.action === 'string' ? previewBody.action : '';
+    } catch {
+        // The normal request parsing below returns the validation response.
+    }
+    const isMergeAction = ['create_merge_code', 'submit_merge_code', 'respond_merge'].includes(requestedAction);
+    if (!isDevelopment && portalMode !== 'edit' && !hasRole(session, ['admin']) && !isMergeAction) {
         return NextResponse.json({
             error: 'Roster editing is only available during the Team Correction Window (Oct 5–6).'
         }, { status: 403 });
