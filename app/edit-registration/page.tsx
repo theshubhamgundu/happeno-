@@ -120,12 +120,67 @@ function EditRegistrationInner() {
     // 1-Time Edit Lock Confirmation State
     const [showLockConfirmModal, setShowLockConfirmModal] = useState(false);
 
+    // Merge Success Celebration Modal State
+    const [showMergeSuccessModal, setShowMergeSuccessModal] = useState(false);
+    const [mergeCelebrationData, setMergeCelebrationData] = useState<{
+        isHost: boolean;
+        oldTeamId: string;
+        newTeamId: string;
+        newTeamName: string;
+        memberCount: number;
+    } | null>(null);
+
     // Auto-login if arriving via official magic link
     useEffect(() => {
         if (urlTeamId && urlToken) {
             void verifyAndLoadTeam(urlTeamId, urlToken, '');
         }
     }, [urlTeamId, urlToken]);
+
+    // Live Background Polling: Detects when host approves a pending merge while opp team is on-screen
+    useEffect(() => {
+        if (!team?.teamId || team.isRosterLocked) return;
+
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch('/api/team/verify-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        teamId: team.teamId,
+                        captainContact: team.captainMobile || team.email
+                    })
+                });
+                const data = await res.json();
+                if (data.success && data.team) {
+                    // Team was merged into a new combo team!
+                    if (data.team.teamId !== team.teamId) {
+                        const previousId = team.teamId;
+                        setTeam(data.team);
+                        setEditedTeam(JSON.parse(JSON.stringify(data.team)));
+                        setPendingMerge(null);
+                        setMergeCelebrationData({
+                            isHost: false,
+                            oldTeamId: previousId,
+                            newTeamId: data.team.teamId,
+                            newTeamName: data.team.teamName,
+                            memberCount: data.team.members?.length || 2
+                        });
+                        setShowMergeSuccessModal(true);
+                        toast.success(`Merge approved! You are now part of "${data.team.teamName}" (${data.team.teamId})`);
+                    } else if (data.pendingMerge && !pendingMerge) {
+                        setPendingMerge(data.pendingMerge);
+                    } else if (!data.pendingMerge && pendingMerge) {
+                        setPendingMerge(null);
+                    }
+                }
+            } catch {
+                // Silently ignore background polling errors
+            }
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [team?.teamId, team?.captainMobile, team?.email, team?.isRosterLocked, pendingMerge]);
 
     const verifyAndLoadTeam = async (id: string, token: string, contact: string) => {
         setIsVerifying(true);
@@ -434,7 +489,18 @@ function EditRegistrationInner() {
             const data = await res.json();
             if (data.success) {
                 toast.success(data.message);
+                const hostOldId = team?.teamId || '';
+                const newId = data.comboTeamId || team?.teamId || '';
+                const newName = data.comboTeamName || '';
                 setPendingMerge(null);
+                setMergeCelebrationData({
+                    isHost: true,
+                    oldTeamId: hostOldId,
+                    newTeamId: newId,
+                    newTeamName: newName,
+                    memberCount: (team?.members?.length || 0) + (pendingMerge?.sourceMemberCount || 0)
+                });
+                setShowMergeSuccessModal(true);
                 // Refresh team data (loads new combo team)
                 const targetIdToLoad = data.comboTeamId || team?.teamId;
                 if (targetIdToLoad) {
@@ -1591,6 +1657,81 @@ function EditRegistrationInner() {
                             </div>
                         </motion.div>
                     </div>
+                )}
+            </AnimatePresence>
+
+            {/* ══════════════ MODAL: MERGE CELEBRATION MODAL ══════════════ */}
+            <AnimatePresence>
+                {showMergeSuccessModal && mergeCelebrationData && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            className="w-full max-w-md bg-white border border-teal-200 rounded-[2rem] p-6 sm:p-7 shadow-2xl text-slate-900 text-center space-y-4"
+                        >
+                            <div className="w-16 h-16 rounded-3xl bg-teal-50 border-2 border-teal-200 text-teal-600 flex items-center justify-center mx-auto shadow-inner">
+                                <Sparkles size={32} className="animate-bounce" />
+                            </div>
+
+                            <div>
+                                <span className="inline-block px-3 py-1 rounded-full bg-teal-100 text-teal-800 text-[10px] font-extrabold uppercase tracking-wider mb-2">
+                                    🎉 Team Merge Successful!
+                                </span>
+                                <h3 className="font-extrabold uppercase tracking-tight text-slate-900 text-lg sm:text-xl">
+                                    {mergeCelebrationData.isHost ? 'You Approved the Merge!' : 'Merge Request Approved!'}
+                                </h3>
+                                <p className="text-xs text-slate-600 mt-1">
+                                    {mergeCelebrationData.isHost
+                                        ? 'Your team and the joining team have officially been combined.'
+                                        : 'The host team accepted your merge request. Welcome to your new combined team!'}
+                                </p>
+                            </div>
+
+                            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-2.5 text-xs">
+                                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                                    <span className="text-slate-500 font-bold uppercase text-[10px]">New Team Name</span>
+                                    <span className="font-bold text-slate-900">{mergeCelebrationData.newTeamName}</span>
+                                </div>
+                                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                                    <span className="text-slate-500 font-bold uppercase text-[10px]">New Team ID</span>
+                                    <div className="flex items-center gap-1.5 font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                                        <span>{mergeCelebrationData.newTeamId}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(mergeCelebrationData.newTeamId);
+                                                toast.success('Team ID copied to clipboard!');
+                                            }}
+                                            className="text-teal-600 hover:text-teal-800 cursor-pointer ml-1"
+                                            title="Copy Team ID"
+                                        >
+                                            <Copy size={12} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                                    <span className="text-slate-500 font-bold uppercase text-[10px]">Total Members</span>
+                                    <span className="font-bold text-slate-900">{mergeCelebrationData.memberCount} Members</span>
+                                </div>
+                                <div className="text-[11px] text-slate-500 bg-teal-50/60 p-2.5 rounded-xl border border-teal-100 flex items-start gap-2">
+                                    <ShieldCheck size={16} className="text-teal-600 shrink-0 mt-0.5" />
+                                    <span>
+                                        You can log in anytime using either your old Team ID ({mergeCelebrationData.oldTeamId}) or this new Team ID ({mergeCelebrationData.newTeamId}).
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setShowMergeSuccessModal(false)}
+                                className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer shadow-md flex items-center justify-center gap-2"
+                            >
+                                <Check size={16} /> Open Combined Roster
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
             </AnimatePresence>
         </div>
     );

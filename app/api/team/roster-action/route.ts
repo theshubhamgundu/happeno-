@@ -486,6 +486,81 @@ export async function POST(req: Request) {
                     await redis.del(`roster_pending_merge:${teamId}`);
                 }
 
+                // Dispatch confirmation emails to both team captains (non-blocking)
+                try {
+                    const magicUrlA = `https://tricity.online/edit-registration?teamId=${encodeURIComponent(comboTeamId)}`;
+                    const magicUrlB = `https://tricity.online/edit-registration?teamId=${encodeURIComponent(comboTeamId)}`;
+
+                    // Email to Host Team Lead (Team A)
+                    if (team.email) {
+                        await sendEmail({
+                            to: team.email,
+                            subject: `[MERGE CONFIRMED] Teams Successfully Merged into "${comboTeamName}" (${comboTeamId})`,
+                            html: `
+                                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
+                                    <div style="background: #0f172a; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
+                                        <h2 style="color: #14b8a6; margin: 0; font-size: 20px;">TEAM MERGE COMPLETED</h2>
+                                        <p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0;">New Combo Team ID: <strong>${comboTeamId}</strong></p>
+                                    </div>
+                                    <div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; background: #ffffff;">
+                                        <p>Hello <strong>${team.captain}</strong>,</p>
+                                        <p>Your team <strong>"${team.team_name}"</strong> has successfully merged with <strong>"${targetTeam.team_name}"</strong>!</p>
+                                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin: 20px 0;">
+                                            <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>New Combined Team:</strong> ${comboTeamName}</p>
+                                            <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>New Team ID:</strong> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${comboTeamId}</code></p>
+                                            <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Total Members:</strong> ${mergedMembers.length}</p>
+                                            <p style="margin: 0; font-size: 13px;"><strong>Designated Lead:</strong> ${team.captain}</p>
+                                        </div>
+                                        <p style="font-size: 13px; color: #475569;">
+                                            You and all teammates can now manage your unified roster using the new Team ID or your previous credentials.
+                                        </p>
+                                        <div style="text-align: center; margin: 24px 0;">
+                                            <a href="${magicUrlA}" style="background: #14b8a6; color: #000000; font-weight: bold; text-decoration: none; padding: 14px 28px; border-radius: 10px; display: inline-block; font-size: 14px;">
+                                                View Combined Team Roster
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                        });
+                    }
+
+                    // Email to Joining Team Lead (Team B)
+                    if (targetTeam.email) {
+                        await sendEmail({
+                            to: targetTeam.email,
+                            subject: `[MERGE APPROVED] You Have Successfully Merged into "${comboTeamName}" (${comboTeamId})`,
+                            html: `
+                                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
+                                    <div style="background: #0f172a; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
+                                        <h2 style="color: #14b8a6; margin: 0; font-size: 20px;">MERGE PROPOSAL APPROVED!</h2>
+                                        <p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0;">New Combo Team ID: <strong>${comboTeamId}</strong></p>
+                                    </div>
+                                    <div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; background: #ffffff;">
+                                        <p>Hello <strong>${targetTeam.captain}</strong>,</p>
+                                        <p>Great news! Team Lead <strong>${team.captain}</strong> has approved your merge request.</p>
+                                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin: 20px 0;">
+                                            <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>New Combined Team:</strong> ${comboTeamName}</p>
+                                            <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>New Team ID:</strong> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${comboTeamId}</code></p>
+                                            <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Total Members:</strong> ${mergedMembers.length}</p>
+                                        </div>
+                                        <p style="font-size: 13px; color: #475569;">
+                                            Even if you enter your old Team ID (${targetTeam.team_id}) and mobile number, the portal will automatically redirect you to this new combined team!
+                                        </p>
+                                        <div style="text-align: center; margin: 24px 0;">
+                                            <a href="${magicUrlB}" style="background: #14b8a6; color: #000000; font-weight: bold; text-decoration: none; padding: 14px 28px; border-radius: 10px; display: inline-block; font-size: 14px;">
+                                                View Combined Team Roster
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                        });
+                    }
+                } catch (emailErr) {
+                    console.warn('Merge notification email dispatch failed:', emailErr);
+                }
+
                 await recordRosterAudit({
                     teamId: comboTeamId,
                     action: 'MERGE_TEAMS',
