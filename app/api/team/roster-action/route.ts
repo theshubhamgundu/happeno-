@@ -399,9 +399,10 @@ export async function POST(req: Request) {
                     console.warn('RPC next_registration_team_id unavailable, using fallback:', rpcErr);
                 }
 
-                if (!comboTeamId) {
+                // If RPC failed or returned the old 'TRICITY_' format, override it to 'TRI26' format
+                if (!comboTeamId || comboTeamId.startsWith('TRICITY_') || comboTeamId.startsWith('TC-')) {
                     const randSuffix = Math.floor(1000 + Math.random() * 9000);
-                    comboTeamId = `TC-${randSuffix}`;
+                    comboTeamId = `TRI26${randSuffix}`;
                 }
 
                 // Preserve and merge member meal states
