@@ -108,7 +108,25 @@ export async function POST(req: Request) {
                 updates.track = String(track).trim();
             }
             if (college) updates.college = String(college).trim();
-            if (members) updates.members = members;
+            
+            if (members && Array.isArray(members)) {
+                // Secure Update: Whitelist fields & match by participant_id
+                const currentDbMembers = team.members || [];
+                updates.members = currentDbMembers.map((dbMember: any) => {
+                    const payloadMember = members.find((m: any) => m.participant_id === dbMember.participant_id);
+                    if (!payloadMember) return dbMember; // Fallback if missing
+                    
+                    return {
+                        ...dbMember, // Preserves ALL hidden fields (addons, redeemed flags, participant_id)
+                        fullName: String(payloadMember.fullName || dbMember.fullName).trim(),
+                        phone: String(payloadMember.phone || dbMember.phone).trim(),
+                        college: String(payloadMember.college || dbMember.college).trim(),
+                        department: String(payloadMember.department || dbMember.department).trim(),
+                        year: String(payloadMember.year || dbMember.year).trim()
+                        // Note: email cannot be changed via update_details, only via replace_member
+                    };
+                });
+            }
 
             const shouldLock = Boolean(finalizeAndLock || lockRoster);
             if (shouldLock) {
@@ -186,13 +204,25 @@ export async function POST(req: Request) {
 
             // Perform replacement
             currentMembers[memberIndex] = {
+                participant_id: randomUUID(), // New UUID for the new person
                 fullName: String(newMember.fullName).trim(),
                 email: newCleanEmail,
                 phone: String(newMember.phone || '').trim(),
                 college: String(newMember.college || team.college || '').trim(),
                 department: String(newMember.department || '').trim(),
                 year: String(newMember.year || '').trim(),
-                replacedAt: new Date().toISOString()
+                
+                // Inherit the slot's paid passes
+                meal_pass: Boolean(oldMember.meal_pass),
+                networking_pass: Boolean(oldMember.networking_pass),
+                
+                // Reset redemption/check-in flags for the new person
+                meal_redeemed: false,
+                networking_redeemed: false,
+                checked_in: false,
+                
+                replacedAt: new Date().toISOString(),
+                is_lead: Boolean(oldMember.is_lead)
             };
 
             const updatedRawData = {
@@ -431,7 +461,12 @@ export async function POST(req: Request) {
                 const targetTracks = Array.isArray(targetTeam.track_preferences) && targetTeam.track_preferences.length
                     ? targetTeam.track_preferences
                     : (targetTeam.track ? [targetTeam.track] : []);
-                const combinedTracks = [...new Set([...sourceTracks, ...targetTracks])].map(String).filter(Boolean);
+                
+                // Merge preferences, remove duplicates, and STRICTLY limit to max 3 (prioritizing the Host team's choices)
+                const combinedTracks = [...new Set([...sourceTracks, ...targetTracks])]
+                    .map(String)
+                    .filter(Boolean)
+                    .slice(0, 3);
 
                 const comboTeamName = `${team.team_name} & ${targetTeam.team_name}`.slice(0, 50);
                 const comboTransactionId = randomUUID();

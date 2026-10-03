@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
+import { randomUUID } from 'node:crypto';
 
 export async function POST(req: Request) {
     if (process.env.PUBLIC_REGISTRATIONS_OPEN !== 'true') {
@@ -71,7 +72,16 @@ export async function POST(req: Request) {
                     team_name: teamName,
                     track: domain,
                     status: 'PENDING', // Waiting for Admin to verify payment
-                    members: members,
+                    members: members.map((m: any, idx: number) => ({
+                        ...m,
+                        participant_id: randomUUID(),
+                        is_lead: idx === 0,
+                        meal_pass: false,
+                        networking_pass: false,
+                        meal_redeemed: false,
+                        networking_redeemed: false,
+                        checked_in: false
+                    })),
                     email: members[0].email,
                     captain: members[0].fullName,
                     captain_mobile: members[0].phone,
