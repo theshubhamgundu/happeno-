@@ -102,8 +102,6 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
 
     return (
         <div className={`dashboard-app dashboard-${type} min-h-screen bg-[#f1eeeb] p-0 text-slate-900`}>
-            {/* Multi-role Fast Testing Suite */}
-            <RoleTestSwitcher />
 
             <div className="p-0 lg:p-3">
             <div className={`mx-auto min-h-screen max-w-[1600px] overflow-hidden bg-[#faf9f7] lg:min-h-[calc(100vh-24px)] lg:rounded-2xl lg:border lg:border-white lg:shadow-[0_12px_36px_rgba(77,57,48,0.08)] ${hasSidebar ? (isSidebarCollapsed ? "lg:grid lg:grid-cols-[68px_minmax(0,1fr)]" : "lg:grid lg:grid-cols-[218px_minmax(0,1fr)]") : "block"}`}>
