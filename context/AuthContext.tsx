@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
 
         void refreshPortalMode();
-        const interval = setInterval(() => void refreshPortalMode(), 30000);
+        const interval = setInterval(() => void refreshPortalMode(), 300000);
         window.addEventListener('focus', refreshPortalMode);
         return () => {
             active = false;

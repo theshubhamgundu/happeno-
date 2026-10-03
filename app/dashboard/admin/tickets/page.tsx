@@ -116,7 +116,7 @@ export default function AdminTickets() {
         fetchTickets(false);
         const timer = setInterval(() => {
             fetchTickets(true);
-        }, 6000);
+        }, 120000); // 2 minutes
         return () => clearInterval(timer);
     }, [fetchTickets]);
 

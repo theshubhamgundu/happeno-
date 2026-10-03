@@ -274,7 +274,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
 
         // Dynamic polling interval based on user role
         // Admins/Judges need faster updates (60s), Teams/Guests can be slower (3 minutes) to reduce DB load
-        const pollingInterval = user?.role === 'admin' || user?.role === 'judge' ? 60000 : 180000;
+        const pollingInterval = user?.role === 'admin' || user?.role === 'judge' ? 300000 : 300000;
 
         const interval = setInterval(() => {
             if (document.visibilityState === 'visible' && mountedRef.current) {

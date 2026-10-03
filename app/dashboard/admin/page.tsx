@@ -297,7 +297,7 @@ export default function AdminDashboard() {
             void fetchInboundEmails();
             const interval = setInterval(() => {
                 void fetchHelpTickets(true);
-            }, 10000); // Quiet background poll every 10s
+            }, 120000); // Quiet background poll every 2 minutes
             return () => clearInterval(interval);
         }
     }, [activeTab]);
