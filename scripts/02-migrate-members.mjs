@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
 
@@ -42,21 +41,20 @@ async function migrate() {
         });
 
         if (needsUpdate) {
-            console.log(\Updating team \...\);
+            console.log(`Updating team ${team.team_id}...`);
             const { error: updateError } = await supabase
                 .from('registrations')
                 .update({ members: newMembers })
                 .eq('team_id', team.team_id);
             if (updateError) {
-                console.error(\Failed to update \:\, updateError);
+                console.error(`Failed to update ${team.team_id}:`, updateError);
             } else {
                 updatedCount++;
             }
         }
     }
 
-    console.log(\Migration complete. Updated \ teams.\);
+    console.log(`Migration complete. Updated ${updatedCount} teams.`);
 }
 
 migrate();
-

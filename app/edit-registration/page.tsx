@@ -1094,12 +1094,23 @@ function EditRegistrationInner() {
                                                         className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
                                                     >
                                                         <option value="">Select Branch</option>
-                                                        <option value="Computer Science / IT">Computer Science / IT</option>
-                                                        <option value="Electronics / Electrical">Electronics / Electrical</option>
-                                                        <option value="Mechanical / Civil">Mechanical / Civil</option>
-                                                        <option value="AI / Data Science">AI / Data Science</option>
-                                                        <option value="Business / Management">Business / Management</option>
-                                                        <option value="Design / Arts">Design / Arts</option>
+                                                        <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                                                        <option value="Information Technology">Information Technology</option>
+                                                        <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+                                                        <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
+                                                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                                        <option value="Civil Engineering">Civil Engineering</option>
+                                                        <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
+                                                        <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+                                                        <option value="Robotics & Automation">Robotics & Automation</option>
+                                                        <option value="Cyber Security / Blockchain">Cyber Security / Blockchain</option>
+                                                        <option value="Aerospace / Aeronautical Engineering">Aerospace / Aeronautical Engineering</option>
+                                                        <option value="Chemical Engineering">Chemical Engineering</option>
+                                                        <option value="Biotechnology / Biomedical">Biotechnology / Biomedical</option>
+                                                        <option value="Architecture / Design">Architecture / Design</option>
+                                                        <option value="Business Administration (BBA/MBA)">Business Administration (BBA/MBA)</option>
+                                                        <option value="Commerce / Economics">Commerce / Economics</option>
+                                                        <option value="Arts / Humanities / Science">Arts / Humanities / Science</option>
                                                         <option value="Other">Other</option>
                                                     </select>
                                                 </div>
@@ -1374,12 +1385,23 @@ function EditRegistrationInner() {
                                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                                         >
                                             <option value="">Select Branch</option>
-                                            <option value="Computer Science / IT">Computer Science / IT</option>
-                                            <option value="Electronics / Electrical">Electronics / Electrical</option>
-                                            <option value="Mechanical / Civil">Mechanical / Civil</option>
-                                            <option value="AI / Data Science">AI / Data Science</option>
-                                            <option value="Business / Management">Business / Management</option>
-                                            <option value="Design / Arts">Design / Arts</option>
+                                            <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                                            <option value="Information Technology">Information Technology</option>
+                                            <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+                                            <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
+                                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                            <option value="Civil Engineering">Civil Engineering</option>
+                                            <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
+                                            <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+                                            <option value="Robotics & Automation">Robotics & Automation</option>
+                                            <option value="Cyber Security / Blockchain">Cyber Security / Blockchain</option>
+                                            <option value="Aerospace / Aeronautical Engineering">Aerospace / Aeronautical Engineering</option>
+                                            <option value="Chemical Engineering">Chemical Engineering</option>
+                                            <option value="Biotechnology / Biomedical">Biotechnology / Biomedical</option>
+                                            <option value="Architecture / Design">Architecture / Design</option>
+                                            <option value="Business Administration (BBA/MBA)">Business Administration (BBA/MBA)</option>
+                                            <option value="Commerce / Economics">Commerce / Economics</option>
+                                            <option value="Arts / Humanities / Science">Arts / Humanities / Science</option>
                                             <option value="Other">Other</option>
                                         </select>
                                     </div>
