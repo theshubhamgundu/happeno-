@@ -1119,13 +1119,29 @@ function EditRegistrationInner() {
                                                         }}
                                                         className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
                                                     >
-                                                        <option value="">Select Year</option>
-                                                        <option value="1st Year">1st Year</option>
-                                                        <option value="2nd Year">2nd Year</option>
-                                                        <option value="3rd Year">3rd Year</option>
-                                                        <option value="4th Year">4th Year</option>
-                                                        <option value="5th Year">5th Year</option>
-                                                        <option value="Graduated / Professional">Graduated / Professional</option>
+                                                        <option value="">Select one</option>
+                                                        <optgroup label="College">
+                                                            <option value="1st Year">1st Year</option>
+                                                            <option value="2nd Year">2nd Year</option>
+                                                            <option value="3rd Year">3rd Year</option>
+                                                            <option value="4th Year">4th Year</option>
+                                                            <option value="5th Year">5th Year</option>
+                                                            <option value="Post Graduate">Post Graduate</option>
+                                                            <option value="Recent Graduate">Recent Graduate</option>
+                                                        </optgroup>
+                                                        <optgroup label="School">
+                                                            <option value="Class 8">Class 8</option>
+                                                            <option value="Class 9">Class 9</option>
+                                                            <option value="Class 10">Class 10</option>
+                                                            <option value="Class 11">Class 11</option>
+                                                            <option value="Class 12">Class 12</option>
+                                                        </optgroup>
+                                                        <optgroup label="Working">
+                                                            <option value="Working Professional">Working Professional</option>
+                                                            <option value="Founder / Entrepreneur">Founder / Entrepreneur</option>
+                                                            <option value="Faculty / Teacher">Faculty / Teacher</option>
+                                                            <option value="Other">Other</option>
+                                                        </optgroup>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1377,13 +1393,29 @@ function EditRegistrationInner() {
                                             onChange={e => setReplacementForm({ ...replacementForm, year: e.target.value })}
                                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                                         >
-                                            <option value="">Select Year</option>
-                                            <option value="1st Year">1st Year</option>
-                                            <option value="2nd Year">2nd Year</option>
-                                            <option value="3rd Year">3rd Year</option>
-                                            <option value="4th Year">4th Year</option>
-                                            <option value="5th Year">5th Year</option>
-                                            <option value="Graduated / Professional">Graduated / Professional</option>
+                                            <option value="">Select one</option>
+                                            <optgroup label="College">
+                                                <option value="1st Year">1st Year</option>
+                                                <option value="2nd Year">2nd Year</option>
+                                                <option value="3rd Year">3rd Year</option>
+                                                <option value="4th Year">4th Year</option>
+                                                <option value="5th Year">5th Year</option>
+                                                <option value="Post Graduate">Post Graduate</option>
+                                                <option value="Recent Graduate">Recent Graduate</option>
+                                            </optgroup>
+                                            <optgroup label="School">
+                                                <option value="Class 8">Class 8</option>
+                                                <option value="Class 9">Class 9</option>
+                                                <option value="Class 10">Class 10</option>
+                                                <option value="Class 11">Class 11</option>
+                                                <option value="Class 12">Class 12</option>
+                                            </optgroup>
+                                            <optgroup label="Working">
+                                                <option value="Working Professional">Working Professional</option>
+                                                <option value="Founder / Entrepreneur">Founder / Entrepreneur</option>
+                                                <option value="Faculty / Teacher">Faculty / Teacher</option>
+                                                <option value="Other">Other</option>
+                                            </optgroup>
                                         </select>
                                     </div>
                                 </div>
