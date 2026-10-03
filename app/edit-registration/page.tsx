@@ -1077,6 +1077,44 @@ function EditRegistrationInner() {
                                                         className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-mono outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
                                                     />
                                                 </div>
+
+                                                <div>
+                                                    <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                                        Branch / Specialization
+                                                    </label>
+                                                    <input
+                                                        id={`member-dept-${idx}`}
+                                                        type="text"
+                                                        placeholder="e.g. Computer Science"
+                                                        disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
+                                                        value={m.department || ''}
+                                                        onChange={e => {
+                                                            const copy = [...editedTeam.members];
+                                                            copy[idx].department = e.target.value;
+                                                            setEditedTeam({ ...editedTeam, members: copy });
+                                                        }}
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                                        Year of Study
+                                                    </label>
+                                                    <input
+                                                        id={`member-year-${idx}`}
+                                                        type="text"
+                                                        placeholder="e.g. 3rd Year"
+                                                        disabled={Boolean(team.isRosterLocked || editedTeam?.isRosterLocked)}
+                                                        value={m.year || ''}
+                                                        onChange={e => {
+                                                            const copy = [...editedTeam.members];
+                                                            copy[idx].year = e.target.value;
+                                                            setEditedTeam({ ...editedTeam, members: copy });
+                                                        }}
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -1270,7 +1308,7 @@ function EditRegistrationInner() {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 gap-3 pt-3">
                                     <div>
                                         <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
                                             Mobile Number
@@ -1293,6 +1331,32 @@ function EditRegistrationInner() {
                                             placeholder="College Name"
                                             value={replacementForm.college}
                                             onChange={e => setReplacementForm({ ...replacementForm, college: e.target.value })}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                            Branch / Specialization
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Computer Science"
+                                            value={replacementForm.department || ''}
+                                            onChange={e => setReplacementForm({ ...replacementForm, department: e.target.value })}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block mb-1">
+                                            Year of Study
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. 3rd Year"
+                                            value={replacementForm.year || ''}
+                                            onChange={e => setReplacementForm({ ...replacementForm, year: e.target.value })}
                                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                                         />
                                     </div>
