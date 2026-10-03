@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -15,6 +16,12 @@ interface MemberData {
     college: string;
     year: string;
     department: string;
+}
+
+declare global {
+    interface Window {
+        onTurnstileSuccess?: (token: string) => void;
+    }
 }
 
 function RegisterPageContent() {
@@ -42,6 +49,14 @@ function RegisterPageContent() {
     const [isLoading, setIsLoading] = useState(false);
     const [activeDomain, setActiveDomain] = useState<string | null>(null);
     const [transactionId, setTransactionId] = useState("");
+    const [turnstileToken, setTurnstileToken] = useState("");
+
+    useEffect(() => {
+        window.onTurnstileSuccess = setTurnstileToken;
+        return () => {
+            delete window.onTurnstileSuccess;
+        };
+    }, []);
 
     // Domains removed — free-text input used instead
 
@@ -57,6 +72,11 @@ function RegisterPageContent() {
 
         if (!teamName || !domain || !transactionId || isLeaderIncomplete) {
             toast.error("Please fill all required fields, including the Team Identity section");
+            return;
+        }
+
+        if (!turnstileToken) {
+            toast.error("Please complete the human verification check");
             return;
         }
 
@@ -90,7 +110,8 @@ function RegisterPageContent() {
                     domain,
                     members: activeMembers,
                     userTransactionId: transactionId,
-                    teamId: nextTeamId
+                    teamId: nextTeamId,
+                    turnstileToken
                 })
             });
 
@@ -175,6 +196,7 @@ function RegisterPageContent() {
 
     return (
         <div className="min-h-screen bg-[#13001F] relative overflow-hidden font-poppins pt-8 pb-12 px-3 md:px-4 md:pt-12 md:pb-20">
+            <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
                 <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-[#62009B] opacity-20 blur-[120px] rounded-full" />
                 <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-[#A200FF] opacity-10 blur-[120px] rounded-full" />
@@ -237,6 +259,14 @@ function RegisterPageContent() {
                                 </div>
                             ))}
 
+                            <div className="flex flex-col items-center gap-3">
+                                <div
+                                    className="cf-turnstile"
+                                    data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+                                    data-action="registration"
+                                    data-callback="onTurnstileSuccess"
+                                />
+                            </div>
                             <button type="button" onClick={handleInitiateRegistration} disabled={isLoading} className="w-full bg-[#FFEE00] text-[#62009B] font-kanit font-black h-16 md:h-20 rounded-2xl md:rounded-3xl text-xl md:text-2xl flex items-center justify-center gap-3 hover:bg-[#FFD620] transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed uppercase shadow-[0_15px_40px_rgba(255,238,0,0.3)]">
                                 {isLoading ? <div className="w-8 h-8 border-4 border-[#62009B] border-t-transparent rounded-full animate-spin" /> : <>SUBMIT REGISTRATION <Send className="w-6 h-6" /></>}
                             </button>

@@ -8,7 +8,25 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { teamName, domain, members, userTransactionId, teamId } = body;
+        const { teamName, domain, members, userTransactionId, teamId, turnstileToken } = body;
+
+        if (typeof turnstileToken !== 'string' || !turnstileToken.trim()) {
+            return NextResponse.json({ success: false, message: 'Human verification is required.' }, { status: 400 });
+        }
+
+        const verificationResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                secret: process.env.TURNSTILE_SECRET_KEY || '',
+                response: turnstileToken,
+            }),
+        });
+        const verification = await verificationResponse.json();
+        const allowedHostnames = new Set(['localhost', '127.0.0.1']);
+        if (!verificationResponse.ok || !verification.success || verification.action !== 'registration' || !allowedHostnames.has(verification.hostname)) {
+            return NextResponse.json({ success: false, message: 'Human verification failed. Please try again.' }, { status: 403 });
+        }
 
         if (typeof teamName !== 'string' || !teamName.trim() || teamName.length > 120 ||
             typeof domain !== 'string' || !domain.trim() || domain.length > 120 ||

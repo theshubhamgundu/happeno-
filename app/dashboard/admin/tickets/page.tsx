@@ -82,38 +82,38 @@ function getCategoryColor(category: string): { bg: string; text: string; border:
     }
 }
 
-const playLoudAlert = () => {
+const playZomatoAlert = () => {
     try {
         const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
         
-        // Main high-pitch beep
-        const osc1 = audioCtx.createOscillator();
-        const gain1 = audioCtx.createGain();
-        osc1.type = 'square';
-        osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
-        osc1.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // Ramp up to A6
+        const playTone = (freq: number, startTime: number, duration: number) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, startTime);
+            
+            // Bell-like envelope: immediate attack, exponential decay
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(1, startTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        };
+
+        const now = audioCtx.currentTime;
+        // Bright, pleasant double-chime (food delivery app style)
+        playTone(1318.51, now, 0.5);       // E6 note
+        playTone(1760.00, now + 0.15, 0.8); // A6 note (higher, sustaining)
         
-        // Fast modulating pulse (siren effect)
-        const osc2 = audioCtx.createOscillator();
-        const gain2 = audioCtx.createGain();
-        osc2.type = 'sawtooth';
-        osc2.frequency.setValueAtTime(900, audioCtx.currentTime);
+        // Repeat once for urgency
+        playTone(1318.51, now + 1.0, 0.5);
+        playTone(1760.00, now + 1.15, 0.8);
         
-        // Master volume
-        const masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
-        masterGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-        
-        osc1.connect(gain1);
-        osc2.connect(gain2);
-        gain1.connect(masterGain);
-        gain2.connect(masterGain);
-        masterGain.connect(audioCtx.destination);
-        
-        osc1.start();
-        osc2.start();
-        osc1.stop(audioCtx.currentTime + 0.6);
-        osc2.stop(audioCtx.currentTime + 0.6);
     } catch (e) {
         console.error("Web Audio API not supported", e);
     }
@@ -156,7 +156,7 @@ export default function AdminTickets() {
         // We also trigger if prev was 0 and we loaded *new* ones, but wait, initial load could have open tickets.
         // To avoid playing sound on initial page load, we check if !isLoading.
         if (!isLoading && openCount > prevOpenCount.current) {
-            playLoudAlert();
+            playZomatoAlert();
         }
         prevOpenCount.current = openCount;
     }, [tickets, isLoading]);

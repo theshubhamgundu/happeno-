@@ -63,6 +63,8 @@ async function persistTickets(tickets: HelpTicket[]): Promise<boolean> {
             saved = true;
         } catch (e) {
             console.warn('Redis write failed, attempting Supabase fallback:', e);
+            // Fail-safe: Try to delete the stale cache to force the next read from Supabase
+            try { await redis.del(HELP_QUEUE_KEY); } catch(err) {}
         }
     }
 
