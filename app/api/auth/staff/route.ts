@@ -38,38 +38,18 @@ export async function POST(req: Request) {
         }
 
         if (role === 'admin') {
-            const { data, error } = await supabase
-                .from('admins')
-                .select('id, username, name, password_hash, authorized_device_id')
-                .eq('username', id.toLowerCase().trim())
-                .maybeSingle();
-
-            if (error) throw error;
-            if (!data?.password_hash || !(await verifyPassword(password, data.password_hash))) {
-                return NextResponse.json({ success: false, error: 'Invalid Admin credentials.' }, { status: 401 });
+            const adminId = process.env.ADMIN_LOGIN_ID;
+            const adminPassword = process.env.ADMIN_PASSWORD;
+            if (!adminId || !adminPassword) {
+                return NextResponse.json({ success: false, error: 'Admin login is not configured.' }, { status: 503 });
             }
-
-            // DEVICE LOCKING LOGIC
-            const cookies = req.headers.get('cookie') || '';
-            const deviceTokenCookie = cookies.split('; ').find(row => row.startsWith('admin_device_token='))?.split('=')[1];
-            
-            if (data.authorized_device_id && data.authorized_device_id !== deviceTokenCookie) {
-                return NextResponse.json({ success: false, error: 'Login rejected: This device is not authorized for this admin account.' }, { status: 403 });
+            if (matchesCredential(id.toLowerCase(), adminId.toLowerCase()) && matchesCredential(password, adminPassword)) {
+                return setSessionCookie(
+                    NextResponse.json({ success: true, id: adminId, name: 'Administrator' }),
+                    { role: 'admin', id: adminId, name: 'Administrator' }
+                );
             }
-
-            let response = NextResponse.json({ success: true, id: data.id, name: data.name });
-            
-            // First time login on their laptop: bind this device to the admin!
-            if (!data.authorized_device_id) {
-                const newDeviceToken = crypto.randomUUID();
-                await supabase.from('admins').update({ authorized_device_id: newDeviceToken }).eq('id', data.id);
-                response.headers.append('Set-Cookie', `admin_device_token=${newDeviceToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=315360000;`);
-            }
-
-            return setSessionCookie(
-                response,
-                { role: 'admin', id: data.id, name: data.name }
-            );
+            return NextResponse.json({ success: false, error: 'Invalid Admin credentials.' }, { status: 401 });
         }
 
         const table = role === 'judge' ? 'judges' : 'volunteers';
