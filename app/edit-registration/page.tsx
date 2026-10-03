@@ -177,7 +177,7 @@ function EditRegistrationInner() {
             } catch {
                 // Silently ignore background polling errors
             }
-        }, 5000);
+        }, 30000); // 30 seconds — prevents DB overload with high concurrent user count
 
         return () => clearInterval(interval);
     }, [team?.teamId, team?.captainMobile, team?.email, team?.isRosterLocked, pendingMerge]);
