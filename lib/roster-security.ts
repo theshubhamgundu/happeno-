@@ -321,3 +321,20 @@ export async function getPendingMergeForTeam(teamId: string): Promise<MergePropo
     }
     return null;
 }
+
+/**
+ * Delete a merge proposal (clean up tokens).
+ */
+export async function deleteMergeProposal(code: string, teamId: string): Promise<void> {
+    if (redis) {
+        await redis.del(`${MERGE_CODES_PREFIX}${code}`);
+        await redis.del(`roster_pending_merge:${teamId}`);
+    } else {
+        const { data } = await supabase.from('hackathon_settings').select('value').eq('key', 'active_merge_proposals').maybeSingle();
+        const proposals: Record<string, MergeProposal> = (data?.value && typeof data.value === 'object') ? data.value : {};
+        if (proposals[code]) {
+            delete proposals[code];
+            await supabase.from('hackathon_settings').upsert({ key: 'active_merge_proposals', value: proposals });
+        }
+    }
+}

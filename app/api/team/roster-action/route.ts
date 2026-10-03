@@ -9,6 +9,7 @@ import {
     createMergeInvite,
     submitMergeRequest,
     getMergeInvite,
+    deleteMergeProposal,
     rateLimitRosterAction
 } from '@/lib/roster-security';
 import { sendEmail } from '@/lib/email';
@@ -344,10 +345,7 @@ export async function POST(req: Request) {
             }
 
             if (decision === 'REJECT') {
-                if (redis) {
-                    await redis.del(`roster_merge:${code}`);
-                    await redis.del(`roster_pending_merge:${teamId}`);
-                }
+                await deleteMergeProposal(code, teamId);
                 return NextResponse.json({ success: true, message: 'Merge proposal rejected.' });
             }
 
@@ -479,10 +477,7 @@ export async function POST(req: Request) {
                     .eq('team_id', targetTeam.team_id);
 
                 // Clean up merge tokens
-                if (redis) {
-                    await redis.del(`roster_merge:${code}`);
-                    await redis.del(`roster_pending_merge:${teamId}`);
-                }
+                await deleteMergeProposal(code, teamId);
 
                 // Dispatch confirmation emails to both team captains (non-blocking)
                 try {
