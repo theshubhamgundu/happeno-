@@ -20,7 +20,7 @@ import {
     Phone,
     Mail
 } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -82,6 +82,43 @@ function getCategoryColor(category: string): { bg: string; text: string; border:
     }
 }
 
+const playLoudAlert = () => {
+    try {
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        
+        // Main high-pitch beep
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'square';
+        osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+        osc1.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // Ramp up to A6
+        
+        // Fast modulating pulse (siren effect)
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(900, audioCtx.currentTime);
+        
+        // Master volume
+        const masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
+        masterGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+        
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        gain1.connect(masterGain);
+        gain2.connect(masterGain);
+        masterGain.connect(audioCtx.destination);
+        
+        osc1.start();
+        osc2.start();
+        osc1.stop(audioCtx.currentTime + 0.6);
+        osc2.stop(audioCtx.currentTime + 0.6);
+    } catch (e) {
+        console.error("Web Audio API not supported", e);
+    }
+};
+
 export default function AdminTickets() {
     const { user } = useAuth();
     const [filter, setFilter] = useState<'all' | 'assigned' | 'resolved'>('all');
@@ -89,6 +126,7 @@ export default function AdminTickets() {
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [actionId, setActionId] = useState<string | null>(null);
+    const prevOpenCount = useRef<number>(0);
 
     const adminIdentifier = user?.name || user?.id || "Admin";
 
@@ -111,7 +149,19 @@ export default function AdminTickets() {
         }
     }, []);
 
-    // Initial load and live polling every 6 seconds
+    // Alert Sound Trigger
+    useEffect(() => {
+        const openCount = tickets.filter(t => t.status === 'open').length;
+        // If there are more open tickets now than before, and it's not the initial load (prevOpenCount > 0), trigger alarm!
+        // We also trigger if prev was 0 and we loaded *new* ones, but wait, initial load could have open tickets.
+        // To avoid playing sound on initial page load, we check if !isLoading.
+        if (!isLoading && openCount > prevOpenCount.current) {
+            playLoudAlert();
+        }
+        prevOpenCount.current = openCount;
+    }, [tickets, isLoading]);
+
+    // Initial load and live polling every 2 minutes
     useEffect(() => {
         fetchTickets(false);
         const timer = setInterval(() => {
