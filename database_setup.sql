@@ -314,7 +314,7 @@ declare
     candidate text;
 begin
     loop
-        candidate := 'TRICITY_' || nextval('registration_team_number_seq')::text;
+        candidate := 'TRI26' || lpad(nextval('registration_team_number_seq')::text, 3, '0');
         exit when not exists (select 1 from registrations where team_id = candidate);
     end loop;
     return candidate;
