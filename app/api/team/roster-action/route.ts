@@ -401,8 +401,22 @@ export async function POST(req: Request) {
 
                 // If RPC failed or returned the old 'TRICITY_' format, override it to 'TRI26' format
                 if (!comboTeamId || comboTeamId.startsWith('TRICITY_') || comboTeamId.startsWith('TC-')) {
-                    const randSuffix = Math.floor(1000 + Math.random() * 9000);
-                    comboTeamId = `TRI26${randSuffix}`;
+                    let isUnique = false;
+                    while (!isUnique) {
+                        const randSuffix = Math.floor(1000 + Math.random() * 9000);
+                        comboTeamId = `TRI26${randSuffix}`;
+                        
+                        // Check if this ID already exists
+                        const { data: existing } = await supabase
+                            .from('registrations')
+                            .select('team_id')
+                            .eq('team_id', comboTeamId)
+                            .maybeSingle();
+                            
+                        if (!existing) {
+                            isUnique = true;
+                        }
+                    }
                 }
 
                 // Preserve and merge member meal states
