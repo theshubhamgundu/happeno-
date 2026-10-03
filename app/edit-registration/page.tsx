@@ -289,9 +289,9 @@ function EditRegistrationInner() {
             return;
         }
 
-        // External Agency Rule: Solo (1), Duo (2), or Quad (4) ONLY
+        // External Event Rule: Solo (1), Duo (2), or Quad (4) ONLY
         if (editedTeam.members.length === 3) {
-            toast.error('External agency rules strictly require Solo (1), Duo (2), or Quad (4) teams. 3-member teams (Tri) are not permitted.');
+            toast.error('External event rules strictly require Solo (1), Duo (2), or Quad (4) teams. 3-member teams (Tri) are not permitted.');
             return;
         }
 
@@ -410,7 +410,7 @@ function EditRegistrationInner() {
 
     const handleGenerateMergeCode = async () => {
         if (editedTeam && editedTeam.members.length === 3) {
-            toast.error('Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).');
+            toast.error('Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. event rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).');
             return;
         }
         if (editedTeam && editedTeam.members.length >= 4) {
@@ -442,7 +442,7 @@ function EditRegistrationInner() {
         e.preventDefault();
         if (!inputMergeCode.trim()) return;
         if (editedTeam && editedTeam.members.length === 3) {
-            toast.error('Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).');
+            toast.error('Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. event rules allow Solo (1), Duo (2), or Quad (4) teams only. If a Solo and Duo want to merge, a 4th teammate must be added to reach a full Quad (4).');
             return;
         }
         if (editedTeam && editedTeam.members.length >= 4) {
@@ -668,7 +668,7 @@ function EditRegistrationInner() {
                                         required
                                     />
                                     <p className="text-[10px] text-slate-400 mt-1">
-                                        Must match the details submitted during agency registration.
+                                        Must match the details submitted during event registration.
                                     </p>
                                 </div>
 
@@ -763,7 +763,7 @@ function EditRegistrationInner() {
                             </div>
                         )}
 
-                        {/* Agency Rule Alert: 3-Member Teams Prohibited */}
+                        {/* Event Rule Alert: 3-Member Teams Prohibited */}
                         {editedTeam && editedTeam.members.length === 3 && !(team.isRosterLocked || editedTeam.isRosterLocked) && (
                             <div className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-4 shadow-sm">
                                 <div className="w-11 h-11 rounded-2xl bg-amber-100 border border-amber-300 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -775,11 +775,11 @@ function EditRegistrationInner() {
                                             Action Required: 3-Member Teams (Tri) Are Not Permitted
                                         </h3>
                                         <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[9px] font-bold uppercase border border-rose-200">
-                                            Agency Rule
+                                            Event Rule
                                         </span>
                                     </div>
                                     <p className="text-xs text-amber-900 mt-1">
-                                        External agency rules strictly require teams to be <strong>Solo (1)</strong>, <strong>Duo (2)</strong>, or <strong>Quad (4)</strong>. Teams cannot compete or be locked with 3 members.
+                                        External event rules strictly require teams to be <strong>Solo (1)</strong>, <strong>Duo (2)</strong>, or <strong>Quad (4)</strong>. Teams cannot compete or be locked with 3 members.
                                     </p>
                                     <div className="flex items-center gap-3 mt-3">
                                         <button

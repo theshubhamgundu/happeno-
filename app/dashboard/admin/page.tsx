@@ -3694,7 +3694,7 @@ export default function AdminDashboard() {
                             </div>
 
                             <p className="text-xs text-white/70 leading-relaxed mb-4">
-                                This will completely wipe all demo / mock registrations in Supabase to give you a pristine database prior to importing the official agency CSV. Admin accounts, settings, and judging configs will remain intact.
+                                This will completely wipe all demo / mock registrations in Supabase to give you a pristine database prior to importing the official registration CSV. Admin accounts, settings, and judging configs will remain intact.
                             </p>
 
                             <div className="mb-5">

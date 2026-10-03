@@ -279,7 +279,7 @@ export async function POST(req: Request) {
             }
             if (memberCount === 3) {
                 return NextResponse.json({
-                    error: 'Cannot merge: 3-member teams (Tri) are prohibited under agency rules. Merging is only permitted between Solo + Solo (forms Duo) or Duo + Duo (forms Quad).'
+                    error: 'Cannot merge: 3-member teams (Tri) are prohibited under event rules. Merging is only permitted between Solo + Solo (forms Duo) or Duo + Duo (forms Quad).'
                 }, { status: 400 });
             }
 
@@ -312,7 +312,7 @@ export async function POST(req: Request) {
             }
             if (targetMemberCount === 3) {
                 return NextResponse.json({
-                    error: 'Cannot merge: 3-member teams (Tri) are prohibited under agency rules. Merging is only permitted between Solo + Solo (forms Duo) or Duo + Duo (forms Quad).'
+                    error: 'Cannot merge: 3-member teams (Tri) are prohibited under event rules. Merging is only permitted between Solo + Solo (forms Duo) or Duo + Duo (forms Quad).'
                 }, { status: 400 });
             }
 
@@ -380,7 +380,7 @@ export async function POST(req: Request) {
 
                 if (mergedMembers.length === 3) {
                     return NextResponse.json({
-                        error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules strictly permit Solo (1), Duo (2), or Quad (4) teams only.'
+                        error: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. event rules strictly permit Solo (1), Duo (2), or Quad (4) teams only.'
                     }, { status: 400 });
                 }
 

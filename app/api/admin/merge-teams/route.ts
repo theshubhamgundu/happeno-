@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         if (!members.length) return NextResponse.json({ error: 'The selected teams have no participants.' }, { status: 400 });
         if (members.length === 3) {
             return NextResponse.json({
-                error: 'External agency rules prohibit 3-member teams (Tri). Combined team must be 2 (Duo) or 4 (Quad) members.'
+                error: 'External event rules prohibit 3-member teams (Tri). Combined team must be 2 (Duo) or 4 (Quad) members.'
             }, { status: 400 });
         }
         if (members.length > MAX_TEAM_MEMBERS) {

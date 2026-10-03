@@ -235,7 +235,7 @@ export async function submitMergeRequest(
     if (totalMembers === 3) {
         return {
             success: false,
-            message: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. Agency rules strictly require Solo (1), Duo (2), or Quad (4) teams only.'
+            message: 'Cannot merge: Solo (1) + Duo (2) = 3 members is prohibited. event rules strictly require Solo (1), Duo (2), or Quad (4) teams only.'
         };
     }
 
