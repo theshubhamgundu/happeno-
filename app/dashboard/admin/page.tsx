@@ -295,10 +295,6 @@ export default function AdminDashboard() {
         if (activeTab === 'helpdesk') {
             void fetchHelpTickets(false);
             void fetchInboundEmails();
-            const interval = setInterval(() => {
-                void fetchHelpTickets(true);
-            }, 120000); // Quiet background poll every 2 minutes
-            return () => clearInterval(interval);
         }
     }, [activeTab]);
 
