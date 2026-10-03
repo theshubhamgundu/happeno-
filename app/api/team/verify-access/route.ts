@@ -258,33 +258,21 @@ export async function POST(req: Request) {
             }
         }
 
-        // Verification Method 2: Captain Email or Phone Dual Factor
+        // Verification Method 2: Team Lead Phone Number ONLY
         if (!isVerified && captainContact && typeof captainContact === 'string') {
-            const cleanContact = captainContact.trim().toLowerCase();
+            const cleanContact = captainContact.trim();
 
-            // Match against original queried team lead (allows old team captain to log in)
-            const origEmail = (team.email || '').trim().toLowerCase();
+            // Only match against original team lead's phone number
             const origPhone = (team.captain_mobile || '').trim();
-            if (origEmail === cleanContact || phoneMatches(origPhone, cleanContact)) {
+            if (phoneMatches(origPhone, cleanContact)) {
                 isVerified = true;
             }
 
-            // Match against active combo team lead
-            const activeEmail = (activeTeam.email || '').trim().toLowerCase();
-            const activePhone = (activeTeam.captain_mobile || '').trim();
-            if (!isVerified && (activeEmail === cleanContact || phoneMatches(activePhone, cleanContact))) {
-                isVerified = true;
-            }
-
-            // Also match against any member of the combined team
-            if (!isVerified && Array.isArray(activeTeam.members)) {
-                for (const m of activeTeam.members) {
-                    const mEmail = (m?.email || '').trim().toLowerCase();
-                    const mPhone = (m?.phone || '').trim();
-                    if (mEmail === cleanContact || phoneMatches(mPhone, cleanContact)) {
-                        isVerified = true;
-                        break;
-                    }
+            // Also match against active combo team lead's phone (for merged teams)
+            if (!isVerified) {
+                const activePhone = (activeTeam.captain_mobile || '').trim();
+                if (phoneMatches(activePhone, cleanContact)) {
+                    isVerified = true;
                 }
             }
         }
@@ -292,7 +280,7 @@ export async function POST(req: Request) {
         if (!isVerified) {
             return NextResponse.json({
                 success: false,
-                error: 'Verification failed. Please enter the registered Team Captain email or 10-digit mobile number.'
+                error: 'Verification failed. Please enter the registered Team Lead 10-digit phone number.'
             }, { status: 401 });
         }
 

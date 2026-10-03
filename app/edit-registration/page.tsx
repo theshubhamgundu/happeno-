@@ -223,7 +223,7 @@ function EditRegistrationInner() {
             return;
         }
         if (!captainContactInput.trim()) {
-            setAuthError('Please enter the registered Team Captain email or mobile number');
+            setAuthError('Please enter the registered Team Lead phone number');
             return;
         }
         void verifyAndLoadTeam(teamIdInput, '', captainContactInput);
@@ -657,18 +657,18 @@ function EditRegistrationInner() {
 
                                 <div>
                                     <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1.5">
-                                        Registered Captain Email or Phone
+                                        Team Lead Registered Phone Number
                                     </label>
                                     <input
-                                        type="text"
-                                        placeholder="Lead email or 10-digit mobile"
+                                        type="tel"
+                                        placeholder="10-digit mobile number"
                                         value={captainContactInput}
                                         onChange={e => setCaptainContactInput(e.target.value)}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
                                         required
                                     />
                                     <p className="text-[10px] text-slate-400 mt-1">
-                                        Must match the details submitted during event registration.
+                                        Enter the Team Lead's phone number used during registration.
                                     </p>
                                 </div>
 
