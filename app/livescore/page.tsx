@@ -299,7 +299,7 @@ export default function LiveScorePage() {
                                                 <td className="py-5 px-8 text-right">
                                                     <div className="flex flex-col items-end">
                                                         <span className="text-xl font-black text-slate-900 tabular-nums">
-                                                            {calculateAverage(p).toFixed(1)}
+                                                            {calculateAverage(p).toFixed(2)}
                                                         </span>
                                                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Global Mean</span>
                                                     </div>
@@ -324,7 +324,7 @@ function ScoreCell({ p, roundId, calculateAverage }: { p: Project; roundId: stri
     return (
         <td className="py-5 px-4 text-center">
             <span className={`text-[15px] font-bold ${hasScores ? 'text-slate-900' : 'text-slate-300 font-mono'}`}>
-                {hasScores ? avg.toFixed(1) : '---'}
+                {hasScores ? avg.toFixed(2) : '---'}
             </span>
         </td>
     );

@@ -32,14 +32,14 @@ function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary
         }
 
         const percentage = (scores.reduce((total, score) => total + score, 0) / scores.length / maxScore(round)) * 100;
-        const rounded = Number(percentage.toFixed(1));
+        const rounded = Number(percentage.toFixed(2));
         roundPercents[round.id] = rounded;
         completed.push(rounded);
     });
 
     return {
         completedRounds: completed.length,
-        overallPercent: completed.length ? Number((completed.reduce((total, score) => total + score, 0) / completed.length).toFixed(1)) : null,
+        overallPercent: completed.length ? Number((completed.reduce((total, score) => total + score, 0) / completed.length).toFixed(2)) : null,
         roundPercents,
         evaluations,
     };
