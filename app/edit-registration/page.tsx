@@ -618,7 +618,7 @@ function EditRegistrationInner() {
                                     Team Correction Portal
                                 </h1>
                                 <p className="text-xs text-slate-500 mt-1.5 font-medium">
-                                    Team merge testing is available now. Other roster edits open October 5–6, 2026.
+                                    Roster edits open October 5–6, 2026.
                                 </p>
                             </div>
 
@@ -626,9 +626,9 @@ function EditRegistrationInner() {
                             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs mb-6 flex items-start gap-2.5">
                                 <Clock size={16} className="shrink-0 text-amber-600 mt-0.5" />
                                 <div className="leading-relaxed">
-                                    <p className="font-bold text-amber-900">Team Merge Testing Available</p>
+                                    <p className="font-bold text-amber-900">48-Hour Edit Window</p>
                                     <p className="text-amber-800 text-[11px] mt-0.5">
-                                        Team leads can test merging teams now. Name changes and member replacements open October 5, and all team details permanently lock on October 6 at 11:59 PM.
+                                        Name changes, member replacements, and team merges open October 5, and all team details permanently lock on October 6 at 11:59 PM.
                                     </p>
                                 </div>
                             </div>
@@ -739,14 +739,14 @@ function EditRegistrationInner() {
                                     <div>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <h2 className="font-kanit font-extrabold uppercase text-lg text-slate-900">
-                                                Team Merge Testing Available
+                                                48-Hour Edit Window
                                             </h2>
                                             <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
                                                 ⚠️ 1-Time Submission Only
                                             </span>
                                         </div>
                                         <p className="text-xs text-slate-600 mt-0.5">
-                                            Team merges can be tested now. Other team details, track preferences, and member changes open October 5 and can be submitted <strong>once</strong> before the registration is permanently locked.
+                                            Team details, track preferences, member changes, and team merges open October 5 and can be submitted <strong>once</strong> before the registration is permanently locked.
                                         </p>
                                     </div>
                                 </div>
