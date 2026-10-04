@@ -164,7 +164,10 @@ export async function POST(req: Request) {
 
         const currentMode = await getParticipantPortalMode();
         const portalMode = currentMode;
-        // Allow access in 'edit' or 'event' mode (or if admin override is on)
+        
+        if (portalMode === 'closed') {
+            return NextResponse.json({ success: false, error: 'The participant portal is currently closed. Please check back during the designated windows.' }, { status: 403 });
+        }
 
         const { data: team, error } = await supabase
             .from('registrations')
