@@ -34,6 +34,12 @@ export async function getParticipantPortalMode(now = new Date()): Promise<Partic
 
     if (Number.isFinite(editStart) && Number.isFinite(editEnd) && current >= editStart && current < editEnd) return 'edit';
     if (Number.isFinite(eventStart) && Number.isFinite(eventEnd) && current >= eventStart && current < eventEnd) return 'event';
+    
+    // Developer convenience: default to 'edit' when running locally on localhost
+    if (process.env.NODE_ENV !== 'production') {
+        return 'edit';
+    }
+    
     return 'closed';
 }
 
