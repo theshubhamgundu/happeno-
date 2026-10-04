@@ -272,20 +272,11 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         };
         initFetch();
 
-        // Dynamic polling interval based on user role
-        // Admins/Judges need faster updates (60s), Teams/Guests can be slower (3 minutes) to reduce DB load
-        const pollingInterval = user?.role === 'admin' || user?.role === 'judge' ? 300000 : 300000;
-
-        const interval = setInterval(() => {
-            if (document.visibilityState === 'visible' && mountedRef.current) {
-                fetchSettings(true);
-                fetchServerTeams(true);
-            }
-        }, pollingInterval);
-
+        // Auto-polling removed to prevent database and Redis exhaustion.
+        // Data is now fetched on page load. Use manual refresh buttons when needed.
+        
         return () => {
             mountedRef.current = false;
-            clearInterval(interval);
         };
     }, [user, needsHackathonData]);
 

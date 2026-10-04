@@ -36,3 +36,6 @@ next-env.d.ts
 # Setup and Utility Scripts
 scripts/
 *.sql
+
+# Sentry Config File
+.env.sentry-build-plugin

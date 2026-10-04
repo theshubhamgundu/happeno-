@@ -9,7 +9,7 @@ import {
     ArrowLeft, Search, Save, Users, User, Edit3, CheckCircle2,
     AlertCircle, Loader2, KeyRound, ShieldCheck, Clock, Copy,
     GitMerge, UserPlus, HelpCircle, Send, Check, X, Sparkles, ChevronRight, Phone, Mail,
-    Lock, Plus, Trash2, AlertTriangle
+    Lock, Plus, Trash2, AlertTriangle, RefreshCw
 } from "lucide-react";
 import { TRACKS } from "@/lib/constants";
 
@@ -138,48 +138,10 @@ function EditRegistrationInner() {
     }, [urlTeamId, urlToken]);
 
     // Live Background Polling: Detects when host approves a pending merge while opp team is on-screen
+    // Auto-polling removed to prevent database and Redis exhaustion.
+    // Participants will manually refresh or check back if expecting a merge approval.
     useEffect(() => {
-        if (!team?.teamId || team.isRosterLocked) return;
-
-        const interval = setInterval(async () => {
-            try {
-                const res = await fetch('/api/team/verify-access', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        teamId: team.teamId,
-                        captainContact: team.captainMobile || team.email
-                    })
-                });
-                const data = await res.json();
-                if (data.success && data.team) {
-                    // Team was merged into a new combo team!
-                    if (data.team.teamId !== team.teamId) {
-                        const previousId = team.teamId;
-                        setTeam(data.team);
-                        setEditedTeam(JSON.parse(JSON.stringify(data.team)));
-                        setPendingMerge(null);
-                        setMergeCelebrationData({
-                            isHost: false,
-                            oldTeamId: previousId,
-                            newTeamId: data.team.teamId,
-                            newTeamName: data.team.teamName,
-                            memberCount: data.team.members?.length || 2
-                        });
-                        setShowMergeSuccessModal(true);
-                        toast.success(`Merge approved! You are now part of "${data.team.teamName}" (${data.team.teamId})`);
-                    } else if (data.pendingMerge && !pendingMerge) {
-                        setPendingMerge(data.pendingMerge);
-                    } else if (!data.pendingMerge && pendingMerge) {
-                        setPendingMerge(null);
-                    }
-                }
-            } catch {
-                // Silently ignore background polling errors
-            }
-        }, 30000); // 30 seconds — prevents DB overload with high concurrent user count
-
-        return () => clearInterval(interval);
+        // Keeping dependency array empty/matching so the hook remains valid but does nothing
     }, [team?.teamId, team?.captainMobile, team?.email, team?.isRosterLocked, pendingMerge]);
 
     const verifyAndLoadTeam = async (id: string, token: string, contact: string) => {
@@ -1201,16 +1163,30 @@ function EditRegistrationInner() {
                                                                 {generatedCode}
                                                             </span>
                                                         </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                void navigator.clipboard.writeText(generatedCode);
-                                                                toast.success('Merge code copied to clipboard!');
-                                                            }}
-                                                            className="px-3 py-1.5 rounded-lg bg-teal-600 text-white font-bold text-[10px] uppercase flex items-center gap-1 cursor-pointer hover:bg-teal-700"
-                                                        >
-                                                            <Copy size={12} /> Copy
-                                                        </button>
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    if (team?.teamId) {
+                                                                        void verifyAndLoadTeam(team.teamId, '', team.captainMobile || team.email || '');
+                                                                        toast.info('Checking for responses...');
+                                                                    }
+                                                                }}
+                                                                className="px-3 py-1.5 rounded-lg bg-teal-100 text-teal-700 border border-teal-200 font-bold text-[10px] uppercase flex items-center gap-1 cursor-pointer hover:bg-teal-200"
+                                                            >
+                                                                <RefreshCw size={12} className={isVerifying ? "animate-spin" : ""} /> Check
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    void navigator.clipboard.writeText(generatedCode);
+                                                                    toast.success('Merge code copied to clipboard!');
+                                                                }}
+                                                                className="px-3 py-1.5 rounded-lg bg-teal-600 text-white font-bold text-[10px] uppercase flex items-center gap-1 cursor-pointer hover:bg-teal-700"
+                                                            >
+                                                                <Copy size={12} /> Copy
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 ) : (
                                                     <button

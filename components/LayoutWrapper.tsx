@@ -3,8 +3,6 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import GlassNavBar from "@/components/navbar";
-import { Footer } from "@/components/footer";
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -17,21 +15,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         }
     }, [user, isLoading, pathname, router]);
 
-    const isDashboard = pathname?.startsWith("/dashboard");
-    const isLogin = pathname === "/login";
-    const isLandingPage = pathname === "/";
-
-    const isSpecialPage = isDashboard || isLogin || isLandingPage || pathname === "/registrations-count" || pathname === "/livescore" || pathname === "/edit-registration";
-
-    if (isSpecialPage) {
-        return <>{children}</>;
-    }
-
     return (
         <>
-            <GlassNavBar />
             {children}
-            <Footer />
         </>
     );
 }

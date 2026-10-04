@@ -7,6 +7,11 @@ import { redis } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
+// In-Memory L1 Cache to save Redis commands during heavy traffic
+const memoryCache: Record<string, { data: any; timestamp: number }> = {};
+const MEMORY_CACHE_TTL = 30000; // 30 seconds
+
+
 function isEnabledFlag(value: unknown): boolean {
     return value === true || (typeof value === 'string' && value.toLowerCase() === 'true');
 }
@@ -224,17 +229,28 @@ export async function GET(req: Request) {
         }
 
         // --- ADDED REDIS CACHING FOR FULL TEAM LIST ---
-        if (!teamId && redis) {
-            try {
-                // Determine cache key based on role (livescore needs a stripped down payload)
-                const cacheKey = session.role === 'livescore' ? 'all_teams_cache_livescore' : 'all_teams_cache_admin';
-                const cachedTeams = await redis.get(cacheKey);
-                if (cachedTeams) {
-                    const parsedTeams = typeof cachedTeams === 'string' ? JSON.parse(cachedTeams) : cachedTeams;
-                    return NextResponse.json(parsedTeams, { headers: { 'Cache-Control': 'no-store' } });
+        if (!teamId) {
+            const cacheKey = session.role === 'livescore' ? 'all_teams_cache_livescore' : 'all_teams_cache_admin';
+
+            // 1. Check L1 In-Memory Cache first (0 commands, 0 egress)
+            const memoryHit = memoryCache[cacheKey];
+            if (memoryHit && (Date.now() - memoryHit.timestamp) < MEMORY_CACHE_TTL) {
+                return NextResponse.json(memoryHit.data, { headers: { 'Cache-Control': 'no-store' } });
+            }
+
+            // 2. Check L2 Redis Cache
+            if (redis) {
+                try {
+                    const cachedTeams = await redis.get(cacheKey);
+                    if (cachedTeams) {
+                        const parsedTeams = typeof cachedTeams === 'string' ? JSON.parse(cachedTeams) : cachedTeams;
+                        // Populate L1 cache for next request
+                        memoryCache[cacheKey] = { data: parsedTeams, timestamp: Date.now() };
+                        return NextResponse.json(parsedTeams, { headers: { 'Cache-Control': 'no-store' } });
+                    }
+                } catch (cacheErr) {
+                    console.error("Redis cache read error:", cacheErr);
                 }
-            } catch (cacheErr) {
-                console.error("Redis cache read error:", cacheErr);
             }
         }
         // ----------------------------------------------
@@ -335,11 +351,17 @@ export async function GET(req: Request) {
         }
 
         // Save to cache for 30 seconds if it was a full fetch
-        if (cacheKeyToSet && redis) {
-            try {
-                await redis.setex(cacheKeyToSet, 30, JSON.stringify(responsePayload));
-            } catch (err) {
-                console.error("Failed to write to Redis cache:", err);
+        if (cacheKeyToSet) {
+            // Save to L1 Memory Cache
+            memoryCache[cacheKeyToSet] = { data: responsePayload, timestamp: Date.now() };
+
+            // Save to L2 Redis Cache
+            if (redis) {
+                try {
+                    await redis.setex(cacheKeyToSet, 30, JSON.stringify(responsePayload));
+                } catch (err) {
+                    console.error("Failed to write to Redis cache:", err);
+                }
             }
         }
 

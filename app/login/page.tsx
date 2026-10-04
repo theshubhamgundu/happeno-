@@ -274,20 +274,7 @@ export default function LoginPage() {
                     </div>
                 </motion.div>
 
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="mt-8 text-center"
-                >
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white border border-gray-200 text-gray-700 hover:text-[#0f172a] hover:border-gray-300 transition-all font-display font-semibold text-sm uppercase tracking-wider group"
-                    >
-                        <ArrowLeft size={16} />
-                        Back to Landing Page
-                    </Link>
-                </motion.div>
+
             </div>
         </main>
     );

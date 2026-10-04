@@ -259,10 +259,8 @@ export default function TeamDashboard() {
 
     useEffect(() => {
         fetchMyTickets();
-        const timer = setInterval(() => {
-            fetchMyTickets();
-        }, 8000);
-        return () => clearInterval(timer);
+        // Removed 8-second automatic polling to protect Redis/DB limits.
+        // Participants must manually refresh the page to see ticket updates.
     }, [fetchMyTickets]);
 
     const handleCancelHelp = async (ticketId: string) => {

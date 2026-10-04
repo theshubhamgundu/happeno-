@@ -163,7 +163,7 @@ export async function POST(req: Request) {
         const normalizedTeamId = teamId.trim().toUpperCase();
 
         const currentMode = await getParticipantPortalMode();
-        const portalMode = (currentMode === 'closed' && process.env.NODE_ENV !== 'production') ? 'edit' : currentMode;
+        const portalMode = currentMode;
         // Allow access in 'edit' or 'event' mode (or if admin override is on)
 
         const { data: team, error } = await supabase
