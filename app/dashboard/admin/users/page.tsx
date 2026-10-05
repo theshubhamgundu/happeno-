@@ -124,6 +124,7 @@ export default function UsersManagement() {
         return projects.filter(project => {
             const matchesSearch =
                 (project.team?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+                (project.teamId?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
                 (project.track?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
                 project.members.some(m => {
                     const memberObj = typeof m === 'string' ? { fullName: m } : m;
