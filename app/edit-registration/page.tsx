@@ -585,7 +585,7 @@ function EditRegistrationInner() {
                                     Team Correction Portal
                                 </h1>
                                 <p className="text-xs text-slate-500 mt-1.5 font-medium">
-                                    Team edits open October 5–6, 2026.
+                                    Team edits open October 5–7, 2026.
                                 </p>
                             </div>
 
@@ -593,9 +593,9 @@ function EditRegistrationInner() {
                             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs mb-6 flex items-start gap-2.5">
                                 <Clock size={16} className="shrink-0 text-amber-600 mt-0.5" />
                                 <div className="leading-relaxed">
-                                    <p className="font-bold text-amber-900">48-Hour Edit Window</p>
+                                    <p className="font-bold text-amber-900">Extended Edit Window</p>
                                     <p className="text-amber-800 text-[11px] mt-0.5">
-                                        Name changes, member replacements, and team merges open October 5, and all team details permanently lock on October 6 at 11:59 PM.
+                                        Name changes, member replacements, and team merges open October 5, and all team details permanently lock on October 7 at 5:00 PM.
                                     </p>
                                 </div>
                             </div>
