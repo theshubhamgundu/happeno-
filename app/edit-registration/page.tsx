@@ -553,7 +553,12 @@ function EditRegistrationInner() {
                         {team && (
                             <button
                                 type="button"
-                                onClick={() => { setTeam(null); setEditedTeam(null); }}
+                                onClick={async () => { 
+                                    setTeam(null); 
+                                    setEditedTeam(null); 
+                                    window.history.replaceState({}, document.title, window.location.pathname);
+                                    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (e) {}
+                                }}
                                 className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-bold transition cursor-pointer hover:bg-slate-50"
                             >
                                 Log out
@@ -580,7 +585,7 @@ function EditRegistrationInner() {
                                     Team Correction Portal
                                 </h1>
                                 <p className="text-xs text-slate-500 mt-1.5 font-medium">
-                                    Roster edits open October 5–6, 2026.
+                                    Team edits open October 5–6, 2026.
                                 </p>
                             </div>
 
@@ -1056,24 +1061,12 @@ function EditRegistrationInner() {
                                                         className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:border-teal-500 focus:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
                                                     >
                                                         <option value="">Select Branch</option>
-                                                        <option value="Computer Science & Engineering">Computer Science & Engineering</option>
-                                                        <option value="Information Technology">Information Technology</option>
-                                                        <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
-                                                        <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
-                                                        <option value="Mechanical Engineering">Mechanical Engineering</option>
-                                                        <option value="Civil Engineering">Civil Engineering</option>
-                                                        <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
-                                                        <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
-                                                        <option value="Robotics & Automation">Robotics & Automation</option>
-                                                        <option value="Cyber Security / Blockchain">Cyber Security / Blockchain</option>
-                                                        <option value="Aerospace / Aeronautical Engineering">Aerospace / Aeronautical Engineering</option>
-                                                        <option value="Chemical Engineering">Chemical Engineering</option>
-                                                        <option value="Biotechnology / Biomedical">Biotechnology / Biomedical</option>
-                                                        <option value="Architecture / Design">Architecture / Design</option>
-                                                        <option value="Business Administration (BBA/MBA)">Business Administration (BBA/MBA)</option>
-                                                        <option value="Commerce / Economics">Commerce / Economics</option>
-                                                        <option value="Arts / Humanities / Science">Arts / Humanities / Science</option>
-                                                        <option value="Other">Other</option>
+                                                        {m.department && !PREDEFINED_BRANCHES.includes(m.department) && (
+                                                            <option value={m.department}>{m.department}</option>
+                                                        )}
+                                                        {PREDEFINED_BRANCHES.map(branch => (
+                                                            <option key={branch} value={branch}>{branch}</option>
+                                                        ))}
                                                     </select>
                                                 </div>
 
@@ -1361,24 +1354,12 @@ function EditRegistrationInner() {
                                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                                         >
                                             <option value="">Select Branch</option>
-                                            <option value="Computer Science & Engineering">Computer Science & Engineering</option>
-                                            <option value="Information Technology">Information Technology</option>
-                                            <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
-                                            <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
-                                            <option value="Mechanical Engineering">Mechanical Engineering</option>
-                                            <option value="Civil Engineering">Civil Engineering</option>
-                                            <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
-                                            <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
-                                            <option value="Robotics & Automation">Robotics & Automation</option>
-                                            <option value="Cyber Security / Blockchain">Cyber Security / Blockchain</option>
-                                            <option value="Aerospace / Aeronautical Engineering">Aerospace / Aeronautical Engineering</option>
-                                            <option value="Chemical Engineering">Chemical Engineering</option>
-                                            <option value="Biotechnology / Biomedical">Biotechnology / Biomedical</option>
-                                            <option value="Architecture / Design">Architecture / Design</option>
-                                            <option value="Business Administration (BBA/MBA)">Business Administration (BBA/MBA)</option>
-                                            <option value="Commerce / Economics">Commerce / Economics</option>
-                                            <option value="Arts / Humanities / Science">Arts / Humanities / Science</option>
-                                            <option value="Other">Other</option>
+                                            {replacementForm.department && !PREDEFINED_BRANCHES.includes(replacementForm.department) && (
+                                                <option value={replacementForm.department}>{replacementForm.department}</option>
+                                            )}
+                                            {PREDEFINED_BRANCHES.map(branch => (
+                                                <option key={branch} value={branch}>{branch}</option>
+                                            ))}
                                         </select>
                                     </div>
 
@@ -1843,7 +1824,7 @@ function EditRegistrationInner() {
                                 onClick={() => setShowMergeSuccessModal(false)}
                                 className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase text-xs tracking-wider transition cursor-pointer shadow-md flex items-center justify-center gap-2"
                             >
-                                <Check size={16} /> Open Combined Roster
+                                <Check size={16} /> Open Combined Team
                             </button>
                         </motion.div>
                     </div>
@@ -1852,6 +1833,27 @@ function EditRegistrationInner() {
         </div>
     );
 }
+
+const PREDEFINED_BRANCHES = [
+    "Computer Science & Engineering",
+    "Information Technology",
+    "Electronics & Communication Engineering",
+    "Electrical & Electronics Engineering",
+    "Mechanical Engineering",
+    "Civil Engineering",
+    "Artificial Intelligence & Data Science",
+    "Artificial Intelligence & Machine Learning",
+    "Robotics & Automation",
+    "Cyber Security / Blockchain",
+    "Aerospace / Aeronautical Engineering",
+    "Chemical Engineering",
+    "Biotechnology / Biomedical",
+    "Architecture / Design",
+    "Business Administration (BBA/MBA)",
+    "Commerce / Economics",
+    "Arts / Humanities / Science",
+    "Other"
+];
 
 export default function EditRegistrationPage() {
     return (

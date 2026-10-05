@@ -67,6 +67,7 @@ import Link from "next/link";
 import Papa from "papaparse";
 import { QRScanner } from "@/components/QRScanner";
 import type { JudgingRound } from "@/lib/judging-rounds";
+import { TeamRestructure } from "@/components/admin/TeamRestructure";
 
 export default function AdminDashboard() {
     const {
@@ -102,7 +103,7 @@ export default function AdminDashboard() {
     const [targetWifiPass, setTargetWifiPass] = useState("");
     const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
-    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin'>('teams');
+    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin' | 'restructure'>('teams');
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
     const [emergencyForm, setEmergencyForm] = useState({ name: "", phone: "" });
@@ -253,7 +254,8 @@ export default function AdminDashboard() {
             meals: 'settings',
             helpdesk: 'helpdesk',
             exports: 'exports',
-            checkin: 'checkin'
+            checkin: 'checkin',
+            restructure: 'restructure'
         } as const;
         const selectSection = (section: string) => {
             setActiveTab(sectionToTab[section as keyof typeof sectionToTab] || 'teams');
@@ -1513,7 +1515,7 @@ export default function AdminDashboard() {
                                                             <span className="text-[9px] font-black uppercase text-amber-300 px-2 py-0.5 border border-amber-400/30 rounded bg-amber-400/10">Room: {team.room}</span>
                                                         )}
                                                     </div>
-                                                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track} • {team.college}</p>
+                                                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track ? `${team.track} • ` : ''}{team.college}</p>
                                                 </div>
                                             </div>
 
@@ -2955,6 +2957,7 @@ export default function AdminDashboard() {
                                 <RotateCcw size={14} /> Clear Submissions ({selectedTeamIds.length})
                             </button>
 
+
                             {/* Bulk Delete */}
                             <button
                                 type="button"
@@ -4311,6 +4314,12 @@ export default function AdminDashboard() {
                     </div>
                 )}
             </AnimatePresence>
+            {/* ═══════════ RESTRUCTURE TAB ═══════════ */}
+            {activeTab === 'restructure' && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <TeamRestructure />
+                </div>
+            )}
             </div>
         </DashboardLayout>
     );

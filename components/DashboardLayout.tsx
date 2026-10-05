@@ -20,6 +20,7 @@ const adminOperationItems = [
     { href: "/dashboard/admin#helpdesk", section: "helpdesk", icon: Headphones, label: "Help Desk" },
     { href: "/dashboard/admin#exports", section: "exports", icon: FileSpreadsheet, label: "CSV Exports" },
     { href: "/dashboard/admin#checkin", section: "checkin", icon: ScanLine, label: "QR Check-in" },
+    { href: "/dashboard/admin#restructure", section: "restructure", icon: Users, label: "Team Restructure" },
 ];
 
 interface DashboardLayoutProps {
