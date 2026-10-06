@@ -1275,15 +1275,6 @@ export default function AdminDashboard() {
     return (
         <DashboardLayout type="admin" title="Admin workspace">
             <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
-                <section className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-                    <MetricCard label="Registered entries" value={dashboardStats.total} icon={Users} tone="purple" />
-                    <MetricCard label="Participating entries" value={dashboardStats.active} icon={CheckCircle2} tone="green" />
-                    <MetricCard label="Checked in" value={projects.filter(p => p.isCheckedIn).length} icon={ScanLine} tone="blue" />
-                    <MetricCard label="Open help tickets" value={helpTickets.filter(t => t.status === 'open').length} icon={Headphones} tone="amber" />
-                    <MetricCard label="Meals claim rate" value={dashboardStats.mealsIncluded > 0 ? `${Math.round((dashboardStats.mealsClaimed / dashboardStats.mealsIncluded) * 100)}%` : "0%"} icon={Coffee} tone="red" />
-                    <MetricCard label="Judges active" value={judges.length} icon={ShieldCheck} tone="orange" />
-                </section>
-
 
             {/* Registrations Tab */}
             {activeTab === 'teams' && (

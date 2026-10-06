@@ -163,7 +163,12 @@ export async function POST(req: Request) {
         const normalizedTeamId = teamId.trim().toUpperCase();
 
         const currentMode = await getParticipantPortalMode();
-        const portalMode = currentMode;
+        let portalMode = currentMode;
+        
+        // Agency testing bypass
+        if (normalizedTeamId === 'TRI26002') {
+            portalMode = 'event';
+        }
         
         if (portalMode === 'closed') {
             return NextResponse.json({ success: false, error: 'The participant portal is currently closed. Please check back during the designated windows.' }, { status: 403 });
