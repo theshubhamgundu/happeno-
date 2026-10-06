@@ -66,6 +66,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Team not found in database.' }, { status: 404 });
         }
 
+        if (String(team.status).toUpperCase() === 'MERGED') {
+            return NextResponse.json({ error: 'This team has already been merged into another team. No further edits are permitted.' }, { status: 403 });
+        }
+
         const rawData = (team.raw_data && typeof team.raw_data === 'object') ? (team.raw_data as any) : {};
         const replacementCount = Number(rawData.member_replacements_count || 0);
         const isRosterLocked = Boolean(rawData.roster_locked || rawData.locked || team.is_locked);
