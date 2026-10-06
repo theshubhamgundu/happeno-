@@ -38,7 +38,9 @@ export async function POST(req: Request) {
         }
         
         if (portalMode === 'closed') {
-
+            return NextResponse.json({ success: false, error: 'The participant portal is currently closed.' }, { status: 403 });
+        }
+        
         const { data: databaseTeam, error: databaseError } = await supabase
             .from('registrations')
             .select('team_id, team_name, password_hash, credentials_issued_at, status, raw_data')
