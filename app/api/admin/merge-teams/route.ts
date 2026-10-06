@@ -98,16 +98,21 @@ export async function POST(req: Request) {
             .single();
         if (insertError) throw insertError;
 
-        const { error: mergeError } = await supabase
-            .from('registrations')
-            .update({
-                status: 'MERGED',
-                merged_into: mergedTeam.team_id
-            })
-            .in('transaction_id', orderedSources.map(team => team.transaction_id));
-        if (mergeError) {
-            await supabase.from('registrations').delete().eq('transaction_id', mergedTransactionId);
-            throw mergeError;
+        // Update each source team to mark them as MERGED
+        for (const team of orderedSources) {
+            const currentRaw = (team.raw_data && typeof team.raw_data === 'object') ? team.raw_data : {};
+            const { error: mergeError } = await supabase
+                .from('registrations')
+                .update({
+                    status: 'MERGED',
+                    raw_data: { ...currentRaw, merged_into_team_id: mergedTeam.team_id }
+                })
+                .eq('transaction_id', team.transaction_id);
+            
+            if (mergeError) {
+                await supabase.from('registrations').delete().eq('transaction_id', mergedTransactionId);
+                throw mergeError;
+            }
         }
 
         return NextResponse.json({
