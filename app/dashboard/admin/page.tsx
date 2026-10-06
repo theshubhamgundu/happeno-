@@ -3562,6 +3562,17 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
 
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Track Preference</label>
+                                    <input
+                                        type="text"
+                                        value={editFormData.track}
+                                        onChange={e => setEditFormData({ ...editFormData, track: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                        placeholder="e.g. General, HealthTech, etc."
+                                    />
+                                </div>
+
                                 <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
                                     <label className="flex items-center gap-2.5 cursor-pointer">
                                         <input
