@@ -3564,13 +3564,20 @@ export default function AdminDashboard() {
 
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Track Preference</label>
-                                    <input
-                                        type="text"
+                                    <select
                                         value={editFormData.track}
                                         onChange={e => setEditFormData({ ...editFormData, track: e.target.value })}
                                         className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
-                                        placeholder="e.g. General, HealthTech, etc."
-                                    />
+                                    >
+                                        <option value="" className="text-black">General / None</option>
+                                        <option value="SaaSsum AI (IT & AI)" className="text-black">SaaSsum AI (IT & AI)</option>
+                                        <option value="Maceco (Analytics)" className="text-black">Maceco (Analytics)</option>
+                                        <option value="Tobofu (Marketing)" className="text-black">Tobofu (Marketing)</option>
+                                        <option value="Promtal (HR Tech)" className="text-black">Promtal (HR Tech)</option>
+                                        <option value="Skill Tank (EdTech)" className="text-black">Skill Tank (EdTech)</option>
+                                        <option value="Vriddhi (FinTech)" className="text-black">Vriddhi (FinTech)</option>
+                                        <option value="Open Innovation" className="text-black">Open Innovation</option>
+                                    </select>
                                 </div>
 
                                 <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
