@@ -16,7 +16,7 @@ const adminOperationItems = [
     { href: "/dashboard/admin#entries", section: "entries", icon: Users, label: "Entries" },
     { href: "/dashboard/admin#judges", section: "judges", icon: ShieldCheck, label: "Evaluators" },
     { href: "/dashboard/admin#volunteers", section: "volunteers", icon: Phone, label: "Volunteers" },
-    { href: "/dashboard/admin#meals", section: "meals", icon: Coffee, label: "Meals" },
+    { href: "/dashboard/admin#addons", section: "addons", icon: Coffee, label: "Addons" },
     { href: "/dashboard/admin#helpdesk", section: "helpdesk", icon: Headphones, label: "Help Desk" },
     { href: "/dashboard/admin#exports", section: "exports", icon: FileSpreadsheet, label: "CSV Exports" },
     { href: "/dashboard/admin#checkin", section: "checkin", icon: ScanLine, label: "QR Check-in" },

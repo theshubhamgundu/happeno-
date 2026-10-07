@@ -251,7 +251,7 @@ export default function AdminDashboard() {
             entries: 'teams',
             judges: 'judges',
             volunteers: 'volunteers',
-            meals: 'settings',
+            addons: 'settings',
             helpdesk: 'helpdesk',
             exports: 'exports',
             checkin: 'checkin',
@@ -1858,87 +1858,76 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            {/* Settings Tab - Meal Management */}
+            {/* ═══════════ ADDONS TAB ═══════════ */}
             {activeTab === 'settings' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
                         <div className="flex justify-between items-center mb-8">
                             <div>
-                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">Meal Settings</h3>
-                                <p className="mt-1 text-xs text-white/40">Configure which meals are active for the event. Only enabled meals can be claimed by participants.</p>
+                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">Purchased Addons</h3>
+                                <p className="mt-1 text-xs text-white/40">View which participants have purchased Networking Passes and Meal Passes.</p>
                             </div>
                         </div>
 
-                        {/* Enabled Meals Configuration */}
-                        <div className="space-y-6 mb-8">
-                            <div>
-                                <h4 className="text-lg font-black text-white mb-4 uppercase tracking-tight">Available Meals</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {EVENT_MEALS.map((meal) => (
-                                        <label key={meal.key} className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all">
-                                            <input
-                                                type="checkbox"
-                                                checked={enabledMeals.includes(meal.key)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        updateEnabledMeals([...enabledMeals, meal.key]);
-                                                    } else {
-                                                        updateEnabledMeals(enabledMeals.filter(k => k !== meal.key));
-                                                    }
-                                                }}
-                                                className="w-5 h-5 rounded border-white/20 bg-black/50 text-[#14b8a6] focus:ring-[#14b8a6]"
-                                            />
-                                            <div className="flex-1">
-                                                <div className="text-white font-black text-sm">{meal.dayLabel} - {meal.mealLabel}</div>
-                                                <div className="text-white/50 text-xs font-bold">{meal.shortLabel}</div>
-                                            </div>
-                                        </label>
-                                    ))}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* LEFT SIDE: NETWORKING PASSES */}
+                            <div className="flex flex-col gap-4">
+                                <h4 className="text-lg font-black text-purple-400 uppercase tracking-widest border-b border-white/10 pb-3">Networking Passes</h4>
+                                <div className="space-y-3">
+                                    {projects.flatMap(p => 
+                                        (p.members || []).map((m: any, i: number) => {
+                                            const mId = m.participant_id || m.id || `m${i}`;
+                                            const mEmail = m.email;
+                                            const np = p.mealAccess?.networking_passes;
+                                            
+                                            let hasNet = false;
+                                            if (np === true) hasNet = true;
+                                            else if (Array.isArray(np)) {
+                                                if (np.includes('all') || np.length >= (p.members?.length || 0)) hasNet = true;
+                                                else if (np.includes(mId)) hasNet = true;
+                                                else if (mEmail && np.includes(mEmail)) hasNet = true;
+                                            }
+                                            
+                                            if (!hasNet) return null;
+                                            return (
+                                                <div key={`net-${p.teamId}-${i}`} className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-1">
+                                                    <div className="font-bold text-white text-sm">{m.fullName || m.name || "Unknown"}</div>
+                                                    <div className="text-xs text-white/50">{p.team || p.name} <span className="text-purple-400">({p.teamId})</span></div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Quick Actions */}
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => updateEnabledMeals(EVENT_MEALS.map(m => m.key))}
-                                    className="px-4 py-3 rounded-xl bg-[#14b8a6]/20 border border-[#14b8a6]/40 text-[#14b8a6] font-black uppercase text-xs tracking-widest hover:bg-[#14b8a6]/30 transition-all"
-                                >
-                                    Enable All
-                                </button>
-                                <button
-                                    onClick={() => updateEnabledMeals([])}
-                                    className="px-4 py-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 font-black uppercase text-xs tracking-widest hover:bg-red-500/30 transition-all"
-                                >
-                                    Disable All
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Meal Statistics */}
-                        <div className="border-t border-white/10 pt-8">
-                            <h4 className="text-lg font-black text-white mb-4 uppercase tracking-tight">Meal Claim Statistics</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {enabledMeals.map((mealKey) => {
-                                    const meal = EVENT_MEALS.find(m => m.key === mealKey);
-                                    const totalClaims = projects.reduce((sum, p) => {
-                                        const mms = p.memberMealState || {};
-                                        return sum + Object.values(mms).filter(memberSlots => 
-                                            memberSlots[mealKey]?.claimedAt
-                                        ).length;
-                                    }, 0);
-                                    
-                                    const totalMembers = projects.reduce((sum, p) => sum + (p.members?.length || 0), 0);
-                                    
-                                    return (
-                                        <div key={mealKey} className="p-4 bg-white/5 border border-white/10 rounded-2xl">
-                                            <div className="text-white font-black text-sm mb-1">{meal?.shortLabel || mealKey}</div>
-                                            <div className="text-[#14b8a6] text-2xl font-black">{totalClaims}</div>
-                                            <div className="text-white/50 text-xs">
-                                                of {totalMembers} participants ({totalMembers > 0 ? Math.round((totalClaims / totalMembers) * 100) : 0}%)
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                            {/* RIGHT SIDE: MEAL PASSES */}
+                            <div className="flex flex-col gap-4">
+                                <h4 className="text-lg font-black text-emerald-400 uppercase tracking-widest border-b border-white/10 pb-3">Meal Passes</h4>
+                                <div className="space-y-3">
+                                    {projects.flatMap(p => 
+                                        (p.members || []).map((m: any, i: number) => {
+                                            const mId = m.participant_id || m.id || `m${i}`;
+                                            const mEmail = m.email;
+                                            const pm = p.mealAccess?.purchased_meals;
+                                            
+                                            let hasMeal = false;
+                                            if (pm === true) hasMeal = true;
+                                            else if (Array.isArray(pm)) {
+                                                if (pm.includes('all') || pm.length >= (p.members?.length || 0)) hasMeal = true;
+                                                else if (pm.includes(mId)) hasMeal = true;
+                                                else if (mEmail && pm.includes(mEmail)) hasMeal = true;
+                                            }
+                                            
+                                            if (!hasMeal) return null;
+                                            return (
+                                                <div key={`meal-${p.teamId}-${i}`} className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-1">
+                                                    <div className="font-bold text-white text-sm">{m.fullName || m.name || "Unknown"}</div>
+                                                    <div className="text-xs text-white/50">{p.team || p.name} <span className="text-emerald-400">({p.teamId})</span></div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
