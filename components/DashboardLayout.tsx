@@ -63,8 +63,8 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
 
     const menuItems = {
         team: [
-            { href: "/dashboard/team/timeline", icon: CalendarDays, label: "Timeline" },
             { href: "/dashboard/team/ticket", icon: QrCode, label: "Digital Ticket" },
+            { href: "/dashboard/team/timeline", icon: CalendarDays, label: "Timeline" },
             { href: "/dashboard/team", icon: LayoutDashboard, label: "Workspace" },
             { href: "/dashboard/team/submissions", icon: Award, label: "Submissions" },
         ],
