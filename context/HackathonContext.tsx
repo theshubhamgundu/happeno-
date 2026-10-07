@@ -126,6 +126,7 @@ export interface Project {
         deployment: string;
         isFinal: boolean;
     };
+    mealAccess?: any;
 }
 
 const HackathonContext = createContext<HackathonContextType | undefined>(undefined);
