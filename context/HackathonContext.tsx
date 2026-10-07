@@ -194,11 +194,11 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    useEffect(() => {
-        if (user?.role === 'team' && user.portalMode !== 'event') {
-            setProjects([]);
-        }
-    }, [user?.role, user?.portalMode]);
+    // useEffect(() => {
+    //     if (user?.role === 'team' && user.portalMode !== 'event') {
+    //         setProjects([]);
+    //     }
+    // }, [user?.role, user?.portalMode]);
 
     // Load application data from Supabase-backed APIs.
     useEffect(() => {
