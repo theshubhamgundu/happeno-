@@ -30,6 +30,16 @@ export default function TicketPage() {
         return false;
     };
 
+    const hasIndividualActivityPass = (t: any, mId: string, mEmail?: string | null) => {
+        if (typeof t.mealAccess?.networking_passes === 'boolean') return t.mealAccess?.networking_passes;
+        if (Array.isArray(t.mealAccess?.networking_passes)) {
+            if (t.mealAccess?.networking_passes.includes('all')) return true;
+            if (t.mealAccess?.networking_passes.includes(mId)) return true;
+            if (mEmail && t.mealAccess?.networking_passes.includes(mEmail)) return true;
+        }
+        return false;
+    };
+
     // Generate Universal QR passes
     useEffect(() => {
         if (team && members.length > 0) {
@@ -90,9 +100,9 @@ export default function TicketPage() {
     const hasMealPass = currentMember && typeof currentMember !== 'string' && typeof currentMember.meal_pass === 'boolean'
         ? currentMember.meal_pass
         : currentMember ? hasIndividualMealPass(team, currentMemberId, currentMemberEmail) : false;
-    const hasNetworkingPass = currentMember && typeof currentMember !== 'string'
-        ? currentMember.networking_pass === true
-        : false;
+    const hasNetworkingPass = currentMember && typeof currentMember !== 'string' && typeof currentMember.networking_pass === 'boolean'
+        ? currentMember.networking_pass
+        : currentMember ? hasIndividualActivityPass(team, currentMemberId, currentMemberEmail) : false;
     const allocatedPlace = team.room || 'Pending Allocation';
 
     return (
@@ -149,8 +159,8 @@ export default function TicketPage() {
                                     </div>
                                     <div className="min-w-0 rounded-xl border border-gray-200 bg-gray-50 p-3">
                                         <p className="flex items-center justify-between gap-1 text-[9px] font-black uppercase tracking-[0.12em] text-gray-500">
-                                            <span className="flex items-center gap-1"><Ticket size={10}/> Networking</span>
-                                            <span role="img" aria-label={hasNetworkingPass ? "Networking pass purchased" : "Networking pass not purchased"}>{hasNetworkingPass ? "✅" : "❌"}</span>
+                                            <span className="flex items-center gap-1"><Ticket size={10}/> Activity Pass</span>
+                                            <span role="img" aria-label={hasNetworkingPass ? "Activity pass purchased" : "Activity pass not purchased"}>{hasNetworkingPass ? "✅" : "❌"}</span>
                                         </p>
                                     </div>
                                 </div>
