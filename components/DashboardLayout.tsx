@@ -92,7 +92,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
             return;
         }
         if (!isLoading && type === 'team' && user?.role === 'team') {
-            if (user.portalMode === 'edit') router.replace('/edit-registration');
+            // if (user.portalMode === 'edit') router.replace('/edit-registration');
             if (user.portalMode === 'closed') router.replace('/login');
         }
     }, [user, isLoading, type, router]);
