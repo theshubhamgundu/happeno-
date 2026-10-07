@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation, Headphones, Send, X } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation, Headphones, Send, X, Key } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
@@ -187,15 +187,6 @@ export default function TeamDashboard() {
     const [editingPI, setEditingPI] = useState(false);
     const [editingTS, setEditingTS] = useState(false);
 
-    // Help request state
-    const [showHelpForm, setShowHelpForm] = useState(false);
-    const [helpCategory, setHelpCategory] = useState("Technical");
-    const [helpDescription, setHelpDescription] = useState("");
-    const [helpTable, setHelpTable] = useState("");
-    const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
-    const [myTickets, setMyTickets] = useState<any[]>([]);
-    const [isCancellingTicketId, setIsCancellingTicketId] = useState<string | null>(null);
-    
     const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || null, [projects, user]);
 
     // Lock state comes from the DB via the API — not guessed from data presence
@@ -283,85 +274,6 @@ export default function TeamDashboard() {
         ), { duration: Infinity, position: 'top-center' });
     };
 
-    const fetchMyTickets = useCallback(async () => {
-        try {
-            const res = await fetch('/api/help-tickets');
-            if (res.ok) {
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    setMyTickets(data);
-                }
-            }
-        } catch (error) {
-            console.error('Failed to fetch team tickets:', error);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchMyTickets();
-        // Removed 8-second automatic polling to protect Redis/DB limits.
-        // Participants must manually refresh the page to see ticket updates.
-    }, [fetchMyTickets]);
-
-    const handleCancelHelp = async (ticketId: string) => {
-        setIsCancellingTicketId(ticketId);
-        try {
-            const res = await fetch('/api/help-tickets', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'cancel', ticketId })
-            });
-            const data = await res.json();
-            if (res.ok && data.success) {
-                toast.success('Help request cancelled.');
-                setMyTickets(data.tickets || []);
-            } else {
-                toast.error(data.error || 'Failed to cancel ticket.');
-            }
-        } catch {
-            toast.error('Could not cancel help request.');
-        } finally {
-            setIsCancellingTicketId(null);
-        }
-    };
-
-    const handleSubmitHelp = async () => {
-        if (!helpDescription.trim()) {
-            toast.error('Please describe your issue.');
-            return;
-        }
-        setIsSubmittingHelp(true);
-        try {
-            const res = await fetch('/api/help-tickets', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    category: helpCategory,
-                    description: helpDescription,
-                    tableNumber: helpTable,
-                    teamName: team?.team || 'Unknown Team'
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                toast.success('Help request sent! A volunteer will be with you shortly.');
-                setShowHelpForm(false);
-                setHelpDescription('');
-                setHelpTable('');
-                if (data.tickets) {
-                    setMyTickets(data.tickets);
-                } else {
-                    fetchMyTickets();
-                }
-            } else {
-                toast.error(data.error || 'Failed to submit help request.');
-            }
-        } catch {
-            toast.error('Could not reach the server.');
-        } finally {
-            setIsSubmittingHelp(false);
-        }
-    };
 
     if (isLoading) return <DashboardLayout type="team" title="Your project"><div className="grid min-h-[420px] place-items-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#df6d59] border-t-transparent" /></div></DashboardLayout>;
     if (!team) return <DashboardLayout type="team" title="Your project"><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><h2 className="text-lg font-semibold">No team is linked to this account</h2><p className="mt-2 text-sm text-slate-500">Please complete registration or contact the event team.</p></div></DashboardLayout>;
@@ -560,156 +472,7 @@ export default function TeamDashboard() {
                         </div>
                     </section>
 
-                    {/* Request Help Card */}
-                    <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-sm font-bold text-amber-900">Need Help?</h3>
-                            <span className="grid h-7 w-7 place-items-center rounded-lg bg-amber-100 text-amber-600"><Headphones size={14} /></span>
-                        </div>
 
-                        {/* Active Tickets List */}
-                        {myTickets.length > 0 && (
-                            <div className="space-y-2.5 mb-4">
-                                {myTickets.map(ticket => {
-                                    const isCancelling = isCancellingTicketId === ticket.id;
-                                    return (
-                                        <div key={ticket.id} className="rounded-xl border border-amber-200/80 bg-white p-3 shadow-xs">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
-                                                            {ticket.category}
-                                                        </span>
-                                                        {ticket.tableNumber && (
-                                                            <span className="text-[10px] font-medium text-slate-500">
-                                                                · Table {ticket.tableNumber}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-xs font-medium text-slate-800 mt-1 line-clamp-2">
-                                                        {ticket.description}
-                                                    </p>
-                                                </div>
-
-                                                {ticket.status === 'open' && (
-                                                    <button
-                                                        onClick={() => handleCancelHelp(ticket.id)}
-                                                        disabled={isCancelling}
-                                                        title="Cancel request"
-                                                        className="text-slate-400 hover:text-rose-500 p-1 rounded-md transition-colors disabled:opacity-50"
-                                                    >
-                                                        {isCancelling ? (
-                                                            <div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
-                                                        ) : (
-                                                            <X size={14} />
-                                                        )}
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {/* Live Status Indicator */}
-                                            <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                                                {ticket.status === 'open' && (
-                                                    <span className="inline-flex items-center gap-1.5 font-bold text-amber-600">
-                                                        <span className="h-2 w-2 rounded-full bg-amber-500 animate-ping" />
-                                                        Waiting for volunteer...
-                                                    </span>
-                                                )}
-                                                {ticket.status === 'accepted' && (
-                                                    <span className="inline-flex items-center gap-1.5 font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md">
-                                                        <CheckCircle2 size={13} className="text-teal-600" />
-                                                        {ticket.acceptedBy ? `${ticket.acceptedBy} is on the way!` : 'Volunteer is on the way!'}
-                                                    </span>
-                                                )}
-                                                {ticket.status === 'resolved' && (
-                                                    <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
-                                                        <CheckCircle2 size={13} />
-                                                        Resolved
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-
-                        {!showHelpForm ? (
-                            <div>
-                                {myTickets.filter(t => t.status !== 'resolved').length === 0 && (
-                                    <p className="text-xs text-amber-700 mb-3">Stuck on something? Request a mentor or report an issue and a volunteer will come to your table.</p>
-                                )}
-                                {myTickets.filter(t => t.status !== 'resolved').length < 3 ? (
-                                    <button
-                                        onClick={() => setShowHelpForm(true)}
-                                        className="w-full py-2.5 rounded-lg bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 shadow-xs"
-                                    >
-                                        <Headphones size={14} />
-                                        {myTickets.filter(t => t.status !== 'resolved').length > 0 ? "+ Request Another Help" : "Request Help / Mentor"}
-                                    </button>
-                                ) : (
-                                    <p className="text-xs text-amber-800/80 font-medium text-center">
-                                        You have 3 active requests in queue.
-                                    </p>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1 block">Category</label>
-                                    <select
-                                        value={helpCategory}
-                                        onChange={e => setHelpCategory(e.target.value)}
-                                        className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-amber-400"
-                                    >
-                                        <option value="Technical">Technical (Code/Bug)</option>
-                                        <option value="Mentor">Need a Mentor</option>
-                                        <option value="WiFi/Infra">WiFi / Infrastructure</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1 block">Describe your issue</label>
-                                    <textarea
-                                        value={helpDescription}
-                                        onChange={e => setHelpDescription(e.target.value)}
-                                        placeholder="e.g. Our backend API is returning 500 errors..."
-                                        rows={3}
-                                        className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-amber-400 resize-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1 block">Table / Location (optional)</label>
-                                    <input
-                                        value={helpTable}
-                                        onChange={e => setHelpTable(e.target.value)}
-                                        placeholder="e.g. Table 12, Room B"
-                                        className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-amber-400"
-                                    />
-                                </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setShowHelpForm(false)}
-                                        className="flex-1 py-2 rounded-lg border border-amber-200 text-xs font-bold text-amber-700 hover:bg-amber-100 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleSubmitHelp}
-                                        disabled={isSubmittingHelp || !helpDescription.trim()}
-                                        className="flex-1 py-2 rounded-lg bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                                    >
-                                        {isSubmittingHelp ? (
-                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        ) : (
-                                            <Send size={12} />
-                                        )}
-                                        Send Request
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </section>
 
                 </div>
 

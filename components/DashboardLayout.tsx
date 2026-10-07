@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import {
     Menu, X, LogOut, User, LayoutDashboard, Award, CalendarDays,
     BarChart3, Users, GanttChartSquare, ChevronRight, QrCode, Lock,
-    ShieldCheck, Phone, Coffee, LifeBuoy, Headphones, FileSpreadsheet, ScanLine
+    ShieldCheck, Phone, Coffee, LifeBuoy, Headphones, FileSpreadsheet, ScanLine, Key, ScrollText
 } from "lucide-react";
 import Link from "next/link";
 import { useHackathon } from "@/context/HackathonContext";
@@ -76,8 +76,11 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
         team: [
             { href: "/dashboard/team/ticket", icon: QrCode, label: "Digital Ticket" },
             { href: "/dashboard/team/timeline", icon: CalendarDays, label: "Timeline" },
+            { href: "/dashboard/team/rules", icon: ScrollText, label: "Rules & Guidelines" },
             { href: "/dashboard/team", icon: LayoutDashboard, label: "Workspace" },
+            { href: "/dashboard/team/help", icon: Headphones, label: "Need Help?" },
             { href: "/dashboard/team/submissions", icon: Award, label: "Submissions" },
+            { href: "/dashboard/team/api-keys", icon: Key, label: "Sponsor APIs" },
         ],
         judge: [
             { href: "/dashboard/judge", icon: LayoutDashboard, label: "Evaluation Pool" },
@@ -147,7 +150,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                             return <Link key={item.href} href={item.href} title={isSidebarCollapsed ? item.label : undefined} aria-label={isSidebarCollapsed ? item.label : undefined} className={`group flex items-center gap-2.5 rounded-lg py-2 text-xs font-semibold transition ${isSidebarCollapsed ? "justify-center px-2" : "px-2.5"} ${isActive ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}>
                                 <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-[#c85847]"}`}><item.icon size={14} /></span>
                                 {!isSidebarCollapsed && <span>{item.label}</span>}
-                                {!isSidebarCollapsed && item.label === "Submissions" && effectiveSubmissionLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
+                                {!isSidebarCollapsed && (item.label === "Submissions" || item.label === "Sponsor APIs") && effectiveSubmissionLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
                             </Link>;
                         })}
                     </nav>
@@ -240,7 +243,17 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                     <motion.div initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -24, opacity: 0 }} onClick={(event) => event.stopPropagation()} className="flex h-full w-full max-w-[320px] flex-col rounded-2xl bg-white p-5 shadow-2xl">
                         <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600 font-bold text-white">T</div><TricityMark compact className="text-xl" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500"><X size={21} /></button></div>
                         <p className="mt-9 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Workspace</p>
-                        <nav className="mt-3 space-y-1">{menuItems[type].map((item: any) => <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${pathname === item.href ? "bg-teal-600 text-white" : "text-slate-600"}`}><item.icon size={18} />{item.label}</Link>)}</nav>
+                        <nav className="mt-3 space-y-1">{menuItems[type].map((item: any) => {
+                            const isActive = pathname === item.href;
+                            const isLocked = (item.label === "Submissions" || item.label === "Sponsor APIs") && effectiveSubmissionLocked;
+                            return (
+                                <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${isActive ? "bg-teal-600 text-white" : "text-slate-600"}`}>
+                                    <item.icon size={18} />
+                                    <span>{item.label}</span>
+                                    {isLocked && <Lock size={15} className={`ml-auto ${isActive ? "text-indigo-200" : "text-slate-400"}`} />}
+                                </Link>
+                            );
+                        })}</nav>
                         {type === "admin" && <div className="mt-6">
                             <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Manage event operations</p>
                             <nav className="space-y-1" aria-label="Manage event operations">
