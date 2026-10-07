@@ -218,9 +218,9 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
     }
     const portalMode = session.portalMode || await getParticipantPortalMode();
-    if (session.role === 'team' && portalMode !== 'event') {
-        return NextResponse.json({ error: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
-    }
+    // if (session.role === 'team' && portalMode !== 'event') {
+    //     return NextResponse.json({ error: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
+    // }
 
     try {
         const requestedTeamId = new URL(req.url).searchParams.get('teamId');
@@ -379,9 +379,9 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
     }
     const portalMode = session.portalMode || await getParticipantPortalMode();
-    if (session.role === 'team' && portalMode !== 'event') {
-        return NextResponse.json({ error: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
-    }
+    // if (session.role === 'team' && portalMode !== 'event') {
+    //     return NextResponse.json({ error: 'Team dashboard access is available only October 10–11, 2026 (IST).' }, { status: 403 });
+    // }
 
     try {
         const body = await req.json();
