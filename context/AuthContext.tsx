@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setUser(null);
                     router.replace('/login');
                 } else if (portalMode === 'edit' && pathname.startsWith('/dashboard/team')) {
-                    router.replace('/edit-registration');
+                    // Do not force redirect to edit-registration anymore
                 }
             } catch (error) {
                 console.error('Participant portal mode refresh failed:', error);
