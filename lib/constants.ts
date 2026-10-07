@@ -44,6 +44,7 @@ export const TRACKS = [
 ];
 
 export const MAX_TEAM_MEMBERS = 4;
+export const MAX_PROPOSED_IDEA_CHARACTERS = 500;
 
 export const PROBLEM_STATEMENTS: Record<string, string[]> = {
     // SaaSsum AI / SaaSum AI (IT & AI)

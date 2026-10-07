@@ -103,7 +103,7 @@ export default function AdminDashboard() {
     const [targetWifiPass, setTargetWifiPass] = useState("");
     const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
-    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin' | 'restructure'>('teams');
+    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin' | 'restructure' | 'prescores'>('teams');
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
     const [emergencyForm, setEmergencyForm] = useState({ name: "", phone: "" });
@@ -255,7 +255,8 @@ export default function AdminDashboard() {
             helpdesk: 'helpdesk',
             exports: 'exports',
             checkin: 'checkin',
-            restructure: 'restructure'
+            restructure: 'restructure',
+            prescores: 'prescores'
         } as const;
         const selectSection = (section: string) => {
             setActiveTab(sectionToTab[section as keyof typeof sectionToTab] || 'teams');
@@ -637,7 +638,7 @@ export default function AdminDashboard() {
         }
     };
 
-    const [newJudge, setNewJudge] = useState({ name: "", specialization: "" });
+    const [newJudge, setNewJudge] = useState({ name: "", specialization: "", phone: "" });
     const [newVolunteer, setNewVolunteer] = useState({ name: "", phone: "", role: "" });
 
     const dashboardStats = useMemo(() => {
@@ -703,7 +704,7 @@ export default function AdminDashboard() {
             email: team.members?.[0]?.email || team.email || '',
             captainMobile: team.captainMobile || team.members?.[0]?.phone || '',
             college: team.college || '',
-            track: team.track || '',
+            track: (team.trackPreferences && team.trackPreferences.length > 0) ? team.trackPreferences.join(', ') : (team.track || ''),
             room: team.room || '',
             resendPass: false
         });
@@ -719,7 +720,8 @@ export default function AdminDashboard() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     teamId,
-                    ...editFormData
+                    ...editFormData,
+                    trackPreferences: editFormData.track ? editFormData.track.split(',').map(s => s.trim()).filter(Boolean) : []
                 })
             });
             const data = await res.json();
@@ -1683,7 +1685,6 @@ export default function AdminDashboard() {
             {/* Judges Tab */}
             {activeTab === 'judges' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <JudgingRoundSettings rounds={roundConfigs} onSave={saveRoundConfigs} />
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
                         <div className="flex justify-between items-center mb-8">
                             <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Add Official Evaluator</h3>
@@ -1705,45 +1706,13 @@ export default function AdminDashboard() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <div className="flex items-center justify-between ml-2">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Assigned Tracks (7 Available)</label>
-                                    <span className="text-[9px] text-white/40">Select as many or none</span>
-                                </div>
-                                <select
-                                    className="w-full bg-[#0B0114] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6] transition-colors text-xs"
-                                    value={newJudge.specialization}
-                                    onChange={(e) => setNewJudge({ ...newJudge, specialization: e.target.value })}
-                                >
-                                    <option value="">All 7 Tracks (General Evaluator)</option>
-                                    {TRACKS.map(t => (
-                                        <option key={t} value={t}>{t}</option>
-                                    ))}
-                                </select>
-                                <div className="flex flex-wrap gap-1 mt-1.5">
-                                    {TRACKS.map(t => {
-                                        const isSelected = (newJudge.specialization || '').includes(t);
-                                        return (
-                                            <button
-                                                key={t}
-                                                type="button"
-                                                onClick={() => {
-                                                    const current = (newJudge.specialization || '').split(',').map(s => s.trim()).filter(Boolean);
-                                                    const updated = current.includes(t)
-                                                        ? current.filter(s => s !== t)
-                                                        : [...current, t];
-                                                    setNewJudge({ ...newJudge, specialization: updated.join(', ') });
-                                                }}
-                                                className={`text-[9px] px-2 py-0.5 rounded font-bold border transition-colors ${
-                                                    isSelected
-                                                        ? "bg-[#14b8a6]/20 border-[#14b8a6] text-[#14b8a6]"
-                                                        : "bg-white/5 border-white/10 text-white/40 hover:text-white"
-                                                }`}
-                                            >
-                                                {t}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Phone</label>
+                                <input
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
+                                    value={newJudge.phone || ''}
+                                    placeholder="10 digit number"
+                                    onChange={(e) => setNewJudge({ ...newJudge, phone: e.target.value.replace(/\D/g, '').slice(-10) })}
+                                />
                             </div>
                             <div className="flex items-start md:items-end">
                                 <button
@@ -1753,7 +1722,7 @@ export default function AdminDashboard() {
                                                 name: newJudge.name,
                                                 specialization: newJudge.specialization || "All 7 Tracks"
                                             });
-                                            setNewJudge({ name: "", specialization: "" });
+                                            setNewJudge({ name: "", specialization: "", phone: "" });
                                         }
                                     }}
                                     className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
@@ -1822,29 +1791,23 @@ export default function AdminDashboard() {
                                 <Download size={18} /> Export Volunteers
                             </button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Name</label>
                                 <input
                                     className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none"
                                     value={newVolunteer.name}
+                                    placeholder="e.g. John Doe"
                                     onChange={(e) => setNewVolunteer({ ...newVolunteer, name: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Phone</label>
                                 <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
                                     value={newVolunteer.phone}
-                                    onChange={(e) => setNewVolunteer({ ...newVolunteer, phone: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Role</label>
-                                <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none"
-                                    value={newVolunteer.role}
-                                    onChange={(e) => setNewVolunteer({ ...newVolunteer, role: e.target.value })}
+                                    placeholder="10 digit number"
+                                    onChange={(e) => setNewVolunteer({ ...newVolunteer, phone: e.target.value.replace(/\D/g, '').slice(-10) })}
                                 />
                             </div>
                             <div className="flex items-end">
@@ -3563,21 +3526,43 @@ export default function AdminDashboard() {
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Track Preference</label>
-                                    <select
-                                        value={editFormData.track}
-                                        onChange={e => setEditFormData({ ...editFormData, track: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
-                                    >
-                                        <option value="" className="text-black">General / None</option>
-                                        <option value="SaaSsum AI (IT & AI)" className="text-black">SaaSsum AI (IT & AI)</option>
-                                        <option value="Maceco (Analytics)" className="text-black">Maceco (Analytics)</option>
-                                        <option value="Tobofu (Marketing)" className="text-black">Tobofu (Marketing)</option>
-                                        <option value="Promtal (HR Tech)" className="text-black">Promtal (HR Tech)</option>
-                                        <option value="Skill Tank (EdTech)" className="text-black">Skill Tank (EdTech)</option>
-                                        <option value="Vriddhi (FinTech)" className="text-black">Vriddhi (FinTech)</option>
-                                        <option value="Open Innovation" className="text-black">Open Innovation</option>
-                                    </select>
+                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Track Preferences (Up to 3)</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[
+                                            "SaaSsum AI (IT & AI)",
+                                            "Maceco (Analytics)",
+                                            "Tobofu (Marketing)",
+                                            "Promtal (HR Tech)",
+                                            "Skill Tank (EdTech)",
+                                            "Vriddhi (FinTech)",
+                                            "Open Innovation"
+                                        ].map(t => {
+                                            const currentTracks = (editFormData.track || '').split(',').map(s => s.trim()).filter(Boolean);
+                                            const isSelected = currentTracks.includes(t);
+                                            return (
+                                                <label key={t} className={`flex items-center gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-colors ${isSelected ? 'bg-blue-500/20 border-blue-500/50 text-blue-300 font-bold' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}>
+                                                    <input
+                                                        type="checkbox"
+                                                        className="hidden"
+                                                        checked={isSelected}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                if (currentTracks.length < 3) {
+                                                                    setEditFormData({ ...editFormData, track: [...currentTracks, t].join(', ') });
+                                                                }
+                                                            } else {
+                                                                setEditFormData({ ...editFormData, track: currentTracks.filter(x => x !== t).join(', ') });
+                                                            }
+                                                        }}
+                                                    />
+                                                    <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${isSelected ? 'border-blue-400 bg-blue-500' : 'border-white/20 bg-black/40'}`}>
+                                                        {isSelected && <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                                                    </span>
+                                                    {t}
+                                                </label>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
 
                                 <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
@@ -4329,7 +4314,56 @@ export default function AdminDashboard() {
                     <TeamRestructure />
                 </div>
             )}
-            </div>
+            
+            {/* 🟢 PRE-SCORES TAB 🟢 */}
+            {activeTab === 'prescores' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5 lg:flex-row lg:items-center">
+                        <div>
+                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
+                                <Award className="text-[#14b8a6]" size={28} />
+                                Rabbit Race Scores
+                            </h2>
+                            <p className="mt-1 max-w-xl text-sm font-medium text-slate-300">
+                                View pre-scores assigned to teams by the agency (e.g., Rabbit Race marks). These are automatically added to their final evaluation score out of 400.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-1 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm text-slate-300">
+                                <thead className="bg-black/40 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                    <tr>
+                                        <th className="px-6 py-4">Team ID</th>
+                                        <th className="px-6 py-4">Team Name</th>
+                                        <th className="px-6 py-4">Track</th>
+                                        <th className="px-6 py-4 text-right">Rabbit Race Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5 bg-black/20">
+                                    {projects.filter(p => p.preScore !== undefined && p.preScore > 0).map(project => (
+                                        <tr key={project.id} className="transition-colors hover:bg-white/5">
+                                            <td className="px-6 py-4 font-bold text-white">{project.teamId}</td>
+                                            <td className="px-6 py-4 font-semibold text-slate-300">{project.team}</td>
+                                            <td className="px-6 py-4 text-xs font-semibold text-slate-400">{project.track || 'Unassigned'}</td>
+                                            <td className="px-6 py-4 text-right font-black text-[#14b8a6]">{project.preScore} / 100</td>
+                                        </tr>
+                                    ))}
+                                    {projects.filter(p => p.preScore !== undefined && p.preScore > 0).length === 0 && (
+                                        <tr>
+                                            <td colSpan={4} className="px-6 py-12 text-center text-sm font-semibold text-slate-500">
+                                                No teams have a pre-score assigned yet.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+</div>
         </DashboardLayout>
     );
 }

@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
-    Menu, X, LogOut, User, LayoutDashboard, Award,
+    Menu, X, LogOut, User, LayoutDashboard, Award, CalendarDays,
     BarChart3, Users, GanttChartSquare, ChevronRight, QrCode, Lock,
     ShieldCheck, Phone, Coffee, LifeBuoy, Headphones, FileSpreadsheet, ScanLine
 } from "lucide-react";
@@ -21,6 +21,7 @@ const adminOperationItems = [
     { href: "/dashboard/admin#exports", section: "exports", icon: FileSpreadsheet, label: "CSV Exports" },
     { href: "/dashboard/admin#checkin", section: "checkin", icon: ScanLine, label: "QR Check-in" },
     { href: "/dashboard/admin#restructure", section: "restructure", icon: Users, label: "Team Restructure" },
+    { href: "/dashboard/admin#prescores", section: "prescores", icon: Award, label: "Rabbit Race" },
 ];
 
 interface DashboardLayoutProps {
@@ -62,9 +63,10 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
 
     const menuItems = {
         team: [
-            { href: "/dashboard/team", icon: LayoutDashboard, label: "Overview" },
-            { href: "/dashboard/team/submissions", icon: Award, label: "Submissions" },
+            { href: "/dashboard/team/timeline", icon: CalendarDays, label: "Timeline" },
             { href: "/dashboard/team/ticket", icon: QrCode, label: "Digital Ticket" },
+            { href: "/dashboard/team", icon: LayoutDashboard, label: "Workspace" },
+            { href: "/dashboard/team/submissions", icon: Award, label: "Submissions" },
         ],
         judge: [
             { href: "/dashboard/judge", icon: LayoutDashboard, label: "Evaluation Pool" },

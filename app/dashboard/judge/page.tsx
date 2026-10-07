@@ -22,16 +22,6 @@ import type { Project } from "@/context/HackathonContext";
 import { useAuth } from "@/context/AuthContext";
 import type { JudgingRound } from "@/lib/judging-rounds";
 
-function safeHttpUrl(value: unknown): string | null {
-    if (typeof value !== 'string' || !value.trim()) return null;
-    try {
-        const parsed = new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`);
-        return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.toString() : null;
-    } catch {
-        return null;
-    }
-}
-
 interface OfflineQueueItem {
     id: string; // evaluationId
     teamId: string;
@@ -646,20 +636,6 @@ export default function JudgeDashboard() {
                                                 (items || []).map(item => <span key={`${category}-${item}`} className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-700">{category}: {item}</span>)
                                             )}
                                             {!Object.values(activeProject.techStack || {}).some(items => items?.length) && <span className="text-xs text-slate-400">No technology stack submitted.</span>}
-                                        </div>
-                                    </div>
-                                    <div className="lg:col-span-2">
-                                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Project links</h3>
-                                        <div className="mt-1.5 flex flex-wrap gap-2">
-                                            {[
-                                                ['Source code', activeProject.submission?.github],
-                                                ['Presentation', activeProject.submission?.presentation],
-                                                ['Demo', activeProject.submission?.demo],
-                                                ['Live product', activeProject.submission?.deployment]
-                                            ].map(([label, value]) => {
-                                                const href = safeHttpUrl(value);
-                                                return href ? <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-teal-700 hover:bg-teal-50 hover:border-teal-300 transition shadow-sm">{label}</a> : null;
-                                            })}
                                         </div>
                                     </div>
                                 </div>

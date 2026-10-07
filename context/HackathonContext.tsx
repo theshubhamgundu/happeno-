@@ -55,7 +55,7 @@ interface HackathonContextType {
     isLoading: boolean;
     checkInTeam: (projectId: any) => Promise<boolean>;
     judges: Judge[];
-    addJudge: (judge: { name: string, specialization: string }) => void;
+    addJudge: (judge: { name: string, specialization: string, phone?: string }) => void;
     removeJudge: (id: string) => void;
     volunteers: Volunteer[];
     addVolunteer: (volunteer: { name: string, phone: string, role: string }) => void;
@@ -80,6 +80,8 @@ export interface Member {
     college?: string;
     year?: string;
     department?: string;
+    meal_pass?: boolean;
+    networking_pass?: boolean;
 }
 
 export interface Project {
@@ -102,6 +104,7 @@ export interface Project {
     captainMobile: string;
     college: string;
     roundScores: Record<string, Record<string, number | null>>; // roundId -> judgeId -> score
+    preScore?: number;
     roundDetailedScores?: Record<string, Record<string, Record<string, number>>>; // roundId -> judgeId -> criterionId -> score
     roundComments?: Record<string, Record<string, string | null>>; // roundId -> judgeId -> comment
     isCheckedIn?: boolean;

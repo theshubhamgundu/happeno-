@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { MAX_TEAM_MEMBERS } from '@/lib/constants';
+import { MAX_PROPOSED_IDEA_CHARACTERS, MAX_TEAM_MEMBERS } from '@/lib/constants';
 import { getSession, hasRole } from '@/lib/session';
 import { getParticipantPortalMode } from '@/lib/event-windows';
 import { redis } from '@/lib/redis';
@@ -60,6 +60,7 @@ function teamResponse(row: Record<string, unknown>) {
         roundScores: row.round_scores || {},
         roundDetailedScores: row.round_detailed_scores || {},
         roundComments: row.round_comments || {},
+        preScore: Number(rawData.rabbit_race_score) || 0,
         isEliminated: row.is_eliminated || false,
         isCheckedIn: row.is_checked_in || false,
         checkedInAt: rawData.checkedInAt || null,
@@ -391,6 +392,12 @@ export async function PATCH(req: Request) {
         } = body;
 
         if (typeof id !== 'string' || !id) return NextResponse.json({ error: 'ID is required.' }, { status: 400 });
+        if (session.role === 'team' && proposedIdea !== undefined &&
+            (typeof proposedIdea !== 'string' || proposedIdea.length > MAX_PROPOSED_IDEA_CHARACTERS)) {
+            return NextResponse.json({
+                error: `Proposed idea must be ${MAX_PROPOSED_IDEA_CHARACTERS} characters or fewer.`
+            }, { status: 400 });
+        }
         if (roundScores !== undefined || roundComments !== undefined || roundDetailedScores !== undefined) {
             return NextResponse.json({ error: 'Evaluations must be saved through the durable judging workflow.' }, { status: 409 });
         }

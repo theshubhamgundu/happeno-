@@ -30,14 +30,20 @@ export async function POST(req: Request) {
     }
 
     try {
-        const { name, specialization } = await req.json();
+        const { name, specialization, phone } = await req.json();
         if (typeof name !== 'string' || !name.trim()) {
             return NextResponse.json({ error: 'Judge name is required.' }, { status: 400 });
         }
 
         const { data: generatedId, error: idError } = await supabase.rpc('next_staff_id', { staff_type: 'judge' });
         if (idError || typeof generatedId !== 'string') throw idError || new Error('Could not allocate a judge ID.');
-        const password = randomBytes(18).toString('base64url');
+        
+        let password = randomBytes(18).toString('base64url');
+        if (phone && typeof phone === 'string') {
+            const digits = phone.replace(/\D/g, '').slice(-10);
+            if (digits.length === 10) password = digits;
+        }
+
         const { data, error } = await supabase
             .from('judges')
             .insert({ name: name.trim(), specialization, generated_id: generatedId, password_hash: await hashPassword(password) })

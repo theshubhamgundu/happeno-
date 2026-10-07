@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation, Headphones, Send, Clock, X } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation, Headphones, Send, X } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
-import { TRACKS, PROBLEM_STATEMENTS, getProblemStatementsForTrack } from "@/lib/constants";
+import { TRACKS, PROBLEM_STATEMENTS, getProblemStatementsForTrack, MAX_PROPOSED_IDEA_CHARACTERS } from "@/lib/constants";
 import { toast } from "sonner";
 
 
@@ -138,6 +138,7 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
 
 export default function TeamDashboard() {
     const { projects, isLoading, isSubmissionLocked, refreshTeams } = useHackathon();
+
     const { user } = useAuth();
     
     const [proposedIdea, setProposedIdea] = useState("");
@@ -201,6 +202,11 @@ export default function TeamDashboard() {
     };
 
     const saveField = (field: string, value: any, setEditingState: (val: boolean) => void) => {
+        if (field === 'proposedIdea' && typeof value === 'string' && value.length > MAX_PROPOSED_IDEA_CHARACTERS) {
+            toast.error(`Proposed idea must be ${MAX_PROPOSED_IDEA_CHARACTERS} characters or fewer.`);
+            return;
+        }
+
         toast.custom((id) => (
             <div className={`animate-in fade-in zoom-in-95 max-w-md w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex flex-col ring-1 ring-black/5 overflow-hidden duration-200`}>
                 <div className="p-5">
@@ -326,15 +332,22 @@ export default function TeamDashboard() {
     if (isLoading) return <DashboardLayout type="team" title="Your project"><div className="grid min-h-[420px] place-items-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#df6d59] border-t-transparent" /></div></DashboardLayout>;
     if (!team) return <DashboardLayout type="team" title="Your project"><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><h2 className="text-lg font-semibold">No team is linked to this account</h2><p className="mt-2 text-sm text-slate-500">Please complete registration or contact the event team.</p></div></DashboardLayout>;
 
+    
+    const IS_HACKATHON_STARTED = new Date() >= new Date('2026-10-10T08:00:00+05:30');
+    // Lock everything if hackathon hasn\'t started
+    const effectiveSubmissionLocked = isSubmissionLocked || !IS_HACKATHON_STARTED;
+    const effectivePILocked = team?.isPILocked || !IS_HACKATHON_STARTED;
+    const effectiveTSLocked = team?.isTSLocked || !IS_HACKATHON_STARTED;
+
     const members = team.members.map((member: any, index: number) => ({ name: typeof member === "string" ? member : member.fullName, role: index === 0 ? "Team lead" : "Member", detail: typeof member === "string" ? "Participant" : member.department || "Participant" }));
     const submitted = Boolean(team.submission?.isFinal);
 
     const isLockedInDB = Boolean(team.isPSLocked || (team.track && team.problemStatement));
-    const actualTrack = localTrack || team.track;
+    const actualTrack = localTrack || team.track || (team.trackPreferences && team.trackPreferences.length > 0 ? team.trackPreferences.join(", ") : "");
     const actualPS = localPS || team.problemStatement;
 
     // If already locked in DB, proceed directly to workspace. Otherwise force Lock-In Flow.
-    if (!isLockedInDB && (!actualTrack || !actualPS)) {
+    if (!isLockedInDB && (!actualTrack || !actualPS) && IS_HACKATHON_STARTED) {
         return (
             <LockInFlow
                 team={team}
@@ -370,7 +383,7 @@ export default function TeamDashboard() {
                     </div>
                     <div className="p-4 flex flex-col justify-center">
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><CheckCircle2 size={12}/> Status</p>
-                        <p className="text-sm font-medium text-slate-900 truncate">{submitted ? "Submitted" : isSubmissionLocked ? "Locked" : "In progress"}</p>
+                        <p className="text-sm font-medium text-slate-900 truncate">{submitted ? "Submitted" : effectiveSubmissionLocked ? "Locked" : "In progress"}</p>
                     </div>
                 </div>
             </section>
@@ -395,12 +408,12 @@ export default function TeamDashboard() {
                     <section className="rounded-2xl border border-slate-200 bg-white p-4 flex-1">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-sm font-bold text-slate-800">Tech Stack</h3>
-                            {!isSubmissionLocked && !isTSLocked && (
+                            {!effectiveSubmissionLocked && !effectiveTSLocked && (
                                 <button onClick={() => editingTS ? saveTechStack() : setEditingTS(true)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${editingTS ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
                                     {editingTS ? <Save size={12} /> : <Edit3 size={12} />} {editingTS ? "Save" : "Edit"}
                                 </button>
                             )}
-                            {isTSLocked && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12}/> Locked</span>}
+                            {effectiveTSLocked && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12}/> Locked</span>}
                         </div>
                         <div className="space-y-4">
                             {Object.entries(TECH_CATEGORIES).map(([category, techs]) => (
@@ -409,11 +422,11 @@ export default function TeamDashboard() {
                                     {editingTS ? (
                                         <div className="flex flex-wrap gap-1.5">
                                             {techs.map(tech => {
-                                                const isSelected = techStack[category]?.includes(tech);
+                                                const current = techStack[category] || [];
+                                                const isSelected = current.includes(tech);
                                                 return (
                                                     <label key={tech} className={`cursor-pointer inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium border transition-colors ${isSelected ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-teal-500"}`}>
                                                         <input type="checkbox" className="hidden" checked={isSelected} onChange={(e) => {
-                                                            const current = techStack[category] || [];
                                                             setTechStack({ ...techStack, [category]: e.target.checked ? [...current, tech] : current.filter(t => t !== tech) });
                                                         }} />
                                                         {tech}
@@ -462,20 +475,26 @@ export default function TeamDashboard() {
                                 <h3 className="text-sm font-bold text-slate-800">Proposed Idea</h3>
                                 <p className="text-[10px] text-slate-500 mt-0.5"><Presentation size={10} className="inline mr-1 mb-0.5"/>Visible to your judges</p>
                             </div>
-                            {!isSubmissionLocked && !isPILocked && (
+                            {!effectiveSubmissionLocked && !effectivePILocked && (
                                 <button onClick={() => editingPI ? saveField('proposedIdea', proposedIdea, setEditingPI) : setEditingPI(true)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${editingPI ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
                                     {editingPI ? <Save size={12} /> : <Edit3 size={12} />} {editingPI ? "Save" : "Edit"}
                                 </button>
                             )}
-                            {isPILocked && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12}/> Locked</span>}
+                            {effectivePILocked && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12}/> Locked</span>}
                         </div>
                         {editingPI ? (
-                            <textarea 
-                                value={proposedIdea} 
-                                onChange={(e) => setProposedIdea(e.target.value)} 
-                                className="flex-1 w-full min-h-[300px] resize-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-relaxed text-slate-700 outline-none focus:border-teal-500" 
-                                placeholder="Explain your approach in detail..."
-                            />
+                            <>
+                                <textarea
+                                    value={proposedIdea}
+                                    onChange={(e) => setProposedIdea(e.target.value)}
+                                    maxLength={MAX_PROPOSED_IDEA_CHARACTERS}
+                                    className="flex-1 w-full min-h-[300px] resize-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-relaxed text-slate-700 outline-none focus:border-teal-500"
+                                    placeholder="Explain your approach in detail..."
+                                />
+                                <p className={`mt-1 text-right text-xs ${proposedIdea.length >= MAX_PROPOSED_IDEA_CHARACTERS ? "text-amber-700" : "text-slate-400"}`}>
+                                    {proposedIdea.length}/{MAX_PROPOSED_IDEA_CHARACTERS} characters
+                                </p>
+                            </>
                         ) : (
                             <div className="flex-1 rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-700 border border-slate-100 whitespace-pre-wrap overflow-y-auto min-h-[300px]">
                                 {proposedIdea}
@@ -663,7 +682,7 @@ export default function TeamDashboard() {
             </div>
         </div>
 
-    </DashboardLayout>;
+        </DashboardLayout>;
 }
 
 function Info({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {

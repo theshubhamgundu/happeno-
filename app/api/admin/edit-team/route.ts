@@ -39,7 +39,7 @@ export async function POST(req: Request) {
             email?: string;
             captainMobile?: string;
             college?: string;
-            track?: string;
+            trackPreferences?: string[];
             room?: string;
             resendPass?: boolean;
         };
@@ -70,7 +70,11 @@ export async function POST(req: Request) {
         const cleanTeamName = typeof body.teamName === 'string' ? body.teamName.trim() : team.team_name;
         const cleanMobile = typeof body.captainMobile === 'string' ? body.captainMobile.trim() : team.captain_mobile;
         const cleanCollege = typeof body.college === 'string' ? body.college.trim() : team.college;
-        const cleanTrack = typeof body.track === 'string' ? body.track.trim() : team.track;
+        
+        const cleanTrackPrefs = Array.isArray(body.trackPreferences) 
+            ? body.trackPreferences.map(t => typeof t === 'string' ? t.trim() : '').filter(Boolean)
+            : (Array.isArray(team.track_preferences) ? team.track_preferences : (team.track ? [team.track] : []));
+        const cleanTrack = cleanTrackPrefs.length > 0 ? cleanTrackPrefs[0] : '';
         const cleanRoom = typeof body.room === 'string' ? body.room.trim() : team.room;
 
         // Synchronize members list (update the captain details in members[0])
@@ -92,6 +96,7 @@ export async function POST(req: Request) {
             captain_mobile: cleanMobile,
             college: cleanCollege,
             track: cleanTrack,
+            track_preferences: cleanTrackPrefs,
             room: cleanRoom,
             members
         };

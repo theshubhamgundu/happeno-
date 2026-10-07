@@ -8,7 +8,7 @@ import { useMemo, useState } from "react";
 
 type ScoreSummary = {
     completedRounds: number;
-    overallPercent: number | null;
+    overallScore: number | null;
     roundPercents: Record<string, number | null>;
     evaluations: Record<string, number>;
 };
@@ -19,6 +19,9 @@ function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary
     const roundPercents: Record<string, number | null> = {};
     const evaluations: Record<string, number> = {};
     const completed: number[] = [];
+    
+    // Start with the Rabbit Race preScore (out of 100) if it exists
+    let totalScore = project.preScore || 0;
 
     rounds.forEach(round => {
         const scores = Object.values(project.roundScores?.[round.id] ?? {})
@@ -35,11 +38,14 @@ function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary
         const rounded = Number(percentage.toFixed(2));
         roundPercents[round.id] = rounded;
         completed.push(rounded);
+        
+        // Add each round's percentage (which is out of 100) to the total score
+        totalScore += rounded;
     });
 
     return {
         completedRounds: completed.length,
-        overallPercent: completed.length ? Number((completed.reduce((total, score) => total + score, 0) / completed.length).toFixed(2)) : null,
+        overallScore: (completed.length > 0 || project.preScore) ? Number(totalScore.toFixed(2)) : null,
         roundPercents,
         evaluations,
     };
@@ -63,25 +69,25 @@ export default function AdminResults() {
                     .filter(Boolean)
                     .some(value => String(value).toLowerCase().includes(query));
                 const matchesTrack = track === "all" || project.track === track;
-                const matchesView = view === "all" || (view === "ranked" ? score.overallPercent !== null : score.overallPercent === null);
+                const matchesView = view === "all" || (view === "ranked" ? score.overallScore !== null : score.overallScore === null);
                 return matchesSearch && matchesTrack && matchesView;
             })
-            .sort((a, b) => (b.score.overallPercent ?? -1) - (a.score.overallPercent ?? -1));
+            .sort((a, b) => (b.score.overallScore ?? -1) - (a.score.overallScore ?? -1));
     }, [projectRows, search, track, view]);
 
     const totals = useMemo(() => ({
         total: projects.length,
-        ranked: projectRows.filter(row => row.score.overallPercent !== null).length,
-        pending: projectRows.filter(row => row.score.overallPercent === null).length,
+        ranked: projectRows.filter(row => row.score.overallScore !== null).length,
+        pending: projectRows.filter(row => row.score.overallScore === null).length,
         complete: projectRows.filter(row => row.score.completedRounds === roundConfigs.length).length,
     }), [projectRows, projects.length, roundConfigs.length]);
 
     const exportLeaderboard = () => {
-        const headers = ["Rank", "Team", "Team ID", "Captain", "Track", ...roundConfigs.map(round => `${round.title} (%)`), "Overall (%)", "Evaluated rounds"];
+        const headers = ["Rank", "Team", "Team ID", "Captain", "Track", ...roundConfigs.map(round => `${round.title} (%)`), "Rabbit Race", "Overall Score", "Evaluated rounds"];
         const lines = displayedRows.map((row, index) => [
-            row.score.overallPercent === null ? "—" : String(index + 1), row.project.team, row.project.teamId, row.project.captain,
+            row.score.overallScore === null ? "—" : String(index + 1), row.project.team, row.project.teamId, row.project.captain,
             row.project.track, ...roundConfigs.map(round => row.score.roundPercents[round.id] ?? "—"),
-            row.score.overallPercent ?? "—", `${row.score.completedRounds}/${roundConfigs.length}`,
+            row.project.preScore ?? "—", row.score.overallScore ?? "—", `${row.score.completedRounds}/${roundConfigs.length}`,
         ].map(value => `"${String(value ?? "").replaceAll('"', '""')}"`).join(","));
         const blob = new Blob([[headers.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
         const url = URL.createObjectURL(blob);
@@ -137,10 +143,10 @@ export default function AdminResults() {
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full min-w-[900px] text-left">
                             <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase tracking-[.16em] text-slate-500">
-                                <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{roundConfigs.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title}</th>)}<th className="px-4 py-4 text-center">Overall</th><th className="px-5 py-4 text-right">Details</th></tr>
+                                <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{roundConfigs.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title}</th>)}<th className="px-4 py-4 text-center text-teal-600">Rabbit Race</th><th className="px-4 py-4 text-center">Overall</th><th className="px-5 py-4 text-right">Details</th></tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {displayedRows.map((row, index) => <LeaderboardRow key={row.project.id} row={row} rounds={roundConfigs} rank={row.score.overallPercent === null ? null : index + 1} onSelect={() => setSelectedProject(row.project)} />)}
+                                {displayedRows.map((row, index) => <LeaderboardRow key={row.project.id} row={row} rounds={roundConfigs} rank={row.score.overallScore === null ? null : index + 1} onSelect={() => setSelectedProject(row.project)} />)}
                                 {!displayedRows.length && <tr><td colSpan={roundConfigs.length + 4} className="px-5 py-16 text-center text-xs text-slate-400 font-semibold">No teams match this view.</td></tr>}
                             </tbody>
                         </table>
@@ -162,14 +168,15 @@ function LeaderboardRow({ row, rounds, rank, onSelect }: { row: { project: Proje
         <td className="px-5 py-4"><span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-lg text-xs font-bold ${rank && rank <= 3 ? "bg-teal-50 text-teal-800 border border-teal-200" : "bg-slate-100 text-slate-600"}`}>{rank ? `#${rank}` : "—"}</span></td>
         <td className="px-5 py-4"><p className="font-bold text-slate-900">{row.project.team || "Untitled team"}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{row.project.teamId} · {row.project.track || "No track"}</p></td>
         {rounds.map(round => <td key={round.id} className="px-4 py-4 text-center"><ScoreCell value={row.score.roundPercents[round.id]} evaluations={row.score.evaluations[round.id]} /></td>)}
-        <td className="px-4 py-4 text-center"><ScoreCell value={row.score.overallPercent} evaluations={row.score.completedRounds} bold /></td>
+        <td className="px-4 py-4 text-center font-black text-sm text-teal-600">{row.project.preScore ? `${row.project.preScore.toFixed(1)} / 100` : "—"}</td>
+        <td className="px-4 py-4 text-center"><ScoreCell value={row.score.overallScore} evaluations={row.score.completedRounds} bold max={400} /></td>
         <td className="px-5 py-4 text-right"><button onClick={onSelect} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:border-teal-300 hover:text-teal-700 hover:bg-teal-50 shadow-sm"><MessageSquare size={13} /> Review</button></td>
     </tr>;
 }
 
-function ScoreCell({ value, evaluations, bold = false }: { value: number | null; evaluations: number; bold?: boolean }) {
+function ScoreCell({ value, evaluations, bold = false, max }: { value: number | null; evaluations: number; bold?: boolean; max?: number }) {
     if (value === null) return <span className="text-xs text-slate-300 font-medium">Not evaluated</span>;
-    return <div><span className={`${bold ? "text-base text-teal-800" : "text-sm text-slate-900"} font-black`}>{value.toFixed(1)}%</span><p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-400">{evaluations} review{evaluations === 1 ? "" : "s"}</p></div>;
+    return <div><span className={`${bold ? "text-base text-teal-800" : "text-sm text-slate-900"} font-black`}>{value.toFixed(1)}{max ? ` / ${max}` : ''}</span><p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-400">{evaluations} review{evaluations === 1 ? "" : "s"}</p></div>;
 }
 
 function ProjectDetails({ project, judges, rounds, onClose }: { project: Project; judges: { generatedId: string; name: string }[]; rounds: JudgingRound[]; onClose: () => void }) {

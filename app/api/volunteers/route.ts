@@ -37,7 +37,11 @@ export async function POST(req: Request) {
 
         const { data: generatedId, error: idError } = await supabase.rpc('next_staff_id', { staff_type: 'volunteer' });
         if (idError || typeof generatedId !== 'string') throw idError || new Error('Could not allocate a volunteer ID.');
-        const password = randomBytes(18).toString('base64url');
+        let password = randomBytes(18).toString('base64url');
+        if (phone && typeof phone === 'string') {
+            const digits = phone.replace(/\D/g, '').slice(-10);
+            if (digits.length === 10) password = digits;
+        }
         const { data, error } = await supabase
             .from('volunteers')
             .insert({ name: name.trim(), role, generated_id: generatedId, password_hash: await hashPassword(password), phone })
