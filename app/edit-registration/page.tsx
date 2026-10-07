@@ -585,85 +585,27 @@ function EditRegistrationInner() {
                                     Team Correction Portal
                                 </h1>
                                 <p className="text-xs text-slate-500 mt-1.5 font-medium">
-                                    Team edits open October 5–7, 2026.
+                                    Team edits closed on October 7, 2026 at 5:00 PM.
                                 </p>
                             </div>
 
-                            {/* 48-Hour Live Window Banner */}
-                            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs mb-6 flex items-start gap-2.5">
-                                <Clock size={16} className="shrink-0 text-amber-600 mt-0.5" />
-                                <div className="leading-relaxed">
-                                    <p className="font-bold text-amber-900">Extended Edit Window</p>
-                                    <p className="text-amber-800 text-[11px] mt-0.5">
-                                        Name changes, member replacements, and team merges open October 5, and all team details permanently lock on October 7 at 5:00 PM.
+                            <div className="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-center space-y-3">
+                                <div className="inline-flex w-10 h-10 rounded-full bg-rose-100 text-rose-600 items-center justify-center">
+                                    <Lock size={20} />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-rose-900 text-sm">Window Closed</h3>
+                                    <p className="text-rose-800 text-xs mt-1 leading-relaxed">
+                                        The team details correction window has permanently locked. All team rosters, tracks, and details have been finalized for the hackathon.
                                     </p>
                                 </div>
                             </div>
 
-                            {authError && (
-                                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs mb-5 flex items-center gap-2.5">
-                                    <AlertCircle size={16} className="shrink-0 text-rose-500" />
-                                    <span>{authError}</span>
-                                </div>
-                            )}
-
-                            <form onSubmit={handleManualLogin} className="space-y-4">
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1.5">
-                                        Assigned Team ID
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. TC-1042"
-                                        value={teamIdInput}
-                                        onChange={e => setTeamIdInput(e.target.value)}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 font-mono uppercase tracking-wider outline-none focus:border-teal-500 focus:bg-white transition"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mb-1.5">
-                                        Team Lead Registered Phone Number
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        placeholder="10-digit mobile number"
-                                        value={captainContactInput}
-                                        onChange={e => setCaptainContactInput(e.target.value)}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition"
-                                        required
-                                    />
-                                    <p className="text-[10px] text-slate-400 mt-1">
-                                        Enter the Team Lead's phone number used during registration.
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={isVerifying}
-                                    className="w-full py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm mt-2"
-                                >
-                                    {isVerifying ? (
-                                        <>
-                                            <Loader2 size={16} className="animate-spin" /> Verifying Team...
-                                        </>
-                                    ) : (
-                                        <>
-                                            View & Edit Team Details <ChevronRight size={14} />
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-
                             <div className="mt-6 pt-5 border-t border-slate-100 text-center">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowLookupModal(true)}
-                                    className="text-xs text-teal-600 hover:underline font-bold"
-                                >
-                                    Forgot your Team ID? Search by Email / Phone
-                                </button>
+                                <p className="text-xs text-slate-600">
+                                    Require urgent assistance? Please use the <br/>
+                                    <strong className="text-teal-700">Coordinator Support</strong> button at the top right.
+                                </p>
                             </div>
                         </motion.div>
                     </div>
