@@ -43,6 +43,10 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
     const [activeAdminSection, setActiveAdminSection] = useState("entries");
     const { hackathonStartDate, projects, isSubmissionLocked } = useHackathon();
 
+    const IS_HACKATHON_STARTED = new Date() >= new Date('2026-10-10T08:00:00+05:30');
+    const effectiveSubmissionLocked = isSubmissionLocked || !IS_HACKATHON_STARTED;
+
+
     useEffect(() => {
         const syncAdminSection = () => setActiveAdminSection(window.location.hash.slice(1) || "entries");
         syncAdminSection();
@@ -136,7 +140,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                             return <Link key={item.href} href={item.href} title={isSidebarCollapsed ? item.label : undefined} aria-label={isSidebarCollapsed ? item.label : undefined} className={`group flex items-center gap-2.5 rounded-lg py-2 text-xs font-semibold transition ${isSidebarCollapsed ? "justify-center px-2" : "px-2.5"} ${isActive ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}>
                                 <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-[#c85847]"}`}><item.icon size={14} /></span>
                                 {!isSidebarCollapsed && <span>{item.label}</span>}
-                                {!isSidebarCollapsed && item.label === "Submissions" && isSubmissionLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
+                                {!isSidebarCollapsed && item.label === "Submissions" && effectiveSubmissionLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
                             </Link>;
                         })}
                     </nav>
