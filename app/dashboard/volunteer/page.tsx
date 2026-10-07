@@ -9,7 +9,8 @@ import {
     Users,
     Zap,
     Clock,
-    ShieldAlert
+    ShieldAlert,
+    Utensils
 } from "lucide-react";
 
 import { useHackathon, Project } from "@/context/HackathonContext";
@@ -17,7 +18,6 @@ import { useState, useCallback } from "react";
 import { QRScanner } from "@/components/QRScanner";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { EVENT_MEALS } from "@/lib/meals";
 
 interface ScanAuditEntry {
     id: string;
@@ -35,6 +35,7 @@ export default function VolunteerDashboard() {
     const { projects, isLoading, checkInTeam } = useHackathon();
     
     // UI Navigation & Mode state
+    const [activeModule, setActiveModule] = useState<'checkin' | 'meal'>('checkin');
     const [isRapidMode, setIsRapidMode] = useState(true);
     const [soundEnabled, setSoundEnabled] = useState(true);
 
@@ -62,8 +63,24 @@ export default function VolunteerDashboard() {
             return false;
         }
 
+        // --- MODULE SPECIFIC ROUTING ---
+        let endpoint = '';
+        if (activeModule === 'checkin') {
+            if (passType === 'member') {
+                toast.error('Wrong pass type! Please scan the Team Gate Pass for check-ins.');
+                return false;
+            }
+            endpoint = '/api/volunteer/checkin';
+        } else {
+            if (passType !== 'member') {
+                toast.error('Wrong pass type! Please scan an Individual Meal Pass for dinner.');
+                return false;
+            }
+            endpoint = '/api/volunteer/dinner';
+        }
+
         try {
-            const response = await fetch('/api/volunteer/scan', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ teamId, passType, memberId })
@@ -89,16 +106,13 @@ export default function VolunteerDashboard() {
             const result = payload.result as Record<string, unknown>;
             const teamName = String(result.teamName || 'Team');
             const canonicalTeamId = String(result.teamId || teamId).toUpperCase();
-            const mealKey = typeof result.mealKey === 'string' ? result.mealKey : '';
-            const mealConfig = EVENT_MEALS.find(meal => meal.key === mealKey);
-            const mealLabel = mealConfig ? `${mealConfig.dayLabel} ${mealConfig.mealLabel}` : mealKey;
             const status = (result.status as ScanAuditEntry['status']) || 'PERMITTED';
 
             let msg = '';
             let isSuccess = false;
 
-            if (status === 'PERMITTED' && passType !== 'member') {
-                msg = 'Check-in validated! Gate entry authorized (8:00 AM – 11:00 AM window).';
+            if (status === 'PERMITTED' && activeModule === 'checkin') {
+                msg = 'Check-in validated! Gate entry authorized.';
                 isSuccess = true;
                 toast.success(`${teamName} checked in.`);
                 // Sync context state
@@ -107,28 +121,24 @@ export default function VolunteerDashboard() {
                     targetProject.isCheckedIn = true;
                     targetProject.checkedInAt = new Date().toISOString();
                 }
+            } else if (status === 'PERMITTED' && activeModule === 'meal') {
+                msg = `Dinner granted for ${result.memberName || 'Participant'}.`;
+                isSuccess = true;
+                toast.success(`${teamName}: Dinner claimed.`);
             } else if (status === 'ALREADY_CHECKED_IN') {
                 msg = 'Team has already completed gate check-in.';
                 isSuccess = true; // still a valid pass, just warning
                 toast.warning(`${teamName} was already checked in.`);
-            } else if (status === 'PERMITTED') {
-                msg = `${mealLabel} granted. Single-use token logged.`;
-                isSuccess = true;
-                toast.success(`${teamName}: ${mealLabel} claimed.`);
-            } else if (status === 'DUPLICATE_SCAN') {
-                msg = 'Duplicate scan within cooldown window.';
+            } else if (status === 'ALREADY_CLAIMED') {
+                msg = `${result.memberName || 'Participant'} has already claimed dinner.`;
                 isSuccess = false;
-                toast.warning('Duplicate scan. Wait a moment.');
-            } else if (status === 'ALL_MEALS_CLAIMED') {
-                msg = 'All included meal tokens have been claimed.';
-                isSuccess = false;
-                toast.error('All meals have already been claimed.');
+                toast.error('Dinner already claimed.');
             } else if (status === 'NEEDS_CHECKIN') {
-                msg = 'Must scan team leader gate pass (8–11 AM) before claiming meals.';
+                msg = 'Must scan team leader gate pass first!';
                 isSuccess = false;
                 toast.error('Team must check in at gate first!');
             } else {
-                msg = 'Meal pass not purchased for this participant (Gate-only registration).';
+                msg = 'Dinner Meal Pass not purchased for this participant.';
                 isSuccess = false;
                 toast.error('No meal pass purchased for this participant.');
             }
@@ -141,14 +151,14 @@ export default function VolunteerDashboard() {
                 passType,
                 status,
                 message: msg,
-                mealLabel,
+                mealLabel: activeModule === 'meal' ? 'Dinner' : undefined,
                 memberId
             };
 
             setLastScanEntry(newEntry);
 
             // If not in rapid mode, trigger the inspection modal
-            if (!isRapidMode) {
+            if (!isRapidMode && activeModule === 'checkin') {
                 const target = projects.find(p => String(p.teamId).toUpperCase() === canonicalTeamId || String(p.id).toUpperCase() === canonicalTeamId);
                 if (target) setInspectedTeam(target);
             }
@@ -159,7 +169,7 @@ export default function VolunteerDashboard() {
             toast.error('Network error during scan.');
             return false;
         }
-    }, [isRapidMode, projects]);
+    }, [isRapidMode, projects, activeModule]);
 
     // Handle Inspection Modal Check-in
     const confirmInspectionCheckIn = async (projectId: string | number, teamName: string) => {
@@ -186,39 +196,70 @@ export default function VolunteerDashboard() {
 
     if (isLoading) {
         return (
-            <DashboardLayout type="volunteer" title="Gate Scanner" hideHeader hideSidebar>
+            <DashboardLayout type="volunteer" title="Scanner" hideHeader hideSidebar>
                 <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
                     <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-slate-400 font-bold uppercase text-xs tracking-widest text-center">Loading Gate Scanner...</p>
+                    <p className="text-slate-400 font-bold uppercase text-xs tracking-widest text-center">Loading Scanner...</p>
                 </div>
             </DashboardLayout>
         );
     }
 
     return (
-        <DashboardLayout type="volunteer" title="Gate Scanner" hideHeader hideSidebar>
+        <DashboardLayout type="volunteer" title="Scanner" hideHeader hideSidebar>
             <div className="max-w-2xl mx-auto space-y-5 py-4">
+                
+                {/* ═══════════ MODULE TABS ═══════════ */}
+                <div className="flex bg-slate-100 p-1.5 rounded-2xl w-full border border-slate-200">
+                    <button
+                        onClick={() => { setActiveModule('checkin'); setLastScanEntry(null); }}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                            activeModule === 'checkin'
+                                ? 'bg-white text-teal-700 shadow-sm border border-slate-200/50'
+                                : 'text-slate-500 hover:bg-slate-200/50'
+                        }`}
+                    >
+                        <Users size={16} />
+                        Gate Check-ins
+                    </button>
+                    <button
+                        onClick={() => { setActiveModule('meal'); setLastScanEntry(null); setIsRapidMode(true); }}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                            activeModule === 'meal'
+                                ? 'bg-white text-amber-700 shadow-sm border border-slate-200/50'
+                                : 'text-slate-500 hover:bg-slate-200/50'
+                        }`}
+                    >
+                        <Utensils size={16} />
+                        Dinner Pass
+                    </button>
+                </div>
+
                 {/* Mode & Sound controls bar */}
                 <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#14b8a6] animate-pulse" />
-                        <span className="text-xs font-black uppercase tracking-wider text-slate-800">Gate QR Scanner</span>
+                        <span className={`h-2.5 w-2.5 rounded-full animate-pulse ${activeModule === 'checkin' ? 'bg-[#14b8a6]' : 'bg-amber-500'}`} />
+                        <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                            {activeModule === 'checkin' ? 'Gate QR Scanner' : 'Dinner QR Scanner'}
+                        </span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {/* Rapid Mode Toggle */}
-                        <button
-                            onClick={() => setIsRapidMode(v => !v)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-wider transition-all ${
-                                isRapidMode
-                                    ? 'bg-amber-400/10 border-amber-400/40 text-amber-700'
-                                    : 'bg-slate-100 border-slate-200 text-slate-500'
-                            }`}
-                            title="In Rapid Mode, the scanner resets automatically without opening a modal"
-                        >
-                            <Zap size={12} className={isRapidMode ? "text-amber-500" : "text-slate-400"} />
-                            {isRapidMode ? "Rapid Continuous ON" : "Inspect Mode"}
-                        </button>
+                        {/* Rapid Mode Toggle (Only show for checkin, meal is always rapid) */}
+                        {activeModule === 'checkin' && (
+                            <button
+                                onClick={() => setIsRapidMode(v => !v)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-wider transition-all ${
+                                    isRapidMode
+                                        ? 'bg-amber-400/10 border-amber-400/40 text-amber-700'
+                                        : 'bg-slate-100 border-slate-200 text-slate-500'
+                                }`}
+                                title="In Rapid Mode, the scanner resets automatically without opening a modal"
+                            >
+                                <Zap size={12} className={isRapidMode ? "text-amber-500" : "text-slate-400"} />
+                                {isRapidMode ? "Rapid Continuous ON" : "Inspect Mode"}
+                            </button>
+                        )}
 
                         {/* Audio Toggle */}
                         <button
@@ -240,12 +281,12 @@ export default function VolunteerDashboard() {
                     <QRScanner
                         onScan={processScan}
                         embedded={true}
-                        continuous={isRapidMode}
+                        continuous={activeModule === 'meal' ? true : isRapidMode}
                         autoResetMs={1300}
                         soundEnabled={soundEnabled}
                         onToggleSound={() => setSoundEnabled(v => !v)}
-                        title={isRapidMode ? "Rapid Gate Check-in" : "Pass Inspection Scan"}
-                        subtitle={isRapidMode ? "Continuous active scanning enabled" : "Modal inspect enabled"}
+                        title={activeModule === 'checkin' ? (isRapidMode ? "Rapid Gate Check-in" : "Pass Inspection Scan") : "Rapid Dinner Check-in"}
+                        subtitle={activeModule === 'meal' ? "Scan Individual Participant QR Codes" : (isRapidMode ? "Continuous active scanning enabled" : "Modal inspect enabled")}
                     />
                 </div>
 
@@ -258,7 +299,7 @@ export default function VolunteerDashboard() {
                         className={`rounded-2xl border p-5 relative overflow-hidden shadow-sm ${
                             lastScanEntry.status === 'PERMITTED'
                                 ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
-                                : lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'DUPLICATE_SCAN'
+                                : lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'ALREADY_CLAIMED'
                                     ? 'bg-amber-50/70 border-amber-200 text-amber-950'
                                     : 'bg-rose-50/70 border-rose-200 text-rose-950'
                         }`}
@@ -268,12 +309,12 @@ export default function VolunteerDashboard() {
                                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-black ${
                                     lastScanEntry.status === 'PERMITTED'
                                         ? 'bg-emerald-600 text-white'
-                                        : lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'DUPLICATE_SCAN'
+                                        : lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'ALREADY_CLAIMED'
                                             ? 'bg-amber-500 text-white'
                                             : 'bg-rose-600 text-white'
                                 }`}>
                                     {lastScanEntry.status === 'PERMITTED' ? <CheckCircle2 size={22} /> :
-                                        lastScanEntry.status === 'ALREADY_CHECKED_IN' ? <Clock size={22} /> :
+                                        (lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'ALREADY_CLAIMED') ? <Clock size={22} /> :
                                             <ShieldAlert size={22} />}
                                 </div>
                                 <div>
@@ -288,7 +329,7 @@ export default function VolunteerDashboard() {
                             <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
                                 lastScanEntry.status === 'PERMITTED'
                                     ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                                    : lastScanEntry.status === 'ALREADY_CHECKED_IN'
+                                    : lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'ALREADY_CLAIMED'
                                         ? 'bg-amber-100 text-amber-800 border border-amber-300'
                                         : 'bg-rose-100 text-rose-800 border border-rose-300'
                             }`}>
@@ -309,7 +350,7 @@ export default function VolunteerDashboard() {
 
             {/* ═══════════ TEAM DETAILS INSPECTION MODAL ═══════════ */}
             <AnimatePresence>
-                {inspectedTeam && (
+                {inspectedTeam && activeModule === 'checkin' && (
                     <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }}

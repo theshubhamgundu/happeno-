@@ -15,7 +15,7 @@ export default function TicketPage() {
     const team = useMemo(() => projects.find((project) => project.teamId === user?.teamId || project.id === user?.teamId) || null, [projects, user]);
     const members = useMemo(() => team?.members || [], [team]);
 
-    const getMemberId = (m: any, idx: number) => typeof m === 'object' && m.id ? String(m.id) : `m${idx}`;
+    const getMemberId = (m: any, idx: number) => typeof m === 'object' && (m.participant_id || m.id) ? String(m.participant_id || m.id) : `m${idx}`;
     const getMemberName = (m: any) => typeof m === 'object' ? (m.fullName || m.name || 'Unknown Member') : String(m);
     const getMemberEmail = (m: any) => typeof m === 'object' ? m.email : null;
 
@@ -24,6 +24,7 @@ export default function TicketPage() {
         if (typeof t.mealAccess?.purchased_meals === 'boolean') return t.mealAccess?.purchased_meals;
         if (Array.isArray(t.mealAccess?.purchased_meals)) {
             if (t.mealAccess?.purchased_meals.includes('all')) return true;
+            if (t.mealAccess?.purchased_meals.length >= (t.members?.length || 0)) return true;
             if (t.mealAccess?.purchased_meals.includes(mId)) return true;
             if (mEmail && t.mealAccess?.purchased_meals.includes(mEmail)) return true;
         }
@@ -34,22 +35,63 @@ export default function TicketPage() {
         if (typeof t.mealAccess?.networking_passes === 'boolean') return t.mealAccess?.networking_passes;
         if (Array.isArray(t.mealAccess?.networking_passes)) {
             if (t.mealAccess?.networking_passes.includes('all')) return true;
+            if (t.mealAccess?.networking_passes.length >= (t.members?.length || 0)) return true;
             if (t.mealAccess?.networking_passes.includes(mId)) return true;
             if (mEmail && t.mealAccess?.networking_passes.includes(mEmail)) return true;
         }
         return false;
     };
 
-    // Generate Universal QR passes
+    // Generate Universal QR passes with embedded names
     useEffect(() => {
         if (team && members.length > 0) {
             const generateAll = async () => {
                 const qrs: Record<string, string> = {};
                 for (let i = 0; i < members.length; i++) {
                     const memberId = getMemberId(members[i], i);
+                    const memberName = getMemberName(members[i]);
                     const payload = JSON.stringify({ teamId: team.teamId || String(team.id), memberId });
-                    qrs[memberId] = await QRCode.toDataURL(payload, {
-                        width: 400, margin: 1, color: { dark: "#0f172a", light: "#ffffff" }
+                    
+                    const rawQrDataUrl = await QRCode.toDataURL(payload, {
+                        width: 400, margin: 2, color: { dark: "#0f172a", light: "#ffffff" }
+                    });
+
+                    // Embed the name directly into the image canvas
+                    const img = new window.Image();
+                    img.src = rawQrDataUrl;
+                    
+                    await new Promise(resolve => {
+                        img.onload = () => {
+                            const canvas = document.createElement("canvas");
+                            const ctx = canvas.getContext("2d");
+                            if (ctx) {
+                                canvas.width = 400;
+                                canvas.height = 460;
+                                
+                                // White background
+                                ctx.fillStyle = "#ffffff";
+                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                
+                                // Draw QR
+                                ctx.drawImage(img, 0, 0, 400, 400);
+                                
+                                // Draw Text
+                                ctx.textAlign = "center";
+                                
+                                ctx.font = "bold 14px system-ui, sans-serif";
+                                ctx.fillStyle = "#64748b";
+                                ctx.fillText("PARTICIPANT", 200, 410);
+                                
+                                ctx.font = "900 24px system-ui, sans-serif";
+                                ctx.fillStyle = "#0f172a";
+                                ctx.fillText(memberName.toUpperCase().substring(0, 30), 200, 435);
+                                
+                                qrs[memberId] = canvas.toDataURL("image/png");
+                            } else {
+                                qrs[memberId] = rawQrDataUrl;
+                            }
+                            resolve(null);
+                        };
                     });
                 }
                 setMemberQrs(qrs);
@@ -97,12 +139,10 @@ export default function TicketPage() {
     const currentMemberId = currentMember ? getMemberId(currentMember, activePassIndex) : '';
     const currentMemberName = currentMember ? getMemberName(currentMember) : '';
     const currentMemberEmail = currentMember ? getMemberEmail(currentMember) : '';
-    const hasMealPass = currentMember && typeof currentMember !== 'string' && typeof currentMember.meal_pass === 'boolean'
-        ? currentMember.meal_pass
-        : currentMember ? hasIndividualMealPass(team, currentMemberId, currentMemberEmail) : false;
-    const hasNetworkingPass = currentMember && typeof currentMember !== 'string' && typeof currentMember.networking_pass === 'boolean'
-        ? currentMember.networking_pass
-        : currentMember ? hasIndividualActivityPass(team, currentMemberId, currentMemberEmail) : false;
+    const hasMealPass = (currentMember ? hasIndividualMealPass(team, currentMemberId, currentMemberEmail) : false) ||
+        (currentMember && typeof currentMember !== 'string' && typeof currentMember.meal_pass === 'boolean' ? currentMember.meal_pass : false);
+    const hasNetworkingPass = (currentMember ? hasIndividualActivityPass(team, currentMemberId, currentMemberEmail) : false) ||
+        (currentMember && typeof currentMember !== 'string' && typeof currentMember.networking_pass === 'boolean' ? currentMember.networking_pass : false);
     const allocatedPlace = team.room || 'Pending Allocation';
 
     return (

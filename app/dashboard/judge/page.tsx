@@ -198,8 +198,9 @@ export default function JudgeDashboard() {
     };
 
     const handleStartEvaluation = async (targetTeamId?: string) => {
-        const selectedId = (targetTeamId || teamIdInput).trim();
-        if (targetTeamId) setTeamIdInput(targetTeamId);
+        const rawInput = (targetTeamId || teamIdInput).trim();
+        const selectedId = targetTeamId ? targetTeamId : (rawInput.toUpperCase().startsWith('TRI') ? rawInput : `TRI${rawInput}`);
+        if (targetTeamId) setTeamIdInput(targetTeamId.replace(/^TRI/i, ''));
 
         if (!currentJudge) {
             toast.error('Evaluator profile not found. Sign in again and retry.');
@@ -527,15 +528,23 @@ export default function JudgeDashboard() {
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <input
-                                    autoFocus
-                                    autoComplete="off"
-                                    value={teamIdInput}
-                                    onChange={event => setTeamIdInput(event.target.value.toUpperCase())}
-                                    placeholder="Enter Team ID (e.g. TC-101)"
-                                    aria-label="Team ID"
-                                    className="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 font-mono text-lg sm:text-xl font-bold uppercase tracking-wider text-slate-900 placeholder:text-slate-400 outline-none focus:border-teal-500 focus:bg-white focus:ring-2 focus:ring-teal-500/10 transition-all"
-                                />
+                                <div className="flex h-14 w-full items-center rounded-2xl border border-slate-200 bg-slate-50 focus-within:border-teal-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-teal-500/10 transition-all overflow-hidden shadow-inner">
+                                    <div className="flex h-full items-center bg-slate-200/60 px-5 border-r border-slate-200 text-slate-700 font-mono text-lg sm:text-xl font-black tracking-widest">
+                                        TRI
+                                    </div>
+                                    <input
+                                        autoFocus
+                                        autoComplete="off"
+                                        value={teamIdInput.replace(/^TRI/i, '')}
+                                        onChange={event => {
+                                            const val = event.target.value.toUpperCase().replace(/^TRI/i, '');
+                                            setTeamIdInput(val);
+                                        }}
+                                        placeholder="26058"
+                                        aria-label="Team ID"
+                                        className="h-full w-full bg-transparent px-4 font-mono text-lg sm:text-xl font-bold uppercase tracking-wider text-slate-900 placeholder:text-slate-300 outline-none"
+                                    />
+                                </div>
                                 <button
                                     type="submit"
                                     disabled={isStarting || !teamIdInput.trim()}

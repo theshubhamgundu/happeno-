@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
 import { getParticipantPortalMode } from '@/lib/event-windows';
 import { redis } from '@/lib/redis';
+import { isOpenInnovationTrack, MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,12 @@ export async function POST(req: Request) {
 
         if (!targetTeamId || !track || !problemStatement) {
             return NextResponse.json({ success: false, message: "Missing required fields (track, problem statement, or team ID)." }, { status: 400 });
+        }
+        if (isOpenInnovationTrack(track) && problemStatement.length > MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS) {
+            return NextResponse.json({
+                success: false,
+                message: `Open Innovation problem statements must be ${MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS} characters or fewer.`
+            }, { status: 400 });
         }
 
         const { data: existing, error: lookupError } = await supabase

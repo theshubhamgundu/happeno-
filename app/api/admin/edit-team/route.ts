@@ -112,7 +112,7 @@ export async function POST(req: Request) {
             updateData.password_hash = passwordHash;
             updateData.credentials_issued_at = credentialsIssuedAt;
 
-            const qrBuffer = await QRCode.toBuffer(team.team_id || teamId, { width: 360, margin: 1 });
+
             const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.online').replace(/\/+$/, '');
             const safeTeamId = escapeHtml(team.team_id || teamId);
             const safeTeamName = escapeHtml(cleanTeamName || 'Your team');
@@ -123,10 +123,7 @@ export async function POST(req: Request) {
                 const delivery = await sendEmail({
                     to: cleanEmail,
                     subject: `[Pass & Credentials] Tri-City AI Hackathon — ${cleanTeamName}`,
-                    attachments: [{
-                        filename: `tricity-pass-${(team.team_id || teamId).replace(/[^a-zA-Z0-9_-]/g, '_')}.png`,
-                        content: qrBuffer
-                    }],
+
                     html: `
                         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6;padding:24px;border:1px solid #e2e8f0;border-radius:12px;background:#ffffff;">
                             <div style="text-align:center;padding-bottom:16px;border-bottom:1px solid #f1f5f9;">
@@ -139,11 +136,10 @@ export async function POST(req: Request) {
                             <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:20px 0;">
                                 <p style="margin:0 0 8px;font-size:13px;color:#475569;"><strong>Team Login ID:</strong> <span style="font-family:monospace;font-size:15px;color:#0f172a;background:#e2e8f0;padding:2px 6px;border-radius:4px;">${safeTeamId}</span></p>
                                 <p style="margin:0 0 8px;font-size:13px;color:#475569;"><strong>Access Password:</strong> <span style="font-family:monospace;font-size:15px;color:#1e293b;background:#fef08a;padding:2px 6px;border-radius:4px;font-weight:bold;">${safePassword}</span></p>
-                                <p style="margin:0 0 8px;font-size:13px;color:#475569;"><strong>Track:</strong> ${escapeHtml(cleanTrack || 'General')}</p>
                                 <p style="margin:0;font-size:13px;color:#475569;"><strong>Portal Link:</strong> <a href="${appUrl}/login" style="color:#2563eb;text-decoration:none;font-weight:bold;">${appUrl}/login</a></p>
                             </div>
 
-                            <p style="font-size:13px;color:#334155;"><strong>Check-in Pass Attached:</strong> Your official check-in QR code is attached to this email. Please present it at the registration desk upon arrival.</p>
+                            <p style="font-size:13px;color:#334155;"><strong>Your Check-in Passes:</strong> Please log in to the team dashboard using the link above to download your individual check-in QR passes. You will need to show these passes at the registration desk upon your arrival.</p>
                             
                             <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
                             <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0;">Tri-City AI Hackathon Organizing Committee • Event Support Desk</p>

@@ -6,7 +6,14 @@ import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentat
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
-import { TRACKS, PROBLEM_STATEMENTS, getProblemStatementsForTrack, MAX_PROPOSED_IDEA_CHARACTERS } from "@/lib/constants";
+import {
+    TRACKS,
+    PROBLEM_STATEMENTS,
+    getProblemStatementsForTrack,
+    isOpenInnovationTrack,
+    MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS,
+    MAX_PROPOSED_IDEA_CHARACTERS
+} from "@/lib/constants";
 import { toast } from "sonner";
 
 
@@ -41,10 +48,17 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
     
     // If external team hasn't set track preferences yet, show all available tracks
     const availableTracks = preferences.length > 0 ? preferences : TRACKS;
+    const isCustomProblemTrack = isOpenInnovationTrack(selectedTrack);
+    const problemText = selectedPS ?? "";
+    const problemWordCount = problemText.trim() ? problemText.trim().split(/\s+/).length : 0;
 
     const handleLock = async () => {
         if (!selectedTrack || !selectedPS) {
-            toast.error("Please select a track and problem statement.");
+            toast.error("Please select a track and enter a problem statement.");
+            return;
+        }
+        if (isOpenInnovationTrack(selectedTrack) && selectedPS.length > MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS) {
+            toast.error(`Your problem statement must be ${MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS} characters or fewer.`);
             return;
         }
 
@@ -103,21 +117,41 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
 
                     {selectedTrack && (
                         <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-                            <h3 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">2. Select Problem Statement</h3>
-                            <div className="grid gap-3">
-                                {getProblemStatementsForTrack(selectedTrack).map((ps: string, idx: number) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setSelectedPS(ps)}
-                                        className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${selectedPS === ps ? 'border-teal-500 bg-teal-50 ring-1 ring-teal-500' : 'border-slate-200 hover:border-slate-300 bg-white'}`}
-                                    >
-                                        <div className={`mt-0.5 shrink-0 h-5 w-5 rounded-full border flex items-center justify-center ${selectedPS === ps ? 'border-teal-500 bg-teal-500' : 'border-slate-300'}`}>
-                                            {selectedPS === ps && <div className="h-2 w-2 rounded-full bg-white" />}
-                                        </div>
-                                        <span className={`font-medium text-sm leading-relaxed ${selectedPS === ps ? 'text-teal-900' : 'text-slate-700'}`}>{ps}</span>
-                                    </button>
-                                ))}
-                            </div>
+                            {isCustomProblemTrack ? (
+                                <div>
+                                    <h3 className="text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">2. Enter Your Problem Statement</h3>
+                                    <p className="mb-3 text-sm text-slate-500">Describe the problem in 5–10 words. Keep it under {MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS} characters.</p>
+                                    <textarea
+                                        value={problemText}
+                                        onChange={(event) => setSelectedPS(event.target.value)}
+                                        maxLength={MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS}
+                                        rows={3}
+                                        placeholder="Enter a concise problem statement"
+                                        className="w-full resize-none rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-800 outline-none transition focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                                    />
+                                    <p className={`mt-1 text-right text-xs ${problemText.length >= MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS ? "text-amber-700" : "text-slate-400"}`}>
+                                        {problemWordCount} words · {problemText.length}/{MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS} characters
+                                    </p>
+                                </div>
+                            ) : (
+                                <>
+                                    <h3 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">2. Select Problem Statement</h3>
+                                    <div className="grid gap-3">
+                                        {getProblemStatementsForTrack(selectedTrack).map((ps: string, idx: number) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setSelectedPS(ps)}
+                                                className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${selectedPS === ps ? 'border-teal-500 bg-teal-50 ring-1 ring-teal-500' : 'border-slate-200 hover:border-slate-300 bg-white'}`}
+                                            >
+                                                <div className={`mt-0.5 shrink-0 h-5 w-5 rounded-full border flex items-center justify-center ${selectedPS === ps ? 'border-teal-500 bg-teal-500' : 'border-slate-300'}`}>
+                                                    {selectedPS === ps && <div className="h-2 w-2 rounded-full bg-white" />}
+                                                </div>
+                                                <span className={`font-medium text-sm leading-relaxed ${selectedPS === ps ? 'text-teal-900' : 'text-slate-700'}`}>{ps}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
 

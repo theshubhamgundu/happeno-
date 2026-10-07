@@ -2,33 +2,45 @@ export const STATIC_ROUNDS_CONFIG = [
     {
         id: "round1",
         title: "Round-1",
-        subtitle: "Problem Analysis & Solution feasibility",
+        subtitle: "Idea, Feasibility & Basic Progress",
         color: "text-teal-600",
         bg: "bg-teal-600",
         dayOffset: 0,
         hour: 14,
         minute: 30,
         criteria: [
-            { id: "r1q1", label: "Problem Understanding", desc: "Clarity in defining the problem and understanding its root cause." },
-            { id: "r1q2", label: "Solution Feasibility", desc: "Solutions for problem is appropriate or not." },
-            { id: "r1q3", label: "Societal Relevance & Impact", desc: "Addresses a real societal / public issue." },
-            { id: "r1q5", label: "Feasibility in 24 Hours", desc: "Can a working prototype be built within the hackathon time" },
-            { id: "r1q6", label: "Team Contribution & Presentation", desc: "Team Members Contribution and Presentation" },
+            { id: "r1q1", label: "Problem Understanding", desc: "Does the team clearly understand the problem they are trying to solve?" },
+            { id: "r1q2", label: "Problem Relevance", desc: "Is the problem actually worth solving, or is it trivial?" },
+            { id: "r1q3", label: "Solution Clarity", desc: "Is their proposed solution logical and easy to understand?" },
+            { id: "r1q4", label: "Target Audience", desc: "Do they have a clear idea of who would actually use their solution?" },
+            { id: "r1q5", label: "Feasibility for Beginners", desc: "Is this realistic for a beginner team to build during the hackathon?" },
+            { id: "r1q6", label: "Clarity of Scope", desc: "Are they focused on a core feature, or trying to do too many things at once?" },
+            { id: "r1q7", label: "Execution Progress", desc: "Have they actually started building something, or is it still just an idea?" },
+            { id: "r1q8", label: "Resource Utilization", desc: "Are they using appropriate basic tools and resources for their skill level?" },
+            { id: "r1q9", label: "Seriousness & Attitude", desc: "Is the team serious about the hackathon and putting in genuine effort?" },
+            { id: "r1q10", label: "Coachability", desc: "Do they listen to feedback and accept advice from mentors/judges?" },
         ]
     },
     {
         id: "round2",
         title: "Round-2",
-        subtitle: "Technical Design - Detailed",
+        subtitle: "Technical Execution & Prototype",
         color: "text-pink-400",
         bg: "bg-pink-500",
         dayOffset: 0,
         hour: 21,
         minute: 30,
         criteria: [
-            { id: "r2q1", label: "Model Design", desc: "Detailed architecture including data flow/control flow, and module interaction" },
-            { id: "r2q3", label: "Methodology", desc: "Detailed implementation steps" },
-            { id: "r2q4", label: "Team Contribution & Presentation", desc: "Team Members Contribution and Presentation" },
+            { id: "r2q1", label: "Core Functionality", desc: "Does the main feature of the prototype actually work without crashing?" },
+            { id: "r2q2", label: "Effort & Coding", desc: "Did the team write original code and put in effort, or rely entirely on templates?" },
+            { id: "r2q3", label: "Tech Stack Knowledge", desc: "Can the team explain what tools/languages they used and why?" },
+            { id: "r2q4", label: "User Interface (UI)", desc: "Is the app/website visually presentable and decent to look at?" },
+            { id: "r2q5", label: "User Experience (UX)", desc: "Is the prototype easy to navigate and understand for a normal user?" },
+            { id: "r2q6", label: "Creativity & Twist", desc: "Did they add any unique or fun elements to their project?" },
+            { id: "r2q7", label: "Overcoming Challenges", desc: "Could they explain the bugs they faced and how they tried to fix them?" },
+            { id: "r2q8", label: "Practical Usefulness", desc: "Does this project actually solve the problem in a practical way?" },
+            { id: "r2q9", label: "Teamwork & Collaboration", desc: "Did everyone contribute, or was it a one-person show?" },
+            { id: "r2q10", label: "Pitch & Presentation", desc: "How confidently and clearly did they demonstrate their project?" },
         ]
     },
 ];
@@ -45,6 +57,7 @@ export const TRACKS = [
 
 export const MAX_TEAM_MEMBERS = 4;
 export const MAX_PROPOSED_IDEA_CHARACTERS = 500;
+export const MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS = 60;
 
 export const PROBLEM_STATEMENTS: Record<string, string[]> = {
     // SaaSsum AI / SaaSum AI (IT & AI)
@@ -170,4 +183,8 @@ export function getProblemStatementsForTrack(track?: string | null): string[] {
 
     // 4. Fallback to Open Innovation
     return PROBLEM_STATEMENTS["Open Innovation"] || [];
+}
+
+export function isOpenInnovationTrack(track?: string | null): boolean {
+    return Boolean(track && track.toLowerCase().replace(/\s*\(.*?\)/g, '').replace(/[^a-z0-9]/g, '') === 'openinnovation');
 }

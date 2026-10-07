@@ -49,9 +49,16 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
 
     useEffect(() => {
         const syncAdminSection = () => setActiveAdminSection(window.location.hash.slice(1) || "entries");
+        const handleCustomEvent = (e: Event) => setActiveAdminSection((e as CustomEvent).detail);
+        
         syncAdminSection();
         window.addEventListener("hashchange", syncAdminSection);
-        return () => window.removeEventListener("hashchange", syncAdminSection);
+        window.addEventListener("admin-section-change", handleCustomEvent);
+        
+        return () => {
+            window.removeEventListener("hashchange", syncAdminSection);
+            window.removeEventListener("admin-section-change", handleCustomEvent);
+        };
     }, [pathname]);
 
     const displayName = useMemo(() => {
