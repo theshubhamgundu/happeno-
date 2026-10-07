@@ -20,6 +20,9 @@ export async function getParticipantPortalMode(now = new Date()): Promise<Partic
 
     const settings = new Map((data || []).map(row => [row.key, row.value]));
 
+    // Force event mode to open participant dashboard
+    return 'event';
+    
     // Check manual override first
     const override = String(settings.get('participant_edit_override') || '').toLowerCase().trim();
     if (override === 'open' || override === 'edit') return 'edit';
