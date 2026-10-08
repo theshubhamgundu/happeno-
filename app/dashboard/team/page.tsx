@@ -319,12 +319,10 @@ export default function TeamDashboard() {
     if (isLoading) return <DashboardLayout type="team" title="Your project"><div className="grid min-h-[420px] place-items-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#df6d59] border-t-transparent" /></div></DashboardLayout>;
     if (!team) return <DashboardLayout type="team" title="Your project"><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><h2 className="text-lg font-semibold">No team is linked to this account</h2><p className="mt-2 text-sm text-slate-500">Please complete registration or contact the event team.</p></div></DashboardLayout>;
 
-    
-    const IS_HACKATHON_STARTED = new Date() >= new Date('2026-10-10T08:00:00+05:30');
-    // Lock everything if hackathon hasn\'t started
-    const effectiveSubmissionLocked = isSubmissionLocked || !IS_HACKATHON_STARTED;
-    const effectivePILocked = team?.isPILocked || !IS_HACKATHON_STARTED;
-    const effectiveTSLocked = team?.isTSLocked || !IS_HACKATHON_STARTED;
+    // Remove early time locks so teams can ideate immediately
+    const effectiveSubmissionLocked = isSubmissionLocked;
+    const effectivePILocked = team?.isPILocked;
+    const effectiveTSLocked = team?.isTSLocked;
 
     const members = team.members.map((member: any, index: number) => ({ name: typeof member === "string" ? member : member.fullName, role: index === 0 ? "Team lead" : "Member", detail: typeof member === "string" ? "Participant" : member.department || "Participant" }));
     const submitted = Boolean(team.submission?.isFinal);
@@ -334,7 +332,7 @@ export default function TeamDashboard() {
     const actualPS = localPS || team.problemStatement;
 
     // If already locked in DB, proceed directly to workspace. Otherwise force Lock-In Flow.
-    if (!isLockedInDB && (!actualTrack || !actualPS) && IS_HACKATHON_STARTED) {
+    if (!isLockedInDB && (!actualTrack || !actualPS)) {
         return (
             <LockInFlow
                 team={team}
