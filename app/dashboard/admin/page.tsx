@@ -157,6 +157,7 @@ export default function AdminDashboard() {
     const [replyText, setReplyText] = useState('');
     const [isSendingReply, setIsSendingReply] = useState(false);
     const [isConvertingTicket, setIsConvertingTicket] = useState<number | null>(null);
+    const [addonsSearchQuery, setAddonsSearchQuery] = useState('');
 
     const fetchInboundEmails = async () => {
         setIsLoadingEmails(true);
@@ -1865,10 +1866,20 @@ export default function AdminDashboard() {
             {activeTab === 'settings' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
-                        <div className="flex justify-between items-center mb-8">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                             <div>
                                 <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">Purchased Addons</h3>
                                 <p className="mt-1 text-xs text-white/40">View which participants have purchased Networking Passes and Meal Passes.</p>
+                            </div>
+                            <div className="relative w-full md:w-64">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Search name, team, or ID..." 
+                                    value={addonsSearchQuery}
+                                    onChange={(e) => setAddonsSearchQuery(e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#14b8a6]/50 transition-all"
+                                />
                             </div>
                         </div>
 
@@ -1876,7 +1887,7 @@ export default function AdminDashboard() {
                             {/* LEFT SIDE: NETWORKING PASSES */}
                             <div className="flex flex-col gap-4">
                                 <h4 className="text-lg font-black text-purple-400 uppercase tracking-widest border-b border-white/10 pb-3">Networking Passes</h4>
-                                <div className="space-y-3">
+                                <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
                                     {projects.flatMap(p => 
                                         (p.members || []).map((m: any, i: number) => {
                                             const mId = m.participant_id || m.id || `m${i}`;
@@ -1892,10 +1903,25 @@ export default function AdminDashboard() {
                                             }
                                             
                                             if (!hasNet) return null;
+
+                                            const memberName = m.fullName || m.name || "Unknown";
+                                            const teamName = p.team || p.name;
+                                            
+                                            if (addonsSearchQuery) {
+                                                const query = addonsSearchQuery.toLowerCase();
+                                                const matchesSearch = 
+                                                    memberName.toLowerCase().includes(query) || 
+                                                    teamName.toLowerCase().includes(query) || 
+                                                    (p.teamId || '').toLowerCase().includes(query) ||
+                                                    (mId || '').toLowerCase().includes(query);
+                                                
+                                                if (!matchesSearch) return null;
+                                            }
+
                                             return (
                                                 <div key={`net-${p.teamId}-${i}`} className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-1">
-                                                    <div className="font-bold text-white text-sm">{m.fullName || m.name || "Unknown"}</div>
-                                                    <div className="text-xs text-white/50">{p.team || p.name} <span className="text-purple-400">({p.teamId})</span></div>
+                                                    <div className="font-bold text-white text-sm">{memberName}</div>
+                                                    <div className="text-xs text-white/50">{teamName} <span className="text-purple-400">({p.teamId})</span></div>
                                                 </div>
                                             );
                                         })
@@ -1906,7 +1932,7 @@ export default function AdminDashboard() {
                             {/* RIGHT SIDE: MEAL PASSES */}
                             <div className="flex flex-col gap-4">
                                 <h4 className="text-lg font-black text-emerald-400 uppercase tracking-widest border-b border-white/10 pb-3">Meal Passes</h4>
-                                <div className="space-y-3">
+                                <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
                                     {projects.flatMap(p => 
                                         (p.members || []).map((m: any, i: number) => {
                                             const mId = m.participant_id || m.id || `m${i}`;
@@ -1922,10 +1948,25 @@ export default function AdminDashboard() {
                                             }
                                             
                                             if (!hasMeal) return null;
+
+                                            const memberName = m.fullName || m.name || "Unknown";
+                                            const teamName = p.team || p.name;
+                                            
+                                            if (addonsSearchQuery) {
+                                                const query = addonsSearchQuery.toLowerCase();
+                                                const matchesSearch = 
+                                                    memberName.toLowerCase().includes(query) || 
+                                                    teamName.toLowerCase().includes(query) || 
+                                                    (p.teamId || '').toLowerCase().includes(query) ||
+                                                    (mId || '').toLowerCase().includes(query);
+                                                
+                                                if (!matchesSearch) return null;
+                                            }
+
                                             return (
                                                 <div key={`meal-${p.teamId}-${i}`} className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-1">
-                                                    <div className="font-bold text-white text-sm">{m.fullName || m.name || "Unknown"}</div>
-                                                    <div className="text-xs text-white/50">{p.team || p.name} <span className="text-emerald-400">({p.teamId})</span></div>
+                                                    <div className="font-bold text-white text-sm">{memberName}</div>
+                                                    <div className="text-xs text-white/50">{teamName} <span className="text-emerald-400">({p.teamId})</span></div>
                                                 </div>
                                             );
                                         })
