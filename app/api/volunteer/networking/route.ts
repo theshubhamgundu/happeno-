@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
         const { data: team, error: fetchErr } = await supabase
             .from('registrations')
-            .select('team_id, team_name, members, raw_data, is_checked_in')
+            .select('team_id, team_name, members, raw_data, meal_access, is_checked_in')
             .or(`team_id.ilike.${teamId},transaction_id.ilike.${teamId}`)
             .single();
 
