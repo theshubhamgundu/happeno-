@@ -133,7 +133,7 @@ export default function AdminTickets() {
     const fetchTickets = useCallback(async (quiet = false) => {
         if (!quiet) setIsRefreshing(true);
         try {
-            const res = await fetch('/api/help-tickets');
+            const res = await fetch(`/api/help-tickets?t=${Date.now()}`, { cache: 'no-store' });
             if (res.ok) {
                 const data: HelpTicket[] = await res.json();
                 setTickets(data);

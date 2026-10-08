@@ -172,15 +172,7 @@ export default function LoginPage() {
                 >
                     <div className="pro-card rounded-xl p-8 bg-white border border-gray-200 shadow-sm relative overflow-hidden">
                         <div className="relative z-10 space-y-6">
-                            {/* Role badge */}
-                            <div className="flex justify-center">
-                                <div className={`px-4 py-2 rounded-full bg-gradient-to-r from-[#0f172a] to-[#0f766e] flex items-center gap-2 shadow-sm`}>
-                                    <UserCircle size={16} className="text-white" />
-                                    <span className="text-xs font-display font-bold uppercase tracking-wider text-white">Unified Login</span>
-                                </div>
-                            </div>
 
-                            <div className="border-t border-gray-100" />
 
                             {/* ID Field */}
                             <div className="space-y-2">

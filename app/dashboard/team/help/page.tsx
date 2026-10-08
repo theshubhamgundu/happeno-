@@ -22,7 +22,7 @@ export default function HelpPage() {
 
     const fetchMyTickets = useCallback(async () => {
         try {
-            const res = await fetch('/api/help-tickets');
+            const res = await fetch(`/api/help-tickets?t=${Date.now()}`, { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
                 if (Array.isArray(data)) {

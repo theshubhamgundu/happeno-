@@ -25,17 +25,6 @@ export interface HelpTicket {
 }
 
 async function loadTickets(): Promise<HelpTicket[]> {
-    if (redis) {
-        try {
-            const raw = await redis.get(HELP_QUEUE_KEY);
-            if (raw) {
-                return typeof raw === 'string' ? JSON.parse(raw) : (raw as HelpTicket[]);
-            }
-        } catch (e) {
-            console.warn('Redis read failed, attempting Supabase fallback:', e);
-        }
-    }
-
     try {
         const { data, error } = await supabase
             .from('hackathon_settings')
@@ -57,16 +46,6 @@ async function loadTickets(): Promise<HelpTicket[]> {
 
 async function persistTickets(tickets: HelpTicket[]): Promise<boolean> {
     let saved = false;
-    if (redis) {
-        try {
-            await redis.set(HELP_QUEUE_KEY, JSON.stringify(tickets));
-            saved = true;
-        } catch (e) {
-            console.warn('Redis write failed, attempting Supabase fallback:', e);
-            // Fail-safe: Try to delete the stale cache to force the next read from Supabase
-            try { await redis.del(HELP_QUEUE_KEY); } catch(err) {}
-        }
-    }
 
     try {
         const { error } = await supabase
@@ -76,7 +55,13 @@ async function persistTickets(tickets: HelpTicket[]): Promise<boolean> {
                 value: tickets,
                 updated_at: new Date().toISOString()
             });
-        if (!error) saved = true;
+        if (!error) {
+            saved = true;
+            // Best effort clear Redis cache to prevent stale data if it was enabled
+            if (redis) {
+                try { await redis.del(HELP_QUEUE_KEY); } catch(err) {}
+            }
+        }
     } catch (e) {
         console.error('Failed to persist tickets to Supabase:', e);
     }
