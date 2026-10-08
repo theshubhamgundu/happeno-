@@ -43,9 +43,8 @@ export async function POST(req: Request) {
             if (member) memberName = member.fullName || member.name || 'Participant';
         }
 
-        const rawData = typeof team.raw_data === 'object' && team.raw_data !== null ? (team.raw_data as any) : {};
-        const networkingClaimed = Array.isArray(rawData.networking_claimed) ? rawData.networking_claimed : [];
         const mealAccess = typeof team.meal_access === 'object' && team.meal_access !== null ? team.meal_access : {};
+        const networkingClaimed = Array.isArray((mealAccess as any).networking_claimed) ? (mealAccess as any).networking_claimed : [];
         const networkingPasses = Array.isArray((mealAccess as any).networking_passes) ? (mealAccess as any).networking_passes : [];
         const isAll = networkingPasses.includes('all');
         const hasMemberAccess = networkingPasses.includes(memberId) || (Array.isArray(team.members) && team.members.find(m => m.id === memberId || m.participant_id === memberId)?.networking_pass === true);
@@ -67,11 +66,12 @@ export async function POST(req: Request) {
 
         // Update networking_claimed
         networkingClaimed.push(memberId);
-        rawData.networking_claimed = networkingClaimed;
         
         const { error: updateErr } = await supabase
             .from('registrations')
-            .update({ raw_data: rawData })
+            .update({ 
+                meal_access: { ...mealAccess, networking_claimed: networkingClaimed } 
+            })
             .eq('team_id', team.team_id);
 
         if (updateErr) throw updateErr;

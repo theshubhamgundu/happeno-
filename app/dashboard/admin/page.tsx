@@ -89,7 +89,7 @@ export default function AdminDashboard() {
         deleteTeams,
         bulkUpdateTeams,
         checkInTeam,
-        resetCheckIn,
+        resetBulkCheckins,
         refreshTeams
     } = useHackathon();
 
@@ -105,6 +105,7 @@ export default function AdminDashboard() {
     const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
     const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin' | 'restructure' | 'prescores'>('teams');
+    const [recentView, setRecentView] = useState<'gate'|'meals'|'networking'>('gate');
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
     const [emergencyForm, setEmergencyForm] = useState({ name: "", phone: "" });
@@ -2504,6 +2505,38 @@ export default function AdminDashboard() {
                             <p className="mt-1 text-xs text-white/45">Scan participant QR codes to mark them as checked-in at the venue.</p>
                         </div>
                         <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => {
+                                        if (confirm('Are you sure you want to clear ALL gate check-ins?')) {
+                                            resetBulkCheckins('gate');
+                                        }
+                                    }}
+                                    className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
+                                >
+                                    Clear Gate
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (confirm('Are you sure you want to clear ALL meal check-ins?')) {
+                                            resetBulkCheckins('meals');
+                                        }
+                                    }}
+                                    className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
+                                >
+                                    Clear Meals
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (confirm('Are you sure you want to clear ALL networking check-ins?')) {
+                                            resetBulkCheckins('networking');
+                                        }
+                                    }}
+                                    className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
+                                >
+                                    Clear Networking
+                                </button>
+                            </div>
                             <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Checked In</span>
                                 <span className="text-xl font-black italic text-[#14b8a6]">{projects.filter(p => p.isCheckedIn).length}</span>
@@ -2547,40 +2580,102 @@ export default function AdminDashboard() {
 
                         {/* Recent Check-ins */}
                         <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-                            <h3 className="text-lg font-black italic uppercase tracking-tight text-white mb-4">Recent Check-ins</h3>
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-black italic uppercase tracking-tight text-white">Recent Check-ins</h3>
+                                <div className="flex bg-white/5 rounded-lg p-1">
+                                    {(['gate', 'meals', 'networking'] as const).map(view => (
+                                        <button
+                                            key={view}
+                                            onClick={() => setRecentView(view)}
+                                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-md transition-all ${
+                                                recentView === view
+                                                    ? 'bg-[#14b8a6] text-black shadow-[0_0_10px_rgba(20,184,166,0.3)]'
+                                                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                                            }`}
+                                        >
+                                            {view}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                             <div className="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
-                                {projects.filter(p => p.isCheckedIn).length === 0 ? (
-                                    <div className="py-12 text-center">
-                                        <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No teams checked in yet</p>
-                                    </div>
-                                ) : (
-                                    projects
-                                        .filter(p => p.isCheckedIn)
-                                        .sort((a, b) => {
-                                            const aTime = a.checkedInAt ? new Date(a.checkedInAt).getTime() : 0;
-                                            const bTime = b.checkedInAt ? new Date(b.checkedInAt).getTime() : 0;
-                                            return bTime - aTime;
-                                        })
-                                        .slice(0, 50)
-                                        .map(team => (
-                                            <div key={team.id} className="flex items-center gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10">
-                                                <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">
-                                                    <CheckCircle size={16} />
+                                {recentView === 'gate' && (
+                                    projects.filter(p => p.isCheckedIn).length === 0 ? (
+                                        <div className="py-12 text-center">
+                                            <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No teams checked in yet</p>
+                                        </div>
+                                    ) : (
+                                        projects
+                                            .filter(p => p.isCheckedIn)
+                                            .sort((a, b) => {
+                                                const aTime = a.checkedInAt ? new Date(a.checkedInAt).getTime() : 0;
+                                                const bTime = b.checkedInAt ? new Date(b.checkedInAt).getTime() : 0;
+                                                return bTime - aTime;
+                                            })
+                                            .slice(0, 50)
+                                            .map(team => (
+                                                <div key={team.id} className="flex items-center gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10">
+                                                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">
+                                                        <CheckCircle size={16} />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-bold text-white truncate">{team.team}</p>
+                                                        <p className="text-[10px] text-white/40">{team.teamId}{team.checkedInAt ? ` • ${new Date(team.checkedInAt).toLocaleTimeString()}` : ''}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-bold text-white truncate">{team.team}</p>
-                                                    <p className="text-[10px] text-white/40">{team.teamId}{team.checkedInAt ? ` • ${new Date(team.checkedInAt).toLocaleTimeString()}` : ''}</p>
-                                                </div>
-                                                <button
-                                                    onClick={() => resetCheckIn(team.id)}
-                                                    className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-all"
-                                                    title="Clear Check-in"
-                                                >
-                                                    <X size={14} />
-                                                </button>
-                                            </div>
-                                        ))
+                                            ))
+                                    )
                                 )}
+                                {recentView === 'meals' && (() => {
+                                    const meals = projects.flatMap(p => 
+                                        (Array.isArray(p.mealAccess?.dinner_claimed) ? p.mealAccess.dinner_claimed : []).map((memberId: string) => ({
+                                            teamName: p.team,
+                                            teamId: p.teamId,
+                                            memberName: p.members?.find((m: any) => (m.participant_id || m.id) === memberId)?.fullName || "Unknown Member"
+                                        }))
+                                    ).slice(0, 50);
+
+                                    return meals.length === 0 ? (
+                                        <div className="py-12 text-center">
+                                            <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No meal claims yet</p>
+                                        </div>
+                                    ) : meals.map((claim: any, idx) => (
+                                        <div key={`meal-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                                            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                                                <Coffee size={16} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold text-white truncate">{claim.teamName} <span className="text-xs font-normal text-white/50">({claim.memberName})</span></p>
+                                                <p className="text-[10px] text-white/40">{claim.teamId} • Dinner</p>
+                                            </div>
+                                        </div>
+                                    ));
+                                })()}
+                                {recentView === 'networking' && (() => {
+                                    const net = projects.flatMap(p => 
+                                        (Array.isArray(p.mealAccess?.networking_claimed) ? p.mealAccess.networking_claimed : []).map((memberId: string) => ({
+                                            teamName: p.team,
+                                            teamId: p.teamId,
+                                            memberName: p.members?.find((m: any) => (m.participant_id || m.id) === memberId)?.fullName || "Unknown Member"
+                                        }))
+                                    ).slice(0, 50);
+
+                                    return net.length === 0 ? (
+                                        <div className="py-12 text-center">
+                                            <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No networking claims yet</p>
+                                        </div>
+                                    ) : net.map((claim: any, idx) => (
+                                        <div key={`net-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 border border-purple-500/10">
+                                            <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
+                                                <Users size={16} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold text-white truncate">{claim.teamName} <span className="text-xs font-normal text-white/50">({claim.memberName})</span></p>
+                                                <p className="text-[10px] text-white/40">{claim.teamId} • Networking</p>
+                                            </div>
+                                        </div>
+                                    ));
+                                })()}
                             </div>
                         </div>
                     </div>

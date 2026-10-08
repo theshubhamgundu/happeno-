@@ -54,7 +54,7 @@ interface HackathonContextType {
     projects: Project[];
     isLoading: boolean;
     checkInTeam: (projectId: any) => Promise<boolean>;
-    resetCheckIn: (projectId: any) => Promise<boolean>;
+    resetBulkCheckins: (type: 'gate' | 'meals' | 'networking') => Promise<boolean>;
     judges: Judge[];
     addJudge: (judge: { name: string, specialization: string, phone?: string }) => void;
     removeJudge: (id: string) => void;
@@ -422,22 +422,20 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const resetCheckIn = async (projectId: any): Promise<boolean> => {
-        const project = projects.find(item => item.id === projectId);
-        if (!project) return false;
+    const resetBulkCheckins = async (type: 'gate' | 'meals' | 'networking'): Promise<boolean> => {
         try {
-            const response = await fetch('/api/teams', {
-                method: 'PATCH',
+            const response = await fetch('/api/admin/reset-checkins', {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: projectId, isCheckedIn: false, checkedInAt: null })
+                body: JSON.stringify({ type })
             });
-            if (!response.ok) throw new Error('Check-in reset was rejected by the server.');
-            setProjects(prev => prev.map(item => item.id === projectId ? { ...item, isCheckedIn: false, checkedInAt: null } : item));
-            toast.success("Check-in cleared!");
+            if (!response.ok) throw new Error('Reset failed on the server.');
+            toast.success(`Successfully cleared ${type} check-ins!`);
+            await refreshTeams();
             return true;
         } catch (err) {
             console.error(err);
-            toast.error("Check-in reset failed");
+            toast.error(`Failed to clear ${type} check-ins`);
             return false;
         }
     };
@@ -946,7 +944,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 projects,
                 isLoading,
                 checkInTeam,
-                resetCheckIn,
+                resetBulkCheckins,
                 judges,
                 addJudge,
                 removeJudge,
