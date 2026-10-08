@@ -6,7 +6,7 @@ import { HelpCircle, Send, X, ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function HelpPage() {
-    const [helpCategory, setHelpCategory] = useState('Team Details Query');
+    const [helpCategory, setHelpCategory] = useState('Login Issue');
     const [helpTeamId, setHelpTeamId] = useState('');
     const [helpContactName, setHelpContactName] = useState('');
     const [helpContactPhone, setHelpContactPhone] = useState('');
@@ -15,6 +15,12 @@ export default function HelpPage() {
 
     const handleSubmitSupportTicket = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!helpTeamId.trim()) {
+            toast.error('Please enter your Team ID.');
+            return;
+        }
+
         if (!helpText.trim()) {
             toast.error('Please describe your issue.');
             return;
@@ -85,16 +91,14 @@ export default function HelpPage() {
                                         onChange={(e) => setHelpCategory(e.target.value)}
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 appearance-none text-sm transition-all"
                                     >
-                                        <option value="Team Details Query">Team Details Query</option>
-                                        <option value="Hackathon Information">Hackathon Information</option>
-                                        <option value="Portal Access">Portal Access</option>
-                                        <option value="Reporting Issue">Reporting Issue</option>
+                                        <option value="Login Issue">Login Issue</option>
+                                        <option value="Mail Not Received">Mail Not Received</option>
                                         <option value="Others">Others</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold uppercase text-slate-500 tracking-wider block mb-1">
-                                        Team ID <span className="text-slate-400 font-normal lowercase">(Optional)</span>
+                                        Team ID <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -148,7 +152,7 @@ export default function HelpPage() {
 
                             <button
                                 type="submit"
-                                disabled={isSubmittingHelp || !helpText.trim()}
+                                disabled={isSubmittingHelp || !helpText.trim() || !helpTeamId.trim()}
                                 className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-black hover:bg-slate-800 text-white font-bold uppercase tracking-widest text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed group mt-2"
                             >
                                 {isSubmittingHelp ? (
