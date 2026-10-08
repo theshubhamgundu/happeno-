@@ -24,6 +24,7 @@ const adminOperationItems = [
     { href: "/dashboard/admin#checkin", section: "checkin", icon: ScanLine, label: "QR Check-in" },
     { href: "/dashboard/admin#restructure", section: "restructure", icon: Users, label: "Team Restructure" },
     { href: "/dashboard/admin#prescores", section: "prescores", icon: Award, label: "Rabbit Race" },
+    { href: "/dashboard/admin/mentors", section: "mentors", icon: UsersRound, label: "Mentors" },
 ];
 
 interface DashboardLayoutProps {
@@ -94,7 +95,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
         admin: [
             { href: "/dashboard/admin", icon: BarChart3, label: "Command" },
             { href: "/dashboard/admin/users", icon: Users, label: "Hacker Directory" },
-            { href: "/dashboard/admin/tickets", icon: LifeBuoy, label: "Mentor Queue" },
+            { href: "/dashboard/admin/tickets", icon: LifeBuoy, label: "Help Requests" },
             { href: "/dashboard/admin/results", icon: GanttChartSquare, label: "Leaderboard" },
         ]
     };

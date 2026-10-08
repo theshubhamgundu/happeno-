@@ -182,7 +182,7 @@ export default function AdminTickets() {
             if (res.ok && data.success) {
                 setTickets(data.tickets);
                 if (action === 'accept') {
-                    toast.success("Ticket claimed! Mentor assigned.");
+                    toast.success("Ticket claimed! Coordinator assigned.");
                 } else if (action === 'resolve') {
                     toast.success("Ticket marked as resolved.");
                 } else {
@@ -217,7 +217,7 @@ export default function AdminTickets() {
     });
 
     return (
-        <DashboardLayout type="admin" title="Mentor & Help Queue">
+        <DashboardLayout type="admin" title="Help Requests">
             {/* Header with live status, counts, and manual refresh */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
@@ -231,7 +231,7 @@ export default function AdminTickets() {
                         )}
                     </h2>
                     <p className="text-xs text-slate-500 mt-1">
-                        Live command queue of teams requesting mentorship, technical guidance, or infrastructure help.
+                        Live command queue of teams requesting support and infrastructure help.
                     </p>
                 </div>
 
@@ -413,7 +413,7 @@ export default function AdminTickets() {
                                         {ticket.status === 'accepted' && (
                                             <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1.5 rounded-xl w-fit">
                                                 <User size={13} />
-                                                <span>Claimed by: <strong>{ticket.acceptedBy || "Mentor"}</strong></span>
+                                                <span>Claimed by: <strong>{ticket.acceptedBy || "Coordinator"}</strong></span>
                                             </div>
                                         )}
                                     </div>
@@ -485,7 +485,7 @@ export default function AdminTickets() {
                         </h3>
                         <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
                             {filter === 'all'
-                                ? "When teams ask for technical or mentor guidance, tickets will instantly appear here."
+                                ? "When teams ask for support, tickets will instantly appear here."
                                 : "Check the active queue to view open requests from participants."}
                         </p>
                     </div>
