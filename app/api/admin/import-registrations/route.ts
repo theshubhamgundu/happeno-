@@ -3,7 +3,7 @@ import { teamSupabase as supabase } from '@/lib/supabase';
 import { randomBytes } from 'node:crypto';
 import QRCode from 'qrcode';
 import { getSession, hasRole } from '@/lib/session';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { sendEmail } from '@/lib/email';
 
 function escapeHtml(value: string): string {
@@ -221,54 +221,54 @@ export async function POST(req: Request) {
 
         let emailsSent = 0;
         let emailFailures = 0;
-        const signInUrl = escapeHtml(`${(process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.online').replace(/\/+$/, '')}/login`);
+        const signInUrl = escapeHtml(`${(process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in').replace(/\/+$/, '')}/login`);
         for (const registration of registrations) {
-                const teamId = registration.teamId;
-                const qrBuffer = await QRCode.toBuffer(teamId, { width: 350, margin: 1 });
-                const password = teamCredentials.get(teamId);
-                const recipients = registration.participants
-                    .map((member, participantIndex) => ({ member, participantIndex }))
-                    .filter(({ member }) => member.email)
-                    .filter(({ member }, index, members) =>
-                        members.findIndex(candidate => candidate.member.email.toLowerCase() === member.email.toLowerCase()) === index
-                    );
-                if (!registration.captain.email) emailFailures++;
+            const teamId = registration.teamId;
+            const qrBuffer = await QRCode.toBuffer(teamId, { width: 350, margin: 1 });
+            const password = teamCredentials.get(teamId);
+            const recipients = registration.participants
+                .map((member, participantIndex) => ({ member, participantIndex }))
+                .filter(({ member }) => member.email)
+                .filter(({ member }, index, members) =>
+                    members.findIndex(candidate => candidate.member.email.toLowerCase() === member.email.toLowerCase()) === index
+                );
+            if (!registration.captain.email) emailFailures++;
 
-                for (const { member, participantIndex } of recipients) {
-                    const isCaptain = participantIndex === 0;
-                    const teamName = escapeHtml(registration.teamName);
-                    const memberName = escapeHtml(member.fullName || 'Participant');
-                    const safeTeamId = escapeHtml(teamId);
-                    const credentialBlock = isCaptain && password
-                        ? `<p><strong>Team login ID:</strong> ${safeTeamId}<br/><strong>Password:</strong> ${escapeHtml(password)}</p><p>Sign in at <a href="${signInUrl}">${signInUrl}</a>.</p>`
-                        : '';
-                    try {
-                        await sendEmail({
-                            to: member.email.trim(),
-                            subject: `Registration confirmed: ${registration.teamName}`,
-                            attachments: [{ filename: `tricity-checkin-${teamId.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, content: qrBuffer }],
-                            html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6"><h1>Registration confirmed</h1><p>Hello ${memberName},</p><p>Your team <strong>${teamName}</strong> is registered for TRI-CITY AI HACKATHON.</p><p><strong>Registration ID:</strong> ${safeTeamId}</p>${credentialBlock}<p>Your check-in QR code is attached. Please present it at the venue.</p></div>`
-                        });
-                        emailsSent++;
-                        if (isCaptain && password) {
-                            const { error: credentialUpdateError } = await supabase
-                                .from('registrations')
-                                .update({ credentials_issued_at: new Date().toISOString() })
-                                .eq('team_id', teamId);
-                            if (credentialUpdateError) {
-                                console.error(`Failed to mark credentials issued for ${teamId}:`, credentialUpdateError);
-                                emailFailures++;
-                            }
+            for (const { member, participantIndex } of recipients) {
+                const isCaptain = participantIndex === 0;
+                const teamName = escapeHtml(registration.teamName);
+                const memberName = escapeHtml(member.fullName || 'Participant');
+                const safeTeamId = escapeHtml(teamId);
+                const credentialBlock = isCaptain && password
+                    ? `<p><strong>Team login ID:</strong> ${safeTeamId}<br/><strong>Password:</strong> ${escapeHtml(password)}</p><p>Sign in at <a href="${signInUrl}">${signInUrl}</a>.</p>`
+                    : '';
+                try {
+                    await sendEmail({
+                        to: member.email.trim(),
+                        subject: `Registration confirmed: ${registration.teamName}`,
+                        attachments: [{ filename: `tricity-checkin-${teamId.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, content: qrBuffer }],
+                        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6"><h1>Registration confirmed</h1><p>Hello ${memberName},</p><p>Your team <strong>${teamName}</strong> is registered for TRI-CITY AI HACKATHON.</p><p><strong>Registration ID:</strong> ${safeTeamId}</p>${credentialBlock}<p>Your check-in QR code is attached. Please present it at the venue.</p></div>`
+                    });
+                    emailsSent++;
+                    if (isCaptain && password) {
+                        const { error: credentialUpdateError } = await supabase
+                            .from('registrations')
+                            .update({ credentials_issued_at: new Date().toISOString() })
+                            .eq('team_id', teamId);
+                        if (credentialUpdateError) {
+                            console.error(`Failed to mark credentials issued for ${teamId}:`, credentialUpdateError);
+                            emailFailures++;
                         }
-                    } catch (emailError: unknown) {
-                        console.error(`Failed to send import email for team ${teamId}:`, emailError);
-                        emailFailures++;
                     }
+                } catch (emailError: unknown) {
+                    console.error(`Failed to send import email for team ${teamId}:`, emailError);
+                    emailFailures++;
+                }
             }
         }
 
         return NextResponse.json({
-            success: true, 
+            success: true,
             imported: data?.length || 0,
             emailsSent,
             emailFailures,

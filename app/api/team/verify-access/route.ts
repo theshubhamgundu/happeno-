@@ -114,7 +114,7 @@ export async function POST(req: Request) {
             if (body.sendMagicLink && finalResults[0]?.email) {
                 const team = results[0];
                 const token = generateRosterToken(team.team_id, team.email);
-                const magicUrl = `https://tricity.online/edit-registration?teamId=${encodeURIComponent(team.team_id)}&token=${encodeURIComponent(token)}`;
+                const magicUrl = `https://tricity.centle.in/edit-registration?teamId=${encodeURIComponent(team.team_id)}&token=${encodeURIComponent(token)}`;
 
                 await sendEmail({
                     to: team.email,

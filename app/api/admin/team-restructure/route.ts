@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { MAX_TEAM_MEMBERS } from '@/lib/constants';
 
 export async function POST(req: Request) {
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
         let allMembers = [...(sourceTeam.members || [])];
         let allMeals = { ...(sourceTeam.member_meal_state || {}) };
-        
+
         let targetTeam = null;
 
         if (action === 'SYNC') {
@@ -76,13 +76,13 @@ export async function POST(req: Request) {
         // Construct final member arrays
         const newSourceMembers = finalSourceEmails.map((e: string) => memberByEmail.get(e));
         const newTargetMembers = finalTargetEmails.map((e: string) => memberByEmail.get(e));
-        
+
         // Construct final meal states
         const newSourceMeals: any = {};
         for (const e of finalSourceEmails) {
             if (allMeals[e]) newSourceMeals[e] = allMeals[e];
         }
-        
+
         const newTargetMeals: any = {};
         for (const e of finalTargetEmails) {
             if (allMeals[e]) newTargetMeals[e] = allMeals[e];
@@ -130,7 +130,7 @@ export async function POST(req: Request) {
             // Generate new team
             const { data: newId, error: idError } = await supabase.rpc('next_registration_team_id');
             if (idError || typeof newId !== 'string') throw idError || new Error('Could not reserve a new team ID.');
-            
+
             const password = randomBytes(18).toString('base64url');
             const cap = newTargetMembers[0];
 
@@ -171,14 +171,14 @@ export async function POST(req: Request) {
                 if (sErr) throw sErr;
             }
 
-            return NextResponse.json({ 
-                success: true, 
+            return NextResponse.json({
+                success: true,
                 message: `Successfully split into new team: ${newId}`,
                 newTeamId: newId,
                 newPassword: password
             });
         }
-        
+
     } catch (err: any) {
         console.error('Restructure Error:', err);
         return NextResponse.json({ error: err.message || 'An error occurred during restructuring.' }, { status: 500 });

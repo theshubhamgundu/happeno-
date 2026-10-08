@@ -1583,6 +1583,7 @@ export default function AdminDashboard() {
                                                         <div className="grid grid-cols-2 gap-2">
                                                             {[
                                                                 { label: 'GitHub', url: team.submission?.github, icon: Code },
+                                                                { label: 'Project ZIP', url: team.submission?.projectZip, icon: Upload },
                                                                 { label: 'Pitch', url: team.submission?.presentation, icon: Presentation },
                                                                 { label: 'Demo', url: team.submission?.demo, icon: Play },
                                                                 { label: 'Live', url: team.submission?.deployment, icon: Globe }
@@ -3640,7 +3641,7 @@ export default function AdminDashboard() {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        void navigator.clipboard.writeText(`Team ID: ${credentialResetResult.teamId}\nPassword: ${credentialResetResult.temporaryPassword}\nLogin: https://tricity.online/login`);
+                                        void navigator.clipboard.writeText(`Team ID: ${credentialResetResult.teamId}\nPassword: ${credentialResetResult.temporaryPassword}\nLogin: https://tricity.centle.in/login`);
                                         toast.success("Credentials copied to clipboard!");
                                     }}
                                     className="flex-1 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-black font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
@@ -4307,22 +4308,22 @@ export default function AdminDashboard() {
             {/* 🟢 PRE-SCORES TAB 🟢 */}
             {activeTab === 'prescores' && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5 lg:flex-row lg:items-center">
+                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-slate-200 bg-white p-5 lg:flex-row lg:items-center">
                         <div>
-                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
+                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-slate-800 flex items-center gap-3">
                                 <Award className="text-[#14b8a6]" size={28} />
                                 Rabbit Race Scores
                             </h2>
-                            <p className="mt-1 max-w-xl text-sm font-medium text-slate-300">
+                            <p className="mt-1 max-w-xl text-sm font-medium text-slate-500">
                                 View pre-scores assigned to teams by the agency (e.g., Rabbit Race marks). These are automatically added to their final evaluation score out of 400.
                             </p>
                         </div>
                     </div>
                     
-                    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-1 overflow-hidden">
+                    <div className="rounded-[1.5rem] border border-slate-200 bg-white p-1 overflow-hidden">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm text-slate-300">
-                                <thead className="bg-black/40 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <table className="w-full text-left text-sm text-slate-700">
+                                <thead className="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-500">
                                     <tr>
                                         <th className="px-6 py-4">Team ID</th>
                                         <th className="px-6 py-4">Team Name</th>
@@ -4330,12 +4331,12 @@ export default function AdminDashboard() {
                                         <th className="px-6 py-4 text-right">Rabbit Race Score</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-white/5 bg-black/20">
+                                <tbody className="divide-y divide-slate-100 bg-white">
                                     {projects.filter(p => p.preScore !== undefined && p.preScore > 0).map(project => (
-                                        <tr key={project.id} className="transition-colors hover:bg-white/5">
-                                            <td className="px-6 py-4 font-bold text-white">{project.teamId}</td>
-                                            <td className="px-6 py-4 font-semibold text-slate-300">{project.team}</td>
-                                            <td className="px-6 py-4 text-xs font-semibold text-slate-400">{project.track || 'Unassigned'}</td>
+                                        <tr key={project.id} className="transition-colors hover:bg-slate-50">
+                                            <td className="px-6 py-4 font-bold text-slate-800">{project.teamId}</td>
+                                            <td className="px-6 py-4 font-semibold text-slate-600">{project.team}</td>
+                                            <td className="px-6 py-4 text-xs font-semibold text-slate-500">{project.track || 'Unassigned'}</td>
                                             <td className="px-6 py-4 text-right font-black text-[#14b8a6]">{project.preScore} / 100</td>
                                         </tr>
                                     ))}

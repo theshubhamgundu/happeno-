@@ -58,7 +58,7 @@ export default function ContactPage() {
                             <ContactCard
                                 icon={<Mail className="text-[#BA45E8]" />}
                                 title="General Inquiry"
-                                value="admin@tricity.online"
+                                value="admin@tricity.centle.in"
                                 subValue="Available 24/7 for support"
                                 color="#BA45E8"
                             />

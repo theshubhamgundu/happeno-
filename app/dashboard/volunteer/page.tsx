@@ -10,7 +10,8 @@ import {
     Zap,
     Clock,
     ShieldAlert,
-    Utensils
+    Utensils,
+    Network
 } from "lucide-react";
 
 import { useHackathon, Project } from "@/context/HackathonContext";
@@ -35,7 +36,7 @@ export default function VolunteerDashboard() {
     const { projects, isLoading, checkInTeam } = useHackathon();
     
     // UI Navigation & Mode state
-    const [activeModule, setActiveModule] = useState<'checkin' | 'meal'>('checkin');
+    const [activeModule, setActiveModule] = useState<'checkin' | 'meal' | 'networking'>('checkin');
     const [isRapidMode, setIsRapidMode] = useState(true);
     const [soundEnabled, setSoundEnabled] = useState(true);
 
@@ -71,12 +72,18 @@ export default function VolunteerDashboard() {
                 return false;
             }
             endpoint = '/api/volunteer/checkin';
-        } else {
+        } else if (activeModule === 'meal') {
             if (passType !== 'member') {
-                toast.error('Wrong pass type! Please scan an Individual Meal Pass for dinner.');
+                toast.error('Wrong pass type! Please scan an Individual Pass for dinner.');
                 return false;
             }
             endpoint = '/api/volunteer/dinner';
+        } else if (activeModule === 'networking') {
+            if (passType !== 'member') {
+                toast.error('Wrong pass type! Please scan an Individual Pass for networking access.');
+                return false;
+            }
+            endpoint = '/api/volunteer/networking';
         }
 
         try {
@@ -121,26 +128,28 @@ export default function VolunteerDashboard() {
                     targetProject.isCheckedIn = true;
                     targetProject.checkedInAt = new Date().toISOString();
                 }
-            } else if (status === 'PERMITTED' && activeModule === 'meal') {
-                msg = `Dinner granted for ${result.memberName || 'Participant'}.`;
+            } else if (status === 'PERMITTED' && (activeModule === 'meal' || activeModule === 'networking')) {
+                const label = activeModule === 'networking' ? 'Networking Event' : 'Dinner';
+                msg = `${label} granted for ${result.memberName || 'Participant'}.`;
                 isSuccess = true;
-                toast.success(`${teamName}: Dinner claimed.`);
+                toast.success(`${teamName}: ${label} claimed.`);
             } else if (status === 'ALREADY_CHECKED_IN') {
                 msg = 'Team has already completed gate check-in.';
                 isSuccess = true; // still a valid pass, just warning
                 toast.warning(`${teamName} was already checked in.`);
             } else if (status === 'ALREADY_CLAIMED') {
-                msg = `${result.memberName || 'Participant'} has already claimed dinner.`;
+                const label = activeModule === 'networking' ? 'Networking' : 'Dinner';
+                msg = `${result.memberName || 'Participant'} has already claimed ${label}.`;
                 isSuccess = false;
-                toast.error('Dinner already claimed.');
+                toast.error(`${label} already claimed.`);
             } else if (status === 'NEEDS_CHECKIN') {
                 msg = 'Must scan team leader gate pass first!';
                 isSuccess = false;
                 toast.error('Team must check in at gate first!');
             } else {
-                msg = 'Dinner Meal Pass not purchased for this participant.';
+                msg = `Access Pass not valid for this participant.`;
                 isSuccess = false;
-                toast.error('No meal pass purchased for this participant.');
+                toast.error('Pass validation failed for this participant.');
             }
 
             const newEntry: ScanAuditEntry = {
@@ -151,7 +160,7 @@ export default function VolunteerDashboard() {
                 passType,
                 status,
                 message: msg,
-                mealLabel: activeModule === 'meal' ? 'Dinner' : undefined,
+                mealLabel: activeModule === 'meal' ? 'Dinner' : (activeModule === 'networking' ? 'Networking' : undefined),
                 memberId
             };
 
@@ -233,14 +242,25 @@ export default function VolunteerDashboard() {
                         <Utensils size={16} />
                         Dinner Pass
                     </button>
+                    <button
+                        onClick={() => { setActiveModule('networking'); setLastScanEntry(null); setIsRapidMode(true); }}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                            activeModule === 'networking'
+                                ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/50'
+                                : 'text-slate-500 hover:bg-slate-200/50'
+                        }`}
+                    >
+                        <Network size={16} />
+                        Networking
+                    </button>
                 </div>
 
                 {/* Mode & Sound controls bar */}
                 <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
-                        <span className={`h-2.5 w-2.5 rounded-full animate-pulse ${activeModule === 'checkin' ? 'bg-[#14b8a6]' : 'bg-amber-500'}`} />
+                        <span className={`h-2.5 w-2.5 rounded-full animate-pulse ${activeModule === 'checkin' ? 'bg-[#14b8a6]' : (activeModule === 'networking' ? 'bg-indigo-500' : 'bg-amber-500')}`} />
                         <span className="text-xs font-black uppercase tracking-wider text-slate-800">
-                            {activeModule === 'checkin' ? 'Gate QR Scanner' : 'Dinner QR Scanner'}
+                            {activeModule === 'checkin' ? 'Gate QR Scanner' : (activeModule === 'networking' ? 'Networking QR Scanner' : 'Dinner QR Scanner')}
                         </span>
                     </div>
 

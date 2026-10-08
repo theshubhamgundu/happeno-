@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { randomBytes } from 'node:crypto';
 
 const publicFields = 'id, generated_id, name, specialization, created_at';
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
         const { data: generatedId, error: idError } = await supabase.rpc('next_staff_id', { staff_type: 'judge' });
         if (idError || typeof generatedId !== 'string') throw idError || new Error('Could not allocate a judge ID.');
-        
+
         let password = randomBytes(18).toString('base64url');
         if (phone && typeof phone === 'string') {
             const digits = phone.replace(/\D/g, '').slice(-10);

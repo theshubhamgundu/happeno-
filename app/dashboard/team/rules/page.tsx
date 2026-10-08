@@ -8,6 +8,49 @@ export default function RulesPage() {
         <DashboardLayout type="team" title="Rules & Guidelines" subtitle="Important rules for participation and final submissions">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 
+                {/* Do's and Don'ts */}
+                <section className="rounded-2xl border border-teal-200 bg-white shadow-sm overflow-hidden lg:col-span-2">
+                    <div className="p-5 border-b border-teal-100 bg-teal-50 flex items-center gap-3">
+                        <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-100 text-teal-700">
+                            <CheckCircle2 size={20} />
+                        </span>
+                        <div>
+                            <h2 className="text-lg font-bold text-teal-800">Event Code of Conduct</h2>
+                            <p className="text-xs text-teal-600 mt-0.5">To ensure a safe, fair, and high-energy hackathon, follow these Do's and Don'ts throughout the event.</p>
+                        </div>
+                    </div>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 className="text-base font-bold text-emerald-700 mb-4 flex items-center gap-2">
+                                <span className="bg-emerald-100 text-emerald-700 w-6 h-6 rounded-full flex items-center justify-center text-sm">✓</span> 
+                                Do's for Students
+                            </h3>
+                            <ul className="space-y-3 text-sm text-slate-600">
+                                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span> Carry your valid ID and keep your participant QR ready at all times.</li>
+                                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span> Use only approved hackathon zones and follow volunteer instructions immediately.</li>
+                                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span> Maintain discipline during coding hours, mentor sessions, and overnight slots.</li>
+                                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span> Keep your workspace clean and use campus infrastructure responsibly.</li>
+                                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span> Report safety issues, health concerns, or suspicious activity to organizers without delay.</li>
+                                <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">•</span> Respect fellow teams, jury members, and campus residents in words and actions.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 className="text-base font-bold text-rose-700 mb-4 flex items-center gap-2">
+                                <span className="bg-rose-100 text-rose-700 w-6 h-6 rounded-full flex items-center justify-center text-sm">✗</span> 
+                                Don'ts for Students
+                            </h3>
+                            <ul className="space-y-3 text-sm text-slate-600">
+                                <li className="flex items-start gap-2"><span className="text-rose-500 mt-0.5">•</span> Do not enter hostels, labs, offices, or any restricted areas.</li>
+                                <li className="flex items-start gap-2"><span className="text-rose-500 mt-0.5">•</span> Do not share, forge, or misuse participant credentials or QR cards.</li>
+                                <li className="flex items-start gap-2"><span className="text-rose-500 mt-0.5">•</span> Do not create noise, disruptions, or behavior that disturbs the campus environment.</li>
+                                <li className="flex items-start gap-2"><span className="text-rose-500 mt-0.5">•</span> Do not litter, damage furniture/equipment, or misuse common facilities.</li>
+                                <li className="flex items-start gap-2"><span className="text-rose-500 mt-0.5">•</span> Do not bypass check-in, verification, or security processes at any point.</li>
+                                <li className="flex items-start gap-2"><span className="text-rose-500 mt-0.5">•</span> Do not engage in misconduct, harassment, or any non-compliant activity.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
                 {/* General Rules */}
                 <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
@@ -113,6 +156,8 @@ export default function RulesPage() {
                         </ul>
                     </div>
                 </section>
+
+
 
             </div>
         </DashboardLayout>

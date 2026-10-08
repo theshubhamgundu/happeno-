@@ -61,6 +61,40 @@ export async function POST(req: Request) {
                 alreadyLocked: true
             });
         }
+        // --- Slot Limit Enforcement (10 teams max per Problem Statement) ---
+        const MAX_TEAMS_PER_PS = 10;
+        let redisKey = '';
+        let slotIncremented = false;
+
+        // Open Innovation has no limits. Only check if redis is available and it's a predefined track.
+        if (redis && !isOpenInnovationTrack(track)) {
+            // Generate a safe unique key for this problem statement
+            const cleanKey = problemStatement.substring(0, 100).replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+            redisKey = `ps_slots_${cleanKey}`;
+
+            try {
+                // Atomically increment the slot counter
+                const currentSlots = await redis.incr(redisKey);
+                
+                if (currentSlots > MAX_TEAMS_PER_PS) {
+                    // Revert the increment since it's full
+                    await redis.decr(redisKey);
+                    return NextResponse.json({ 
+                        success: false, 
+                        message: `Sorry, this problem statement has reached its maximum limit of ${MAX_TEAMS_PER_PS} teams. Please choose another one.` 
+                    }, { status: 400 });
+                }
+                
+                slotIncremented = true;
+            } catch (err) {
+                console.error("Redis slot increment failed:", err);
+                // In a production environment, if redis fails, we might want to fail the request 
+                // or fallback to a DB check. For now, we will fail safe to prevent overallocation.
+                return NextResponse.json({ success: false, message: "Could not verify problem statement availability. Please try again." }, { status: 500 });
+            }
+        }
+        // ------------------------------------------------------------------
+
         rawData.ps_locked = true;
         rawData.track = track;
         rawData.problem_statement = problemStatement;
@@ -77,6 +111,16 @@ export async function POST(req: Request) {
 
         if (updateError) {
             console.error("Failed to lock track:", updateError);
+            
+            // ROLLBACK the Redis slot if the DB update failed
+            if (slotIncremented && redisKey) {
+                try {
+                    await redis.decr(redisKey);
+                } catch (e) {
+                    console.error("Failed to rollback Redis slot:", e);
+                }
+            }
+
             return NextResponse.json({ success: false, message: "Database update failed", details: updateError.message }, { status: 500 });
         }
 

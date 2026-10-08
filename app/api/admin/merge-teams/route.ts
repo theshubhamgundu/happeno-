@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { MAX_TEAM_MEMBERS } from '@/lib/constants';
 import { getSession, hasRole } from '@/lib/session';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { randomBytes } from 'node:crypto';
 
 function getMemberName(member: unknown): string {
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
         const { data: mergedTeam, error: insertError } = await supabase
             .from('registrations')
             .insert({
-            transaction_id: mergedTransactionId,
+                transaction_id: mergedTransactionId,
                 team_id: teamId,
                 team_name: newTeamName.trim(),
                 password_hash: await hashPassword(password),
@@ -108,7 +108,7 @@ export async function POST(req: Request) {
                     raw_data: { ...currentRaw, merged_into_team_id: mergedTeam.team_id }
                 })
                 .eq('transaction_id', team.transaction_id);
-            
+
             if (mergeError) {
                 await supabase.from('registrations').delete().eq('transaction_id', mergedTransactionId);
                 throw mergeError;

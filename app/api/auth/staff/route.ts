@@ -2,7 +2,7 @@ import { timingSafeEqual } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { setSessionCookie } from '@/lib/session';
-import { verifyPassword } from '@/lib/password';
+import { verifyPassword } from '@/lib/COST_FACTOR';
 import { Ratelimit } from '@upstash/ratelimit';
 import { redis } from '@/lib/redis';
 

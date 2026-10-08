@@ -43,9 +43,10 @@ const timeline = [
     {
         date: "October 10, 2026",
         time: "1:30 – 2:30 PM",
-        title: "Lunch",
-        description: "Room-wise lunch served in the dining area.",
+        title: "Lunch Break",
+        description: "Take a break and grab lunch.",
     },
+
     {
         date: "October 10, 2026",
         time: "2:30 – 5:00 PM",
@@ -110,7 +111,7 @@ const timeline = [
         date: "October 11, 2026",
         time: "1:00 PM onward",
         title: "Wrap-Up & Departure",
-        description: "Certificates, feedback forms, group photo, collect lunch packets, and departure.",
+        description: "Certificates, feedback forms, group photo, and departure.",
     },
 ];
 

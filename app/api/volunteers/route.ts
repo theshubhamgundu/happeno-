@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { randomBytes } from 'node:crypto';
 
 const publicFields = 'id, generated_id, name, phone, role, created_at';

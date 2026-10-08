@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { sendEmail } from '@/lib/email';
 
 function escapeHtml(value: string): string {
@@ -61,9 +61,9 @@ export async function POST(req: Request) {
         }
 
         const members = Array.isArray(team.members) ? team.members : [];
-    const captainName = typeof team.captain === 'string' ? team.captain.trim().toLowerCase() : '';
-    const captain = members.find(member => captainName && memberName(member).toLowerCase() === captainName) || members[0];
-    const leadEmail = memberEmail(captain) || (typeof team.email === 'string' ? team.email.trim() : '');
+        const captainName = typeof team.captain === 'string' ? team.captain.trim().toLowerCase() : '';
+        const captain = members.find(member => captainName && memberName(member).toLowerCase() === captainName) || members[0];
+        const leadEmail = memberEmail(captain) || (typeof team.email === 'string' ? team.email.trim() : '');
         if (!/^\S+@\S+\.\S+$/.test(leadEmail)) {
             return NextResponse.json({ success: false, error: 'A valid team lead email is required before resetting credentials.' }, { status: 422 });
         }
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: 'Could not update team credentials.' }, { status: 500 });
         }
 
-        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.online').replace(/\/+$/, '');
+        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in').replace(/\/+$/, '');
         const safeTeamId = escapeHtml(team.team_id);
         const safeTeamName = escapeHtml(team.team_name || 'Your team');
         const safePassword = escapeHtml(temporaryPassword);

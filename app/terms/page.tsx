@@ -30,7 +30,7 @@ export default function TermsPage() {
                             REGISTRATION
                         </h2>
                         <p>
-                            Teams must register through the official website (tricity.online). The registration fee is <strong className="text-white">â‚¹600 per team</strong>. All information provided during registration must be accurate. Duplicate registrations or providing false information may lead to disqualification.
+                            Teams must register through the official website (https://tricity.centle.in). The registration fee is <strong className="text-white">â‚¹600 per team</strong>. All information provided during registration must be accurate. Duplicate registrations or providing false information may lead to disqualification.
                         </p>
                     </section>
 

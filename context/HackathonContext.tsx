@@ -100,6 +100,7 @@ export interface Project {
     isPILocked?: boolean;
     isTSLocked?: boolean;
     members: (string | Member)[];
+    memberContributions?: string[];
     captain: string;
     captainMobile: string;
     college: string;
@@ -124,6 +125,7 @@ export interface Project {
         presentation: string;
         demo: string;
         deployment: string;
+        projectZip?: string;
         isFinal: boolean;
     };
     mealAccess?: any;

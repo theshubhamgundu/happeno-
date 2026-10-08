@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { teamSupabase as supabase } from '@/lib/supabase';
 import { setSessionCookie } from '@/lib/session';
-import { verifyPassword } from '@/lib/password';
+import { verifyPassword } from '@/lib/COST_FACTOR';
 import { getParticipantPortalMode } from '@/lib/event-windows';
 import { Ratelimit } from '@upstash/ratelimit';
 import { redis } from '@/lib/redis';
@@ -36,14 +36,14 @@ export async function POST(req: Request) {
         if (normalizedTeamId === 'TRI26002') {
             portalMode = 'event';
         }
-        
+
         if (portalMode === 'closed') {
             return NextResponse.json({ success: false, error: 'The participant portal is currently closed.' }, { status: 403 });
         }
-        
+
         const { data: databaseTeam, error: databaseError } = await supabase
             .from('registrations')
-            .select('team_id, team_name, password_hash, credentials_issued_at, status, raw_data')
+            .select('team_id, team_name, password_hash, credentials_issued_at, status, raw_data, captain, members')
             .eq('team_id', normalizedTeamId)
             .maybeSingle();
 
@@ -51,7 +51,37 @@ export async function POST(req: Request) {
             console.error('Database team authentication failed:', databaseError);
             return NextResponse.json({ success: false, error: 'Could not verify team credentials.' }, { status: 503 });
         }
-        if (!databaseTeam?.password_hash || !databaseTeam.credentials_issued_at || !(await verifyPassword(password, databaseTeam.password_hash))) {
+        if (!databaseTeam) {
+            return NextResponse.json({ success: false, error: 'Invalid Participant ID or Password' }, { status: 401 });
+        }
+        // --- Dual-password check ---
+        // 1) Fast logical password: @FirstNameTEAMID (instant, no hashing)
+        //    Handles initials like "G.Tejasree" → skips "G." and uses "Tejasree"
+        //    Case-insensitive comparison
+        const raw_check = (databaseTeam.raw_data && typeof databaseTeam.raw_data === 'object') ? (databaseTeam.raw_data as any) : {};
+        const rawCaptain = raw_check.captain || raw_check.participants?.[0] || {};
+        // Try: raw_data.captain.fullName → top-level captain column → members[0].fullName
+        const captainFullName: string = rawCaptain.fullName || rawCaptain.name || rawCaptain.full_name 
+            || (typeof databaseTeam.captain === 'string' ? databaseTeam.captain : '')
+            || (Array.isArray(databaseTeam.members) && databaseTeam.members[0]?.fullName) || '';
+        
+        // Split name into parts, strip dots/special chars, find the first "real" name (length > 1)
+        const nameParts = captainFullName.split(/[\s.]+/).map((p: string) => p.replace(/[^a-zA-Z]/g, '')).filter(Boolean);
+        const firstName = nameParts.find((p: string) => p.length > 1) || nameParts[0] || '';
+        const logicalPassword = firstName ? `@${firstName}${normalizedTeamId.replace(/[^0-9]/g, '')}` : '';
+
+        let passwordValid = false;
+
+        // Try the logical password first (instant, zero CPU cost, case-insensitive)
+        if (logicalPassword && password.toLowerCase() === logicalPassword.toLowerCase()) {
+            passwordValid = true;
+        }
+        // Fall back to system-generated bcrypt hash
+        else if (databaseTeam.password_hash && databaseTeam.credentials_issued_at) {
+            passwordValid = await verifyPassword(password, databaseTeam.password_hash);
+        }
+
+        if (!passwordValid) {
             return NextResponse.json({ success: false, error: 'Invalid Participant ID or Password' }, { status: 401 });
         }
 

@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { sendEmail } from '@/lib/email';
 import QRCode from 'qrcode';
 
@@ -107,7 +107,7 @@ export async function POST(req: Request) {
             });
         }
 
-        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.online').replace(/\/+$/, '');
+        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in').replace(/\/+$/, '');
         let successCount = 0;
         let failureCount = 0;
         const results: Array<{ teamId: string; teamName: string; captainEmail: string; status: 'SUCCESS' | 'FAILED'; error?: string }> = [];
@@ -161,7 +161,7 @@ export async function POST(req: Request) {
                             <p style="font-size:12px;color:#64748b;margin-top:16px;"><em>Note: As Team Lead, you have access to project submissions, meal tokens, and room assignments. Keep these credentials confidential.</em></p>
                             
                             <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
-                            <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0;">Tri-City AI Hackathon Organizing Committee • tricity.online</p>
+                            <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0;">Tri-City AI Hackathon Organizing Committee • tricity.centle.in</p>
                         </div>
                     `
                 });

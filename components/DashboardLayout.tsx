@@ -1,3 +1,5 @@
+"use client";
+
 import { motion, AnimatePresence } from "framer-motion";
 import TricityMark from "@/components/TricityMark";
 import { useAuth } from "@/context/AuthContext";
@@ -6,7 +8,7 @@ import { useRouter, usePathname } from "next/navigation";
 import {
     Menu, X, LogOut, User, LayoutDashboard, Award, CalendarDays,
     BarChart3, Users, GanttChartSquare, ChevronRight, QrCode, Lock,
-    ShieldCheck, Phone, Coffee, LifeBuoy, Headphones, FileSpreadsheet, ScanLine, Key, ScrollText
+    ShieldCheck, Phone, Coffee, LifeBuoy, Headphones, FileSpreadsheet, ScanLine, Key, ScrollText, Target, UsersRound
 } from "lucide-react";
 import Link from "next/link";
 import { useHackathon } from "@/context/HackathonContext";
@@ -80,6 +82,8 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
             { href: "/dashboard/team", icon: LayoutDashboard, label: "Workspace" },
             { href: "/dashboard/team/help", icon: Headphones, label: "Need Help?" },
             { href: "/dashboard/team/submissions", icon: Award, label: "Submissions" },
+            { href: "/dashboard/team/contributions", icon: UsersRound, label: "Team Contributions" },
+            { href: "/dashboard/team/evaluation-criteria", icon: Target, label: "Evaluation Criteria" },
             { href: "/dashboard/team/api-keys", icon: Key, label: "Sponsor APIs" },
         ],
         judge: [

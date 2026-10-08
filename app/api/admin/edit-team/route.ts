@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { sendEmail } from '@/lib/email';
 import { redis } from '@/lib/redis';
 import QRCode from 'qrcode';
@@ -70,8 +70,8 @@ export async function POST(req: Request) {
         const cleanTeamName = typeof body.teamName === 'string' ? body.teamName.trim() : team.team_name;
         const cleanMobile = typeof body.captainMobile === 'string' ? body.captainMobile.trim() : team.captain_mobile;
         const cleanCollege = typeof body.college === 'string' ? body.college.trim() : team.college;
-        
-        const cleanTrackPrefs = Array.isArray(body.trackPreferences) 
+
+        const cleanTrackPrefs = Array.isArray(body.trackPreferences)
             ? body.trackPreferences.map(t => typeof t === 'string' ? t.trim() : '').filter(Boolean)
             : (Array.isArray(team.track_preferences) ? team.track_preferences : (team.track ? [team.track] : []));
         const cleanTrack = cleanTrackPrefs.length > 0 ? cleanTrackPrefs[0] : '';
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
             updateData.credentials_issued_at = credentialsIssuedAt;
 
 
-            const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.online').replace(/\/+$/, '');
+            const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in').replace(/\/+$/, '');
             const safeTeamId = escapeHtml(team.team_id || teamId);
             const safeTeamName = escapeHtml(cleanTeamName || 'Your team');
             const safePassword = escapeHtml(temporaryPassword);

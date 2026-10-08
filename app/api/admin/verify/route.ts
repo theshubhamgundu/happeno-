@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import QRCode from 'qrcode';
 import { supabase } from '@/lib/supabase';
 import { getSession, hasRole } from '@/lib/session';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/COST_FACTOR';
 import { sendEmail } from '@/lib/email';
 
 function escapeHtml(value: string): string {
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
             const teamId = escapeHtml(approved.team_id || '');
             const captain = escapeHtml(approved.captain || 'Participant');
             const track = escapeHtml(approved.track || '');
-            const signInUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.online'}/login`;
+            const signInUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in'}/login`;
             const qrCode = await QRCode.toBuffer(approved.team_id || '', { width: 350, margin: 1 });
             await sendEmail({
                 to: captainEmail.trim(),

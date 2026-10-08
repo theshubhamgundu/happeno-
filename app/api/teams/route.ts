@@ -28,9 +28,19 @@ function memberEmail(member: unknown): string {
     return (member as { email?: string }).email || '';
 }
 
+function memberContributionKey(member: unknown, index: number): string {
+    const email = memberEmail(member).trim().toLowerCase();
+    if (email) return `email:${email}`;
+    return `member:${memberName(member).trim().toLowerCase()}:${index}`;
+}
+
 function teamResponse(row: Record<string, unknown>) {
     const rawData = row.raw_data && typeof row.raw_data === 'object'
         ? row.raw_data as Record<string, unknown>
+        : {};
+    const members = Array.isArray(row.members) ? row.members : [];
+    const savedContributions = rawData.member_contributions && typeof rawData.member_contributions === 'object'
+        ? rawData.member_contributions as Record<string, unknown>
         : {};
     return {
         id: row.transaction_id || '',
@@ -41,7 +51,11 @@ function teamResponse(row: Record<string, unknown>) {
         captainMobile: row.captain_mobile || '',
         college: row.college || '',
         teamId: row.team_id || '',
-        members: row.members || [],
+        members,
+        memberContributions: members.map((member, index) => {
+            const contribution = savedContributions[memberContributionKey(member, index)];
+            return typeof contribution === 'string' ? contribution : '';
+        }),
         status: row.status || 'PENDING',
         problemStatement: (row.problem_statement as string) || (rawData.problem_statement as string) || (rawData.problemStatement as string) || '',
         proposedIdea: row.proposed_idea || (rawData.proposed_idea as string) || (rawData.proposedIdea as string) || '',
@@ -55,6 +69,7 @@ function teamResponse(row: Record<string, unknown>) {
             presentation: row.presentation_url || '',
             demo: row.demo_url || '',
             deployment: row.deployment_url || '',
+            projectZip: typeof rawData.project_zip_url === 'string' ? rawData.project_zip_url : '',
             isFinal: row.is_final_submission || false
         },
         roundScores: row.round_scores || {},
@@ -388,7 +403,7 @@ export async function PATCH(req: Request) {
         const {
             id, problemStatement, proposedIdea, techStack, submission, roundScores,
             roundComments, roundDetailedScores, isCheckedIn, checkedInAt,
-            members, memberMealState, transferMembers
+            members, memberMealState, memberContributions, transferMembers
         } = body;
 
         if (typeof id !== 'string' || !id) return NextResponse.json({ error: 'ID is required.' }, { status: 400 });
@@ -402,7 +417,7 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ error: 'Evaluations must be saved through the durable judging workflow.' }, { status: 409 });
         }
         if (session.role === 'team') {
-            const allowedKeys = new Set(['id', 'proposedIdea', 'techStack', 'submission']);
+            const allowedKeys = new Set(['id', 'proposedIdea', 'techStack', 'submission', 'memberContributions']);
             if (Object.keys(body).some(key => !allowedKeys.has(key))) {
                 return NextResponse.json({ error: 'Team sessions may only update their own project details.' }, { status: 403 });
             }
@@ -439,7 +454,7 @@ export async function PATCH(req: Request) {
                 return NextResponse.json({ error: 'The tech stack has already been locked.' }, { status: 409 });
             }
 
-            if (proposedIdea !== undefined || techStack !== undefined || submission !== undefined) {
+            if (proposedIdea !== undefined || techStack !== undefined || submission !== undefined || memberContributions !== undefined) {
                 const { data: submissionLock, error: submissionLockError } = await supabase
                     .from('hackathon_settings')
                     .select('value')
@@ -478,6 +493,25 @@ export async function PATCH(req: Request) {
             rawData.ts_locked = true;
             rawDataChanged = true;
         }
+        if (memberContributions !== undefined) {
+            const roster = Array.isArray(existing.members) ? existing.members : [];
+            if (!Array.isArray(memberContributions) ||
+                memberContributions.length !== roster.length ||
+                memberContributions.some((contribution: unknown) =>
+                    typeof contribution !== 'string' || contribution.length > 2000
+                )) {
+                return NextResponse.json({
+                    error: 'Enter a contribution of 2,000 characters or fewer for every current team member.'
+                }, { status: 400 });
+            }
+            rawData.member_contributions = Object.fromEntries(
+                memberContributions.map((contribution: string, index: number) => [
+                    memberContributionKey(roster[index], index),
+                    contribution.trim(),
+                ])
+            );
+            rawDataChanged = true;
+        }
         if (checkedInAt !== undefined) {
             rawData.checkedInAt = checkedInAt;
             rawDataChanged = true;
@@ -491,6 +525,23 @@ export async function PATCH(req: Request) {
             if (submission.presentation !== undefined) updateData.presentation_url = submission.presentation;
             if (submission.demo !== undefined) updateData.demo_url = submission.demo;
             if (submission.deployment !== undefined) updateData.deployment_url = submission.deployment;
+            if (submission.projectZip !== undefined) {
+                if (typeof submission.projectZip !== 'string' || submission.projectZip.length > 2048) {
+                    return NextResponse.json({ error: 'The Google Drive link must be a valid URL of 2048 characters or fewer.' }, { status: 400 });
+                }
+                if (submission.projectZip) {
+                    try {
+                        const projectZipUrl = new URL(submission.projectZip);
+                        if (projectZipUrl.protocol !== 'https:' || projectZipUrl.hostname !== 'drive.google.com') {
+                            return NextResponse.json({ error: 'Please provide an HTTPS Google Drive sharing link.' }, { status: 400 });
+                        }
+                    } catch {
+                        return NextResponse.json({ error: 'Please provide a valid Google Drive sharing link.' }, { status: 400 });
+                    }
+                }
+                rawData.project_zip_url = submission.projectZip;
+                updateData.raw_data = rawData;
+            }
             if (submission.isFinal !== undefined) updateData.is_final_submission = submission.isFinal;
         }
         if (!Object.keys(updateData).length) return NextResponse.json({ error: 'No fields to update.' }, { status: 400 });

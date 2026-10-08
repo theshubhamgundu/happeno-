@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://tricity.online";
+  const baseUrl = "https://tricity.centle.in";
 
   return [
     {

@@ -13,7 +13,8 @@ import {
     Wifi,
     WifiOff,
     RefreshCw,
-    CloudUpload
+    CloudUpload,
+    ExternalLink
 } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -647,6 +648,19 @@ export default function JudgeDashboard() {
                                             {!Object.values(activeProject.techStack || {}).some(items => items?.length) && <span className="text-xs text-slate-400">No technology stack submitted.</span>}
                                         </div>
                                     </div>
+                                    {activeProject.submission?.projectZip && (
+                                        <div className="border-t border-slate-100 pt-6">
+                                            <a
+                                                href={activeProject.submission.projectZip}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm font-semibold text-teal-800 hover:bg-teal-100"
+                                            >
+                                                <ExternalLink size={16} />
+                                                Open project ZIP in Google Drive
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

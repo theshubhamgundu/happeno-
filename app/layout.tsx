@@ -53,7 +53,7 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tricity.online'),
+  metadataBase: new URL('https://tricity.centle.in'),
   title: {
     default: "TRI-CITY AI HACKATHON | Centle India Hyderabad Hackathon",
     template: "%s | TRI-CITY AI HACKATHON"
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "TRI-CITY AI HACKATHON | Centle India Hyderabad Hackathon",
     description: "Join us for 2 days of coding, innovation, and fun at Centle India, Hyderabad.",
-    url: 'https://tricity.online',
+    url: 'https://tricity.centle.in',
     siteName: 'TRI-CITY AI HACKATHON',
     locale: 'en_US',
     type: 'website',

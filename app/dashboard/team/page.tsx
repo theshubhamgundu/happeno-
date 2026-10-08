@@ -9,6 +9,7 @@ import { useHackathon } from "@/context/HackathonContext";
 import {
     TRACKS,
     PROBLEM_STATEMENTS,
+    EXTENDED_PROBLEM_STATEMENTS,
     getProblemStatementsForTrack,
     isOpenInnovationTrack,
     MAX_OPEN_INNOVATION_PROBLEM_CHARACTERS,
@@ -42,6 +43,25 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
     const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
     const [selectedPS, setSelectedPS] = useState<string | null>(null);
     const [isLocking, setIsLocking] = useState(false);
+    const [availability, setAvailability] = useState<Record<string, {used: number, total: number, isFull: boolean}>>({});
+    const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
+
+    useEffect(() => {
+        if (selectedTrack && !isOpenInnovationTrack(selectedTrack)) {
+            setIsLoadingAvailability(true);
+            fetch(`/api/team/available-ps?track=${encodeURIComponent(selectedTrack)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.availability) {
+                        setAvailability(data.availability);
+                    }
+                })
+                .catch(console.error)
+                .finally(() => setIsLoadingAvailability(false));
+        } else {
+            setAvailability({});
+        }
+    }, [selectedTrack]);
 
     // trackPreferences comes from the teams API (sourced from raw_data.track_preferences in DB)
     const preferences: string[] = team.trackPreferences || [];
@@ -135,20 +155,41 @@ function LockInFlow({ team, onLocked }: { team: any, onLocked: (track: string, p
                                 </div>
                             ) : (
                                 <>
-                                    <h3 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">2. Select Problem Statement</h3>
+                                    <h3 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">
+                                        2. Select Problem Statement
+                                        {isLoadingAvailability && <span className="ml-2 text-xs font-normal text-slate-400 lowercase">(checking availability...)</span>}
+                                    </h3>
                                     <div className="grid gap-3">
-                                        {getProblemStatementsForTrack(selectedTrack).map((ps: string, idx: number) => (
-                                            <button
-                                                key={idx}
-                                                onClick={() => setSelectedPS(ps)}
-                                                className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${selectedPS === ps ? 'border-teal-500 bg-teal-50 ring-1 ring-teal-500' : 'border-slate-200 hover:border-slate-300 bg-white'}`}
-                                            >
-                                                <div className={`mt-0.5 shrink-0 h-5 w-5 rounded-full border flex items-center justify-center ${selectedPS === ps ? 'border-teal-500 bg-teal-500' : 'border-slate-300'}`}>
-                                                    {selectedPS === ps && <div className="h-2 w-2 rounded-full bg-white" />}
-                                                </div>
-                                                <span className={`font-medium text-sm leading-relaxed ${selectedPS === ps ? 'text-teal-900' : 'text-slate-700'}`}>{ps}</span>
-                                            </button>
-                                        ))}
+                                        {getProblemStatementsForTrack(selectedTrack).map((ps: string, idx: number) => {
+                                            const avail = availability[ps];
+                                            const isFull = avail?.isFull;
+                                            const extData = EXTENDED_PROBLEM_STATEMENTS[selectedTrack]?.find(e => e.statement === ps);
+                                            const mvp = extData?.mvp;
+
+                                            return (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => !isFull && setSelectedPS(ps)}
+                                                    disabled={isFull}
+                                                    className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all 
+                                                        ${isFull ? 'opacity-50 cursor-not-allowed bg-slate-50 border-slate-200' : ''}
+                                                        ${selectedPS === ps ? 'border-teal-500 bg-teal-50 ring-1 ring-teal-500' : (!isFull ? 'border-slate-200 hover:border-slate-300 bg-white' : '')}`}
+                                                >
+                                                    <div className={`mt-0.5 shrink-0 h-5 w-5 rounded-full border flex items-center justify-center ${selectedPS === ps ? 'border-teal-500 bg-teal-500' : 'border-slate-300'}`}>
+                                                        {selectedPS === ps && <div className="h-2 w-2 rounded-full bg-white" />}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <span className={`font-medium text-sm leading-relaxed block ${selectedPS === ps ? 'text-teal-900' : 'text-slate-700'} ${isFull ? 'line-through text-slate-500' : ''}`}>{ps}</span>
+                                                        {mvp && <p className="mt-2 text-xs text-slate-500 leading-relaxed border-t border-slate-100 pt-2"><span className="font-semibold text-slate-600">MVP Scope:</span> {mvp}</p>}
+                                                    </div>
+                                                    {avail && (
+                                                        <div className={`shrink-0 text-xs font-bold px-2 py-1 rounded-md ${isFull ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'}`}>
+                                                            {isFull ? 'FULL' : `${Math.max(0, avail.total - avail.used)} slots left`}
+                                                        </div>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </>
                             )}
