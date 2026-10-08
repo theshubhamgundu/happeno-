@@ -9,26 +9,26 @@ export async function POST(req: Request) {
     try {
         const { type } = await req.json();
 
-        if (type === 'gate') {
-            const { error } = await supabase
-                .from('registrations')
-                .update({ is_checked_in: false, checked_in_at: null })
-                .neq('team_id', 'invalid_placeholder'); // just a dummy condition to update all
-
-            if (error) throw error;
-        } else if (type === 'meals' || type === 'networking') {
+        if (type === 'gate' || type === 'meals' || type === 'networking') {
             // Fetch all records
             const { data: teams, error: fetchErr } = await supabase
                 .from('registrations')
-                .select('id, raw_data, meal_access');
+                .select('id, team_id, is_checked_in, raw_data, meal_access');
 
             if (fetchErr) throw fetchErr;
 
             for (const team of teams) {
                 let updated = false;
                 let newRawData = typeof team.raw_data === 'object' && team.raw_data !== null ? { ...team.raw_data } : {};
+                let newIsCheckedIn = team.is_checked_in;
 
-                if (type === 'meals') {
+                if (type === 'gate') {
+                    if (newIsCheckedIn || 'checkedInAt' in newRawData) {
+                        newIsCheckedIn = false;
+                        delete newRawData.checkedInAt;
+                        updated = true;
+                    }
+                } else if (type === 'meals') {
                     if (Array.isArray(newRawData.dinner_claimed)) {
                         newRawData.dinner_claimed = [];
                         updated = true;
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
                 if (updated) {
                     await supabase
                         .from('registrations')
-                        .update({ raw_data: newRawData })
+                        .update({ is_checked_in: newIsCheckedIn, raw_data: newRawData })
                         .eq('id', team.id);
                 }
             }
