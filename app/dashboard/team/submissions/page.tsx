@@ -80,7 +80,7 @@ export default function TeamSubmissions() {
                         <h2 className="mt-1 text-lg font-semibold">Submit your project links</h2>
                         <p className="mt-1 text-sm text-slate-500">Save each item as it becomes ready. You can return and update it before final review.</p>
                     </div>
-                    {locked && <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700"><Lock size={13} /> Locked until Oct 11, 12:01 AM</span>}
+                    {locked && <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700"><Lock size={13} /> Locked until Oct 11th</span>}
                 </div>
                 <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
                     <p className="font-semibold">Upload your project as a ZIP file to Google Drive</p>

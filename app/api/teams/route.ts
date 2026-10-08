@@ -457,7 +457,7 @@ export async function PATCH(req: Request) {
             if (submission !== undefined) {
                 const submissionOpenTime = new Date('2026-10-11T00:01:00+05:30').getTime();
                 if (Date.now() < submissionOpenTime) {
-                    return NextResponse.json({ error: 'Submissions do not open until October 11th at 12:01 AM (IST).' }, { status: 423 });
+                    return NextResponse.json({ error: 'Submissions do not open until October 11th.' }, { status: 423 });
                 }
             }
 
