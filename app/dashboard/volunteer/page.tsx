@@ -67,22 +67,10 @@ export default function VolunteerDashboard() {
         // --- MODULE SPECIFIC ROUTING ---
         let endpoint = '';
         if (activeModule === 'checkin') {
-            if (passType === 'member') {
-                toast.error('Wrong pass type! Please scan the Team Gate Pass for check-ins.');
-                return false;
-            }
             endpoint = '/api/volunteer/checkin';
         } else if (activeModule === 'meal') {
-            if (passType !== 'member') {
-                toast.error('Wrong pass type! Please scan an Individual Pass for dinner.');
-                return false;
-            }
             endpoint = '/api/volunteer/dinner';
         } else if (activeModule === 'networking') {
-            if (passType !== 'member') {
-                toast.error('Wrong pass type! Please scan an Individual Pass for networking access.');
-                return false;
-            }
             endpoint = '/api/volunteer/networking';
         }
 

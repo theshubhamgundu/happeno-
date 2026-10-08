@@ -50,7 +50,7 @@ export default function TicketPage() {
                 for (let i = 0; i < members.length; i++) {
                     const memberId = getMemberId(members[i], i);
                     const memberName = getMemberName(members[i]);
-                    const payload = JSON.stringify({ teamId: team.teamId || String(team.id), memberId });
+                    const payload = JSON.stringify({ teamId: team.teamId || String(team.id), memberId, passType: 'member' });
                     
                     const rawQrDataUrl = await QRCode.toDataURL(payload, {
                         width: 400, margin: 2, color: { dark: "#0f172a", light: "#ffffff" }
