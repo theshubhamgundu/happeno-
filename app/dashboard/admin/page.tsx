@@ -2631,7 +2631,7 @@ export default function AdminDashboard() {
                                         (Array.isArray(p.mealAccess?.dinner_claimed) ? p.mealAccess.dinner_claimed : []).map((memberId: string) => ({
                                             teamName: p.team,
                                             teamId: p.teamId,
-                                            memberName: p.members?.find((m: any) => (m.participant_id || m.id) === memberId)?.fullName || "Unknown Member"
+                                            memberName: (p.members?.find((m: any) => (m?.participant_id || m?.id) === memberId) as any)?.fullName || "Unknown Member"
                                         }))
                                     ).slice(0, 50);
 
@@ -2656,7 +2656,7 @@ export default function AdminDashboard() {
                                         (Array.isArray(p.mealAccess?.networking_claimed) ? p.mealAccess.networking_claimed : []).map((memberId: string) => ({
                                             teamName: p.team,
                                             teamId: p.teamId,
-                                            memberName: p.members?.find((m: any) => (m.participant_id || m.id) === memberId)?.fullName || "Unknown Member"
+                                            memberName: (p.members?.find((m: any) => (m?.participant_id || m?.id) === memberId) as any)?.fullName || "Unknown Member"
                                         }))
                                     ).slice(0, 50);
 

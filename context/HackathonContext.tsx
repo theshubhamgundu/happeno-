@@ -431,7 +431,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
             });
             if (!response.ok) throw new Error('Reset failed on the server.');
             toast.success(`Successfully cleared ${type} check-ins!`);
-            await refreshTeams();
+            await fetchServerTeams();
             return true;
         } catch (err) {
             console.error(err);

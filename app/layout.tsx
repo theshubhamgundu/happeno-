@@ -6,7 +6,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: "400",
 });
 
 const geistSans = Geist({
@@ -20,8 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 const kanit = Kanit({
-  weight: ["400", "700", "800"],
-  style: ["normal", "italic"],
+  weight: "400",
   subsets: ["latin"],
   variable: "--font-kanit",
 });
@@ -29,27 +28,27 @@ const kanit = Kanit({
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: "variable",
 });
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
 });
 
 // Landing page display font
 const syne = Syne({
   subsets: ["latin"],
   variable: "--font-syne",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "variable",
 });
 
 // Landing page mono font
 const spaceMono = Space_Mono({
   subsets: ["latin"],
   variable: "--font-space-mono",
-  weight: ["400", "700"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
