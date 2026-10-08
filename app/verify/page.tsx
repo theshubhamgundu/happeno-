@@ -15,5 +15,5 @@ export default async function VerifyPage({
         }
     }
     const queryString = query.toString();
-    redirect(`/edit-registration${queryString ? `?${queryString}` : ''}`);
+    redirect(`/help${queryString ? `?${queryString}` : ''}`);
 }

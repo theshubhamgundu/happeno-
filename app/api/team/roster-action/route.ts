@@ -535,8 +535,8 @@ export async function POST(req: Request) {
 
                 // Dispatch confirmation emails to both team captains (non-blocking)
                 try {
-                    const magicUrlA = `https://tricity.centle.in/edit-registration?teamId=${encodeURIComponent(comboTeamId)}`;
-                    const magicUrlB = `https://tricity.centle.in/edit-registration?teamId=${encodeURIComponent(comboTeamId)}`;
+                    const magicUrlA = `https://tricity.centle.in/help?teamId=${encodeURIComponent(comboTeamId)}`;
+                    const magicUrlB = `https://tricity.centle.in/help?teamId=${encodeURIComponent(comboTeamId)}`;
 
                     // Email to Host Team Lead (Team A)
                     if (team.email) {

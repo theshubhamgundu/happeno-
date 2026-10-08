@@ -31,8 +31,8 @@ export default function LoginPage() {
                     return;
                 }
                 if (user.portalMode === 'edit') {
-                    // Allow them to go to dashboard instead of forcefully redirecting to edit-registration
-                    // router.replace('/edit-registration');
+                    // Allow them to go to dashboard instead of forcefully redirecting to help
+                    // router.replace('/help');
                     // return;
                 }
             }

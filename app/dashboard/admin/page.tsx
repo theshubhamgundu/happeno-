@@ -4442,7 +4442,7 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                     <p className="text-xs text-white/60 leading-relaxed">
-                                        Emails each Team Captain their private, encrypted link to <strong>/edit-registration</strong> so they can fix names, replace absent members, or merge without passwords.
+                                        Emails each Team Captain their private, encrypted link to <strong>/help</strong> so they can raise support tickets for any name changes or merging issues.
                                     </p>
                                     <button
                                         type="button"

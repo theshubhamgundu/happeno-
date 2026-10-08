@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setUser(null);
                     router.replace('/login');
                 } else if (portalMode === 'edit' && pathname.startsWith('/dashboard/team')) {
-                    // Do not force redirect to edit-registration anymore
+                    // Do not force redirect to help anymore
                 }
             } catch (error) {
                 console.error('Participant portal mode refresh failed:', error);
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const login = (role: Role, data?: { id?: string; teamId?: string; name?: string; portalMode?: 'edit' | 'event' | 'closed' }) => {
         setUser({ role, ...data });
         const destination = role === 'team' && data?.portalMode === 'edit'
-            ? '/edit-registration'
+            ? '/help'
             : `/dashboard/${role}`;
         router.push(destination);
     };
