@@ -90,7 +90,7 @@ export async function POST(req: Request) {
         const targetId = raw.merged_into_team_id;
         const comboQuery = supabase
             .from('registrations')
-            .select('team_id, team_name, password_hash, credentials_issued_at, status, raw_data');
+            .select('team_id, team_name, password_hash, credentials_issued_at, status, raw_data, captain, members');
         const { data: comboTeam } = targetId
             ? await comboQuery.eq('team_id', String(targetId).trim().toUpperCase()).maybeSingle()
             : await comboQuery
