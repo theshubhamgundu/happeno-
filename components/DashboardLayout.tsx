@@ -76,10 +76,10 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
 
     const menuItems = {
         team: [
+            { href: "/dashboard/team", icon: LayoutDashboard, label: "Workspace" },
             { href: "/dashboard/team/ticket", icon: QrCode, label: "Digital Ticket" },
             { href: "/dashboard/team/timeline", icon: CalendarDays, label: "Timeline" },
             { href: "/dashboard/team/rules", icon: ScrollText, label: "Rules & Guidelines" },
-            { href: "/dashboard/team", icon: LayoutDashboard, label: "Workspace" },
             { href: "/dashboard/team/help", icon: Headphones, label: "Need Help?" },
             { href: "/dashboard/team/submissions", icon: Award, label: "Submissions" },
             { href: "/dashboard/team/contributions", icon: UsersRound, label: "Team Contributions" },
