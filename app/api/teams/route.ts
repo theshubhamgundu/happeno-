@@ -454,6 +454,13 @@ export async function PATCH(req: Request) {
                 return NextResponse.json({ error: 'The tech stack has already been locked.' }, { status: 409 });
             }
 
+            if (submission !== undefined) {
+                const submissionOpenTime = new Date('2026-10-11T00:01:00+05:30').getTime();
+                if (Date.now() < submissionOpenTime) {
+                    return NextResponse.json({ error: 'Submissions do not open until October 11th at 12:01 AM (IST).' }, { status: 423 });
+                }
+            }
+
             if (proposedIdea !== undefined || techStack !== undefined || submission !== undefined || memberContributions !== undefined) {
                 const { data: submissionLock, error: submissionLockError } = await supabase
                     .from('hackathon_settings')

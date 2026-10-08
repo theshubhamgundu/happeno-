@@ -60,8 +60,8 @@ export default function TeamSubmissions() {
             setSaving(null);
         }
     };
-    const IS_HACKATHON_STARTED = new Date() >= new Date('2026-10-10T08:00:00+05:30');
-    const locked = isSubmissionLocked || !IS_HACKATHON_STARTED;
+    const IS_SUBMISSION_WINDOW_OPEN = new Date() >= new Date('2026-10-11T00:01:00+05:30');
+    const locked = isSubmissionLocked || !IS_SUBMISSION_WINDOW_OPEN;
 
     const items = [
         { key: "repo" as const, label: "Source code", help: "GitHub repository URL", placeholder: "https://github.com/your-team/project", icon: Github, required: true },
@@ -80,7 +80,7 @@ export default function TeamSubmissions() {
                         <h2 className="mt-1 text-lg font-semibold">Submit your project links</h2>
                         <p className="mt-1 text-sm text-slate-500">Save each item as it becomes ready. You can return and update it before final review.</p>
                     </div>
-                    {locked && <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700"><Lock size={13} /> Locked until Oct 10th</span>}
+                    {locked && <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700"><Lock size={13} /> Locked until Oct 11, 12:01 AM</span>}
                 </div>
                 <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
                     <p className="font-semibold">Upload your project as a ZIP file to Google Drive</p>
