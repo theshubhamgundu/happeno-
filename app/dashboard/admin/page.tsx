@@ -2353,7 +2353,7 @@ export default function AdminDashboard() {
                             <Award size={16} />
                             <span>1. Judging, Ceremony & Deliverables</span>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {[
                                 { 
                                     type: 'standings', 
@@ -2370,6 +2370,14 @@ export default function AdminDashboard() {
                                     badge: 'Jury Review',
                                     icon: Presentation, 
                                     color: 'teal' 
+                                },
+                                { 
+                                    type: 'contributions', 
+                                    label: 'Team Contributions', 
+                                    desc: 'Detailed breakdown of what each team member contributed to the project during the hackathon.', 
+                                    badge: 'Review',
+                                    icon: Users, 
+                                    color: 'purple' 
                                 },
                             ].map(exp => (
                                 <button

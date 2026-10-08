@@ -64,7 +64,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type'); 
-    const validTypes = ['teams', 'standings', 'submissions', 'meals', 'checkin', 'emails', 'dietary', 'judges', 'volunteers', 'master'];
+    const validTypes = ['teams', 'standings', 'submissions', 'meals', 'checkin', 'emails', 'dietary', 'judges', 'volunteers', 'master', 'contributions'];
 
     if (!type || !validTypes.includes(type)) {
         return NextResponse.json({ 
@@ -221,6 +221,38 @@ export async function GET(req: Request) {
                     escapeCsv(deployment),
                     escapeCsv(isFinal ? 'Yes' : 'No')
                 ].join(',') + '\n';
+            }
+        }
+
+        // ═════════════════════════════════════════════════════════
+        // 3.5. TEAM CONTRIBUTIONS
+        // ═════════════════════════════════════════════════════════
+        else if (type === 'contributions') {
+            const teams = await fetchAllRegistrations();
+            csvContent = 'Team ID,Team Name,Track,Member Name,Role,Contribution\n';
+            for (const team of teams) {
+                const raw = (team.raw_data as Record<string, any>) || {};
+                const members = Array.isArray(team.members) && team.members.length > 0 ? team.members : ((raw.members as any[]) || []);
+                const savedContributions = raw.member_contributions || {};
+
+                members.forEach((member: any, index: number) => {
+                    const memberName = member.fullName || member.name || (index === 0 ? team.captain : `Member ${index + 1}`);
+                    let memberKey = `member:${String(memberName).trim().toLowerCase()}:${index}`;
+                    if (member.email) {
+                        memberKey = `email:${String(member.email).trim().toLowerCase()}`;
+                    }
+                    const contribution = savedContributions[memberKey] || '';
+                    if (contribution) {
+                        csvContent += [
+                            escapeCsv(team.team_id || ''),
+                            escapeCsv(team.team_name || raw.teamName || ''),
+                            escapeCsv(team.track || ''),
+                            escapeCsv(memberName),
+                            escapeCsv(index === 0 ? 'Captain' : 'Member'),
+                            escapeCsv(contribution)
+                        ].join(',') + '\n';
+                    }
+                });
             }
         }
 
