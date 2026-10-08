@@ -89,6 +89,7 @@ export default function AdminDashboard() {
         deleteTeams,
         bulkUpdateTeams,
         checkInTeam,
+        resetCheckIn,
         refreshTeams
     } = useHackathon();
 
@@ -2570,6 +2571,13 @@ export default function AdminDashboard() {
                                                     <p className="text-sm font-bold text-white truncate">{team.team}</p>
                                                     <p className="text-[10px] text-white/40">{team.teamId}{team.checkedInAt ? ` • ${new Date(team.checkedInAt).toLocaleTimeString()}` : ''}</p>
                                                 </div>
+                                                <button
+                                                    onClick={() => resetCheckIn(team.id)}
+                                                    className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-all"
+                                                    title="Clear Check-in"
+                                                >
+                                                    <X size={14} />
+                                                </button>
                                             </div>
                                         ))
                                 )}

@@ -54,6 +54,7 @@ interface HackathonContextType {
     projects: Project[];
     isLoading: boolean;
     checkInTeam: (projectId: any) => Promise<boolean>;
+    resetCheckIn: (projectId: any) => Promise<boolean>;
     judges: Judge[];
     addJudge: (judge: { name: string, specialization: string, phone?: string }) => void;
     removeJudge: (id: string) => void;
@@ -417,6 +418,26 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
         } catch (err) {
             console.error(err);
             toast.error("Check-in sync failed");
+            return false;
+        }
+    };
+
+    const resetCheckIn = async (projectId: any): Promise<boolean> => {
+        const project = projects.find(item => item.id === projectId);
+        if (!project) return false;
+        try {
+            const response = await fetch('/api/teams', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId, isCheckedIn: false, checkedInAt: null })
+            });
+            if (!response.ok) throw new Error('Check-in reset was rejected by the server.');
+            setProjects(prev => prev.map(item => item.id === projectId ? { ...item, isCheckedIn: false, checkedInAt: null } : item));
+            toast.success("Check-in cleared!");
+            return true;
+        } catch (err) {
+            console.error(err);
+            toast.error("Check-in reset failed");
             return false;
         }
     };
@@ -925,6 +946,7 @@ export const HackathonProvider = ({ children }: { children: ReactNode }) => {
                 projects,
                 isLoading,
                 checkInTeam,
+                resetCheckIn,
                 judges,
                 addJudge,
                 removeJudge,
