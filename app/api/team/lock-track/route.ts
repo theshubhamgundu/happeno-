@@ -113,7 +113,7 @@ export async function POST(req: Request) {
             console.error("Failed to lock track:", updateError);
             
             // ROLLBACK the Redis slot if the DB update failed
-            if (slotIncremented && redisKey) {
+            if (slotIncremented && redisKey && redis) {
                 try {
                     await redis.decr(redisKey);
                 } catch (e) {
