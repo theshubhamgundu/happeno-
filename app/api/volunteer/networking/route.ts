@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession, hasRole } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
+import { redis } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,6 +76,11 @@ export async function POST(req: Request) {
             .eq('team_id', team.team_id);
 
         if (updateErr) throw updateErr;
+
+        if (redis) {
+            await redis.del('all_teams_cache_admin');
+            await redis.del('all_teams_cache_livescore');
+        }
 
         return NextResponse.json({ 
             success: true, 
