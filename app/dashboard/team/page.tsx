@@ -511,8 +511,7 @@ export default function TeamDashboard() {
                         </div>
                     </section>
 
-
-
+                    {/* Removed WhatsApp Groups widget, moving it to submodule */}
                 </div>
 
             </div>

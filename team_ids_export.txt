@@ -1,0 +1,532 @@
+TRI26313 - Individual & Individual
+TRI26714 - HEISENBERG
+TRI26627 - MASS
+TRI26397 - Team SVD
+TRI26576 - CodeOrbit
+TRI26044 - EINSTEINS
+TRI26312 - Nexora
+TRI26293 - Individual & Individual
+TRI26673 - Tech Titans
+TRI26612 - ZEN 4.0
+TRI26701 - INNOVATIONS
+TRI26355 - Dot Race
+TRI26090 - Glitchcore
+TRI26624 - QUARD
+TRI26078 - QuadraTech
+TRI26353 - Vision Spark
+TRI26047 - Individual
+TRI26302 - Individual
+TRI26228 - Team NOVA
+TRI26215 - Team spark
+TRI26484 - BYTEVISION
+TRI26488 - Team Techno
+TRI26086 - TFI BOYS
+TRI26028 - Individual
+TRI26640 - TEAM BOLTZ
+TRI26686 - DOMINION
+TRI26064 - KaizenX
+TRI26184 - STARS
+TRI26282 - FourByte
+TRI26128 - Nexora
+TRI26352 - Tri Spark
+TRI26058 - avengers
+TRI26210 - Idea squad
+TRI26372 - KITSW WARRIOR
+TRI26626 - MSDS Nexus
+TRI26521 - Cortex Crew
+TRI26369 - INCEPTION.EXE
+TRI26323 - Individual & Individual
+TRI26270 - Catalyst
+TRI26119 - Chathur
+TRI26279 - The_TechAchievers
+TRI26031 - Tech Titans
+TRI26376 - MindSpark
+TRI26346 - The Fourth
+TRI26426 - TEAM S4UL
+TRI26251 - Hack Titans
+TRI26401 - ARIX
+TRI26305 - TechVintage
+TRI26414 - TechTitans
+TRI26601 - Digital minds
+TRI26582 - Sunrisers
+TRI26380 - Runtime Rebels
+TRI26649 - ZERO DAY
+TRI26498 - Hackhive
+TRI26457 - Sony
+TRI26623 - VisionX
+TRI26140 - Team Nexus
+TRI26590 - VisionPath
+TRI26660 - Mech Nova
+TRI26597 - super tech
+TRI26230 - Individual
+TRI26206 - Tech4
+TRI26633 - Tattva tech
+TRI26630 - Zentra
+TRI26023 - Hackamole
+TRI26637 - Team Apex
+TRI26277 - Individual
+TRI26139 - AVERON
+TRI26272 - Hydra
+TRI26096 - VYBE
+TRI26490 - Code bloom
+TRI26430 - DIYA
+TRI26234 - Kshtej team
+TRI26560 - Fuji
+TRI26010 - TECH FUSION
+TRI26581 - Hackhive
+TRI26250 - Hacker SquadX
+TRI26224 - Individual
+TRI26384 - Tech Titans
+TRI26126 - QuadX
+TRI26092 - Synaptech
+TRI26151 - INNOVATEX
+TRI26153 - TeamVaranasi
+TRI26226 - Individual
+TRI26648 - NOVA4
+TRI26051 - Thunderbolt
+TRI26105 - Individual
+TRI26596 - TechNova
+TRI26247 - Individual
+TRI26287 - Hackzen & TechGen
+TRI26174 - Frost Logic SaaS
+TRI26519 - Level 1
+TRI26493 - Data Dynamos
+TRI26266 - Hack Attack
+TRI26278 - Espada
+TRI26059 - Shouryaanga
+TRI26395 - Code Nxt
+TRI26158 - Team Cyber nova
+TRI26566 - CODE CRAFT
+TRI26629 - InnoVexa
+TRI26271 - CodeNexa
+TRI26417 - Byte force
+TRI26481 - BYTEWAR
+TRI26327 - Byteforce
+TRI26441 - Code Crafters
+TRI26598 - Cyber phantoms
+TRI26586 - MarketIQ
+TRI26081 - Garuda
+TRI26680 - Individual
+TRI26122 - Binary brains
+TRI26223 - Meghana and group
+TRI26294 - Individual & Individual
+TRI26303 - Individual
+TRI26167 - Individual
+TRI26563 - PIXELFORGE
+TRI26046 - AI Innovators
+TRI26292 - Plot twist
+TRI26675 - Team beeta
+TRI26232 - Pesaru.spandana
+TRI26334 - HackHer4
+TRI26083 - DYNAMO SAVIOURS
+TRI26099 - EGG SALAD
+TRI26152 - NovaX
+TRI26136 - Quadruples
+TRI26540 - SPARK-V
+TRI26200 - Innovengers
+TRI26308 - Individual
+TRI26002 - Individual
+TRI26191 - Plot twist
+TRI26317 - Ram Charan and team
+TRI26273 - Binary Brains
+TRI26423 - Raijin
+TRI26183 - NexGen
+TRI26356 - GOODFELLAS
+TRI26248 - GHTS innovators
+TRI26472 - Sparkmind
+TRI26361 - TEAM CLOVER
+TRI26506 - COREZ
+TRI26690 - Individual
+TRI26233 - Individual
+TRI26102 - Not Our Team
+TRI26666 - AI Mates
+TRI26249 - Nexora
+TRI26483 - El Rata Alada
+TRI26367 - TEAM NEXTVISION
+TRI26707 - Nexus
+TRI26109 - Brain Byte
+TRI26129 - KITSAURA
+TRI26385 - TECHMINDS
+TRI26264 - The Tyrant
+TRI26238 - Git Push and Pray
+TRI26165 - DivaBytes
+TRI26034 - TEAM LOOPFLOW
+TRI26373 - TECH TITANS
+TRI26591 - beyondThree
+TRI26050 - Millennium Falcon
+TRI26241 - GSX
+TRI26618 - TECHSOLVERS
+TRI26434 - Individual
+TRI26394 - NEXAS
+TRI26557 - Binary brains
+TRI26237 - Individual
+TRI26236 - Individual
+TRI26260 - Individual
+TRI26258 - Code & cosmos
+TRI26712 - Individual
+TRI26125 - Beyond Algorithms
+TRI26261 - Individual
+TRI26501 - TechTwin
+TRI26045 - Code vibers
+TRI26077 - TEAM VISHWAKARMA
+TRI26159 - Nexus
+TRI26420 - VQ
+TRI26402 - Onemind
+TRI26610 - Innovexa
+TRI26578 - �LPH� X
+TRI26337 - Vision4
+TRI26245 - Individual
+TRI26332 - Error
+TRI26440 - Warriors
+TRI26204 - MINDX
+TRI26343 - The innovators
+TRI26214 - Nirvana
+TRI26048 - Individual
+TRI26150 - Visionary Minds
+TRI26017 - Habeeba and group
+TRI26286 - AXIOM
+TRI26504 - TechGen
+TRI26144 - NEXORA
+TRI26085 - Individual
+TRI26178 - Apex
+TRI26315 - Individual & Individual
+TRI26189 - TwinSpark
+TRI26020 - Quantum coders
+TRI26075 - Individual
+TRI26466 - Nexora
+TRI26138 - TechVibe
+TRI26036 - AI CATALYST
+TRI26242 - ByteBloom
+TRI26229 - Logic league
+TRI26209 - Team Spark
+TRI26344 - CodeCrafters
+TRI26166 - Axon pulse
+TRI26074 - Individual
+TRI26427 - Team RK
+TRI26412 - Saha
+TRI26112 - Individual
+TRI26053 - Lock Smiths
+TRI26257 - Team Vega
+TRI26602 - Innovation squad
+TRI26072 - Dilamma minds
+TRI26603 - Kanya rashi
+TRI26470 - Code Challengers
+TRI26104 - BEST OF FOUR
+TRI26275 - Individual
+TRI26243 - DualCore
+TRI26062 - NextGenMinds
+TRI26463 - POWER HOUSE
+TRI26570 - Individual
+TRI26015 - Tech Titans
+TRI26274 - SQUAD ZERO
+TRI26262 - Trio
+TRI26269 - Chai And Deploy
+TRI26155 - Echo
+TRI26268 - GenX
+TRI26284 - ByteStorm
+TRI26171 - ARHA
+TRI26595 - Tech Titans
+TRI26392 - Code Titans
+TRI26280 - Creative Minds
+TRI26310 - SKILLPILOT
+TRI26156 - EUREKA
+TRI26116 - DATA SIRENSMI
+TRI26383 - Innov4
+TRI26203 - Onenightmarvels
+TRI26387 - MindSpark
+TRI26425 - Synaptic Four
+TRI26187 - Binary Beasts
+TRI26658 - AI Avengers
+TRI26143 - KINGSLAYER
+TRI26518 - ASTRA
+TRI26606 - Individual
+TRI26288 - CODE404!
+TRI26149 - ByteBloom
+TRI26368 - TEAM APEX
+TRI26285 - Vyoma
+TRI26592 - CodeCrafters
+TRI26391 - PROJECT 67
+TRI26291 - Individual
+TRI26335 - Debug Dynasty
+TRI26358 - CodeMinds
+TRI26192 - Neural force
+TRI26482 - Tech Brains
+TRI26231 - Team Cholas
+TRI26405 - Individual
+TRI26265 - TEEN TITANS
+TRI26651 - SCS devs
+TRI26652 - Individual
+TRI26095 - Evox
+TRI26222 - Ajay and group
+TRI26646 - Codenova
+TRI26328 - Individual
+TRI26253 - ByteBrains
+TRI26670 - Codevibe
+TRI26409 - Individual
+TRI26415 - Teen Titans Go!
+TRI26451 - Noventra
+TRI26478 - TAG-ALPHA
+TRI26068 - Team Spark
+TRI26569 - Cyber Nexus
+TRI26676 - Mind Masters
+TRI26642 - SSKR Vision
+TRI26107 - TEAM HYDRA
+TRI26605 - Bit4Force
+TRI26364 - Individual
+TRI26696 - Axis Powers
+TRI26641 - VisionX
+TRI26094 - R3D RISERS
+TRI26408 - Tech Titans
+TRI26531 - Cosmic Aura
+TRI26520 - Code crafters
+TRI26663 - Logic Legends
+TRI26550 - Catalyst Latent
+TRI26443 - Debug divas
+TRI26304 - Individual
+TRI26449 - SMVL
+TRI26494 - Team alpha
+TRI26523 - Ushasri more
+TRI26121 - MindMesh
+TRI26359 - Froniter
+TRI26435 - Nexora AI
+TRI26548 - NITRO
+TRI26043 - Individual
+TRI26487 - S^2TP solution squard
+TRI26645 - Dark Mode Crew
+TRI26544 - 404 Founders
+TRI26318 - Tech developers
+TRI26599 - NextGen Marketers
+TRI26444 - SPARK
+TRI26445 - AI Innovators
+TRI26350 - Logic Loop
+TRI26329 - Individual
+TRI26689 - Individual
+TRI26118 - TEAM TECHNO
+TRI26063 - Individual
+TRI26065 - Individual
+TRI26552 - 4S SPARKS
+TRI26564 - DataX
+TRI26374 - Axiom
+TRI26677 - Team quad core
+TRI26431 - TEAM ALISHA
+TRI26333 - Techwave
+TRI26115 - Morphosis
+TRI26683 - Individual
+TRI26692 - Individual
+TRI26132 - Solution Squad
+TRI26130 - ByteBrain
+TRI26399 - Individual
+TRI26583 - CodeX
+TRI26088 - Individual
+TRI26220 - Squadron
+TRI26625 - smashers
+TRI26131 - Individual
+TRI26093 - Individual
+TRI26593 - "" TEAM ABHYUDAYA ""
+TRI26514 - Champions
+TRI26516 - Code duo
+TRI26594 - Optimize Prime
+TRI26616 - DUONEX
+TRI26607 - Brain cell
+TRI26137 - NO SLEEP
+TRI26496 - Built from Bugs
+TRI26322 - Axis Powers
+TRI26347 - Team Subhash
+TRI26141 - Talla padmavathi
+TRI26377 - Individual
+TRI26114 - QuadCore
+TRI26628 - Team Thrive
+TRI26509 - Individual
+TRI26319 - Individual & Individual
+TRI26147 - Bug Busters
+TRI26532 - INNOVEX
+TRI26620 - Individual
+TRI26507 - Code fusion
+TRI26513 - BHEEM REDDY RITHWIK REDDY
+TRI26154 - EduNova
+TRI26539 - Individual
+TRI26161 - Individual
+TRI26665 - Challengers
+TRI26511 - RULER
+TRI26160 - UTTISHTHA
+TRI26162 - CodeX
+TRI26297 - Individual & Individual
+TRI26164 - Lumora
+TRI26462 - Cybernova
+TRI26173 - Individual
+TRI26169 - Neural trio
+TRI26524 - Elite
+TRI26012 - 100X engineers
+TRI26170 - Individual
+TRI26177 - Individual
+TRI26526 - CodeCrew
+TRI26180 - Individual
+TRI26172 - Siri
+TRI26190 - Individual
+TRI26181 - Alien_Force
+TRI26530 - ALPHA CODE
+TRI26547 - United nodes
+TRI26471 - RUNTIME TERROR
+TRI26193 - Avengers Assemble
+TRI26197 - Individual
+TRI26546 - Vyntra
+TRI26208 - Hackzen
+TRI26477 - SyntaxSphere
+TRI26026 - Tech Titians
+TRI26205 - Fourbidden Code
+TRI26201 - Individual
+TRI26202 - VisionX
+TRI26039 - code cru
+TRI26474 - hack nova
+TRI26101 - InfynAI
+TRI26212 - NOVA
+TRI26559 - SentraX
+TRI26221 - Individual
+TRI26225 - Obito
+TRI26217 - Freddy's Eveil
+TRI26432 - Cofee to Code
+TRI26227 - Individual
+TRI26574 - ERROR.127?KV
+TRI26565 - Individual
+TRI26534 - VORPAL SWORDS
+TRI26543 - Greentech labs
+TRI26687 - Nereid
+TRI26639 - The Explorers
+TRI26573 - Tech titans
+TRI26635 - Individual
+TRI26669 - TEAM DRAGONS
+TRI26697 - Team SkillNova
+TRI26694 - Tech Rebel
+TRI26678 - THE UNKNOWNS
+TRI26061 - Ctrl Freaks
+TRI26255 - Individual
+TRI26254 - CODESTROM
+TRI26076 - Tech Titans
+TRI26267 - HackHive
+TRI26276 - Code - Alpha
+TRI26326 - Individual
+TRI26298 - Mind forge
+TRI26619 - Byte squad
+TRI26283 - Deep thinkers
+TRI26311 - Individual
+TRI26306 - Individual
+TRI26309 - Prabha
+TRI26320 - Ai squad
+TRI26316 - Ascend
+TRI26341 - Individual
+TRI26106 - Navonmesha
+TRI26340 - DevOps Duo
+TRI26342 - AUREX
+TRI26400 - SKS
+TRI26113 - 4-Bit Ninjas
+TRI26638 - Novatrix
+TRI26348 - Null pointers
+TRI26117 - QuadraVision
+TRI26349 - Syntax At Night
+TRI26218 - TetraCore
+TRI26281 - AVV-ASTRA & AVVS-ASTRA
+TRI26362 - Individual
+TRI26148 - Hack Smiths
+TRI26378 - Individual
+TRI26654 - Prompt Pirates
+TRI26679 - Individual
+TRI26379 - Peruka. Tejaswini
+TRI26381 - Individual
+TRI26146 - Think Together
+TRI26389 - TELAVIV KIRKERS
+TRI26428 - CRACKERS
+TRI26419 - NEXGEN
+TRI26194 - Techora squad
+TRI26040 - Individual
+TRI26467 - Individual
+TRI26188 - CODE_3
+TRI26456 - Individual
+TRI26465 - Individual
+TRI26198 - Error404
+TRI26314 - Millennium Falcons
+TRI26480 - Individual
+TRI26259 - Individual
+TRI26485 - IntegraX
+TRI26500 - Individual
+TRI26491 - MINI MATRIX
+TRI26682 - TWIN TITANS
+TRI26525 - Quadcore
+TRI26235 - QUBRIX
+TRI26533 - Individual
+TRI26542 - Debug Dynasty
+TRI26538 - Individual
+TRI26252 - Binary_Bond
+TRI26693 - Individual
+TRI26551 - TechBytes
+TRI26055 - Plot Twist
+TRI26580 - Panic Deploy
+TRI26300 - BTS(Brain tech squad)
+TRI26589 - OFF.SCRIPT
+TRI26681 - Individual
+TRI26611 - ASTRA
+TRI26617 - Individual
+TRI26290 - Team 3 Headaches
+TRI26009 - Individual
+TRI26647 - TEAM KANYARASI
+TRI26671 - Team NEW
+TRI26256 - Tattva
+TRI26134 - Carlos
+TRI26321 - Cognitwo
+TRI26004 - Ruhan
+TRI26005 - Individual
+TRI26008 - Individual
+TRI26688 - Individual
+TRI26698 - DEFEAT
+TRI26706 - Zephyr
+TRI26037 - Individual
+TRI26022 - Individual
+TRI26024 - Individual
+TRI26016 - HackTwins
+TRI26700 - Mudassir
+TRI26032 - Individual
+TRI26041 - Torch Bearers
+TRI26033 - Innovation duo
+TRI26049 - Individual
+TRI26052 - Individual
+TRI26057 - Individual
+TRI26066 - Individual
+TRI26070 - Individual
+TRI26084 - Individual
+TRI26079 - NovaPair
+TRI26708 - Phoenix
+TRI26080 - Brute Force
+TRI26711 - Individual
+TRI26710 - Individual
+TRI26713 - Individual
+TRI26100 - Individual
+TRI26715 - Individual
+TRI26716 - KA
+TRI26717 - Individual
+TRI26133 - Tech Sparks
+TRI26336 - OG
+TRI26398 - Cognova
+TRI26295 - Team jadal
+TRI26296 - Individual & Individual
+TRI26410 - Individual
+TRI26572 - Individual
+TRI26307 - Individual & Individual
+TRI26289 - Team vector
+TRI26299 - Logic Fixers
+TRI26447 - Team Shiva Gayathri
+TRI26656 - RUNTIME EXCEPTION
+TRI26508 - Rear four
+TRI26087 - TriTech Titans
+TRI26071 - GRIDHACK
+TRI26145 - Next Horizon
+TRI26098 - AVV-ASTRA
+TRI26110 - AVVS-ASTRA
+TRI26195 - Vertex
+TRI26175 - Innovara
+TRI26338 - Individual
+TRI26263 - ITians
+TRI26244 - ThinkForge
+TRI26365 - Nexora
+TRI26575 - Zenith
+TRI26517 - Rizzlers
+TRI26502 - Akatsuki
+TRI26631 - Works On My Machine
