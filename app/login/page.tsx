@@ -258,10 +258,14 @@ export default function LoginPage() {
                             </button>
 
                             {/* Credentials hint */}
-                            <div className="pt-3 border-t border-gray-100 text-center">
-                                <p className="font-body text-xs text-gray-500">
-                                    Contact the organizer if you don&apos;t have credentials
+                            <div className="pt-4 border-t border-gray-100 text-center">
+                                <p className="font-body text-xs text-gray-500 mb-2">
+                                    Need help or have any queries? Contact:
                                 </p>
+                                <div className="font-body text-xs text-gray-600 font-medium space-y-1">
+                                    <p>👤 Shubham: +91 86988 46796</p>
+                                    <p>👤 Karthik: +91 93817 28045</p>
+                                </div>
                             </div>
                         </div>
                     </div>
