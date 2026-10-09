@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation, Headphones, Send, X, Key } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Edit3, Save, Users, FolderKanban, Presentation, Headphones, Send, X, Key, MapPin, Wifi } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
@@ -510,6 +510,40 @@ export default function TeamDashboard() {
                             ))}
                         </div>
                     </section>
+
+                    {/* Compact Side-by-Side Widgets */}
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Allocated Space */}
+                        <section className="rounded-2xl border border-slate-200 bg-white p-3">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-xs font-bold text-slate-800">Allocated Space</h3>
+                                <span className="grid h-6 w-6 place-items-center rounded-lg bg-teal-50 text-teal-600"><MapPin size={12} /></span>
+                            </div>
+                            <div className="rounded-xl bg-slate-50 p-3 border border-slate-100 flex flex-col items-center justify-center text-center shadow-inner h-24">
+                                <MapPin className="text-teal-400 mb-1 opacity-80" size={20} />
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.1em] mb-1">Your Area</p>
+                                <p className="text-xs font-black text-slate-800 uppercase leading-snug line-clamp-2">{team.room || 'Pending Allocation'}</p>
+                            </div>
+                        </section>
+
+                        {/* Wi-Fi Access */}
+                        <section className="rounded-2xl border border-slate-200 bg-white p-3">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-xs font-bold text-slate-800">Wi-Fi Access</h3>
+                                <span className="grid h-6 w-6 place-items-center rounded-lg bg-teal-50 text-teal-600"><Wifi size={12} /></span>
+                            </div>
+                            <div className="rounded-xl bg-slate-50 p-3 border border-slate-100 flex flex-col items-center justify-center text-center shadow-inner h-24">
+                                <Wifi className="text-teal-400 mb-1 opacity-80" size={20} />
+                                <div className="bg-white border border-slate-200 rounded-lg px-3 py-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-teal-300 transition-colors" onClick={() => {
+                                    navigator.clipboard.writeText('kitsw#123');
+                                    toast.success('Wi-Fi password copied!');
+                                }}>
+                                    <p className="text-xs font-black text-slate-800 tracking-wider">kitsw#123</p>
+                                </div>
+                                <p className="text-[8px] text-slate-400 mt-1.5 font-medium uppercase tracking-wider">Click to copy</p>
+                            </div>
+                        </section>
+                    </div>
 
                     {/* Removed WhatsApp Groups widget, moving it to submodule */}
                 </div>

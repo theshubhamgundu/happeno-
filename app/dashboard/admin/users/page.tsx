@@ -17,15 +17,18 @@ import {
     Check,
     Trash2,
     Plus,
-    Loader2
+    Loader2,
+    UtensilsCrossed,
+    Wifi
 } from "lucide-react";
-import { useState, useMemo, Fragment } from "react";
+import { useState, useMemo, Fragment, useCallback } from "react";
 import { useHackathon, Project, Member } from "@/context/HackathonContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { EVENT_MEALS } from "@/lib/meals";
 import { MAX_TEAM_MEMBERS } from "@/lib/constants";
+import { toast } from "sonner";
 
 interface UserListItem extends Member {
     teamName: string;
@@ -51,7 +54,7 @@ const AVATAR_GRADIENTS = [
 ];
 
 export default function UsersManagement() {
-    const { projects, isLoading, updateMemberDetails, removeTeamMember, addTeamMember, transferTeamMembers, toggleMealAccess } = useHackathon();
+    const { projects, isLoading, updateMemberDetails, removeTeamMember, addTeamMember, transferTeamMembers, toggleMealAccess, refreshTeams } = useHackathon();
     const [editingParticipant, setEditingParticipant] = useState<UserListItem | null>(null);
     const [editingLocation, setEditingLocation] = useState<{ teamId: string; memberIndex: number } | null>(null);
     const [editFormData, setEditFormData] = useState<Partial<UserListItem>>({});
@@ -63,6 +66,31 @@ export default function UsersManagement() {
     const [selectedExistingMembers, setSelectedExistingMembers] = useState<{ sourceTeamId: string; memberIndex: number }[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null);
+    const [togglingPass, setTogglingPass] = useState<string | null>(null); // "teamId-participantId-passType"
+
+    const handleToggleMemberPass = useCallback(async (teamId: string, participantId: string, passType: 'meal' | 'networking', enabled: boolean) => {
+        const key = `${teamId}-${participantId}-${passType}`;
+        setTogglingPass(key);
+        try {
+            const res = await fetch('/api/admin/member-passes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ teamId, participantId, passType, enabled }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.error(data.error || 'Failed to update pass');
+            } else {
+                toast.success(`${passType === 'meal' ? 'Food' : 'Networking'} pass ${enabled ? 'granted' : 'revoked'}`);
+                // Refresh team data
+                await refreshTeams();
+            }
+        } catch {
+            toast.error('Network error while updating pass');
+        } finally {
+            setTogglingPass(null);
+        }
+    }, []);
 
     const handleAddParticipant = async () => {
         if (!addingToTeam) return;
@@ -410,6 +438,53 @@ export default function UsersManagement() {
                                                                                             <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-semibold text-slate-600">{m.year || 'N/A'}</span>
                                                                                             <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-semibold text-slate-600">{m.department || 'N/A'}</span>
                                                                                         </div>
+                                                                                        {/* Per-member Pass Toggles */}
+                                                                                        {(() => {
+                                                                                            const pid = (m as any).participant_id || (m as any).id || `m${mIdx}`;
+                                                                                            const effectiveTeamId = project.teamId || project.id;
+                                                                                            if (!effectiveTeamId) return null;
+                                                                                            const ma = project.mealAccess || { purchased_meals: [], networking_passes: [] };
+                                                                                            const meals: string[] = Array.isArray(ma.purchased_meals) ? ma.purchased_meals : [];
+                                                                                            const nets: string[] = Array.isArray(ma.networking_passes) ? ma.networking_passes : [];
+                                                                                            const hasMeal = meals.includes('all') || meals.includes(pid);
+                                                                                            const hasNet = nets.includes('all') || nets.includes(pid);
+                                                                                            const mealLoading = togglingPass === `${effectiveTeamId}-${pid}-meal`;
+                                                                                            const netLoading = togglingPass === `${effectiveTeamId}-${pid}-networking`;
+                                                                                            return (
+                                                                                                <div className="flex items-center gap-2 mt-2.5">
+                                                                                                    <button
+                                                                                                        onClick={(e) => {
+                                                                                                            e.stopPropagation();
+                                                                                                            handleToggleMemberPass(effectiveTeamId as string, pid, 'meal', !hasMeal);
+                                                                                                        }}
+                                                                                                        disabled={mealLoading}
+                                                                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border transition-all ${
+                                                                                                            hasMeal
+                                                                                                                ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
+                                                                                                                : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100 hover:text-slate-600'
+                                                                                                        } ${mealLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+                                                                                                    >
+                                                                                                        <UtensilsCrossed size={10} />
+                                                                                                        {mealLoading ? '...' : hasMeal ? 'Food ✓' : 'Food ✗'}
+                                                                                                    </button>
+                                                                                                    <button
+                                                                                                        onClick={(e) => {
+                                                                                                            e.stopPropagation();
+                                                                                                            handleToggleMemberPass(effectiveTeamId as string, pid, 'networking', !hasNet);
+                                                                                                        }}
+                                                                                                        disabled={netLoading}
+                                                                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border transition-all ${
+                                                                                                            hasNet
+                                                                                                                ? 'bg-purple-50 text-purple-700 border-purple-300 hover:bg-purple-100'
+                                                                                                                : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100 hover:text-slate-600'
+                                                                                                        } ${netLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+                                                                                                    >
+                                                                                                        <Wifi size={10} />
+                                                                                                        {netLoading ? '...' : hasNet ? 'Network ✓' : 'Network ✗'}
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            );
+                                                                                        })()}
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="flex gap-1.5 opacity-100 md:flex-col md:opacity-0 md:group-hover/member:opacity-100 transition-opacity">
