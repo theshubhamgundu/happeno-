@@ -1282,15 +1282,21 @@ export default function AdminDashboard() {
     };
 
     const handleExportJudges = () => {
-        const headers = ["Name", "Judge ID", "Specialization", "Password"];
-        const rows = judges.map(j => [j.name, j.generatedId, j.specialization, j.password]);
-        openBrandedReport("Judges Directory", "Total Judges", headers, rows, `judges_export_${new Date().toISOString().split('T')[0]}`);
+        const link = document.createElement('a');
+        link.href = '/judges_login_details.csv';
+        link.download = `judges_login_details_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const handleExportVolunteers = () => {
-        const headers = ["Name", "Volunteer ID", "Phone", "Role", "Password"];
-        const rows = volunteers.map(v => [v.name, v.generatedId, v.phone, v.role, v.password]);
-        openBrandedReport("Volunteers Directory", "Total Volunteers", headers, rows, `volunteers_export_${new Date().toISOString().split('T')[0]}`);
+        const link = document.createElement('a');
+        link.href = '/volunteers_login_details.csv';
+        link.download = `volunteers_login_details_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     if (isLoading) {

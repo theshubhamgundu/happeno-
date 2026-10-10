@@ -335,7 +335,7 @@ export default function JudgeDashboard() {
             return;
         }
 
-        const totalScore = evaluationRound.criteria.reduce((total, criterion) => total + Number(currentScores[criterion.id]), 0);
+        const totalScore = evaluationRound.criteria.reduce((total, criterion) => total + Number(currentScores[criterion.id]), 0) * 2;
         setIsSubmitting(true);
         setOfflineSubmitNotice(null);
 

@@ -13,7 +13,7 @@ type ScoreSummary = {
     evaluations: Record<string, number>;
 };
 
-const maxScore = (round: JudgingRound) => round.criteria.length * 10;
+const maxScore = (round: JudgingRound) => round.criteria.length * 10 * 2;
 
 function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary {
     const roundPercents: Record<string, number | null> = {};

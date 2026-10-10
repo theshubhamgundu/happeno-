@@ -369,7 +369,7 @@ export async function PUT(req: Request) {
             return jsonError('Score every criterion from 1 to 10 and add feedback before submitting.', 400);
         }
 
-        const totalScore = round.criteria.reduce((total, criterion) => total + Number(scores[criterion.id]), 0);
+        const totalScore = round.criteria.reduce((total, criterion) => total + Number(scores[criterion.id]), 0) * 2;
         const now = new Date().toISOString();
         const { data: submitted, error: submitError } = await supabase
             .from('judging_evaluations')
