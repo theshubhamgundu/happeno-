@@ -2619,10 +2619,32 @@ export default function AdminDashboard() {
                                 </button>
                             </div>
                             <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Checked In</span>
-                                <span className="text-xl font-black italic text-[#14b8a6]">{projects.filter(p => p.isCheckedIn).length}</span>
-                                <span className="text-white/30 font-bold">/</span>
-                                <span className="text-lg font-black text-white/50">{projects.length}</span>
+                                {recentView === 'gate' && (
+                                    <>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Checked In</span>
+                                        <span className="text-xl font-black italic text-[#14b8a6]">{projects.filter(p => p.isCheckedIn).length}</span>
+                                        <span className="text-white/30 font-bold">/</span>
+                                        <span className="text-lg font-black text-white/50">{projects.length}</span>
+                                    </>
+                                )}
+                                {recentView === 'meals' && (() => {
+                                    const mealsScannedCount = projects.reduce((acc, p) => acc + (Array.isArray(p.mealAccess?.dinner_claimed) ? p.mealAccess.dinner_claimed.length : 0), 0);
+                                    return (
+                                        <>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Meals Claimed</span>
+                                            <span className="text-xl font-black italic text-[#14b8a6]">{mealsScannedCount}</span>
+                                        </>
+                                    );
+                                })()}
+                                {recentView === 'networking' && (() => {
+                                    const networkingScannedCount = projects.reduce((acc, p) => acc + (Array.isArray(p.mealAccess?.networking_claimed) ? p.mealAccess.networking_claimed.length : 0), 0);
+                                    return (
+                                        <>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Networking Claimed</span>
+                                            <span className="text-xl font-black italic text-[#14b8a6]">{networkingScannedCount}</span>
+                                        </>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>
