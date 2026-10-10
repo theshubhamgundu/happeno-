@@ -20,11 +20,30 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: 'Invalid individual pass scanned.' }, { status: 400 });
         }
 
-        const { data: team, error: fetchErr } = await supabase
-            .from('registrations')
-            .select('team_id, team_name, members, meal_access, is_checked_in')
-            .or(`team_id.ilike.${teamId},transaction_id.ilike.${teamId}`)
-            .single();
+        let locked = false;
+        let attempts = 0;
+        let lockKey = `lock:dinner:${teamId}`;
+        
+        if (redis) {
+            while (!locked && attempts < 15) {
+                // @ts-ignore
+                locked = await redis.set(lockKey, '1', { ex: 5, nx: true });
+                if (!locked) {
+                    await new Promise(r => setTimeout(r, 300));
+                    attempts++;
+                }
+            }
+            if (!locked) {
+                return NextResponse.json({ success: false, error: 'System is busy processing another scan for this team. Please retry.' }, { status: 409 });
+            }
+        }
+
+        try {
+            const { data: team, error: fetchErr } = await supabase
+                .from('registrations')
+                .select('team_id, team_name, members, meal_access, is_checked_in')
+                .or(`team_id.ilike.${teamId},transaction_id.ilike.${teamId}`)
+                .single();
 
         if (fetchErr || !team) {
             return NextResponse.json({ success: false, error: 'Team not found in database.' }, { status: 404 });
@@ -96,6 +115,12 @@ export async function POST(req: Request) {
             } 
         });
 
+        } finally {
+            if (redis && locked) {
+                // @ts-ignore
+                await redis.del(lockKey);
+            }
+        }
     } catch (error) {
         console.error('Dinner scan failed:', error);
         return NextResponse.json({ success: false, error: 'Could not process dinner scan.' }, { status: 500 });
