@@ -761,7 +761,7 @@ export default function JudgeDashboard() {
                                                 Weak / Offline Connection — Scores Safely Saved!
                                             </h4>
                                             <p className="mt-1 text-xs text-amber-800 leading-relaxed">
-                                                Your evaluation for <strong className="text-slate-900 font-bold">{offlineSubmitNotice.teamName}</strong> (Score: {offlineSubmitNotice.totalScore} pts) is safely preserved in this phone&apos;s memory. You won&apos;t lose anything even if you close the app.
+                                                Your evaluation for <strong className="text-slate-900 font-bold">{offlineSubmitNotice.teamName}</strong> is safely preserved in this phone&apos;s memory. You won&apos;t lose anything even if you close the app.
                                             </p>
                                             <div className="mt-3 flex flex-wrap gap-2">
                                                 <button

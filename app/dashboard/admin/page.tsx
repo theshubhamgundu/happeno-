@@ -1348,6 +1348,14 @@ export default function AdminDashboard() {
                             <Download size={18} /> Export
                         </button>
 
+                        {/* Submissions & Reviews Portal */}
+                        <Link
+                            href="/dashboard/admin/reviews"
+                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/50 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-400 hover:bg-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.15)]"
+                        >
+                            <Award size={18} /> Submissions & Reviews
+                        </Link>
+
                         {/* Roster Window & Audit Hub */}
                         <button
                             type="button"
@@ -4594,7 +4602,7 @@ export default function AdminDashboard() {
                                 Rabbit Race Scores
                             </h2>
                             <p className="mt-1 max-w-xl text-sm font-medium text-slate-500">
-                                View pre-scores assigned to teams by the agency (e.g., Rabbit Race marks). These are automatically added to their final evaluation score out of 400.
+                                View pre-scores assigned to teams by the agency (e.g., Rabbit Race marks). These are automatically added to their final evaluation score out of 500.
                             </p>
                         </div>
                     </div>

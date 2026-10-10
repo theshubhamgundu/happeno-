@@ -9,13 +9,15 @@ import { useMemo, useState } from "react";
 type ScoreSummary = {
     completedRounds: number;
     overallScore: number | null;
+    roundScores: Record<string, number | null>;
     roundPercents: Record<string, number | null>;
     evaluations: Record<string, number>;
 };
 
-const maxScore = (round: JudgingRound) => round.criteria.length * 10 * 2;
+const maxScore = (round: JudgingRound) => (round.criteria?.length || 10) * 10 * 2;
 
 function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary {
+    const roundScores: Record<string, number | null> = {};
     const roundPercents: Record<string, number | null> = {};
     const evaluations: Record<string, number> = {};
     const completed: number[] = [];
@@ -30,22 +32,28 @@ function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary
         evaluations[round.id] = scores.length;
 
         if (!scores.length) {
+            roundScores[round.id] = null;
             roundPercents[round.id] = null;
             return;
         }
 
-        const percentage = (scores.reduce((total, score) => total + score, 0) / scores.length / maxScore(round)) * 100;
-        const rounded = Number(percentage.toFixed(2));
-        roundPercents[round.id] = rounded;
+        // Each round is evaluated out of 200
+        const avgScore = scores.reduce((total, score) => total + score, 0) / scores.length;
+        const rounded = Number(avgScore.toFixed(1));
+        const percentage = Number(((rounded / 200) * 100).toFixed(1));
+
+        roundScores[round.id] = rounded;
+        roundPercents[round.id] = percentage;
         completed.push(rounded);
         
-        // Add each round's percentage (which is out of 100) to the total score
+        // Add round score out of 200 to total score
         totalScore += rounded;
     });
 
     return {
         completedRounds: completed.length,
-        overallScore: (completed.length > 0 || project.preScore) ? Number(totalScore.toFixed(2)) : null,
+        overallScore: (completed.length > 0 || (project.preScore && project.preScore > 0)) ? Number(totalScore.toFixed(1)) : null,
+        roundScores,
         roundPercents,
         evaluations,
     };
@@ -83,11 +91,11 @@ export default function AdminResults() {
     }), [projectRows, projects.length, roundConfigs.length]);
 
     const exportLeaderboard = () => {
-        const headers = ["Rank", "Team", "Team ID", "Captain", "Track", ...roundConfigs.map(round => `${round.title} (%)`), "Rabbit Race", "Overall Score", "Evaluated rounds"];
+        const headers = ["Rank", "Team", "Team ID", "Captain", "Track", ...roundConfigs.map(round => `${round.title} (/200)`), "Rabbit Race (/100)", "Overall Score (/500)", "Evaluated rounds"];
         const lines = displayedRows.map((row, index) => [
             row.score.overallScore === null ? "—" : String(index + 1), row.project.team, row.project.teamId, row.project.captain,
-            row.project.track, ...roundConfigs.map(round => row.score.roundPercents[round.id] ?? "—"),
-            row.project.preScore ?? "—", row.score.overallScore ?? "—", `${row.score.completedRounds}/${roundConfigs.length}`,
+            row.project.track, ...roundConfigs.map(round => row.score.roundScores[round.id] !== null ? `${row.score.roundScores[round.id]} (${row.score.roundPercents[round.id]}%)` : "—"),
+            row.project.preScore ? `${row.project.preScore} / 100` : "—", row.score.overallScore ? `${row.score.overallScore} / 500` : "—", `${row.score.completedRounds}/${roundConfigs.length}`,
         ].map(value => `"${String(value ?? "").replaceAll('"', '""')}"`).join(","));
         const blob = new Blob([[headers.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
         const url = URL.createObjectURL(blob);
@@ -143,7 +151,7 @@ export default function AdminResults() {
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full min-w-[900px] text-left">
                             <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase tracking-[.16em] text-slate-500">
-                                <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{roundConfigs.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title}</th>)}<th className="px-4 py-4 text-center text-teal-600">Rabbit Race</th><th className="px-4 py-4 text-center">Overall</th><th className="px-5 py-4 text-right">Details</th></tr>
+                                <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{roundConfigs.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title} (/200)</th>)}<th className="px-4 py-4 text-center text-teal-600">Rabbit Race (/100)</th><th className="px-4 py-4 text-center">Overall (/500)</th><th className="px-5 py-4 text-right">Details</th></tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {displayedRows.map((row, index) => <LeaderboardRow key={row.project.id} row={row} rounds={roundConfigs} rank={row.score.overallScore === null ? null : index + 1} onSelect={() => setSelectedProject(row.project)} />)}
@@ -167,16 +175,30 @@ function LeaderboardRow({ row, rounds, rank, onSelect }: { row: { project: Proje
     return <tr className="text-sm transition hover:bg-slate-50/80">
         <td className="px-5 py-4"><span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-lg text-xs font-bold ${rank && rank <= 3 ? "bg-teal-50 text-teal-800 border border-teal-200" : "bg-slate-100 text-slate-600"}`}>{rank ? `#${rank}` : "—"}</span></td>
         <td className="px-5 py-4"><p className="font-bold text-slate-900">{row.project.team || "Untitled team"}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{row.project.teamId} · {row.project.track || "No track"}</p></td>
-        {rounds.map(round => <td key={round.id} className="px-4 py-4 text-center"><ScoreCell value={row.score.roundPercents[round.id]} evaluations={row.score.evaluations[round.id]} /></td>)}
+        {rounds.map(round => <td key={round.id} className="px-4 py-4 text-center"><ScoreCell value={row.score.roundScores[round.id]} evaluations={row.score.evaluations[round.id]} max={200} percent={row.score.roundPercents[round.id]} /></td>)}
         <td className="px-4 py-4 text-center font-black text-sm text-teal-600">{row.project.preScore ? `${row.project.preScore.toFixed(1)} / 100` : "—"}</td>
-        <td className="px-4 py-4 text-center"><ScoreCell value={row.score.overallScore} evaluations={row.score.completedRounds} bold max={400} /></td>
+        <td className="px-4 py-4 text-center"><ScoreCell value={row.score.overallScore} evaluations={row.score.completedRounds} bold max={500} /></td>
         <td className="px-5 py-4 text-right"><button onClick={onSelect} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:border-teal-300 hover:text-teal-700 hover:bg-teal-50 shadow-sm"><MessageSquare size={13} /> Review</button></td>
     </tr>;
 }
 
-function ScoreCell({ value, evaluations, bold = false, max }: { value: number | null; evaluations: number; bold?: boolean; max?: number }) {
+function ScoreCell({ value, evaluations, bold = false, max, percent }: { value: number | null; evaluations: number; bold?: boolean; max?: number; percent?: number | null }) {
     if (value === null) return <span className="text-xs text-slate-300 font-medium">Not evaluated</span>;
-    return <div><span className={`${bold ? "text-base text-teal-800" : "text-sm text-slate-900"} font-black`}>{value.toFixed(1)}{max ? ` / ${max}` : ''}</span><p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-400">{evaluations} review{evaluations === 1 ? "" : "s"}</p></div>;
+    return (
+        <div>
+            <span className={`${bold ? "text-base text-teal-800" : "text-sm text-slate-900"} font-black`}>
+                {value.toFixed(1)}{max ? ` / ${max}` : ''}
+            </span>
+            {percent !== undefined && percent !== null && (
+                <span className="ml-1 text-[10px] font-bold text-slate-400">
+                    ({percent.toFixed(0)}%)
+                </span>
+            )}
+            <p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-400">
+                {evaluations} review{evaluations === 1 ? "" : "s"}
+            </p>
+        </div>
+    );
 }
 
 function ProjectDetails({ project, judges, rounds, onClose }: { project: Project; judges: { generatedId: string; name: string }[]; rounds: JudgingRound[]; onClose: () => void }) {
