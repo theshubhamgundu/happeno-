@@ -60,7 +60,7 @@ export default function LoginPage() {
                 body: JSON.stringify({ role: 'admin', id, password: pass })
             });
             let data = await response.json();
-            
+
             if (response.ok && data.success) {
                 setDetectedRole("Admin");
                 login('admin', { id: data.id, name: data.name });
@@ -74,7 +74,7 @@ export default function LoginPage() {
                 body: JSON.stringify({ role: 'judge', id, password: pass })
             });
             data = await response.json();
-            
+
             if (response.ok && data.success) {
                 setDetectedRole("Judge");
                 login('judge', { id: data.id, name: data.name });
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 body: JSON.stringify({ role: 'volunteer', id, password: pass })
             });
             data = await response.json();
-            
+
             if (response.ok && data.success) {
                 setDetectedRole("Volunteer");
                 login('volunteer', { id: data.id, name: data.name });
@@ -108,7 +108,7 @@ export default function LoginPage() {
                 body: JSON.stringify({ teamId: id, password: pass })
             });
             data = await response.json();
-            
+
             if (response.status === 403 && data.error) {
                 setError(data.error);
                 return;
@@ -152,11 +152,11 @@ export default function LoginPage() {
                         Tri-City Hackathon
                     </h1>
                     <p className="font-body text-gray-600 text-sm md:text-base">
-                        Evaluator & Staff Command Portal
+                        Portal
                     </p>
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium mt-3 shadow-xs">
                         <span className="w-2 h-2 rounded-full bg-amber-500" />
-                        <span>Event Concluded — Participant logins are closed</span>
+                        <span>Event Concluded</span>
                     </div>
                 </motion.div>
 
@@ -262,8 +262,7 @@ export default function LoginPage() {
                                     Need help or have any queries? Contact:
                                 </p>
                                 <div className="font-body text-xs text-gray-600 font-medium space-y-1">
-                                    <p>👤 Shubham: +91 86988 46796</p>
-                                    <p>👤 Karthik: +91 93817 28045</p>
+                                    <p> CENTLE </p>
                                 </div>
                             </div>
                         </div>
