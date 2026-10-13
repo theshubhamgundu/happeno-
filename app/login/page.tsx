@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 // ─── Main Login Page ──────────────────────────────────────────────────
 export default function LoginPage() {
-    const { user, isLoading, login } = useAuth();
+    const { user, isLoading, login, logout } = useAuth();
     const router = useRouter();
 
     const [loginId, setLoginId] = useState("");
@@ -22,25 +22,19 @@ export default function LoginPage() {
     const [isVerifying, setIsVerifying] = useState(false);
     const [detectedRole, setDetectedRole] = useState<string | null>(null);
 
-    // Redirect if already logged in
+    // Redirect if already logged in as staff
     useEffect(() => {
         if (!isLoading && user && user.role) {
             if (user.role === 'team') {
-                if (user.portalMode === 'closed') {
-                    // Portal closed: do NOT redirect to /dashboard/team
-                    return;
-                }
-                if (user.portalMode === 'edit') {
-                    // Allow them to go to dashboard instead of forcefully redirecting to help
-                    // router.replace('/help');
-                    // return;
-                }
+                // Event is closed: clear participant session
+                void logout();
+                return;
             }
             router.replace(`/dashboard/${user.role}`);
         }
-    }, [user, isLoading, router]);
+    }, [user, isLoading, router, logout]);
 
-    if (isLoading || (user && user.role)) {
+    if (isLoading || (user && user.role && user.role !== 'team')) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="w-12 h-12 border-4 border-teal-200 border-t-[#0f766e] rounded-full animate-spin" />
@@ -101,7 +95,13 @@ export default function LoginPage() {
                 return;
             }
 
-            // Finally, Try Participant
+            // Reject participant logins since event has concluded
+            if (id.toUpperCase().startsWith("TRI")) {
+                setError("The Tri-City Hackathon has concluded. Participant portal and logins are closed.");
+                return;
+            }
+
+            // Fallback Participant check
             response = await fetch('/api/auth/team', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -109,12 +109,7 @@ export default function LoginPage() {
             });
             data = await response.json();
             
-            if (response.ok && data.success) {
-                setDetectedRole("Participant");
-                login('team', { teamId: data.teamId, name: data.teamName, portalMode: data.portalMode });
-                return;
-            }
-            if (response.status === 403 && data.error && !data.error.includes("Invalid")) {
+            if (response.status === 403 && data.error) {
                 setError(data.error);
                 return;
             }
@@ -151,14 +146,18 @@ export default function LoginPage() {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="text-center mb-12"
+                    className="text-center mb-10"
                 >
-                    <h1 className="font-display font-extrabold text-5xl md:text-6xl text-[#0f172a] mb-2">
+                    <h1 className="font-display font-extrabold text-4xl md:text-5xl text-[#0f172a] mb-2">
                         Tri-City Hackathon
                     </h1>
-                    <p className="font-body text-gray-600 text-base md:text-lg">
-                        Sign in to access your dashboard
+                    <p className="font-body text-gray-600 text-sm md:text-base">
+                        Evaluator & Staff Command Portal
                     </p>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium mt-3 shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-amber-500" />
+                        <span>Event Concluded — Participant logins are closed</span>
+                    </div>
                 </motion.div>
 
                 {/* ─── Login Form ─── */}

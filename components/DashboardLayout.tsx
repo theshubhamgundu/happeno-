@@ -108,9 +108,9 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
             router.push("/login");
             return;
         }
-        if (!isLoading && type === 'team' && user?.role === 'team') {
-            // if (user.portalMode === 'edit') router.replace('/help');
-            if (user.portalMode === 'closed') router.replace('/login');
+        if (!isLoading && (type === 'team' || user?.role === 'team')) {
+            router.replace('/login');
+            return;
         }
     }, [user, isLoading, type, router]);
 

@@ -32,13 +32,10 @@ export async function POST(req: Request) {
         }
         const normalizedTeamId = teamId.trim().toUpperCase();
 
-        let portalMode = await getParticipantPortalMode();
-        if (normalizedTeamId === 'TRI26002') {
-            portalMode = 'event';
-        }
+        const portalMode = await getParticipantPortalMode();
 
         if (portalMode === 'closed') {
-            return NextResponse.json({ success: false, error: 'The participant portal is currently closed.' }, { status: 403 });
+            return NextResponse.json({ success: false, error: 'The Tri-City Hackathon has concluded. Participant portal and logins are permanently closed.' }, { status: 403 });
         }
 
         const { data: databaseTeam, error: databaseError } = await supabase
