@@ -39,7 +39,7 @@ export default function PrizesPage() {
 					</div>
 
 					<div className="w-[35%] sm:block hidden sm:self-center self-end sm:w-[30%] md:w-[25%] lg:w-[25%] xl:w-[10%]sm:mr-40 md:mr-15 lg:mr-30 xl:mr-40">
-						<span className="font-kanit font-black italic text-3xl text-[#FFEE00]">TRICITY</span>
+						<span className="font-kanit font-black italic text-3xl text-teal-400">HAPPENO</span>
 					</div>
 				</div>
 			</div>

@@ -26,13 +26,13 @@ export default function ContactPage() {
                                 GET IN <span className="text-white">TOUCH</span>
                             </h1>
                             <p className="text-white/60 font-kanit text-xl md:text-2xl tracking-[0.2em] uppercase italic">
-                                Centle India Institute of Technology & Science
+                                Happeno Hackathon Platform
                             </p>
                         </div>
 
                         <div className="w-48 md:w-64 py-10 text-center animate-float">
-                            <span className="font-kanit font-black italic text-5xl md:text-7xl text-[#FFEE00]">TRICITY</span>
-                            <span className="block mt-2 text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-white/70">AI Hackathon</span>
+                            <span className="font-kanit font-black italic text-5xl md:text-7xl text-teal-400">HAPPENO</span>
+                            <span className="block mt-2 text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-white/70">Hackathon OS</span>
                         </div>
                     </div>
                 </FadeInView>
@@ -48,8 +48,8 @@ export default function ContactPage() {
                         <FadeInView delay={0.1}>
                             <ContactCard
                                 icon={<MapPin className="text-[#FFEE00]" />}
-                                title="Location"
-                                value="Centle India Campus, Deshmukhi(V), Yadadri Bhuvanagiri(Dist), Telangana - 508284."
+                                title="Platform Support"
+                                value="Happeno Hackathon OS, Hyderabad, Telangana, India."
                                 color="#FFEE00"
                             />
                         </FadeInView>
@@ -58,7 +58,7 @@ export default function ContactPage() {
                             <ContactCard
                                 icon={<Mail className="text-[#BA45E8]" />}
                                 title="General Inquiry"
-                                value="admin@tricity.centle.in"
+                                value="support@happeno.in"
                                 subValue="Available 24/7 for support"
                                 color="#BA45E8"
                             />

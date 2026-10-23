@@ -20,7 +20,7 @@ export default function TermsPage() {
                             OVERVIEW
                         </h2>
                         <p>
-                            TRI-CITY AI HACKATHON is a 24-hour hackathon event organized to foster innovation and technical skills. By registering for the event, teams and individuals agree to follow the rules, code of conduct, and guidelines set by the organizing committee.
+                            HAPPENO is a hackathon operating system platform organized to foster innovation, structured stage evaluation, and technical excellence. By registering, teams and individuals agree to follow the rules, code of conduct, and guidelines set by the organizing committee.
                         </p>
                     </section>
 
@@ -30,7 +30,7 @@ export default function TermsPage() {
                             REGISTRATION
                         </h2>
                         <p>
-                            Teams must register through the official website (https://tricity.centle.in). The registration fee is <strong className="text-white">â‚¹600 per team</strong>. All information provided during registration must be accurate. Duplicate registrations or providing false information may lead to disqualification.
+                            Teams must register through the official website (https://happeno.in). All information provided during registration must be accurate. Duplicate registrations or providing false information may lead to disqualification.
                         </p>
                     </section>
 
@@ -50,7 +50,7 @@ export default function TermsPage() {
                             INTELLECTUAL PROPERTY
                         </h2>
                         <p>
-                            Participants retain ownership of the intellectual property they create during the hackathon. However, by participating, you grant TRI-CITY AI HACKATHON a non-exclusive, royalty-free license to showcase your project for promotional purposes.
+                            Participants retain ownership of the intellectual property they create during the hackathon. However, by participating, you grant HAPPENO a non-exclusive, royalty-free license to showcase your project for promotional purposes.
                         </p>
                     </section>
 

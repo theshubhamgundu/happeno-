@@ -62,13 +62,13 @@ export async function POST(req: Request) {
             const teamId = escapeHtml(approved.team_id || '');
             const captain = escapeHtml(approved.captain || 'Participant');
             const track = escapeHtml(approved.track || '');
-            const signInUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in'}/login`;
+            const signInUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://happeno.in'}/login`;
             const qrCode = await QRCode.toBuffer(approved.team_id || '', { width: 350, margin: 1 });
             await sendEmail({
                 to: captainEmail.trim(),
                 subject: `Registration approved: ${approved.team_name}`,
-                attachments: [{ filename: `tricity-checkin-${(approved.team_id || '').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, content: qrCode }],
-                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6"><h1>Registration approved</h1><p>Hello ${captain},</p><p>Your team <strong>${teamName}</strong> has been approved for TRI-CITY AI HACKATHON.</p><p><strong>Team ID:</strong> ${teamId}<br/><strong>Track:</strong> ${track}</p><p><strong>Login password:</strong> ${escapeHtml(password)}</p><p><a href="${escapeHtml(signInUrl)}">Sign in to your team dashboard</a>. Store this password securely; it cannot be retrieved later.</p><p>Your check-in QR code is attached.</p></div>`
+                attachments: [{ filename: `happeno-checkin-${(approved.team_id || '').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, content: qrCode }],
+                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6"><h1>Registration approved</h1><p>Hello ${captain},</p><p>Your team <strong>${teamName}</strong> has been approved for the Happeno Hackathon.</p><p><strong>Team ID:</strong> ${teamId}<br/><strong>Track:</strong> ${track}</p><p><strong>Login password:</strong> ${escapeHtml(password)}</p><p><a href="${escapeHtml(signInUrl)}">Sign in to your team dashboard</a>. Store this password securely; it cannot be retrieved later.</p><p>Your check-in QR code is attached.</p></div>`
             });
         } catch (emailError) {
             const { error: rollbackError } = await supabase

@@ -114,11 +114,12 @@ export async function POST(req: Request) {
             if (body.sendMagicLink && finalResults[0]?.email) {
                 const team = results[0];
                 const token = generateRosterToken(team.team_id, team.email);
-                const magicUrl = `https://tricity.centle.in/help?teamId=${encodeURIComponent(team.team_id)}&token=${encodeURIComponent(token)}`;
+                const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://happeno.in').replace(/\/+$/, '');
+                const magicUrl = `${appUrl}/help?teamId=${encodeURIComponent(team.team_id)}&token=${encodeURIComponent(token)}`;
 
                 await sendEmail({
                     to: team.email,
-                    subject: `[ACCESS LINK] Your Tri-City Hackathon Roster Link (${team.team_id})`,
+                    subject: `[ACCESS LINK] Your Happeno Hackathon Roster Link (${team.team_id})`,
                     html: `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
                             <div style="background: #0f172a; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">

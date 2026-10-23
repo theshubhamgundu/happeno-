@@ -82,7 +82,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: 'Could not update team credentials.' }, { status: 500 });
         }
 
-        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in').replace(/\/+$/, '');
+        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://happeno.in').replace(/\/+$/, '');
         const safeTeamId = escapeHtml(team.team_id);
         const safeTeamName = escapeHtml(team.team_name || 'Your team');
         const safePassword = escapeHtml(temporaryPassword);

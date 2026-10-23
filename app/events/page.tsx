@@ -143,7 +143,7 @@ export default function EventsPage() {
                             SHUBHAM VASANT GUNDU
                         </h2>
                         <p className="text-white/40 text-sm max-w-xl mx-auto">
-                            Operating as the primary coordinator and event organizer for TRI-CITY AI HACKATHON. All commercial transactions are processed through the official gateway under this legal registry.
+                            Operating as the primary coordinator and event organizer for HAPPENO HACKATHON. All commercial transactions are processed through the official gateway under this legal registry.
                         </p>
                     </FadeInView>
                 </div>
@@ -151,7 +151,7 @@ export default function EventsPage() {
 
             {/* Decorative Footer Logo */}
             <div className="absolute bottom-20 -left-20 opacity-5 pointer-events-none">
-                <span className="font-kanit font-black italic text-8xl">TRICITY</span>
+                <span className="font-kanit font-black italic text-8xl">HAPPENO</span>
             </div>
         </div>
     );

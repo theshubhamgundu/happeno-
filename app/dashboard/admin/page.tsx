@@ -3928,7 +3928,7 @@ export default function AdminDashboard() {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        void navigator.clipboard.writeText(`Team ID: ${credentialResetResult.teamId}\nPassword: ${credentialResetResult.temporaryPassword}\nLogin: https://tricity.centle.in/login`);
+                                        void navigator.clipboard.writeText(`Team ID: ${credentialResetResult.teamId}\nPassword: ${credentialResetResult.temporaryPassword}\nLogin: https://happeno.in/login`);
                                         toast.success("Credentials copied to clipboard!");
                                     }}
                                     className="flex-1 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-black font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(251,191,36,0.3)]"

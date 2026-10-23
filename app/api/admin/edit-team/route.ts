@@ -113,7 +113,7 @@ export async function POST(req: Request) {
             updateData.credentials_issued_at = credentialsIssuedAt;
 
 
-            const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in').replace(/\/+$/, '');
+            const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://happeno.in').replace(/\/+$/, '');
             const safeTeamId = escapeHtml(team.team_id || teamId);
             const safeTeamName = escapeHtml(cleanTeamName || 'Your team');
             const safePassword = escapeHtml(temporaryPassword);
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
             try {
                 const delivery = await sendEmail({
                     to: cleanEmail,
-                    subject: `[Pass & Credentials] Tri-City AI Hackathon — ${cleanTeamName}`,
+                    subject: `[Pass & Credentials] Happeno Hackathon — ${cleanTeamName}`,
 
                     html: `
                         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6;padding:24px;border:1px solid #e2e8f0;border-radius:12px;background:#ffffff;">

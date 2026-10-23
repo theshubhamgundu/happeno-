@@ -104,7 +104,7 @@ function BentoCard({ image, index, onClick }: BentoCardProps) {
       {/* Bottom Card Information */}
       <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-3 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
         <div className="flex items-center gap-2 text-teal-300 text-[11px] font-mono uppercase tracking-wider mb-1 font-medium">
-          <span>Tri-City 2026</span>
+          <span>Happeno 2026</span>
           <span>•</span>
           <span>{image.day}</span>
         </div>

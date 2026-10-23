@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://tricity.centle.in/sitemap.xml",
+    sitemap: "https://happeno.in/sitemap.xml",
   };
 }

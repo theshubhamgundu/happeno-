@@ -126,11 +126,11 @@ export default function FaqPage() {
 								</p>
 
 								<Link
-									href="mailto:admin@tricity.centle.in"
+									href="mailto:support@happeno.in"
 									className="font-poppins flex gap-3 items-center text-white sm:text-lg text-md font-medium w-fit"
 								>
 									<Mail />
-									<span>admin@tricity.centle.in</span>
+									<span>support@happeno.in</span>
 								</Link>
 							</div>
 						</FadeInView>

@@ -220,7 +220,7 @@ function RegisterPageContent() {
                             </h1>
                         </div>
                         <div className="w-24 md:w-32 self-end py-6 text-center opacity-90 transition-transform duration-500 hover:scale-110">
-                            <span className="font-kanit font-black italic text-2xl md:text-3xl text-[#FFEE00]">TRICITY</span>
+                            <span className="font-kanit font-black italic text-2xl md:text-3xl text-teal-400">HAPPENO</span>
                         </div>
                     </div>
 

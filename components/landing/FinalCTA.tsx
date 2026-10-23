@@ -22,21 +22,20 @@ export default function FinalCTA() {
           <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full border border-teal-200 bg-teal-50 text-[#0f766e]">
             <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
             <span className="font-mono text-xs tracking-wider uppercase font-semibold">
-              October 10–11, 2026 · Telangana
+              Happeno · The Modern Hackathon OS
             </span>
           </div>
 
           <h2 className="font-display font-extrabold text-3xl sm:text-5xl md:text-6xl text-[#0f172a] leading-tight mb-4">
-            Build with the Tri-City Community
+            Build with the Happeno Community
           </h2>
 
           <p className="font-body text-base sm:text-lg text-gray-600 max-w-xl mx-auto leading-relaxed mb-3">
-            Join hundreds of innovators from Warangal, Hanamkonda, and Kazipet for 24 hours of
-            creation, mentorship, and building solutions.
+            Join thousands of developers, organizers, and mentors executing world-class hackathons with zero chaos.
           </p>
 
-          <p className="font-mono text-xs text-gray-500 mb-10 font-medium">
-            Warangal · Hanamkonda · Kazipet
+          <p className="font-mono text-xs text-teal-700 mb-10 font-medium">
+            Stage Pipelines · Live Rubrics · Sub-Second QR Passes
           </p>
 
           {/* Login Button with user icon + Sponsor button */}

@@ -107,7 +107,7 @@ export async function POST(req: Request) {
             });
         }
 
-        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in').replace(/\/+$/, '');
+        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://happeno.in').replace(/\/+$/, '');
         let successCount = 0;
         let failureCount = 0;
         const results: Array<{ teamId: string; teamName: string; captainEmail: string; status: 'SUCCESS' | 'FAILED'; error?: string }> = [];
@@ -139,16 +139,16 @@ export async function POST(req: Request) {
                 // 1. Dispatch to Captain (Credentials + Pass Attachment)
                 await sendEmail({
                     to: captainEmail,
-                    subject: `[Pass & Credentials] Tri-City AI Hackathon — ${teamName}`,
+                    subject: `[Pass & Credentials] Happeno Hackathon — ${teamName}`,
 
                     html: `
                         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6;padding:24px;border:1px solid #e2e8f0;border-radius:12px;background:#ffffff;">
                             <div style="text-align:center;padding-bottom:16px;border-bottom:1px solid #f1f5f9;">
-                                <h1 style="color:#0f172a;font-size:22px;margin:0;">TRI-CITY AI HACKATHON 2026</h1>
+                                <h1 style="color:#0f172a;font-size:22px;margin:0;">HAPPENO HACKATHON OS</h1>
                                 <p style="color:#64748b;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin:4px 0 0;">Official Team Pass & Login Credentials</p>
                             </div>
                             <p style="margin-top:20px;">Hello <strong>${safeCaptainName}</strong>,</p>
-                            <p>Congratulations! Your team <strong>${safeTeamName}</strong> is registered for the <strong>TRI-CITY AI HACKATHON 2026</strong>.</p>
+                            <p>Congratulations! Your team <strong>${safeTeamName}</strong> is registered on the <strong>Happeno Hackathon Platform</strong>.</p>
                             
                             <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:20px 0;">
                                 <p style="margin:0 0 8px;font-size:13px;color:#475569;"><strong>Team Login ID:</strong> <span style="font-family:monospace;font-size:15px;color:#0f172a;background:#e2e8f0;padding:2px 6px;border-radius:4px;">${safeTeamId}</span></p>
@@ -161,7 +161,7 @@ export async function POST(req: Request) {
                             <p style="font-size:12px;color:#64748b;margin-top:16px;"><em>Note: As Team Lead, you have access to project submissions, meal tokens, and room assignments. Keep these credentials confidential.</em></p>
                             
                             <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
-                            <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0;">Tri-City AI Hackathon Organizing Committee • tricity.centle.in</p>
+                            <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0;">Happeno Organizing Team • happeno.in</p>
                         </div>
                     `
                 });

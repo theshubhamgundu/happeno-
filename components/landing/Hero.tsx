@@ -75,8 +75,7 @@ export default function Hero() {
         >
           <span className="w-2 h-2 shrink-0 rounded-full bg-teal-600 animate-pulse" />
           <span className="font-mono text-[10px] sm:text-xs tracking-wider uppercase font-medium text-center leading-snug">
-            <span className="sm:hidden">Oct 10–11, 2026 · Warangal</span>
-            <span className="hidden sm:inline">October 10–11, 2026 · Warangal | Hanamkonda | Kazipet</span>
+            Happeno 2.0 · The Premier Hackathon OS
           </span>
         </motion.div>
 
@@ -87,9 +86,9 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.15 }}
           className="font-display font-extrabold text-[2.5rem] sm:text-6xl md:text-7xl lg:text-8xl leading-[1.08] tracking-tight text-[#0f172a] mb-4 sm:mb-6"
         >
-          Tri-City Hackathon
+          Happeno
           <span className="block text-lg sm:text-3xl md:text-4xl font-semibold text-[#0f766e] tracking-normal mt-1 sm:mt-2">
-            Warangal · Hanamkonda · Kazipet
+            The Modern Hackathon Operating System
           </span>
         </motion.h1>
 
@@ -100,11 +99,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="font-body text-sm sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2 sm:px-0"
         >
-          24 hours of innovation across Telangana&apos;s historic tri-cities. Connecting student
-          creators, developers, and industry mentors across{' '}
-          <span className="font-semibold text-gray-900">Warangal</span>,{' '}
-          <span className="font-semibold text-gray-900">Hanamkonda</span>, and{' '}
-          <span className="font-semibold text-gray-900">Kazipet</span>.
+          End-to-end competition management engineered for tech fests, universities, and builder communities. Stage-wise pipelines, sub-second QR entry passes, transparent judge rubrics, and team workspaces.
         </motion.p>
 
         {/* Countdown */}
@@ -134,10 +129,10 @@ export default function Hero() {
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-            <span>Login</span>
+            <span>Open Workspace</span>
           </a>
           <a href="#about" className="btn-ghost w-full sm:w-auto text-center">
-            <span>Learn More</span>
+            <span>Explore Platform</span>
           </a>
         </motion.div>
 
@@ -149,10 +144,10 @@ export default function Hero() {
           className="mt-10 pt-8 sm:mt-16 sm:pt-12 border-t border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"
         >
           {[
-            { value: '1000+', label: 'Participants' },
-            { value: '24h', label: 'Continuous Coding' },
-            { value: '3', label: 'Tri-City Hubs' },
-            { value: '3', label: 'Grand Finale' },
+            { value: '5000+', label: 'Active Builders' },
+            { value: '24h', label: 'Continuous Sprints' },
+            { value: '< 200ms', label: 'QR Scan Speed' },
+            { value: '100%', label: 'Real-Time Scoring' },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-[#0f172a]">

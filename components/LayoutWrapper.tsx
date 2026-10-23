@@ -9,10 +9,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     const router = useRouter();
     const { user, isLoading } = useAuth();
 
+    // Keep homepage accessible to everyone
     useEffect(() => {
-        if (!isLoading && user?.role === 'team' && pathname === '/') {
-            router.push('/dashboard/team');
-        }
+        // No forced redirect away from homepage
     }, [user, isLoading, pathname, router]);
 
     return (

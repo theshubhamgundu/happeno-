@@ -10,12 +10,12 @@ interface FAQ {
 
 const FAQS: FAQ[] = [
   {
-    q: 'Who can participate in the Tri-City Hackathon?',
-    a: 'Any student or professional residing or studying across Warangal, Hanamkonda, Kazipet, and neighboring regions in Telangana. All engineering, design, and domain enthusiasts are welcome.',
+    q: 'Who can participate in hackathons on Happeno?',
+    a: 'Any student, developer, designer, or builder looking to build innovative solutions. Teams can register from any university, club, or independently.',
   },
   {
-    q: 'How does team formation work for the tri-city format?',
-    a: 'Teams can comprise 2 to 4 members. You can form teams with peers from your college or collaborate cross-institutionally across the tri-cities.',
+    q: 'How does team formation work?',
+    a: 'Teams can comprise 2 to 4 members. You can register solo or with a team, invite members via a private invite link, and assign roles.',
   },
   {
     q: 'What should I bring to the hackathon?',

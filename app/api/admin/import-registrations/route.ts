@@ -221,7 +221,7 @@ export async function POST(req: Request) {
 
         let emailsSent = 0;
         let emailFailures = 0;
-        const signInUrl = escapeHtml(`${(process.env.NEXT_PUBLIC_APP_URL || 'https://tricity.centle.in').replace(/\/+$/, '')}/login`);
+        const signInUrl = escapeHtml(`${(process.env.NEXT_PUBLIC_APP_URL || 'https://happeno.in').replace(/\/+$/, '')}/login`);
         for (const registration of registrations) {
             const teamId = registration.teamId;
             const qrBuffer = await QRCode.toBuffer(teamId, { width: 350, margin: 1 });

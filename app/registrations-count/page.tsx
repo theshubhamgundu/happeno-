@@ -161,7 +161,7 @@ export default function RegistrationsCountPage() {
                         </form>
                     </div>
                     <p className="text-center text-slate-400 text-xs mt-8 font-medium">
-                        &copy; 2026 tricity Infrastructure. All rights reserved.
+                        &copy; {new Date().getFullYear()} Happeno Infrastructure. All rights reserved.
                     </p>
                 </motion.div>
             </main>

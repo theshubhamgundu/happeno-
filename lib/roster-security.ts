@@ -9,7 +9,7 @@ const AUDIT_LOGS_KEY = 'roster_audit_logs';
 const MERGE_CODES_PREFIX = 'roster_merge:';
 
 function getRosterSecret(): string {
-    return process.env.AUTH_SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'tricity-secure-roster-secret-2026';
+    return process.env.AUTH_SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'happeno-secure-roster-secret-2026';
 }
 
 /**

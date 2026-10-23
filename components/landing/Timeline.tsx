@@ -29,7 +29,7 @@ const PHASES: Phase[] = [
   {
     date: 'Oct 10',
     title: 'Opening Ceremony & Keynote',
-    desc: 'Official launch event, briefing, and mentoring orientation across tri-city centers.',
+    desc: 'Official launch event, briefing, and mentoring orientation across event hubs.',
     icon: '🎤',
     status: 'active',
   },

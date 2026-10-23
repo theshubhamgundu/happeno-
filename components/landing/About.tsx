@@ -3,24 +3,21 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
-const CITIES = [
+const PILLARS = [
   {
-    name: 'Warangal',
-    tag: 'Historical & Cultural Capital',
-    desc: 'The historic heart of Kakatiya heritage, bringing together passionate engineers, innovative thinkers, and researchers.',
-    bgImage: '/images/hanamkonda.jpg'
+    name: 'Stage Pipeline Engine',
+    tag: 'Stage-Wise Sprints',
+    desc: 'Break your hackathon into structured rounds: Ideation, Prototype checkpoint, and Final Demo Day with automatic stage countdowns.',
   },
   {
-    name: 'Hanamkonda',
-    tag: 'Education & Commercial Hub',
-    desc: 'The educational powerhouse with premier institutes fostering young minds in deep tech, software development, and design.',
-    bgImage: '/images/warangal.jpeg'
+    name: 'Sub-Second QR Logistics',
+    tag: 'Venue & Access Pass',
+    desc: 'Fraud-proof digital entry passes, multi-meal tokens (Lunch, Dinner, Midnight Snack), and instant team seat locator.',
   },
   {
-    name: 'Kazipet',
-    tag: 'Connectivity & Logistics Core',
-    desc: 'The key junction connecting Telangana to the nation, representing infrastructure, systems integration, and IoT networks.',
-    bgImage: '/images/kazipet.webp'
+    name: 'Live Fair-Play Rubric',
+    tag: 'Real-Time Judging',
+    desc: 'Multi-parameter weighted scoring, offline phone resilience, score normalization, and instant live leaderboards.',
   },
 ];
 
@@ -65,60 +62,43 @@ export default function About() {
 
         <FadeIn delay={0.1}>
           <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-[#0f172a] leading-tight mb-6">
-            Connecting Three Cities.{' '}
-            <span className="text-[#0f766e]">Igniting Tech Talent.</span>
+            Engineered for Competitions.{' '}
+            <span className="text-[#0f766e]">Built for Builders.</span>
           </h2>
         </FadeIn>
 
         <FadeIn delay={0.2}>
           <p className="font-body text-base sm:text-lg text-gray-600 max-w-3xl leading-relaxed mb-6">
-            The <strong className="text-gray-900 font-semibold">Tri-City Hackathon</strong> is a
-            premier regional initiative bringing together student developers, designers, and
-            innovators from across
-            <span className="text-gray-900 font-medium"> Warangal</span>,{' '}
-            <span className="text-gray-900 font-medium">Hanamkonda</span>, and{' '}
-            <span className="text-gray-900 font-medium">Kazipet</span>.
+            The <strong className="text-gray-900 font-semibold">Happeno Hackathon OS</strong> is a
+            purpose-built operating system replacing fragmented spreadsheets, manual forms, and WhatsApp groups with a unified platform for hackathons.
           </p>
         </FadeIn>
 
         <FadeIn delay={0.3}>
           <p className="font-body text-base sm:text-lg text-gray-600 max-w-3xl leading-relaxed mb-16">
-            What makes it truly &quot;Tri-City&quot; is the synergy of our region: the academic
-            strength of top regional universities, the rich cultural heritage of Warangal, and the
-            engineering dynamism of Kazipet. Teams collaborate under common problem statements to
-            engineer impactful, real-world solutions.
+            From track allocation caps and participant onboarding to sub-second venue badge check-in, real-time rubric evaluations, and automated certificate generation—Happeno elevates every minute of your hackathon.
           </p>
         </FadeIn>
 
-        {/* City cards */}
+        {/* Pillars cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {CITIES.map((city, i) => (
-            <FadeIn key={city.name} delay={0.2 + i * 0.1}>
+          {PILLARS.map((pillar, i) => (
+            <FadeIn key={pillar.name} delay={0.2 + i * 0.1}>
               <div 
-                className="pro-card rounded-xl p-8 h-full flex flex-col justify-between border border-gray-200 hover:border-teal-600 transition-all duration-300 relative overflow-hidden group"
-                style={{
-                  backgroundImage: `url(${city.bgImage})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat'
-                }}
+                className="bg-white rounded-xl p-8 h-full flex flex-col justify-between border border-gray-200 hover:border-teal-600 transition-all duration-300 shadow-sm relative group"
               >
-                {/* Black overlay for better text readability */}
-                <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/75 group-hover:from-black/60 group-hover:via-black/50 group-hover:to-black/65 transition-all duration-300" />
-                
-                {/* Content */}
-                <div className="relative z-10">
-                  <div className="inline-block px-3 py-1 rounded text-[11px] font-mono font-medium tracking-wide uppercase bg-teal-500/80 text-white mb-4 backdrop-blur-sm">
-                    {city.tag}
+                <div>
+                  <div className="inline-block px-3 py-1 rounded text-[11px] font-mono font-medium tracking-wide uppercase bg-teal-50 text-teal-800 border border-teal-200 mb-4">
+                    {pillar.tag}
                   </div>
-                  <h3 className="font-display font-bold text-2xl text-white mb-3 drop-shadow-lg">
-                    {city.name}
+                  <h3 className="font-display font-bold text-xl text-[#0f172a] mb-3">
+                    {pillar.name}
                   </h3>
-                  <p className="font-body text-sm text-gray-200 leading-relaxed drop-shadow-md">{city.desc}</p>
+                  <p className="font-body text-sm text-gray-600 leading-relaxed">{pillar.desc}</p>
                 </div>
-                <div className="pt-6 mt-6 border-t border-white/20 flex items-center justify-between text-xs font-mono text-gray-300 relative z-10">
-                  <span>Telangana</span>
-                  <span className="text-teal-400 font-semibold">Tri-City Hub</span>
+                <div className="pt-6 mt-6 border-t border-gray-100 flex items-center justify-between text-xs font-mono text-gray-500">
+                  <span>Happeno Platform</span>
+                  <span className="text-teal-600 font-semibold">Core Feature</span>
                 </div>
               </div>
             </FadeIn>

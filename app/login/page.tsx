@@ -97,7 +97,7 @@ export default function LoginPage() {
 
             // Reject participant logins since event has concluded
             if (id.toUpperCase().startsWith("TRI")) {
-                setError("The Tri-City Hackathon has concluded. Participant portal and logins are closed.");
+                setError("Participant portal session inactive. Please contact your hackathon organizer.");
                 return;
             }
 
@@ -149,14 +149,14 @@ export default function LoginPage() {
                     className="text-center mb-10"
                 >
                     <h1 className="font-display font-extrabold text-4xl md:text-5xl text-[#0f172a] mb-2">
-                        Tri-City Hackathon
+                        Happeno
                     </h1>
                     <p className="font-body text-gray-600 text-sm md:text-base">
-                        Portal
+                        Workspace & Access Portal
                     </p>
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium mt-3 shadow-xs">
-                        <span className="w-2 h-2 rounded-full bg-amber-500" />
-                        <span>Event Concluded</span>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-medium mt-3 shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+                        <span>Happeno Hackathon OS</span>
                     </div>
                 </motion.div>
 

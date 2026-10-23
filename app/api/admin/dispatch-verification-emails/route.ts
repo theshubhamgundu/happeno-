@@ -55,7 +55,8 @@ export async function POST(req: Request) {
                 }
 
                 const token = generateRosterToken(team.team_id, leadEmail);
-                const magicUrl = `https://tricity.centle.in/help?teamId=${encodeURIComponent(team.team_id)}&token=${encodeURIComponent(token)}`;
+                const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://happeno.in').replace(/\/+$/, '');
+                const magicUrl = `${appUrl}/help?teamId=${encodeURIComponent(team.team_id)}&token=${encodeURIComponent(token)}`;
 
                 const membersListHtml = Array.isArray(team.members) && team.members.length > 0
                     ? team.members.map((m: any, idx: number) => `

@@ -128,14 +128,14 @@ export const DashboardSidebar = ({ type, isOpen, onClose, isCollapsed, onToggleC
                 <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} mb-12 px-2`}>
                     {!isCollapsed ? (
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(147,51,234,0.5)] overflow-hidden bg-black">
-                                <span className="text-[#FFEE00]">T</span>
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(15,118,110,0.5)] overflow-hidden bg-[#0f766e]">
+                                <span className="text-white">H</span>
                             </div>
                             <TricityMark compact className="text-2xl" />
                         </div>
                     ) : (
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(147,51,234,0.5)] overflow-hidden bg-black">
-                            <span className="text-[#FFEE00]">T</span>
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(15,118,110,0.5)] overflow-hidden bg-[#0f766e]">
+                            <span className="text-white">H</span>
                         </div>
                     )}
                     {/* Close Button for Mobile */}

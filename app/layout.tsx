@@ -52,18 +52,18 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tricity.centle.in'),
+  metadataBase: new URL('https://happeno.in'),
   title: {
-    default: "TRI-CITY AI HACKATHON | Centle India Hyderabad Hackathon",
-    template: "%s | TRI-CITY AI HACKATHON"
+    default: "HAPPENO | The Premier Hackathon Operating System",
+    template: "%s | HAPPENO"
   },
-  description: "TRI-CITY AI HACKATHON is Centle India Hyderabad's student-run hackathon. Join us for 2 days of coding, innovation, and fun. February 27-28, 2026.",
-  keywords: ["Hackathon", "Centle India", "Coding", "tricity", "Hyderabad", "Tech Event", "Centle India"],
+  description: "Happeno is the modern hackathon platform for universities and builder communities. Stage-wise pipelines, live rubric scoring, sub-second QR entry, and team management.",
+  keywords: ["Hackathon", "Happeno", "Coding", "Tech Event", "Hackathon Platform", "Judging Rubric", "Team Workspace"],
   openGraph: {
-    title: "TRI-CITY AI HACKATHON | Centle India Hyderabad Hackathon",
-    description: "Join us for 2 days of coding, innovation, and fun at Centle India, Hyderabad.",
-    url: 'https://tricity.centle.in',
-    siteName: 'TRI-CITY AI HACKATHON',
+    title: "HAPPENO | The Premier Hackathon Operating System",
+    description: "Modern hackathon platform for universities and builder communities.",
+    url: 'https://happeno.in',
+    siteName: 'HAPPENO',
     locale: 'en_US',
     type: 'website',
   },

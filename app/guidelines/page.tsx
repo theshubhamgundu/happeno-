@@ -365,12 +365,12 @@ export default function GuidelinesPage() {
 
             {/* Sticky Logo / Footer */}
             <div className="relative z-10 text-center py-12 opacity-30">
-                <p className="uppercase tracking-[1em] font-black text-xs">TRI-CITY AI HACKATHON PROTOCOL</p>
+                <p className="uppercase tracking-[1em] font-black text-xs">HAPPENO HACKATHON PROTOCOL</p>
             </div>
 
             {/* Fixed Background Branding */}
             <div className="fixed bottom-0 right-0 p-10 opacity-[0.02] pointer-events-none select-none -z-10">
-                <span className="font-kanit font-black italic text-8xl">TRICITY</span>
+                <span className="font-kanit font-black italic text-8xl">HAPPENO</span>
             </div>
         </div>
     );

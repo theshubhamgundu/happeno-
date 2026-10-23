@@ -40,7 +40,7 @@ export default function RefundPage() {
                             DUPLICATE PAYMENTS
                         </h2>
                         <p>
-                            If you have been charged twice for a single registration due to a technical glitch, please contact our support team at <a href="mailto:admin@tricity.centle.in" className="text-[#FFEE00] hover:underline">admin@tricity.centle.in</a> with payment proofs. Duplicate captures will be reversed after manual verification.
+                            If you have been charged twice for a single registration due to a technical glitch, please contact our support team at <a href="mailto:support@happeno.in" className="text-teal-400 hover:underline">support@happeno.in</a> with payment proofs. Duplicate captures will be reversed after manual verification.
                         </p>
                     </section>
 

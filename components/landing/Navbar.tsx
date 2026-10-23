@@ -44,15 +44,15 @@ export default function Navbar() {
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           {/* Logo */}
           <a href="#hero" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-md bg-[#0f172a] flex items-center justify-center text-white font-display font-extrabold text-xs shadow-sm">
-              TC
+            <div className="w-8 h-8 rounded-md bg-[#0f766e] flex items-center justify-center text-white font-display font-extrabold text-sm shadow-sm">
+              H
             </div>
             <div className="flex flex-col">
               <span className="font-display font-bold text-sm tracking-wider uppercase text-[#0f172a]">
-                Tri-City Hackathon
+                Happeno
               </span>
-              <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest -mt-0.5">
-                TS · 2026
+              <span className="text-[10px] font-mono text-teal-700 uppercase tracking-widest -mt-0.5">
+                Hackathon OS
               </span>
             </div>
           </a>

@@ -14,7 +14,7 @@ export interface AppSession {
     expiresAt: number;
 }
 
-const COOKIE_NAME = 'tricity_session';
+const COOKIE_NAME = 'happeno_session';
 const SESSION_SECONDS = 60 * 60 * 12;
 
 function getSecret(): string {
