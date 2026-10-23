@@ -10,28 +10,28 @@ interface FAQ {
 
 const FAQS: FAQ[] = [
   {
-    q: 'Who can participate in hackathons on Happeno?',
-    a: 'Any student, developer, designer, or builder looking to build innovative solutions. Teams can register from any university, club, or independently.',
+    q: 'How does Happeno streamline hackathon management?',
+    a: 'Happeno replaces multiple disconnected tools (Google Forms, Excel spreadsheets, manual paper lists, and WhatsApp groups) with a unified, real-time operating system covering registration, sub-second QR venue access, meal token logistics, stage pipelines, and live judging.',
   },
   {
-    q: 'How does team formation work?',
-    a: 'Teams can comprise 2 to 4 members. You can register solo or with a team, invite members via a private invite link, and assign roles.',
+    q: 'How do QR passes and meal tracking prevent fraud?',
+    a: 'Every participant receives an encrypted digital QR pass on their personal dashboard. Station volunteers scan passes in under 200ms. The platform automatically enforces meal allocations (Breakfast, Lunch, Dinner, Midnight Snack) and eliminates duplicate scans or unverified claims.',
   },
   {
-    q: 'What should I bring to the hackathon?',
-    a: 'Your laptop, chargers, identity cards, Wi-Fi, power points, and workspace are provided.',
+    q: 'Can organizers configure custom stages and sprint deadlines?',
+    a: 'Yes. Happeno supports stage-gate sprints: Round 1 ideation checks, mid-way mentor evaluation checkpoints, and Final Round pitch shortlists, each with automated countdown timers and instant submission locks.',
   },
   {
-    q: 'Are there any registration fees?',
-    a: 'Yes.',
+    q: 'How does fair-play score normalization work for judges?',
+    a: 'Organizers can create weighted, multi-parameter rubrics across different tracks. The scoring engine aggregates multi-judge evaluations and applies score normalization to eliminate jury bias and deliver transparent, tamper-proof rankings.',
   },
   {
-    q: 'What are the evaluation criteria?',
-    a: 'Projects are evaluated based on Problem Relevance & Innovation (30%), Technical Implementation (30%), Scalability & Practical Utility (25%), and Presentation & Demo (15%).',
+    q: 'How do participants form teams and submit code?',
+    a: 'Participants can create or join teams with private invite links, assign member roles, and link their GitHub repository for automated commit tracking and verification during the competition window.',
   },
   {
-    q: 'Can we use pre-existing code?',
-    a: 'You can use open-source frameworks, packages, and public APIs. However, core project architecture and custom features must be developed during the 24-hour hackathon window.',
+    q: 'Can universities, tech clubs, or enterprises host events on Happeno?',
+    a: 'Yes. Happeno is engineered to scale from college hackathons to enterprise-grade hackathons with thousands of simultaneous builders, multi-track evaluations, and granular role permissions.',
   },
 ];
 
@@ -108,7 +108,7 @@ export default function FAQ() {
         >
           <div className="flex items-center gap-3 mb-4">
             <span className="font-mono text-xs tracking-[0.25em] uppercase text-[#0f766e] font-semibold">
-              06
+              03
             </span>
             <span className="h-[1px] w-10 bg-teal-600/40" />
             <span className="font-mono text-xs tracking-[0.25em] uppercase text-gray-500">
@@ -120,7 +120,7 @@ export default function FAQ() {
             Frequently Asked Questions
           </h2>
           <p className="font-body text-base text-gray-600 max-w-xl leading-relaxed mb-10">
-            Key details for participants joining across Warangal, Hanamkonda, and Kazipet.
+            Key operational details about the Happeno Hackathon Operating System.
           </p>
         </motion.div>
 

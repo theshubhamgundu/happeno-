@@ -4,11 +4,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_LINKS = [
-  { label: 'About', href: '#about' },
-  { label: 'Tracks', href: '#tracks' },
-  { label: 'Timeline', href: '#timeline' },
-  { label: 'Gallery', href: '#gallery' },
-  { label: 'Sponsors', href: '#sponsors' },
+  { label: 'Platform', href: '#about' },
+  { label: 'Capabilities', href: '#features' },
   { label: 'FAQ', href: '#faq' },
 ];
 

@@ -1,48 +1,28 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
-/* ───── Countdown Timer ───── */
-function CountdownTimer() {
-  const targetDate = useMemo(() => new Date('2026-10-09T00:00:00'), []);
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const tick = () => {
-      const now = new Date();
-      const diff = Math.max(0, targetDate.getTime() - now.getTime());
-      setTimeLeft({
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((diff / (1000 * 60)) % 60),
-        seconds: Math.floor((diff / 1000) % 60),
-      });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [targetDate]);
-
-  const units = [
-    { label: 'Days', value: timeLeft.days },
-    { label: 'Hours', value: timeLeft.hours },
-    { label: 'Mins', value: timeLeft.minutes },
-    { label: 'Secs', value: timeLeft.seconds },
+/* ───── Hackathon OS Feature Badges ───── */
+function PlatformHighlights() {
+  const highlights = [
+    { title: 'Stage-Gate Pipeline', sub: 'Sprint Management' },
+    { title: 'Sub-Second QR', sub: 'Passes & Meal Claims' },
+    { title: 'Normalized Rubrics', sub: 'Fair-Play Judging' },
+    { title: 'Team Workspaces', sub: 'GitHub Sync & Roles' },
   ];
 
   return (
-    <div className="flex justify-center gap-2 sm:gap-3 md:gap-6">
-      {units.map((u) => (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 max-w-3xl mx-auto">
+      {highlights.map((h) => (
         <div
-          key={u.label}
-          className="flex flex-col items-center bg-white border border-gray-200 rounded-lg px-3 py-2.5 sm:px-4 sm:py-3 min-w-[60px] sm:min-w-[72px] md:min-w-[90px] shadow-sm"
+          key={h.title}
+          className="flex flex-col items-center bg-white border border-gray-200 hover:border-teal-500 rounded-lg p-3 text-center transition-all duration-200 shadow-sm"
         >
-          <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold text-[#0f172a] tabular-nums">
-            {String(u.value).padStart(2, '0')}
+          <span className="font-display font-bold text-xs sm:text-sm text-[#0f172a]">
+            {h.title}
           </span>
-          <span className="font-mono text-[9px] sm:text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mt-0.5">
-            {u.label}
+          <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-teal-700 mt-0.5">
+            {h.sub}
           </span>
         </div>
       ))}
@@ -102,14 +82,14 @@ export default function Hero() {
           End-to-end competition management engineered for tech fests, universities, and builder communities. Stage-wise pipelines, sub-second QR entry passes, transparent judge rubrics, and team workspaces.
         </motion.p>
 
-        {/* Countdown */}
+        {/* Platform Highlights */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mb-8 sm:mb-10"
         >
-          <CountdownTimer />
+          <PlatformHighlights />
         </motion.div>
 
         {/* Buttons: Login Button with user icon + Learn More */}
