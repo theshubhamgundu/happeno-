@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import TricityMark from "@/components/TricityMark";
+import HappenoMark from "@/components/HappenoMark";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -135,7 +135,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                     <Link href="/" aria-label="Happeno home" className={`flex items-center gap-2.5 rounded-xl px-2 py-2.5 transition hover:bg-slate-50 ${isSidebarCollapsed ? "justify-center" : ""}`}>
                         <div className="grid h-9 w-9 place-items-center rounded-lg bg-teal-600 text-base font-bold text-white shadow-sm">H</div>
                         {!isSidebarCollapsed && <div>
-                            <TricityMark compact className="text-lg" />
+                            <HappenoMark compact className="text-lg" />
                             <p className="mt-1 text-[9px] font-bold uppercase tracking-[.19em] text-slate-400">Hackathon OS</p>
                         </div>}
                     </Link>
@@ -248,7 +248,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
             <AnimatePresence>
                 {hasSidebar && isMobileMenuOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-slate-950/25 p-4 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
                     <motion.div initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -24, opacity: 0 }} onClick={(event) => event.stopPropagation()} className="flex h-full w-full max-w-[320px] flex-col rounded-2xl bg-white p-5 shadow-2xl">
-                        <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600 font-bold text-white">H</div><TricityMark compact className="text-xl" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500"><X size={21} /></button></div>
+                        <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600 font-bold text-white">H</div><HappenoMark compact className="text-xl" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500"><X size={21} /></button></div>
                         <p className="mt-9 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Workspace</p>
                         <nav className="mt-3 space-y-1">{menuItems[type].map((item: any) => {
                             const isActive = pathname === item.href;

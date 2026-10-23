@@ -1,6 +1,16 @@
 import React from 'react';
-import ghostsData from './data.json';
+import rawGhostsData from './data.json';
 import { ShieldAlert } from 'lucide-react';
+
+interface GhostRecord {
+  name: string;
+  phone: string;
+  email: string;
+  deletedFrom: string;
+  keptIn: string;
+}
+
+const ghostsData = rawGhostsData as GhostRecord[];
 
 export default function GhostMembersPage() {
   return (

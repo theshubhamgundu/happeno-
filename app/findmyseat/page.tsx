@@ -14,7 +14,7 @@ export default function FindMySeat() {
         const numericPart = teamId.trim();
         if (!numericPart) return;
         
-        const query = `TRI${numericPart}`.toUpperCase();
+        const query = numericPart.toUpperCase().startsWith('HAP') ? numericPart.toUpperCase() : (numericPart.toUpperCase().startsWith('TRI') ? numericPart.toUpperCase() : `TRI${numericPart}`.toUpperCase());
 
         const room = ROOM_ALLOCATIONS[query];
         
@@ -51,7 +51,7 @@ export default function FindMySeat() {
                         <Search size={20} />
                     </div>
                     <div className="flex items-center bg-transparent py-4 text-slate-900 font-bold uppercase tracking-wider text-lg">
-                        <span className="text-teal-700 select-none mr-1">TRI</span>
+                        <span className="text-teal-700 select-none mr-1">#</span>
                         <input
                             type="text"
                             maxLength={5}

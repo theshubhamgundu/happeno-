@@ -260,7 +260,7 @@ export async function POST(req: Request) {
                 if (oldMember?.email) {
                     await sendEmail({
                         to: oldMember.email,
-                        subject: `[NOTICE] Tri-City Hackathon Registration Update (Team ${team.team_name})`,
+                        subject: `[NOTICE] Happeno Hackathon Registration Update (Team ${team.team_name})`,
                         html: `
                             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
                                 <div style="background: #0f172a; padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
@@ -269,7 +269,7 @@ export async function POST(req: Request) {
                                 <div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; background: #ffffff;">
                                     <p>Hello <strong>${oldMember.fullName || oldMember.name || 'Participant'}</strong>,</p>
                                     <p>Your slot in team <strong>"${team.team_name}" (${teamId})</strong> has been reassigned by Team Lead <strong>${team.captain}</strong>.</p>
-                                    <p style="font-size: 12px; color: #64748b;">If this was done by mistake, please contact your Team Lead immediately or reach out to the organizing desk at <strong>business@centle.in</strong>.</p>
+                                    <p style="font-size: 12px; color: #64748b;">If this was done by mistake, please contact your Team Lead immediately or reach out to the organizing desk at <strong>support@happeno.in</strong>.</p>
                                 </div>
                             </div>
                         `
@@ -279,11 +279,11 @@ export async function POST(req: Request) {
                 if (newCleanEmail) {
                     await sendEmail({
                         to: newCleanEmail,
-                        subject: `Welcome to Team "${team.team_name}" - Tri-City AI Hackathon 2026!`,
+                        subject: `Welcome to Team "${team.team_name}" - Happeno Hackathon!`,
                         html: `
                             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
                                 <div style="background: #0f172a; padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
-                                    <h2 style="color: #14b8a6; margin: 0; font-size: 18px;">WELCOME TO TRI-CITY 2026!</h2>
+                                    <h2 style="color: #14b8a6; margin: 0; font-size: 18px;">WELCOME TO HAPPENO HACKATHON!</h2>
                                 </div>
                                 <div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; background: #ffffff;">
                                     <p>Hello <strong>${newMember.fullName}</strong>,</p>

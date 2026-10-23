@@ -26,8 +26,8 @@ export default function RoutePage() {
     <main className={styles.page}>
       <div className={styles.container}>
         <header className={styles.header}>
-          <Link className={styles.wordmark} href="/" aria-label="TRI-CITY home">
-            TRI-CITY
+          <Link className={styles.wordmark} href="/" aria-label="Happeno home">
+            HAPPENO
           </Link>
           <a
             className={styles.mapLink}

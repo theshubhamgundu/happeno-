@@ -258,11 +258,11 @@ export default function LoginPage() {
 
                             {/* Credentials hint */}
                             <div className="pt-4 border-t border-gray-100 text-center">
-                                <p className="font-body text-xs text-gray-500 mb-2">
-                                    Need help or have any queries? Contact:
+                                <p className="font-body text-xs text-gray-500 mb-1">
+                                    Happeno Hackathon OS
                                 </p>
-                                <div className="font-body text-xs text-gray-600 font-medium space-y-1">
-                                    <p> CENTLE </p>
+                                <div className="font-body text-xs text-gray-600 font-medium">
+                                    <p>support@happeno.in</p>
                                 </div>
                             </div>
                         </div>

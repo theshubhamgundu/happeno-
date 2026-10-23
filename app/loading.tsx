@@ -23,20 +23,20 @@ export default function Loading() {
                     <div className="absolute inset-0 w-16 h-16 rounded-full border-2 border-transparent border-t-[#0f766e] animate-spin" />
                     {/* Center logo mark */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-md bg-[#0f172a] flex items-center justify-center text-white font-display font-extrabold text-[10px] shadow-sm">
-                            TC
+                        <div className="w-8 h-8 rounded-md bg-[#0f766e] flex items-center justify-center text-white font-display font-extrabold text-[12px] shadow-sm">
+                            H
                         </div>
                     </div>
                 </div>
 
                 {/* Title */}
                 <h2 className="font-display font-bold text-lg sm:text-xl tracking-tight text-[#0f172a] mb-2 text-center">
-                    Tri-City Hackathon
+                    Happeno
                 </h2>
 
                 {/* Subtitle */}
-                <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-gray-500 mb-6">
-                    Warangal · Hanamkonda · Kazipet
+                <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-teal-700 mb-6 font-semibold">
+                    Hackathon Operating System
                 </p>
 
                 {/* Loading dots */}

@@ -1238,7 +1238,7 @@ export default function AdminDashboard() {
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>TRI-CITY AI HACKATHON â€” ${title}</title>
+    <title>Happeno Hackathon OS — ${title}</title>
     <style>
         @page { size: A3 landscape; margin: 12mm; }
         @media print { .no-print { display: none !important; } body { margin: 0; } tr { page-break-inside: avoid; } }
@@ -1247,26 +1247,26 @@ export default function AdminDashboard() {
     </style>
 </head>
 <body>
-    <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#1a1a8c;color:#fff;
+    <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#0f172a;color:#fff;
         padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:Arial,sans-serif;">
-        <span style="font-weight:700;font-size:13px;">ðŸ“‹ TRI-CITY AI HACKATHON â€” ${title} (${rows.length} records)</span>
-        <button onclick="window.print()" style="background:#14b8a6;color:#000;border:none;padding:8px 22px;
-            border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">ðŸ–¨ï¸ Print / Save as PDF</button>
+        <span style="font-weight:700;font-size:13px;">HAPPENO HACKATHON OS — ${title} (${rows.length} records)</span>
+        <button onclick="window.print()" style="background:#0f766e;color:#fff;border:none;padding:8px 22px;
+            border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">Print / Save as PDF</button>
     </div>
     <div style="padding:18px 24px;margin-top:50px;">
         <div style="display:flex;align-items:center;justify-content:flex-start;gap:20px;margin-bottom:8px;">
-            <img src="/Centle India-logo.png" style="height:80px;object-fit:contain;flex-shrink:0;" />
+            <div style="width:48px;height:48px;background:#0f766e;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:900;font-size:24px;">H</div>
             <div style="font-family:'Segoe UI',Arial,sans-serif;">
-                <div style="font-size:11px;color:#333;letter-spacing:0.5px;font-weight:700;">Centle India</div>
-                <div style="font-size:22px;font-weight:900;letter-spacing:3px;color:#1a1a8c;margin-top:4px;">TRI-CITY AI HACKATHON</div>
-                <div style="font-size:13px;font-weight:700;letter-spacing:5px;color:#cc0000;margin-top:2px;">${title.toUpperCase()}</div>
+                <div style="font-size:11px;color:#0f766e;letter-spacing:1px;font-weight:700;">HAPPENO PLATFORM</div>
+                <div style="font-size:22px;font-weight:900;letter-spacing:2px;color:#0f172a;margin-top:4px;">HACKATHON OPERATING SYSTEM</div>
+                <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#0f766e;margin-top:2px;">${title.toUpperCase()}</div>
                 <div style="font-size:10px;color:#888;margin-top:5px;">Date: ${now} &nbsp;|&nbsp; ${subtitle}: ${rows.length}</div>
             </div>
         </div>
-        <div style="height:3px;background:linear-gradient(90deg,#cc0000,#1a1a8c,#cc0000);margin:8px 0 14px;border-radius:2px;"></div>
+        <div style="height:3px;background:linear-gradient(90deg,#0f766e,#0f172a,#0f766e);margin:8px 0 14px;border-radius:2px;"></div>
         <table><thead>${headerRow}</thead><tbody>${dataRows}</tbody></table>
         <div style="margin-top:14px;text-align:center;font-size:9px;color:#bbb;border-top:1px solid #eee;padding-top:8px;">
-            TRI-CITY AI HACKATHON Hackathon &nbsp;|&nbsp; Centle India &nbsp;|&nbsp; ${title} &nbsp;|&nbsp; Generated: ${now}
+            Happeno Hackathon OS &nbsp;|&nbsp; ${title} &nbsp;|&nbsp; Generated: ${now}
         </div>
     </div>
 </body>
@@ -2238,7 +2238,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <span className="font-mono text-xs font-bold text-white">business@centle.in</span>
+                                            <span className="font-mono text-xs font-bold text-white">business@happeno.in</span>
                                             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                                             <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">cPanel IMAP (SSL:993)</span>
                                         </div>
@@ -2279,7 +2279,7 @@ export default function AdminDashboard() {
                                 <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
                                     <Inbox size={48} className="mx-auto mb-4 text-white/10" />
                                     <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No emails in inbox</p>
-                                    <p className="text-white/20 text-xs mt-2">Replies to your passes or queries to business@centle.in will appear here.</p>
+                                    <p className="text-white/20 text-xs mt-2">Replies to your passes or queries to business@happeno.in will appear here.</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
@@ -3457,7 +3457,7 @@ export default function AdminDashboard() {
                                             <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${
                                                 passTheme === 'light' ? 'bg-teal-600' : 'bg-[#14b8a6]'
                                             }`} />
-                                            Tri-City AI Hackathon 2026
+                                            Happeno Hackathon OS
                                         </p>
                                     </div>
                                 </div>
@@ -4266,7 +4266,7 @@ export default function AdminDashboard() {
                                     <div>
                                         <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Reply to Inbound Email</h3>
                                         <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">
-                                            Sending via business@centle.in (cPanel SMTP)
+                                            Sending via business@happeno.in (cPanel SMTP)
                                         </p>
                                     </div>
                                 </div>
@@ -4319,14 +4319,14 @@ export default function AdminDashboard() {
                                 <div className="flex gap-2 flex-wrap">
                                     <button
                                         type="button"
-                                        onClick={() => setReplyText(`Hello,\n\nWe have verified your registration details. Your digital pass and login credentials have been re-issued. Please check your inbox or visit the onsite help desk if you need immediate printouts.\n\nBest regards,\nTri-City Organizing Committee`)}
+                                        onClick={() => setReplyText(`Hello,\n\nWe have verified your registration details. Your digital pass and login credentials have been re-issued. Please check your inbox or visit the onsite help desk if you need immediate printouts.\n\nBest regards,\nHappeno Organizing Committee`)}
                                         className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
                                     >
                                         Pass Verification
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setReplyText(`Hello,\n\nThank you for reaching out! A volunteer or mentor has been notified. You can also raise an instant ticket at the Help Desk section of your team portal or visit Desk 1 at the venue.\n\nBest regards,\nTri-City Technical Support`)}
+                                        onClick={() => setReplyText(`Hello,\n\nThank you for reaching out! A volunteer or mentor has been notified. You can also raise an instant ticket at the Help Desk section of your team portal or visit Desk 1 at the venue.\n\nBest regards,\nHappeno Technical Support`)}
                                         className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
                                     >
                                         Mentor/Desk Info

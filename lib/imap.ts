@@ -48,7 +48,7 @@ function parseFromAddress(fromHeader: string): { name: string; email: string } {
 export async function getInboundEmails(limit = 15): Promise<{ status: InboxStatus; emails: InboundEmailSummary[] }> {
     const host = process.env.SMTP_CONNECT_HOST || process.env.SMTP_HOST || '148.113.0.192';
     const servername = process.env.SMTP_TLS_SERVERNAME || process.env.SMTP_HOST || 'cloud-xent.crazzydns.com';
-    const user = process.env.SMTP_USER || 'business@centle.in';
+    const user = process.env.SMTP_USER || 'business@happeno.in';
     const pass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD || '';
     const port = 993; // Standard cPanel IMAP SSL Port
 

@@ -246,8 +246,8 @@ export async function POST(req: Request) {
                     await sendEmail({
                         to: member.email.trim(),
                         subject: `Registration confirmed: ${registration.teamName}`,
-                        attachments: [{ filename: `tricity-checkin-${teamId.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, content: qrBuffer }],
-                        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6"><h1>Registration confirmed</h1><p>Hello ${memberName},</p><p>Your team <strong>${teamName}</strong> is registered for TRI-CITY AI HACKATHON.</p><p><strong>Registration ID:</strong> ${safeTeamId}</p>${credentialBlock}<p>Your check-in QR code is attached. Please present it at the venue.</p></div>`
+                        attachments: [{ filename: `happeno-checkin-${teamId.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, content: qrBuffer }],
+                        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6"><h1>Registration confirmed</h1><p>Hello ${memberName},</p><p>Your team <strong>${teamName}</strong> is registered for the Happeno Hackathon.</p><p><strong>Registration ID:</strong> ${safeTeamId}</p>${credentialBlock}<p>Your check-in QR code is attached. Please present it at the venue.</p></div>`
                     });
                     emailsSent++;
                     if (isCaptain && password) {

@@ -107,7 +107,7 @@ export default function GuidelinesPage() {
 
                 {/* 1. Overview */}
                 <Section title="Event Overview" id="1">
-                    <p>TRI-CITY AI HACKATHON is an 24 hours innovative, multi domain based hackathon conducted over two days.</p>
+                    <p>Hackathons managed through Happeno are fast-paced, multi-stage competitive sprints conducted across structured phases.</p>
                     <p>All solutions must be conceptualized, designed, and developed entirely during the official hackathon duration.</p>
                     <p>Development may begin only after the official kickoff announcement.</p>
                 </Section>
@@ -356,7 +356,7 @@ export default function GuidelinesPage() {
                         </div>
                         <div className="space-y-4">
                             <h4 className="text-white/60 text-xs font-black uppercase tracking-widest italic">17. IP Rights</h4>
-                            <p className="text-sm text-white/50 font-mono italic">Teams retain ownership. TRI-CITY AI HACKATHON may showcase projects for promotional/reporting purposes.</p>
+                            <p className="text-sm text-white/50 font-mono italic">Teams retain ownership. Happeno and event organizers may showcase projects for promotional/reporting purposes.</p>
                         </div>
                     </div>
                 </Section>

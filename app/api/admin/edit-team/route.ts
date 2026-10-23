@@ -127,7 +127,7 @@ export async function POST(req: Request) {
                     html: `
                         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6;padding:24px;border:1px solid #e2e8f0;border-radius:12px;background:#ffffff;">
                             <div style="text-align:center;padding-bottom:16px;border-bottom:1px solid #f1f5f9;">
-                                <h1 style="color:#0f172a;font-size:22px;margin:0;">TRI-CITY AI HACKATHON 2026</h1>
+                                <h1 style="color:#0f172a;font-size:22px;margin:0;">HAPPENO HACKATHON OS</h1>
                                 <p style="color:#64748b;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin:4px 0 0;">Updated Team Pass & Access Credentials</p>
                             </div>
                             <p style="margin-top:20px;">Hello <strong>${safeLeadName}</strong>,</p>
@@ -142,7 +142,7 @@ export async function POST(req: Request) {
                             <p style="font-size:13px;color:#334155;"><strong>Your Check-in Passes:</strong> Please log in to the team dashboard using the link above to download your individual check-in QR passes. You will need to show these passes at the registration desk upon your arrival.</p>
                             
                             <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
-                            <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0;">Tri-City AI Hackathon Organizing Committee • Event Support Desk</p>
+                            <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0;">Happeno Organizing Committee • Event Support Desk</p>
                         </div>
                     `
                 });

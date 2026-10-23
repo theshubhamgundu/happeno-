@@ -62,7 +62,7 @@ export async function GET(req: Request) {
             success: false,
             error: message,
             configuredServer: process.env.SMTP_TLS_SERVERNAME || 'cloud-xent.crazzydns.com',
-            user: process.env.SMTP_USER || 'business@centle.in'
+            user: process.env.SMTP_USER || 'business@happeno.in'
         }, { status: 500 });
     }
 }
@@ -134,15 +134,15 @@ export async function POST(req: Request) {
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
                         <div style="background: #0f172a; padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
-                            <h2 style="color: #14b8a6; margin: 0; font-size: 18px; letter-spacing: 1px;">TRI-CITY AI HACKATHON 2026</h2>
+                            <h2 style="color: #14b8a6; margin: 0; font-size: 18px; letter-spacing: 1px;">HAPPENO HACKATHON OS</h2>
                             <p style="color: #94a3b8; margin: 4px 0 0 0; font-size: 11px;">Official Support Response</p>
                         </div>
                         <div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; background: #ffffff;">
                             <p style="white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #334155;">${replyText}</p>
                             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
                             <p style="font-size: 11px; color: #64748b; margin: 0;">
-                                This response was sent by the Tri-City Hackathon Organizing Committee via <strong>business@centle.in</strong>.<br/>
-                                If you have any urgent issues during the event, visit the Admin / Help Desk at the venue.
+                                This response was sent by the Happeno Support Desk via <strong>support@happeno.in</strong>.<br/>
+                                If you have any urgent issues during the event, reach out to your organizer or admin.
                             </p>
                         </div>
                     </div>

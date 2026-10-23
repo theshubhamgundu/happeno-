@@ -1,40 +1,31 @@
-# Tri-City AI Hackathon
+# Happeno • The Modern Hackathon Operating System
 
-The Tri-City AI Hackathon platform supports participant registration, payments, team project submissions, and event operations for administrators, judges, and volunteers.
+Happeno is a purpose-built operating system replacing fragmented spreadsheets, manual forms, and WhatsApp groups with a unified, real-time platform for hackathons.
+
+## Features
+
+- **Stage-Gate Sprint Pipeline**: Multi-round milestones, automated lock-in timers, and shortlisting.
+- **Sub-Second QR Logistics**: Tamper-proof digital QR passes and real-time attendance tracking.
+- **Smart Meal Token Control**: Anti-fraud meal claim management across multiple catering counters.
+- **Fair-Play Rubric Engine**: Multi-judge weighted scoring, score normalization, and live leaderboards.
+- **Team Workspaces & Repo Sync**: Private invite codes, role distribution, and GitHub verification.
+- **Granular Multi-Role Control**: Isolated portals for Organizers, Volunteers, Mentors, and Grand Jury.
 
 ## Technology
 
-- Next.js 16 App Router, React 19, and TypeScript
-- Supabase for application data and server-side persistence
-- UPI/UTR-based payment review for registrations
+- Next.js App Router, React 19, and TypeScript
+- Supabase for application data and real-time state
+- UPI/UTR-based payment review and team verification
 - Nodemailer with SMTP for email notifications
 - Tailwind CSS and Framer Motion for the interface
-
-## Project Structure
-
-- `app/` contains public pages, dashboards, and API routes.
-- `components/` contains shared layout and landing-page components.
-- `context/` contains shared authentication and hackathon state.
-- `data/` contains legacy import files; runtime application records are stored in Supabase.
-- `lib/` contains database, authentication, email, payment, and event helpers.
-- `public/` contains static assets.
-- `scripts/` contains project utility scripts, including the data migration utility.
-- `database_setup.sql` defines the Supabase tables, functions, and policies required by the app.
-
-## Requirements
-
-- Node.js 20.9 or later
-- npm
-- A Supabase project with permission to run the SQL setup
-- SMTP credentials if you want to test email notifications locally
 
 ## Local Setup
 
 1. Clone the repository and change into the project directory:
 
    ```sh
-   git clone https://github.com/theshubhamgundu/tricity-.git
-   cd tricity-
+   git clone https://github.com/theshubhamgundu/happeno-.git
+   cd happeno-
    ```
 
 2. Install the dependencies:
@@ -69,7 +60,7 @@ The Tri-City AI Hackathon platform supports participant registration, payments, 
    SMTP_SECURE=true
    SMTP_USER=your-smtp-username
    SMTP_PASSWORD=your-smtp-password
-   EMAIL_FROM=TRI-CITY AI HACKATHON <you@example.com>
+   EMAIL_FROM=Happeno Hackathon OS <support@happeno.in>
    ```
 
    Use the SMTP provider's settings for the host, port, TLS mode, and sender address. Keep `SMTP_PASSWORD` private. Email settings are only needed for flows that send email.

@@ -36,7 +36,7 @@ export default function TeamOnboarding() {
         console.log("Onboarding Data:", formData);
 
         // Simulate Success
-        toast.success("Welcome to TRI-CITY AI HACKATHON! Your profile is set.");
+        toast.success("Welcome to Happeno Hackathon! Your profile is set.");
         router.push("/dashboard/team");
     };
 
@@ -153,7 +153,7 @@ export default function TeamOnboarding() {
                                 {agreed && <CheckCircle2 size={16} className="text-white" />}
                             </div>
                             <span className="text-sm font-bold text-white/60 group-hover:text-white transition-colors italic">
-                                I agree to the TRI-CITY AI HACKATHON Hackathon Rules
+                                I agree to the Happeno Hackathon Rules
                             </span>
                         </div>
                     </div>

@@ -24,12 +24,12 @@ export default function FaqPage() {
 		},
 		{
 			question: "Will the Hackathon be in person or online ?",
-			answer: "TRI-CITY AI HACKATHON will be conducted in complete offline/in-person mode.",
+			answer: "Hackathons on Happeno support in-person, online, and hybrid competition workflows configured by event organizers.",
 		},
 		{
-			question: "What is the venue for TRI-CITY AI HACKATHON ?",
+			question: "What is the venue format on Happeno?",
 			answer:
-				"Centle India, Hyderabad â€” explore our beautiful campus while thinking about innovating some crazy thing.",
+				"Venue details, hall allocations, and table assignments are dynamically provisioned on your Happeno participant pass.",
 		},
 		{
 			question: "What are the prerequisites to participate in this hackathon ?",

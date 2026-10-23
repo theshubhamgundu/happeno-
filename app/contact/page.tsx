@@ -97,10 +97,10 @@ export default function ContactPage() {
                                     </a>
                                 </div>
 
-                                {/* Campus Focused Map */}
+                                {/* Map */}
                                 <div className="flex-grow w-full rounded-[25px] overflow-hidden border border-white/5">
                                     <iframe
-                                        src="https://www.google.com/maps?q=Centle India%20Institute%20of%20Technology%20and%20Science%2C%20Deshmukhi&output=embed"
+                                        src="https://www.google.com/maps?q=Hyderabad%2C%20Telangana%2C%20India&output=embed"
                                         className="w-full h-full min-h-[500px] rounded-[25px] grayscale brightness-90 contrast-110 group-hover:grayscale-0 transition duration-500"
                                         style={{ border: 0 }}
                                         allowFullScreen
@@ -113,11 +113,11 @@ export default function ContactPage() {
                     </div>
                 </div>
 
-                {/* Student Coordinators Section */}
+                {/* Team Coordinators Section */}
                 <div className="mt-20">
                     <FadeInView>
                         <h2 className="text-white font-kanit font-black text-3xl md:text-5xl uppercase italic mb-10 text-center md:text-left">
-                            STUDENT <span className="text-[#FFEE00]">COORDINATORS</span>
+                            COMMUNITY <span className="text-[#FFEE00]">COORDINATORS</span>
                         </h2>
                     </FadeInView>
 
@@ -125,7 +125,7 @@ export default function ContactPage() {
                         <FadeInView delay={0.1}>
                             <ContactCard
                                 icon={<User className="text-[#FFEE00]" />}
-                                title="Student Coordinator"
+                                title="Platform Coordinator"
                                 value="SHUBHAM GUNDU"
                                 subValue={
                                     <div className="flex flex-col gap-2 mt-3">
@@ -135,11 +135,11 @@ export default function ContactPage() {
                                             </div>
                                             <span className="text-sm font-bold">+91 86988 46796</span>
                                         </a>
-                                        <a href="mailto:23891A7228@Centle Indiaits.ac.in" className="flex items-center gap-2 hover:text-[#FFEE00] transition-colors w-fit">
+                                        <a href="mailto:support@happeno.in" className="flex items-center gap-2 hover:text-[#FFEE00] transition-colors w-fit">
                                             <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
                                                 <Mail size={14} />
                                             </div>
-                                            <span className="text-sm font-bold lowercase">23891A7228@Centle Indiaits.ac.in</span>
+                                            <span className="text-sm font-bold lowercase">support@happeno.in</span>
                                         </a>
                                     </div>
                                 }

@@ -7,8 +7,8 @@ import { motion } from "framer-motion";
 
 const PRODUCTS = [
     {
-        id: "tricity-main",
-        title: "TRI-CITY AI HACKATHON Registration",
+        id: "happeno-main",
+        title: "Happeno National Hackathon Pass",
         description: "Official entry ticket for the 48-hour national level hackathon. Includes access to workspace, mentors, and all sessions.",
         price: "â‚¹600",
         date: "April 10-11, 2026",

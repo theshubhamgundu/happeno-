@@ -202,7 +202,7 @@ export default function UsersManagement() {
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>TRI-CITY AI HACKATHON â€” Hacker Directory</title>
+    <title>Happeno Hackathon OS — Hacker Directory</title>
     <style>
         @page { size: A3 landscape; margin: 12mm; }
         @media print { .no-print { display: none !important; } body { margin: 0; } tr { page-break-inside: avoid; } }
@@ -211,26 +211,26 @@ export default function UsersManagement() {
     </style>
 </head>
 <body>
-    <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#1a1a8c;color:#fff;
+    <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#0f172a;color:#fff;
         padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:Arial,sans-serif;">
-        <span style="font-weight:700;font-size:13px;">ðŸ“‹ TRI-CITY AI HACKATHON â€” Hacker Directory (${rows.length} participants)</span>
-        <button onclick="window.print()" style="background:#14b8a6;color:#000;border:none;padding:8px 22px;
-            border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">ðŸ–¨ï¸ Print / Save as PDF</button>
+        <span style="font-weight:700;font-size:13px;">HAPPENO HACKATHON OS — Participant Directory (${rows.length} participants)</span>
+        <button onclick="window.print()" style="background:#0f766e;color:#fff;border:none;padding:8px 22px;
+            border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">Print / Save as PDF</button>
     </div>
     <div style="padding:18px 24px;margin-top:50px;">
         <div style="display:flex;align-items:center;justify-content:flex-start;gap:20px;margin-bottom:8px;">
-            <img src="/Centle India-logo.png" style="height:80px;object-fit:contain;flex-shrink:0;" />
+            <div style="width:48px;height:48px;background:#0f766e;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:900;font-size:24px;">H</div>
             <div style="font-family:'Segoe UI',Arial,sans-serif;">
-                <div style="font-size:11px;color:#333;letter-spacing:0.5px;font-weight:700;">Centle India</div>
-                <div style="font-size:22px;font-weight:900;letter-spacing:3px;color:#1a1a8c;margin-top:4px;">TRI-CITY AI HACKATHON HACKATHON</div>
-                <div style="font-size:13px;font-weight:700;letter-spacing:5px;color:#cc0000;margin-top:2px;">HACKER DIRECTORY</div>
+                <div style="font-size:11px;color:#0f766e;letter-spacing:1px;font-weight:700;">HAPPENO PLATFORM</div>
+                <div style="font-size:22px;font-weight:900;letter-spacing:2px;color:#0f172a;margin-top:4px;">HACKATHON OPERATING SYSTEM</div>
+                <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#0f766e;margin-top:2px;">BUILDER DIRECTORY</div>
                 <div style="font-size:10px;color:#888;margin-top:5px;">Date: ${now} &nbsp;|&nbsp; Total Participants: ${rows.length}</div>
             </div>
         </div>
-        <div style="height:3px;background:linear-gradient(90deg,#cc0000,#1a1a8c,#cc0000);margin:8px 0 14px;border-radius:2px;"></div>
+        <div style="height:3px;background:linear-gradient(90deg,#0f766e,#0f172a,#0f766e);margin:8px 0 14px;border-radius:2px;"></div>
         <table><thead>${headerRow}</thead><tbody>${dataRows}</tbody></table>
         <div style="margin-top:14px;text-align:center;font-size:9px;color:#bbb;border-top:1px solid #eee;padding-top:8px;">
-            TRI-CITY AI HACKATHON Hackathon &nbsp;|&nbsp; Centle India &nbsp;|&nbsp; Hacker Directory &nbsp;|&nbsp; Generated: ${now}
+            Happeno Hackathon OS &nbsp;|&nbsp; Official Builder Directory &nbsp;|&nbsp; Generated: ${now}
         </div>
     </div>
 </body>

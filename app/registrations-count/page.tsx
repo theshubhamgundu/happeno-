@@ -178,7 +178,7 @@ export default function RegistrationsCountPage() {
                             <ShieldCheck size={20} />
                         </div>
                         <div>
-                            <h2 className="text-sm font-bold tracking-tight">TRI-CITY AI HACKATHON Audit</h2>
+                            <h2 className="text-sm font-bold tracking-tight">Happeno Hackathon OS Audit</h2>
                             <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Registration Registry</p>
                         </div>
                     </div>

@@ -106,7 +106,7 @@ export default function HumansPage() {
             <FadeInView delay={0.1} yOffset={20}>
               <Image
                 src="/humans_title.svg"
-                alt="Humans at TRI-CITY AI HACKATHON"
+                alt="Humans at Happeno"
                 width={574}
                 height={158}
                 className="w-full h-auto object-contain object-center"

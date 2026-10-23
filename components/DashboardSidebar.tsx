@@ -21,7 +21,7 @@ import {
     X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import TricityMark from "@/components/TricityMark";
+import HappenoMark from "@/components/HappenoMark";
 import { useAuth } from "@/context/AuthContext";
 import { useHackathon } from "@/context/HackathonContext";
 import { useMemo } from "react";
@@ -131,7 +131,7 @@ export const DashboardSidebar = ({ type, isOpen, onClose, isCollapsed, onToggleC
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(15,118,110,0.5)] overflow-hidden bg-[#0f766e]">
                                 <span className="text-white">H</span>
                             </div>
-                            <TricityMark compact className="text-2xl" />
+                            <HappenoMark compact className="text-2xl" />
                         </div>
                     ) : (
                         <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(15,118,110,0.5)] overflow-hidden bg-[#0f766e]">
