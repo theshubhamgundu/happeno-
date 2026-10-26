@@ -20,7 +20,7 @@ export default function TermsPage() {
                             OVERVIEW
                         </h2>
                         <p>
-                            HAPPENO is a hackathon operating system platform organized to foster innovation, structured stage evaluation, and technical excellence. By registering, teams and individuals agree to follow the rules, code of conduct, and guidelines set by the organizing committee.
+                            HAPPENO is a hackathon HMSplatform organized to foster innovation, structured stage evaluation, and technical excellence. By registering, teams and individuals agree to follow the rules, code of conduct, and guidelines set by the organizing committee.
                         </p>
                     </section>
 

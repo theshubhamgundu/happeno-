@@ -86,6 +86,7 @@ export const DashboardSidebar = ({ type, isOpen, onClose, isCollapsed, onToggleC
         team: [
             { href: "/dashboard/team", icon: LayoutDashboard, label: "Overview" },
             { href: "/dashboard/team/submissions", icon: Award, label: "Submissions" },
+            { href: "/dashboard/team/certificate", icon: Award, label: "Certificates" },
         ],
         judge: [
             { href: "/dashboard/judge", icon: LayoutDashboard, label: "Grading Pool" },

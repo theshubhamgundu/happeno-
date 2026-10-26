@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
         const nextTeamId = String(teamId).trim();
         const teamNumber = Number(nextTeamId.match(/(\d+)$/)?.[1]);
-        if (!/^TRICITY_\d+$/.test(nextTeamId) || !Number.isSafeInteger(teamNumber)) {
+        if (!/^Happeno_\d+$/.test(nextTeamId) || !Number.isSafeInteger(teamNumber)) {
             return NextResponse.json({ success: false, message: 'Invalid team ID reservation.' }, { status: 400 });
         }
 

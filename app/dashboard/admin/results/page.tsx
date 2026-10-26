@@ -21,7 +21,7 @@ function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary
     const roundPercents: Record<string, number | null> = {};
     const evaluations: Record<string, number> = {};
     const completed: number[] = [];
-    
+
     // Start with the Rabbit Race preScore (out of 100) if it exists
     let totalScore = project.preScore || 0;
 
@@ -45,7 +45,7 @@ function getScoreSummary(project: Project, rounds: JudgingRound[]): ScoreSummary
         roundScores[round.id] = rounded;
         roundPercents[round.id] = percentage;
         completed.push(rounded);
-        
+
         // Add round score out of 200 to total score
         totalScore += rounded;
     });
@@ -101,7 +101,7 @@ export default function AdminResults() {
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.href = url;
-        anchor.download = "tricity-ai-hackathon-leaderboard.csv";
+        anchor.download = "Happeno-ai-hackathon-leaderboard.csv";
         anchor.click();
         URL.revokeObjectURL(url);
     };

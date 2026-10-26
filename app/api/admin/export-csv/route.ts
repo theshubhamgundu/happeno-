@@ -63,12 +63,12 @@ export async function GET(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const type = searchParams.get('type'); 
+    const type = searchParams.get('type');
     const validTypes = ['teams', 'standings', 'submissions', 'meals', 'checkin', 'emails', 'dietary', 'judges', 'volunteers', 'master', 'contributions'];
 
     if (!type || !validTypes.includes(type)) {
-        return NextResponse.json({ 
-            error: `Valid export type is required: ${validTypes.join(', ')}` 
+        return NextResponse.json({
+            error: `Valid export type is required: ${validTypes.join(', ')}`
         }, { status: 400 });
     }
 
@@ -86,7 +86,7 @@ export async function GET(req: Request) {
                 const raw = (team.raw_data as Record<string, any>) || {};
                 const members = Array.isArray(team.members) && team.members.length > 0 ? team.members : ((raw.members as unknown[]) || []);
                 const captain = (members[0] as Record<string, string>) || {};
-                
+
                 csvContent += [
                     escapeCsv(team.team_id || ''),
                     escapeCsv(team.transaction_id || ''),
@@ -103,7 +103,7 @@ export async function GET(req: Request) {
                     escapeCsv(team.created_at ? new Date(team.created_at).toLocaleString() : '')
                 ].join(',') + '\n';
             }
-        } 
+        }
 
         // ═════════════════════════════════════════════════════════
         // 2. FINAL SCORES & STANDINGS (CLOSING CEREMONY)
@@ -201,7 +201,7 @@ export async function GET(req: Request) {
             for (const team of teams) {
                 const raw = (team.raw_data as Record<string, any>) || {};
                 const sub = (raw.submission as Record<string, any>) || {};
-                
+
                 const github = team.github_url || sub.github || sub.repo || '';
                 const presentation = team.presentation_url || sub.presentation || '';
                 const demo = team.demo_url || sub.demo || sub.video || '';
@@ -510,7 +510,7 @@ export async function GET(req: Request) {
             }
         }
 
-        const filename = `tricity_${type}_export_${todayStr}.csv`;
+        const filename = `Happeno_${type}_export_${todayStr}.csv`;
 
         return new NextResponse(csvContent, {
             headers: {

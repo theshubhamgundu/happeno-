@@ -157,8 +157,8 @@ export default function UsersManagement() {
                 project.members.some(m => {
                     const memberObj = typeof m === 'string' ? { fullName: m } : m;
                     return (memberObj.fullName?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-                           (memberObj.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-                           (memberObj.college?.toLowerCase() || "").includes(searchQuery.toLowerCase());
+                        (memberObj.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+                        (memberObj.college?.toLowerCase() || "").includes(searchQuery.toLowerCase());
                 });
 
             return matchesSearch;
@@ -202,7 +202,7 @@ export default function UsersManagement() {
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>Happeno Hackathon OS — Hacker Directory</title>
+    <title>Happeno hackathon— Hacker Directory</title>
     <style>
         @page { size: A3 landscape; margin: 12mm; }
         @media print { .no-print { display: none !important; } body { margin: 0; } tr { page-break-inside: avoid; } }
@@ -213,7 +213,7 @@ export default function UsersManagement() {
 <body>
     <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#0f172a;color:#fff;
         padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:Arial,sans-serif;">
-        <span style="font-weight:700;font-size:13px;">HAPPENO HACKATHON OS — Participant Directory (${rows.length} participants)</span>
+        <span style="font-weight:700;font-size:13px;">HAPPENO hackathon— Participant Directory (${rows.length} participants)</span>
         <button onclick="window.print()" style="background:#0f766e;color:#fff;border:none;padding:8px 22px;
             border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">Print / Save as PDF</button>
     </div>
@@ -230,7 +230,7 @@ export default function UsersManagement() {
         <div style="height:3px;background:linear-gradient(90deg,#0f766e,#0f172a,#0f766e);margin:8px 0 14px;border-radius:2px;"></div>
         <table><thead>${headerRow}</thead><tbody>${dataRows}</tbody></table>
         <div style="margin-top:14px;text-align:center;font-size:9px;color:#bbb;border-top:1px solid #eee;padding-top:8px;">
-            Happeno Hackathon OS &nbsp;|&nbsp; Official Builder Directory &nbsp;|&nbsp; Generated: ${now}
+            Happeno hackathon&nbsp;|&nbsp; Official Builder Directory &nbsp;|&nbsp; Generated: ${now}
         </div>
     </div>
 </body>
@@ -337,249 +337,247 @@ export default function UsersManagement() {
                                 <AnimatePresence mode="popLayout">
                                     {filteredProjects.map((project: Project, idx: number) => {
                                         const isExpanded = expandedTeamId === project.id;
-                                        
+
                                         return (
-                                        <Fragment key={`${project.id}-${idx}`}>
-                                            <motion.tr
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                exit={{ opacity: 0 }}
-                                                className={`group hover:bg-slate-50 transition-colors cursor-pointer ${isExpanded ? 'bg-slate-50/60' : ''}`}
-                                                onClick={() => setExpandedTeamId(isExpanded ? null : project.id)}
-                                            >
-                                                <td className="p-5 pl-7">
-                                                    <div className="flex items-center gap-3.5">
-                                                        <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 font-bold border border-teal-100">
-                                                            <Users size={18} />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-slate-900 font-bold tracking-tight group-hover:text-teal-700 transition-colors text-base">{project.team || 'Unknown Team'}</p>
-                                                            <div className="flex items-center gap-2 mt-0.5">
-                                                                <span className="text-[10px] text-teal-700 font-bold uppercase tracking-wider">{project.teamId}</span>
-                                                                <span className="w-1 h-1 rounded-full bg-slate-300" />
-                                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{project.track || 'TBD'}</span>
+                                            <Fragment key={`${project.id}-${idx}`}>
+                                                <motion.tr
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                    className={`group hover:bg-slate-50 transition-colors cursor-pointer ${isExpanded ? 'bg-slate-50/60' : ''}`}
+                                                    onClick={() => setExpandedTeamId(isExpanded ? null : project.id)}
+                                                >
+                                                    <td className="p-5 pl-7">
+                                                        <div className="flex items-center gap-3.5">
+                                                            <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 font-bold border border-teal-100">
+                                                                <Users size={18} />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-slate-900 font-bold tracking-tight group-hover:text-teal-700 transition-colors text-base">{project.team || 'Unknown Team'}</p>
+                                                                <div className="flex items-center gap-2 mt-0.5">
+                                                                    <span className="text-[10px] text-teal-700 font-bold uppercase tracking-wider">{project.teamId}</span>
+                                                                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{project.track || 'TBD'}</span>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td className="p-5">
-                                                    <div className="flex items-center gap-2.5">
-                                                        <div className="flex -space-x-2">
-                                                            {project.members.slice(0, 4).map((m, i) => (
-                                                                <div key={i} className={`w-7 h-7 rounded-full ${AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-sm`}>
-                                                                    {(typeof m === 'string' ? m : m.fullName)?.[0]?.toUpperCase() || '?'}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                        <span className="text-xs font-bold text-slate-600">{project.members.length} Members</span>
-                                                    </div>
-                                                </td>
-                                                <td className="p-5">
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                                        {project.status || 'REGISTERED'}
-                                                    </span>
-                                                </td>
-                                                <td className="p-5 pr-7 text-right">
-                                                    <button 
-                                                        className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 group-hover:text-slate-800 transition-all inline-flex items-center justify-center"
-                                                    >
-                                                        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                                                    </button>
-                                                </td>
-                                            </motion.tr>
-                                            
-                                            <AnimatePresence>
-                                                {isExpanded && (
-                                                    <motion.tr
-                                                        initial={{ opacity: 0, height: 0 }}
-                                                        animate={{ opacity: 1, height: 'auto' }}
-                                                        exit={{ opacity: 0, height: 0 }}
-                                                        className="bg-slate-50/40 border-b border-slate-200"
-                                                    >
-                                                        <td colSpan={4} className="p-0">
-                                                            <div className="p-6 pl-14 sm:pl-20 space-y-4">
-                                                                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.16em]">Team Participants ({project.members.length}/{MAX_TEAM_MEMBERS})</p>
-                                                                    <button
-                                                                        onClick={(event) => {
-                                                                            event.stopPropagation();
-                                                                            setNewMemberForm({ fullName: '' });
-                                                                            setAddParticipantMode('manual');
-                                                                            setExistingMemberQuery('');
-                                                                            setSelectedExistingMembers([]);
-                                                                            setAddingToTeam(project);
-                                                                        }}
-                                                                        disabled={project.members.length >= MAX_TEAM_MEMBERS}
-                                                                        title={project.members.length >= MAX_TEAM_MEMBERS ? `Teams are limited to ${MAX_TEAM_MEMBERS} participants` : 'Add participant'}
-                                                                        className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-teal-600 bg-teal-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none"
-                                                                    >
-                                                                        <Plus size={14} /> {project.members.length >= MAX_TEAM_MEMBERS ? 'Team full' : 'Add participant'}
-                                                                    </button>
-                                                                </div>
-                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                                                                    {project.members.map((member, mIdx) => {
-                                                                        const m = typeof member === 'string' ? { fullName: member } as Member : member;
-                                                                        return (
-                                                                            <div key={mIdx} className="bg-white border border-slate-200 rounded-xl p-4 flex items-start justify-between group/member hover:border-slate-300 transition-colors shadow-sm">
-                                                                                <div className="flex gap-3.5">
-                                                                                    <div className={`w-9 h-9 rounded-full ${AVATAR_GRADIENTS[mIdx % AVATAR_GRADIENTS.length]} flex items-center justify-center text-white font-bold text-xs shadow-sm`}>
-                                                                                        {m.fullName?.[0]?.toUpperCase() || '?'}
-                                                                                    </div>
-                                                                                    <div>
-                                                                                        <p className="text-sm font-bold text-slate-900">{m.fullName || 'Unknown'}</p>
-                                                                                        <div className="flex items-center gap-2 mt-1">
-                                                                                            <p className="text-[10px] text-slate-500 font-medium">{m.email || 'NO_EMAIL'}</p>
-                                                                                            <span className="w-1 h-1 rounded-full bg-slate-300" />
-                                                                                            <p className="text-[10px] text-slate-500 font-medium">{m.phone || 'NO_PHONE'}</p>
-                                                                                        </div>
-                                                                                        <div className="flex items-center gap-2 mt-2.5">
-                                                                                            <span className="text-[10px] text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200 uppercase tracking-wide">{m.college || 'Unknown College'}</span>
-                                                                                            <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-semibold text-slate-600">{m.year || 'N/A'}</span>
-                                                                                            <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-semibold text-slate-600">{m.department || 'N/A'}</span>
-                                                                                        </div>
-                                                                                        {/* Per-member Pass Toggles */}
-                                                                                        {(() => {
-                                                                                            const pid = (m as any).participant_id || (m as any).id || `m${mIdx}`;
-                                                                                            const effectiveTeamId = project.teamId || project.id;
-                                                                                            if (!effectiveTeamId) return null;
-                                                                                            const ma = project.mealAccess || { purchased_meals: [], networking_passes: [] };
-                                                                                            const meals: string[] = Array.isArray(ma.purchased_meals) ? ma.purchased_meals : [];
-                                                                                            const nets: string[] = Array.isArray(ma.networking_passes) ? ma.networking_passes : [];
-                                                                                            const hasMeal = meals.includes('all') || meals.includes(pid);
-                                                                                            const hasNet = nets.includes('all') || nets.includes(pid);
-                                                                                            const mealLoading = togglingPass === `${effectiveTeamId}-${pid}-meal`;
-                                                                                            const netLoading = togglingPass === `${effectiveTeamId}-${pid}-networking`;
-                                                                                            return (
-                                                                                                <div className="flex items-center gap-2 mt-2.5">
-                                                                                                    <button
-                                                                                                        onClick={(e) => {
-                                                                                                            e.stopPropagation();
-                                                                                                            handleToggleMemberPass(effectiveTeamId as string, pid, 'meal', !hasMeal);
-                                                                                                        }}
-                                                                                                        disabled={mealLoading}
-                                                                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border transition-all ${
-                                                                                                            hasMeal
-                                                                                                                ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
-                                                                                                                : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100 hover:text-slate-600'
-                                                                                                        } ${mealLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
-                                                                                                    >
-                                                                                                        <UtensilsCrossed size={10} />
-                                                                                                        {mealLoading ? '...' : hasMeal ? 'Food ✓' : 'Food ✗'}
-                                                                                                    </button>
-                                                                                                    <button
-                                                                                                        onClick={(e) => {
-                                                                                                            e.stopPropagation();
-                                                                                                            handleToggleMemberPass(effectiveTeamId as string, pid, 'networking', !hasNet);
-                                                                                                        }}
-                                                                                                        disabled={netLoading}
-                                                                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border transition-all ${
-                                                                                                            hasNet
-                                                                                                                ? 'bg-purple-50 text-purple-700 border-purple-300 hover:bg-purple-100'
-                                                                                                                : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100 hover:text-slate-600'
-                                                                                                        } ${netLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
-                                                                                                    >
-                                                                                                        <Wifi size={10} />
-                                                                                                        {netLoading ? '...' : hasNet ? 'Network ✓' : 'Network ✗'}
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                            );
-                                                                                        })()}
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div className="flex gap-1.5 opacity-100 md:flex-col md:opacity-0 md:group-hover/member:opacity-100 transition-opacity">
-                                                                                    <button 
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            const userObj = {
-                                                                                                ...m,
-                                                                                                teamName: project.team,
-                                                                                                teamId: project.teamId || "N/A",
-                                                                                                track: project.track || "TBD",
-                                                                                                isTrackSelected: !!project.track
-                                                                                            };
-                                                                                            setEditingParticipant(userObj as UserListItem);
-                                                                                            setEditFormData(userObj);
-                                                                                            setEditingLocation({ teamId: String(project.id), memberIndex: mIdx });
-                                                                                        }}
-                                                                                        className="p-1.5 rounded-lg bg-slate-100 text-teal-700 hover:bg-teal-50 transition-colors"
-                                                                                        title="Edit Participant"
-                                                                                    >
-                                                                                        <Edit size={13} />
-                                                                                    </button>
-                                                                                    <button 
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            if (project.members.length <= 1 || !window.confirm(`Remove ${m.fullName || 'this participant'} from ${project.team}?`)) return;
-                                                                                            void removeTeamMember(project.id, mIdx);
-                                                                                        }}
-                                                                                        disabled={project.members.length <= 1}
-                                                                                        className="p-1.5 rounded-lg bg-slate-100 text-rose-600 hover:bg-rose-50 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
-                                                                                        title={project.members.length <= 1 ? 'A team must have at least one participant' : 'Remove Participant'}
-                                                                                    >
-                                                                                        <Trash2 size={13} />
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                        );
-                                                                    })}
-                                                                </div>
-
-                                                                {/* Meal Pass Toggle Section */}
-                                                                <div className="mt-6 border-t border-slate-200 pt-5">
-                                                                    <div className="flex items-center gap-2 mb-3">
-                                                                        <Coffee size={15} className="text-amber-600" />
-                                                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Food & Snack Passes</p>
+                                                    </td>
+                                                    <td className="p-5">
+                                                        <div className="flex items-center gap-2.5">
+                                                            <div className="flex -space-x-2">
+                                                                {project.members.slice(0, 4).map((m, i) => (
+                                                                    <div key={i} className={`w-7 h-7 rounded-full ${AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-sm`}>
+                                                                        {(typeof m === 'string' ? m : m.fullName)?.[0]?.toUpperCase() || '?'}
                                                                     </div>
-                                                                    <div className="flex flex-wrap gap-2.5">
-                                                                        {EVENT_MEALS.map((meal) => {
-                                                                            // Check if ANY member has access to this meal (we'll treat it as team-wide access for this UI)
-                                                                            const memberStates = project.memberMealState || {};
-                                                                            const hasAnyAccess = Object.values(memberStates).some(memberSlots => !!memberSlots[meal.key]);
-                                                                            const hasAnyClaimed = Object.values(memberStates).some(memberSlots => !!memberSlots[meal.key]?.claimedAt);
-                                                                            
-                                                                            const isIncluded = hasAnyAccess;
-                                                                            const isClaimed = hasAnyClaimed;
-                                                                            
+                                                                ))}
+                                                            </div>
+                                                            <span className="text-xs font-bold text-slate-600">{project.members.length} Members</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-5">
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                            {project.status || 'REGISTERED'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-5 pr-7 text-right">
+                                                        <button
+                                                            className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 group-hover:text-slate-800 transition-all inline-flex items-center justify-center"
+                                                        >
+                                                            {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                                                        </button>
+                                                    </td>
+                                                </motion.tr>
+
+                                                <AnimatePresence>
+                                                    {isExpanded && (
+                                                        <motion.tr
+                                                            initial={{ opacity: 0, height: 0 }}
+                                                            animate={{ opacity: 1, height: 'auto' }}
+                                                            exit={{ opacity: 0, height: 0 }}
+                                                            className="bg-slate-50/40 border-b border-slate-200"
+                                                        >
+                                                            <td colSpan={4} className="p-0">
+                                                                <div className="p-6 pl-14 sm:pl-20 space-y-4">
+                                                                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.16em]">Team Participants ({project.members.length}/{MAX_TEAM_MEMBERS})</p>
+                                                                        <button
+                                                                            onClick={(event) => {
+                                                                                event.stopPropagation();
+                                                                                setNewMemberForm({ fullName: '' });
+                                                                                setAddParticipantMode('manual');
+                                                                                setExistingMemberQuery('');
+                                                                                setSelectedExistingMembers([]);
+                                                                                setAddingToTeam(project);
+                                                                            }}
+                                                                            disabled={project.members.length >= MAX_TEAM_MEMBERS}
+                                                                            title={project.members.length >= MAX_TEAM_MEMBERS ? `Teams are limited to ${MAX_TEAM_MEMBERS} participants` : 'Add participant'}
+                                                                            className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-teal-600 bg-teal-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none"
+                                                                        >
+                                                                            <Plus size={14} /> {project.members.length >= MAX_TEAM_MEMBERS ? 'Team full' : 'Add participant'}
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                                                        {project.members.map((member, mIdx) => {
+                                                                            const m = typeof member === 'string' ? { fullName: member } as Member : member;
                                                                             return (
-                                                                                <div key={meal.key} className={`flex items-center gap-3 p-2.5 px-3 rounded-xl border ${isIncluded ? 'bg-amber-50/80 border-amber-200' : 'bg-white border-slate-200'} transition-colors`}>
-                                                                                    <div className="flex flex-col">
-                                                                                        <span className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">{meal.shortLabel}</span>
-                                                                                        {isClaimed ? (
-                                                                                            <span className="text-[8px] font-bold text-emerald-700 uppercase">Claimed</span>
-                                                                                        ) : isIncluded ? (
-                                                                                            <span className="text-[8px] font-bold text-amber-700 uppercase">Pending</span>
-                                                                                        ) : (
-                                                                                            <span className="text-[8px] font-bold text-slate-400 uppercase">No Access</span>
-                                                                                        )}
+                                                                                <div key={mIdx} className="bg-white border border-slate-200 rounded-xl p-4 flex items-start justify-between group/member hover:border-slate-300 transition-colors shadow-sm">
+                                                                                    <div className="flex gap-3.5">
+                                                                                        <div className={`w-9 h-9 rounded-full ${AVATAR_GRADIENTS[mIdx % AVATAR_GRADIENTS.length]} flex items-center justify-center text-white font-bold text-xs shadow-sm`}>
+                                                                                            {m.fullName?.[0]?.toUpperCase() || '?'}
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <p className="text-sm font-bold text-slate-900">{m.fullName || 'Unknown'}</p>
+                                                                                            <div className="flex items-center gap-2 mt-1">
+                                                                                                <p className="text-[10px] text-slate-500 font-medium">{m.email || 'NO_EMAIL'}</p>
+                                                                                                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                                                                                <p className="text-[10px] text-slate-500 font-medium">{m.phone || 'NO_PHONE'}</p>
+                                                                                            </div>
+                                                                                            <div className="flex items-center gap-2 mt-2.5">
+                                                                                                <span className="text-[10px] text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200 uppercase tracking-wide">{m.college || 'Unknown College'}</span>
+                                                                                                <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-semibold text-slate-600">{m.year || 'N/A'}</span>
+                                                                                                <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-semibold text-slate-600">{m.department || 'N/A'}</span>
+                                                                                            </div>
+                                                                                            {/* Per-member Pass Toggles */}
+                                                                                            {(() => {
+                                                                                                const pid = (m as any).participant_id || (m as any).id || `m${mIdx}`;
+                                                                                                const effectiveTeamId = project.teamId || project.id;
+                                                                                                if (!effectiveTeamId) return null;
+                                                                                                const ma = project.mealAccess || { purchased_meals: [], networking_passes: [] };
+                                                                                                const meals: string[] = Array.isArray(ma.purchased_meals) ? ma.purchased_meals : [];
+                                                                                                const nets: string[] = Array.isArray(ma.networking_passes) ? ma.networking_passes : [];
+                                                                                                const hasMeal = meals.includes('all') || meals.includes(pid);
+                                                                                                const hasNet = nets.includes('all') || nets.includes(pid);
+                                                                                                const mealLoading = togglingPass === `${effectiveTeamId}-${pid}-meal`;
+                                                                                                const netLoading = togglingPass === `${effectiveTeamId}-${pid}-networking`;
+                                                                                                return (
+                                                                                                    <div className="flex items-center gap-2 mt-2.5">
+                                                                                                        <button
+                                                                                                            onClick={(e) => {
+                                                                                                                e.stopPropagation();
+                                                                                                                handleToggleMemberPass(effectiveTeamId as string, pid, 'meal', !hasMeal);
+                                                                                                            }}
+                                                                                                            disabled={mealLoading}
+                                                                                                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border transition-all ${hasMeal
+                                                                                                                    ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
+                                                                                                                    : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100 hover:text-slate-600'
+                                                                                                                } ${mealLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+                                                                                                        >
+                                                                                                            <UtensilsCrossed size={10} />
+                                                                                                            {mealLoading ? '...' : hasMeal ? 'Food ✓' : 'Food ✗'}
+                                                                                                        </button>
+                                                                                                        <button
+                                                                                                            onClick={(e) => {
+                                                                                                                e.stopPropagation();
+                                                                                                                handleToggleMemberPass(effectiveTeamId as string, pid, 'networking', !hasNet);
+                                                                                                            }}
+                                                                                                            disabled={netLoading}
+                                                                                                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border transition-all ${hasNet
+                                                                                                                    ? 'bg-purple-50 text-purple-700 border-purple-300 hover:bg-purple-100'
+                                                                                                                    : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100 hover:text-slate-600'
+                                                                                                                } ${netLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+                                                                                                        >
+                                                                                                            <Wifi size={10} />
+                                                                                                            {netLoading ? '...' : hasNet ? 'Network ✓' : 'Network ✗'}
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                );
+                                                                                            })()}
+                                                                                        </div>
                                                                                     </div>
-                                                                                    
-                                                                                    <button
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            toggleMealAccess(project.id, meal.key, !isIncluded);
-                                                                                        }}
-                                                                                        disabled={isClaimed}
-                                                                                        className={`w-9 h-5 rounded-full p-0.5 transition-colors flex ${isIncluded ? 'bg-amber-500 justify-end' : 'bg-slate-200 justify-start'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:ring-2 hover:ring-amber-200'}`}
-                                                                                    >
-                                                                                        <motion.div 
-                                                                                            layout 
-                                                                                            className="w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm"
+                                                                                    <div className="flex gap-1.5 opacity-100 md:flex-col md:opacity-0 md:group-hover/member:opacity-100 transition-opacity">
+                                                                                        <button
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                const userObj = {
+                                                                                                    ...m,
+                                                                                                    teamName: project.team,
+                                                                                                    teamId: project.teamId || "N/A",
+                                                                                                    track: project.track || "TBD",
+                                                                                                    isTrackSelected: !!project.track
+                                                                                                };
+                                                                                                setEditingParticipant(userObj as UserListItem);
+                                                                                                setEditFormData(userObj);
+                                                                                                setEditingLocation({ teamId: String(project.id), memberIndex: mIdx });
+                                                                                            }}
+                                                                                            className="p-1.5 rounded-lg bg-slate-100 text-teal-700 hover:bg-teal-50 transition-colors"
+                                                                                            title="Edit Participant"
                                                                                         >
-                                                                                            {isIncluded && <Check size={10} className="text-amber-600" />}
-                                                                                        </motion.div>
-                                                                                    </button>
+                                                                                            <Edit size={13} />
+                                                                                        </button>
+                                                                                        <button
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                if (project.members.length <= 1 || !window.confirm(`Remove ${m.fullName || 'this participant'} from ${project.team}?`)) return;
+                                                                                                void removeTeamMember(project.id, mIdx);
+                                                                                            }}
+                                                                                            disabled={project.members.length <= 1}
+                                                                                            className="p-1.5 rounded-lg bg-slate-100 text-rose-600 hover:bg-rose-50 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+                                                                                            title={project.members.length <= 1 ? 'A team must have at least one participant' : 'Remove Participant'}
+                                                                                        >
+                                                                                            <Trash2 size={13} />
+                                                                                        </button>
+                                                                                    </div>
                                                                                 </div>
                                                                             );
                                                                         })}
                                                                     </div>
+
+                                                                    {/* Meal Pass Toggle Section */}
+                                                                    <div className="mt-6 border-t border-slate-200 pt-5">
+                                                                        <div className="flex items-center gap-2 mb-3">
+                                                                            <Coffee size={15} className="text-amber-600" />
+                                                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Food & Snack Passes</p>
+                                                                        </div>
+                                                                        <div className="flex flex-wrap gap-2.5">
+                                                                            {EVENT_MEALS.map((meal) => {
+                                                                                // Check if ANY member has access to this meal (we'll treat it as team-wide access for this UI)
+                                                                                const memberStates = project.memberMealState || {};
+                                                                                const hasAnyAccess = Object.values(memberStates).some(memberSlots => !!memberSlots[meal.key]);
+                                                                                const hasAnyClaimed = Object.values(memberStates).some(memberSlots => !!memberSlots[meal.key]?.claimedAt);
+
+                                                                                const isIncluded = hasAnyAccess;
+                                                                                const isClaimed = hasAnyClaimed;
+
+                                                                                return (
+                                                                                    <div key={meal.key} className={`flex items-center gap-3 p-2.5 px-3 rounded-xl border ${isIncluded ? 'bg-amber-50/80 border-amber-200' : 'bg-white border-slate-200'} transition-colors`}>
+                                                                                        <div className="flex flex-col">
+                                                                                            <span className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">{meal.shortLabel}</span>
+                                                                                            {isClaimed ? (
+                                                                                                <span className="text-[8px] font-bold text-emerald-700 uppercase">Claimed</span>
+                                                                                            ) : isIncluded ? (
+                                                                                                <span className="text-[8px] font-bold text-amber-700 uppercase">Pending</span>
+                                                                                            ) : (
+                                                                                                <span className="text-[8px] font-bold text-slate-400 uppercase">No Access</span>
+                                                                                            )}
+                                                                                        </div>
+
+                                                                                        <button
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                toggleMealAccess(project.id, meal.key, !isIncluded);
+                                                                                            }}
+                                                                                            disabled={isClaimed}
+                                                                                            className={`w-9 h-5 rounded-full p-0.5 transition-colors flex ${isIncluded ? 'bg-amber-500 justify-end' : 'bg-slate-200 justify-start'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:ring-2 hover:ring-amber-200'}`}
+                                                                                        >
+                                                                                            <motion.div
+                                                                                                layout
+                                                                                                className="w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm"
+                                                                                            >
+                                                                                                {isIncluded && <Check size={10} className="text-amber-600" />}
+                                                                                            </motion.div>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                    </motion.tr>
-                                                )}
-                                            </AnimatePresence>
-                                        </Fragment>
+                                                            </td>
+                                                        </motion.tr>
+                                                    )}
+                                                </AnimatePresence>
+                                            </Fragment>
                                         );
                                     })}
                                 </AnimatePresence>
@@ -615,22 +613,22 @@ export default function UsersManagement() {
                             exit={{ scale: 0.95, opacity: 0 }}
                             className="bg-white p-8 rounded-[1rem] shadow-2xl max-w-lg w-full relative"
                         >
-                                <button
+                            <button
                                 onClick={() => { setEditingParticipant(null); setEditingLocation(null); }}
                                 className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
                             >
                                 <X size={20} />
                             </button>
-                            
+
                             <h2 className="text-xl font-bold uppercase tracking-wide text-gray-800 mb-6">
                                 EDIT <span className="text-[#14b8a6]">PARTICIPANT</span>
                             </h2>
-                            
+
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Full Name</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editFormData.fullName || ''}
                                         onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
                                         className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
@@ -638,8 +636,8 @@ export default function UsersManagement() {
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Email</label>
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         value={editFormData.email || ''}
                                         onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
                                         className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
@@ -647,8 +645,8 @@ export default function UsersManagement() {
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Phone</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editFormData.phone || ''}
                                         onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
                                         className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
@@ -656,8 +654,8 @@ export default function UsersManagement() {
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">College</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editFormData.college || ''}
                                         onChange={(e) => setEditFormData({ ...editFormData, college: e.target.value })}
                                         className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
@@ -666,8 +664,8 @@ export default function UsersManagement() {
                                 <div className="flex gap-4">
                                     <div className="flex-1">
                                         <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Year</label>
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             value={editFormData.year || ''}
                                             onChange={(e) => setEditFormData({ ...editFormData, year: e.target.value })}
                                             className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
@@ -675,8 +673,8 @@ export default function UsersManagement() {
                                     </div>
                                     <div className="flex-1">
                                         <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Department</label>
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             value={editFormData.department || ''}
                                             onChange={(e) => setEditFormData({ ...editFormData, department: e.target.value })}
                                             className="w-full bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2.5 text-black font-bold outline-none focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-transparent transition-all text-sm"
@@ -684,15 +682,15 @@ export default function UsersManagement() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="mt-8 flex justify-end gap-4">
-                                <button 
+                                <button
                                     onClick={() => { setEditingParticipant(null); setEditingLocation(null); }}
                                     className="px-6 py-2.5 rounded-full bg-gray-200 text-black font-bold uppercase text-[11px] tracking-widest hover:bg-gray-300 transition-colors"
                                 >
                                     Cancel
                                 </button>
-                                <button 
+                                <button
                                     onClick={async () => {
                                         if (editingLocation) {
                                             const saved = await updateMemberDetails(editingLocation.teamId, editingLocation.memberIndex, {

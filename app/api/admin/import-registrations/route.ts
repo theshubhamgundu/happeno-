@@ -90,7 +90,7 @@ function normalizeRegistration(value: unknown, index: number): Registration {
             : [];
 
     const teamId = textValue(reg.teamId ?? reg.team_id ?? reg.id ?? reg['Team ID'] ?? reg['Registration ID'] ?? reg['teamId'])
-        || `TRICITY_IMPORT_${randomBytes(6).toString('hex').toUpperCase()}`;
+        || `Happeno_IMPORT_${randomBytes(6).toString('hex').toUpperCase()}`;
 
     const teamName = textValue(reg.teamName ?? reg.team_name ?? reg.name ?? reg['Team Name'] ?? reg['team_name'])
         || participants[0]?.fullName

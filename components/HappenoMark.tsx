@@ -12,4 +12,4 @@ export default function HappenoMark({ className = "", compact = false }: Happeno
   );
 }
 
-export { HappenoMark as TricityMark };
+export { HappenoMark as HappenoMark };

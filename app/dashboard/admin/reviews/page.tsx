@@ -348,7 +348,7 @@ export default function AdminReviewsPage() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `tricity-submissions-reviews-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.download = `Happeno-submissions-reviews-${new Date().toISOString().slice(0, 10)}.csv`;
         link.click();
         URL.revokeObjectURL(url);
         toast.success(`Exported ${filteredRows.length} team submissions to CSV!`);
@@ -357,7 +357,7 @@ export default function AdminReviewsPage() {
     return (
         <DashboardLayout type="admin" title="Submissions & Reviews">
             <main className="mx-auto max-w-[1700px] space-y-6 pb-16 px-2 sm:px-4">
-                
+
                 {/* ── HEADER BANNER ── */}
                 <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                     <div className="absolute top-0 right-0 -mt-8 -mr-8 h-44 w-44 rounded-full bg-teal-500/5 blur-3xl pointer-events-none" />
@@ -810,7 +810,7 @@ export default function AdminReviewsPage() {
                                 >
                                     <ChevronLeft size={14} /> Previous
                                 </button>
-                                
+
                                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                     let pageNum = i + 1;
                                     if (totalPages > 5 && currentPage > 3) {

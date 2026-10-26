@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 
-/* ───── Hackathon OS Feature Badges ───── */
+/* ───── hackathonFeature Badges ───── */
 function PlatformHighlights() {
   const highlights = [
     { title: 'Stage-Gate Pipeline', sub: 'Sprint Management' },

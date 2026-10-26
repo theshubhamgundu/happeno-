@@ -100,7 +100,7 @@ export async function POST(req: Request) {
 
             const updates: Record<string, unknown> = {};
             if (teamName) updates.team_name = String(teamName).trim();
-            
+
             const updatedRawData = { ...rawData };
 
             if (Array.isArray(trackPreferences) && trackPreferences.length > 0) {
@@ -112,14 +112,14 @@ export async function POST(req: Request) {
                 updates.track = String(track).trim();
             }
             if (college) updates.college = String(college).trim();
-            
+
             if (members && Array.isArray(members)) {
                 // Secure Update: Whitelist fields & match by participant_id
                 const currentDbMembers = team.members || [];
                 updates.members = currentDbMembers.map((dbMember: any) => {
                     const payloadMember = members.find((m: any) => m.participant_id === dbMember.participant_id);
                     if (!payloadMember) return dbMember; // Fallback if missing
-                    
+
                     return {
                         ...dbMember, // Preserves ALL hidden fields (addons, redeemed flags, participant_id)
                         fullName: String(payloadMember.fullName || dbMember.fullName).trim(),
@@ -215,16 +215,16 @@ export async function POST(req: Request) {
                 college: String(newMember.college || team.college || '').trim(),
                 department: String(newMember.department || '').trim(),
                 year: String(newMember.year || '').trim(),
-                
+
                 // Inherit the slot's paid passes
                 meal_pass: Boolean(oldMember.meal_pass),
                 networking_pass: Boolean(oldMember.networking_pass),
-                
+
                 // Reset redemption/check-in flags for the new person
                 meal_redeemed: false,
                 networking_redeemed: false,
                 checked_in: false,
-                
+
                 replacedAt: new Date().toISOString(),
                 is_lead: Boolean(oldMember.is_lead)
             };
@@ -433,20 +433,20 @@ export async function POST(req: Request) {
                     console.warn('RPC next_registration_team_id unavailable, using fallback:', rpcErr);
                 }
 
-                // If RPC failed or returned the old 'TRICITY_' format, override it to 'TRI26' format
-                if (!comboTeamId || comboTeamId.startsWith('TRICITY_') || comboTeamId.startsWith('TC-')) {
+                // If RPC failed or returned the old 'Happeno_' format, override it to 'TRI26' format
+                if (!comboTeamId || comboTeamId.startsWith('Happeno_') || comboTeamId.startsWith('TC-')) {
                     let isUnique = false;
                     while (!isUnique) {
                         const randSuffix = Math.floor(1000 + Math.random() * 9000);
                         comboTeamId = `TRI26${randSuffix}`;
-                        
+
                         // Check if this ID already exists
                         const { data: existing } = await supabase
                             .from('registrations')
                             .select('team_id')
                             .eq('team_id', comboTeamId)
                             .maybeSingle();
-                            
+
                         if (!existing) {
                             isUnique = true;
                         }
@@ -465,7 +465,7 @@ export async function POST(req: Request) {
                 const targetTracks = Array.isArray(targetTeam.track_preferences) && targetTeam.track_preferences.length
                     ? targetTeam.track_preferences
                     : (targetTeam.track ? [targetTeam.track] : []);
-                
+
                 // Merge preferences, remove duplicates, and STRICTLY limit to max 3 (prioritizing the Host team's choices)
                 const combinedTracks = [...new Set([...sourceTracks, ...targetTracks])]
                     .map(String)

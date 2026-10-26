@@ -63,12 +63,12 @@ export default function JudgeDashboard() {
         ? { id: user.id, generatedId: user.id, name: user.name || user.id }
         : null;
 
-    const draftStorageKey = useCallback((tId: string, rId: string) => `tricity_judge_draft_${tId}_${rId}`, []);
+    const draftStorageKey = useCallback((tId: string, rId: string) => `Happeno_judge_draft_${tId}_${rId}`, []);
 
     const loadOfflineQueue = useCallback(() => {
         if (typeof window === 'undefined') return [];
         try {
-            const raw = localStorage.getItem('tricity_judge_offline_queue');
+            const raw = localStorage.getItem('Happeno_judge_offline_queue');
             if (raw) {
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed)) {
@@ -86,7 +86,7 @@ export default function JudgeDashboard() {
         setOfflineQueue(prev => {
             const updated = [...prev.filter(q => q.id !== item.id), item];
             if (typeof window !== 'undefined') {
-                localStorage.setItem('tricity_judge_offline_queue', JSON.stringify(updated));
+                localStorage.setItem('Happeno_judge_offline_queue', JSON.stringify(updated));
             }
             return updated;
         });
@@ -96,7 +96,7 @@ export default function JudgeDashboard() {
         setOfflineQueue(prev => {
             const updated = prev.filter(q => q.id !== evalId);
             if (typeof window !== 'undefined') {
-                localStorage.setItem('tricity_judge_offline_queue', JSON.stringify(updated));
+                localStorage.setItem('Happeno_judge_offline_queue', JSON.stringify(updated));
             }
             return updated;
         });
@@ -133,7 +133,7 @@ export default function JudgeDashboard() {
                 const result = await response.json();
                 if (response.ok && (result.success || result.alreadySubmitted)) {
                     remaining = remaining.filter(q => q.id !== item.id);
-                    localStorage.setItem('tricity_judge_offline_queue', JSON.stringify(remaining));
+                    localStorage.setItem('Happeno_judge_offline_queue', JSON.stringify(remaining));
                     localStorage.removeItem(draftStorageKey(item.teamId, item.roundId));
                     syncedCount++;
                 }
@@ -427,13 +427,12 @@ export default function JudgeDashboard() {
                                     <span>Evaluator: <strong className="text-slate-800">{currentJudge.name}</strong></span>
                                 </div>
                             )}
-                            <div className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
-                                !isOnline
+                            <div className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${!isOnline
                                     ? "border-amber-300 bg-amber-50 text-amber-800"
                                     : offlineQueue.length > 0
-                                    ? "border-amber-300 bg-amber-50 text-amber-800"
-                                    : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                            }`}>
+                                        ? "border-amber-300 bg-amber-50 text-amber-800"
+                                        : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                                }`}>
                                 {!isOnline ? (
                                     <>
                                         <WifiOff size={13} className="animate-pulse" />

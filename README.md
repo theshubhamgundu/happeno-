@@ -1,6 +1,6 @@
 # Happeno • The Modern Hackathon Operating System
 
-Happeno is a purpose-built operating system replacing fragmented spreadsheets, manual forms, and WhatsApp groups with a unified, real-time platform for hackathons.
+Happeno is a purpose-built HMSreplacing fragmented spreadsheets, manual forms, and WhatsApp groups with a unified, real-time platform for hackathons.
 
 ## Features
 
@@ -60,7 +60,7 @@ Happeno is a purpose-built operating system replacing fragmented spreadsheets, m
    SMTP_SECURE=true
    SMTP_USER=your-smtp-username
    SMTP_PASSWORD=your-smtp-password
-   EMAIL_FROM=Happeno Hackathon OS <support@happeno.in>
+   EMAIL_FROM=Happeno hackathon<support@happeno.in>
    ```
 
    Use the SMTP provider's settings for the host, port, TLS mode, and sender address. Keep `SMTP_PASSWORD` private. Email settings are only needed for flows that send email.

@@ -24,7 +24,7 @@ const adminOperationItems = [
     { href: "/dashboard/admin#checkin", section: "checkin", icon: ScanLine, label: "QR Check-in" },
     { href: "/dashboard/admin#restructure", section: "restructure", icon: Users, label: "Team Restructure" },
     { href: "/dashboard/admin/reviews", section: "reviews", icon: Award, label: "Submissions & Reviews" },
-    { href: "/dashboard/admin#prescores", section: "prescores", icon: Award, label: "Rabbit Race" },
+    { href: "/dashboard/admin#certificates", section: "certificates", icon: Award, label: "Certificates & Feedback" },
     { href: "/dashboard/admin/mentors", section: "mentors", icon: UsersRound, label: "Mentors" },
 ];
 
@@ -86,6 +86,7 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
             { href: "/dashboard/team/submissions", icon: Award, label: "Submissions" },
             { href: "/dashboard/team/contributions", icon: UsersRound, label: "Team Contributions" },
             { href: "/dashboard/team/evaluation-criteria", icon: Target, label: "Evaluation Criteria" },
+            { href: "/dashboard/team/certificate", icon: Award, label: "Certificates" },
             { href: "/dashboard/team/communications", icon: MessageCircle, label: "Updates" },
         ],
         judge: [
@@ -106,10 +107,6 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
     useEffect(() => {
         if (!isLoading && (!user || user.role !== type)) {
             router.push("/login");
-            return;
-        }
-        if (!isLoading && (type === 'team' || user?.role === 'team')) {
-            router.replace('/login');
             return;
         }
     }, [user, isLoading, type, router]);

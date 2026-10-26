@@ -68,6 +68,7 @@ import Papa from "papaparse";
 import { QRScanner } from "@/components/QRScanner";
 import type { JudgingRound } from "@/lib/judging-rounds";
 import { TeamRestructure } from "@/components/admin/TeamRestructure";
+import CertificateManager from "@/components/admin/CertificateManager";
 
 export default function AdminDashboard() {
     const {
@@ -104,8 +105,8 @@ export default function AdminDashboard() {
     const [targetWifiPass, setTargetWifiPass] = useState("");
     const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
-    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin' | 'restructure' | 'prescores'>('teams');
-    const [recentView, setRecentView] = useState<'gate'|'meals'|'networking'>('gate');
+    const [activeTab, setActiveTab] = useState<'teams' | 'judges' | 'volunteers' | 'settings' | 'helpdesk' | 'exports' | 'checkin' | 'restructure' | 'prescores' | 'certificates'>('teams');
+    const [recentView, setRecentView] = useState<'gate' | 'meals' | 'networking'>('gate');
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
     const [emergencyForm, setEmergencyForm] = useState({ name: "", phone: "" });
@@ -285,7 +286,8 @@ export default function AdminDashboard() {
             exports: 'exports',
             checkin: 'checkin',
             restructure: 'restructure',
-            prescores: 'prescores'
+            prescores: 'prescores',
+            certificates: 'certificates'
         } as const;
         const selectSection = (section: string) => {
             setActiveTab(sectionToTab[section as keyof typeof sectionToTab] || 'teams');
@@ -359,7 +361,7 @@ export default function AdminDashboard() {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `tricity_${type}_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `Happeno_${type}_${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -410,7 +412,7 @@ export default function AdminDashboard() {
             return false;
         }
     };
-    
+
     // Pagination state for scalability
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 50;
@@ -464,8 +466,8 @@ export default function AdminDashboard() {
         }
         setIsBulkAssigning(true);
         try {
-            const targetIds = selectedTeamIds.length > 0 
-                ? selectedTeamIds 
+            const targetIds = selectedTeamIds.length > 0
+                ? selectedTeamIds
                 : projects.map(p => p.id);
             await bulkAssignMealPlan(targetIds, selectedBulkMeals, true);
             setShowBulkMealModal(false);
@@ -534,7 +536,7 @@ export default function AdminDashboard() {
 
             // Handle numeric-only search (e.g., "101" -> matches "VH-101")
             const isNumeric = /^\d+$/.test(query);
-            const matchesPrefixId = isNumeric && teamId.includes(`tricity_${query}`);
+            const matchesPrefixId = isNumeric && teamId.includes(`Happeno_${query}`);
 
             // Search member names, emails, and phones
             const members = Array.isArray(p.members) ? p.members : [];
@@ -560,7 +562,7 @@ export default function AdminDashboard() {
     const totalPages = Math.ceil(filteredTeams.length / itemsPerPage);
 
     const toggleSelectTeam = (id: string) => {
-        setSelectedTeamIds(prev => 
+        setSelectedTeamIds(prev =>
             prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
         );
     };
@@ -1109,7 +1111,7 @@ export default function AdminDashboard() {
                 try {
                     const rows = results.data as Record<string, string>[];
                     const groupedRegistrations = rows.reduce((groups, row) => {
-                        const teamId = readValue(row, ['Registration ID', 'registration_id', 'team_id', 'Team ID']) || `TRICITY_IMPORT_${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+                        const teamId = readValue(row, ['Registration ID', 'registration_id', 'team_id', 'Team ID']) || `Happeno_IMPORT_${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
                         const current = groups.get(teamId) || {
                             teamId,
                             teamName: readValue(row, ['Team Name', 'team_name', 'Team']) || '',
@@ -1137,7 +1139,7 @@ export default function AdminDashboard() {
                         track: string;
                         problemStatement: string;
                         participants: Array<{ fullName: string; email: string; phone: string; college: string; year: string; department: string }>;
-                            leaderEmail: string;
+                        leaderEmail: string;
                     }>());
 
                     const registrations = Array.from(groupedRegistrations.values()).map(entry => {
@@ -1238,7 +1240,7 @@ export default function AdminDashboard() {
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>Happeno Hackathon OS — ${title}</title>
+    <title>Happeno hackathon— ${title}</title>
     <style>
         @page { size: A3 landscape; margin: 12mm; }
         @media print { .no-print { display: none !important; } body { margin: 0; } tr { page-break-inside: avoid; } }
@@ -1249,7 +1251,7 @@ export default function AdminDashboard() {
 <body>
     <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#0f172a;color:#fff;
         padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:Arial,sans-serif;">
-        <span style="font-weight:700;font-size:13px;">HAPPENO HACKATHON OS — ${title} (${rows.length} records)</span>
+        <span style="font-weight:700;font-size:13px;">HAPPENO hackathon— ${title} (${rows.length} records)</span>
         <button onclick="window.print()" style="background:#0f766e;color:#fff;border:none;padding:8px 22px;
             border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">Print / Save as PDF</button>
     </div>
@@ -1266,7 +1268,7 @@ export default function AdminDashboard() {
         <div style="height:3px;background:linear-gradient(90deg,#0f766e,#0f172a,#0f766e);margin:8px 0 14px;border-radius:2px;"></div>
         <table><thead>${headerRow}</thead><tbody>${dataRows}</tbody></table>
         <div style="margin-top:14px;text-align:center;font-size:9px;color:#bbb;border-top:1px solid #eee;padding-top:8px;">
-            Happeno Hackathon OS &nbsp;|&nbsp; ${title} &nbsp;|&nbsp; Generated: ${now}
+            Happeno hackathon&nbsp;|&nbsp; ${title} &nbsp;|&nbsp; Generated: ${now}
         </div>
     </div>
 </body>
@@ -1313,3334 +1315,3232 @@ export default function AdminDashboard() {
         <DashboardLayout type="admin" title="Admin workspace">
             <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
 
-            {/* Registrations Tab */}
-            {activeTab === 'teams' && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
-                        <div>
-                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Registration entries</h2>
-                            <p className="mt-1 text-xs text-white/45">Search registrations or open a participant&apos;s complete record.</p>
+                {/* Registrations Tab */}
+                {activeTab === 'teams' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
+                            <div>
+                                <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Registration entries</h2>
+                                <p className="mt-1 text-xs text-white/45">Search registrations or open a participant&apos;s complete record.</p>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-[#14b8a6]" /> {filteredTeams.length} shown</div>
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-[#14b8a6]" /> {filteredTeams.length} shown</div>
-                    </div>
-                    <div className="flex items-center gap-3 flex-wrap">
-                        <div className="relative flex-grow">
-                            <input
-                                type="text"
-                                placeholder="Search by ID (e.g. 101) or Team Name..."
-                                value={searchQuery}
-                                onChange={(e) => {
-                                    setSearchQuery(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                            className="h-14 w-full rounded-xl border border-white/10 bg-[#0B0114]/60 py-3 pl-12 pr-4 text-sm font-medium text-white outline-none transition-all placeholder:text-white/25 focus:border-[#14b8a6]/70 focus:ring-2 focus:ring-[#14b8a6]/10"
-                            />
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={19} />
-                        </div>
-                        <div className="flex h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Total</span>
-                            <span className="text-xl font-black italic text-[#14b8a6]">{projects.length}</span>
-                        </div>
-                        <button
-                            onClick={handleExportTeams}
-                            className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-[10px] font-black uppercase tracking-wider text-white transition hover:border-[#14b8a6]/50 hover:text-[#14b8a6]"
-                        >
-                            <Download size={18} /> Export
-                        </button>
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <div className="relative flex-grow">
+                                <input
+                                    type="text"
+                                    placeholder="Search by ID (e.g. 101) or Team Name..."
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                    className="h-14 w-full rounded-xl border border-white/10 bg-[#0B0114]/60 py-3 pl-12 pr-4 text-sm font-medium text-white outline-none transition-all placeholder:text-white/25 focus:border-[#14b8a6]/70 focus:ring-2 focus:ring-[#14b8a6]/10"
+                                />
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={19} />
+                            </div>
+                            <div className="flex h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Total</span>
+                                <span className="text-xl font-black italic text-[#14b8a6]">{projects.length}</span>
+                            </div>
+                            <button
+                                onClick={handleExportTeams}
+                                className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-[10px] font-black uppercase tracking-wider text-white transition hover:border-[#14b8a6]/50 hover:text-[#14b8a6]"
+                            >
+                                <Download size={18} /> Export
+                            </button>
 
-                        {/* Submissions & Reviews Portal */}
-                        <Link
-                            href="/dashboard/admin/reviews"
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/50 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-400 hover:bg-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.15)]"
-                        >
-                            <Award size={18} /> Submissions & Reviews
-                        </Link>
+                            {/* Submissions & Reviews Portal */}
+                            <Link
+                                href="/dashboard/admin/reviews"
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/50 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-400 hover:bg-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.15)]"
+                            >
+                                <Award size={18} /> Submissions & Reviews
+                            </Link>
 
-                        {/* Roster Window & Audit Hub */}
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setShowRosterModal(true);
-                                void fetchRosterSettings();
-                            }}
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-500/70 hover:bg-teal-500/30 cursor-pointer"
-                        >
-                            <GitMerge size={18} /> Team Edit Window & Logs
-                            <span className={`w-2 h-2 rounded-full ${rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' : 'bg-white/40'}`} />
-                        </button>
-                        
-                        {/* Merge Teams */}
-                        <button
-                            onClick={() => setShowMergeModal(true)}
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/10 px-5 text-[10px] font-bold uppercase tracking-wider text-teal-700 transition hover:border-teal-500/70 hover:bg-teal-500/20"
-                        >
-                            <Users size={18} /> Merge Teams
-                        </button>
-
-                        {/* CSV Import */}
-                        <input
-                            type="file"
-                            accept=".csv"
-                            ref={fileInputRef}
-                            onChange={handleFileUpload}
-                            className="hidden"
-                        />
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={isImporting}
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-[#a855f7]/40 bg-[#a855f7]/20 px-5 text-[10px] font-black uppercase tracking-wider text-[#c084fc] transition hover:border-[#a855f7]/70 hover:bg-[#a855f7]/30 disabled:opacity-50"
-                        >
-                            {isImporting ? (
-                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#c084fc] border-t-transparent" />
-                            ) : (
-                                <Upload size={18} />
-                            )}
-                            {isImporting ? 'Importing...' : 'Import CSV'}
-                        </button>
-                        
-                        {/* Bulk Meals Button */}
-                        <button
-                            onClick={() => setShowBulkMealModal(true)}
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-amber-400 transition hover:border-amber-500/70 hover:bg-amber-500/30"
-                        >
-                            <Coffee size={18} /> Bulk Meals
-                        </button>
-
-                        {/* Dispatch Passes & Credentials Button */}
-                        <button
-                            onClick={handleOpenDispatchModal}
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-emerald-400 transition hover:border-emerald-500/70 hover:bg-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
-                        >
-                            <Mail size={18} /> Dispatch Passes
-                        </button>
-
-                        {/* Purge Demo Data Button */}
-                        <button
-                            onClick={() => {
-                                setPurgeConfirmText('');
-                                setShowPurgeModal(true);
-                            }}
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 text-[10px] font-black uppercase tracking-wider text-red-400 transition hover:border-red-500/60 hover:bg-red-500/20"
-                            title="Wipe mock/demo data before importing real CSV"
-                        >
-                            <Trash2 size={16} /> Purge Demo
-                        </button>
-
-                        {/* Clear Submissions Button */}
-                        <button
-                            onClick={() => {
-                                setClearSubmissionsTarget('all');
-                                setShowClearSubmissionsModal(true);
-                            }}
-                            className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 text-[10px] font-black uppercase tracking-wider text-amber-300 transition hover:border-amber-500/60 hover:bg-amber-500/20"
-                            title="Clear project deliverables and links so participant dashboards feel fresh"
-                        >
-                            <RotateCcw size={16} /> Clear Submissions
-                        </button>
-                    </div>
-
-                    {/* Bulk Selection Header Bar */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/10">
-                        <div className="flex items-center gap-3">
+                            {/* Certificates & Feedback Control */}
                             <button
                                 type="button"
-                                onClick={handleToggleSelectAllPage}
-                                className={`w-7 h-7 rounded-xl border flex items-center justify-center transition-all ${
-                                    isAllPageSelected
+                                onClick={() => {
+                                    window.location.hash = "certificates";
+                                    setActiveTab("certificates");
+                                }}
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/50 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-400 hover:bg-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.15)] cursor-pointer"
+                            >
+                                <Award size={18} /> Certificates & Feedback
+                            </button>
+
+                            {/* Roster Window & Audit Hub */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowRosterModal(true);
+                                    void fetchRosterSettings();
+                                }}
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-500/70 hover:bg-teal-500/30 cursor-pointer"
+                            >
+                                <GitMerge size={18} /> Team Edit Window & Logs
+                                <span className={`w-2 h-2 rounded-full ${rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' : 'bg-white/40'}`} />
+                            </button>
+
+                            {/* Merge Teams */}
+                            <button
+                                onClick={() => setShowMergeModal(true)}
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/10 px-5 text-[10px] font-bold uppercase tracking-wider text-teal-700 transition hover:border-teal-500/70 hover:bg-teal-500/20"
+                            >
+                                <Users size={18} /> Merge Teams
+                            </button>
+
+                            {/* CSV Import */}
+                            <input
+                                type="file"
+                                accept=".csv"
+                                ref={fileInputRef}
+                                onChange={handleFileUpload}
+                                className="hidden"
+                            />
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isImporting}
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-[#a855f7]/40 bg-[#a855f7]/20 px-5 text-[10px] font-black uppercase tracking-wider text-[#c084fc] transition hover:border-[#a855f7]/70 hover:bg-[#a855f7]/30 disabled:opacity-50"
+                            >
+                                {isImporting ? (
+                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#c084fc] border-t-transparent" />
+                                ) : (
+                                    <Upload size={18} />
+                                )}
+                                {isImporting ? 'Importing...' : 'Import CSV'}
+                            </button>
+
+                            {/* Bulk Meals Button */}
+                            <button
+                                onClick={() => setShowBulkMealModal(true)}
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-amber-400 transition hover:border-amber-500/70 hover:bg-amber-500/30"
+                            >
+                                <Coffee size={18} /> Bulk Meals
+                            </button>
+
+                            {/* Dispatch Passes & Credentials Button */}
+                            <button
+                                onClick={handleOpenDispatchModal}
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-emerald-400 transition hover:border-emerald-500/70 hover:bg-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                            >
+                                <Mail size={18} /> Dispatch Passes
+                            </button>
+
+                            {/* Purge Demo Data Button */}
+                            <button
+                                onClick={() => {
+                                    setPurgeConfirmText('');
+                                    setShowPurgeModal(true);
+                                }}
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 text-[10px] font-black uppercase tracking-wider text-red-400 transition hover:border-red-500/60 hover:bg-red-500/20"
+                                title="Wipe mock/demo data before importing real CSV"
+                            >
+                                <Trash2 size={16} /> Purge Demo
+                            </button>
+
+                            {/* Clear Submissions Button */}
+                            <button
+                                onClick={() => {
+                                    setClearSubmissionsTarget('all');
+                                    setShowClearSubmissionsModal(true);
+                                }}
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 text-[10px] font-black uppercase tracking-wider text-amber-300 transition hover:border-amber-500/60 hover:bg-amber-500/20"
+                                title="Clear project deliverables and links so participant dashboards feel fresh"
+                            >
+                                <RotateCcw size={16} /> Clear Submissions
+                            </button>
+                        </div>
+
+                        {/* Bulk Selection Header Bar */}
+                        <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={handleToggleSelectAllPage}
+                                    className={`w-7 h-7 rounded-xl border flex items-center justify-center transition-all ${isAllPageSelected
                                         ? 'bg-[#14b8a6] border-[#14b8a6] text-black shadow-[0_0_12px_rgba(20,184,166,0.5)]'
                                         : selectedTeamIds.length > 0
                                             ? 'bg-[#14b8a6]/20 border-[#14b8a6] text-[#14b8a6]'
                                             : 'border-white/20 bg-white/5 hover:border-white/40 text-transparent'
-                                }`}
-                                title={isAllPageSelected ? "Deselect this page" : "Select all on this page"}
-                            >
-                                {isAllPageSelected ? (
-                                    <Check size={16} className="stroke-[3] text-black" />
-                                ) : selectedTeamIds.length > 0 ? (
-                                    <span className="w-2.5 h-0.5 bg-[#14b8a6] rounded-full" />
-                                ) : null}
-                            </button>
-                            <div>
-                                <span className="text-xs font-black uppercase italic tracking-wider text-white block">
-                                    {selectedTeamIds.length > 0 ? (
-                                        <span className="text-[#14b8a6]">{selectedTeamIds.length} of {filteredTeams.length} Selected</span>
-                                    ) : (
-                                        <span className="text-white/60">Bulk Actions & Direct Select</span>
-                                    )}
-                                </span>
-                                <span className="text-[10px] text-white/35 font-semibold">
-                                    Select teams for bulk deletion, track moving, room assignments, and check-in
-                                </span>
+                                        }`}
+                                    title={isAllPageSelected ? "Deselect this page" : "Select all on this page"}
+                                >
+                                    {isAllPageSelected ? (
+                                        <Check size={16} className="stroke-[3] text-black" />
+                                    ) : selectedTeamIds.length > 0 ? (
+                                        <span className="w-2.5 h-0.5 bg-[#14b8a6] rounded-full" />
+                                    ) : null}
+                                </button>
+                                <div>
+                                    <span className="text-xs font-black uppercase italic tracking-wider text-white block">
+                                        {selectedTeamIds.length > 0 ? (
+                                            <span className="text-[#14b8a6]">{selectedTeamIds.length} of {filteredTeams.length} Selected</span>
+                                        ) : (
+                                            <span className="text-white/60">Bulk Actions & Direct Select</span>
+                                        )}
+                                    </span>
+                                    <span className="text-[10px] text-white/35 font-semibold">
+                                        Select teams for bulk deletion, track moving, room assignments, and check-in
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 flex-wrap text-xs">
+                                <button
+                                    type="button"
+                                    onClick={handleToggleSelectAllPage}
+                                    className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold transition-all text-[11px]"
+                                >
+                                    {isAllPageSelected ? "Deselect Page" : `Select Page (${paginatedTeams.length})`}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleSelectAllFiltered}
+                                    className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold transition-all text-[11px]"
+                                >
+                                    {isAllFilteredSelected ? "Deselect All" : `Select All Matching (${filteredTeams.length})`}
+                                </button>
+                                {selectedTeamIds.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={clearSelection}
+                                        className="px-3 py-1.5 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 font-bold transition-all text-[11px]"
+                                    >
+                                        Clear Selection
+                                    </button>
+                                )}
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 flex-wrap text-xs">
-                            <button
-                                type="button"
-                                onClick={handleToggleSelectAllPage}
-                                className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold transition-all text-[11px]"
-                            >
-                                {isAllPageSelected ? "Deselect Page" : `Select Page (${paginatedTeams.length})`}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleSelectAllFiltered}
-                                className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold transition-all text-[11px]"
-                            >
-                                {isAllFilteredSelected ? "Deselect All" : `Select All Matching (${filteredTeams.length})`}
-                            </button>
-                            {selectedTeamIds.length > 0 && (
-                                <button
-                                    type="button"
-                                    onClick={clearSelection}
-                                    className="px-3 py-1.5 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 font-bold transition-all text-[11px]"
-                                >
-                                    Clear Selection
-                                </button>
-                            )}
-                        </div>
-                    </div>
+                        <div className="grid grid-cols-1 gap-6">
+                            {paginatedTeams.map((team) => {
+                                const teamKey = team.teamId || String(team.id);
+                                const isSelected = selectedTeamIds.includes(teamKey);
 
-                    <div className="grid grid-cols-1 gap-6">
-                        {paginatedTeams.map((team) => {
-                            const teamKey = team.teamId || String(team.id);
-                            const isSelected = selectedTeamIds.includes(teamKey);
-
-                            return (
-                                <div
-                                    key={team.id}
-                                    className={`border rounded-[2rem] transition-all cursor-pointer overflow-hidden ${
-                                        isSelected
+                                return (
+                                    <div
+                                        key={team.id}
+                                        className={`border rounded-[2rem] transition-all cursor-pointer overflow-hidden ${isSelected
                                             ? 'bg-[#14b8a6]/[0.06] border-[#14b8a6]/60 shadow-[0_0_20px_rgba(20,184,166,0.15)]'
                                             : expandedTeamId === team.id
                                                 ? 'bg-white/[0.08] border-white/20 shadow-2xl'
                                                 : 'bg-white/5 border-white/10 hover:bg-white/[0.07] opacity-90'
-                                    }`}
-                                    onClick={() => setExpandedTeamId(expandedTeamId === team.id ? null : team.id)}
-                                >
-                                    <div className="p-8">
-                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                                            <div className="flex items-center gap-5">
-                                                {/* Selection Checkbox */}
-                                                <div
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        toggleSelectTeam(teamKey);
-                                                    }}
-                                                    className={`w-7 h-7 rounded-xl border flex items-center justify-center cursor-pointer transition-all shrink-0 ${
-                                                        isSelected
+                                            }`}
+                                        onClick={() => setExpandedTeamId(expandedTeamId === team.id ? null : team.id)}
+                                    >
+                                        <div className="p-8">
+                                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                                                <div className="flex items-center gap-5">
+                                                    {/* Selection Checkbox */}
+                                                    <div
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleSelectTeam(teamKey);
+                                                        }}
+                                                        className={`w-7 h-7 rounded-xl border flex items-center justify-center cursor-pointer transition-all shrink-0 ${isSelected
                                                             ? 'bg-[#14b8a6] border-[#14b8a6] text-black shadow-[0_0_12px_rgba(20,184,166,0.6)]'
                                                             : 'border-white/20 bg-white/5 hover:border-white/40 text-transparent'
-                                                    }`}
-                                                    title={isSelected ? "Deselect team" : "Select team"}
-                                                >
-                                                    <Check size={16} className={`stroke-[3] ${isSelected ? 'text-black' : 'opacity-0'}`} />
+                                                            }`}
+                                                        title={isSelected ? "Deselect team" : "Select team"}
+                                                    >
+                                                        <Check size={16} className={`stroke-[3] ${isSelected ? 'text-black' : 'opacity-0'}`} />
+                                                    </div>
+
+                                                    <div className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-black bg-slate-900/20 text-slate-900 shrink-0">
+                                                        {team.team ? team.team[0] : "?"}
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center flex-wrap gap-2">
+                                                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{team.team}</h3>
+                                                            <span className="text-[10px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{team.teamId}</span>
+                                                            {team.isCheckedIn && (
+                                                                <span className="text-[9px] font-black uppercase text-green-400 px-2 py-0.5 border border-green-500/30 rounded bg-green-500/10">Checked In ✓</span>
+                                                            )}
+                                                            {team.room && (
+                                                                <span className="text-[9px] font-black uppercase text-amber-300 px-2 py-0.5 border border-amber-400/30 rounded bg-amber-400/10">Room: {team.room}</span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track ? `${team.track} • ` : ''}{team.college}</p>
+                                                    </div>
                                                 </div>
 
-                                                <div className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-black bg-slate-900/20 text-slate-900 shrink-0">
-                                                    {team.team ? team.team[0] : "?"}
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center flex-wrap gap-2">
-                                                        <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{team.team}</h3>
-                                                        <span className="text-[10px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{team.teamId}</span>
-                                                        {team.isCheckedIn && (
-                                                            <span className="text-[9px] font-black uppercase text-green-400 px-2 py-0.5 border border-green-500/30 rounded bg-green-500/10">Checked In ✓</span>
-                                                        )}
-                                                        {team.room && (
-                                                            <span className="text-[9px] font-black uppercase text-amber-300 px-2 py-0.5 border border-amber-400/30 rounded bg-amber-400/10">Room: {team.room}</span>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">{team.track ? `${team.track} • ` : ''}{team.college}</p>
+                                                <div className="flex items-center gap-2 flex-wrap" onClick={(e) => e.stopPropagation()}>
+                                                    {/* On-Screen Pass & QR Modal */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPassModalTeam(team)}
+                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#14b8a6]/40 bg-[#14b8a6]/10 hover:bg-[#14b8a6]/20 text-[#14b8a6] text-[10px] font-black uppercase tracking-wider transition-all"
+                                                        title="View Official Digital Pass & QR on screen"
+                                                    >
+                                                        <QrCode size={14} /> Pass
+                                                    </button>
+
+                                                    {/* Quick Edit Details Modal */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openEditModal(team)}
+                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-teal-500/40 bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 text-[10px] font-bold uppercase tracking-wider transition-all"
+                                                        title="Correct email typos, phone, name, or resend pass"
+                                                    >
+                                                        <Edit3 size={14} /> Edit
+                                                    </button>
+
+                                                    {/* Reset Login Credentials */}
+                                                    <button
+                                                        type="button"
+                                                        disabled={!team.teamId || resettingTeamId === team.teamId}
+                                                        onClick={() => { if (team.teamId) void handleResetTeamCredentials(team.teamId, team.team); }}
+                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-wider transition-all disabled:opacity-50"
+                                                        title="Generate new temporary password and show on screen"
+                                                    >
+                                                        <KeyRound size={14} /> {resettingTeamId === team.teamId ? '...' : 'Reset'}
+                                                    </button>
+
+                                                    {/* Delete Team */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setSelectedTeamIds([teamKey]);
+                                                            setShowDeleteModal(true);
+                                                        }}
+                                                        className="p-2 rounded-xl border border-white/10 hover:border-red-500/40 text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                                        title="Delete this team"
+                                                    >
+                                                        <Trash2 size={15} />
+                                                    </button>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2 flex-wrap" onClick={(e) => e.stopPropagation()}>
-                                                {/* On-Screen Pass & QR Modal */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setPassModalTeam(team)}
-                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#14b8a6]/40 bg-[#14b8a6]/10 hover:bg-[#14b8a6]/20 text-[#14b8a6] text-[10px] font-black uppercase tracking-wider transition-all"
-                                                    title="View Official Digital Pass & QR on screen"
-                                                >
-                                                    <QrCode size={14} /> Pass
-                                                </button>
-
-                                                {/* Quick Edit Details Modal */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => openEditModal(team)}
-                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-teal-500/40 bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 text-[10px] font-bold uppercase tracking-wider transition-all"
-                                                    title="Correct email typos, phone, name, or resend pass"
-                                                >
-                                                    <Edit3 size={14} /> Edit
-                                                </button>
-
-                                                {/* Reset Login Credentials */}
-                                                <button
-                                                    type="button"
-                                                    disabled={!team.teamId || resettingTeamId === team.teamId}
-                                                    onClick={() => { if (team.teamId) void handleResetTeamCredentials(team.teamId, team.team); }}
-                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-wider transition-all disabled:opacity-50"
-                                                    title="Generate new temporary password and show on screen"
-                                                >
-                                                    <KeyRound size={14} /> {resettingTeamId === team.teamId ? '...' : 'Reset'}
-                                                </button>
-
-                                                {/* Delete Team */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setSelectedTeamIds([teamKey]);
-                                                        setShowDeleteModal(true);
-                                                    }}
-                                                    className="p-2 rounded-xl border border-white/10 hover:border-red-500/40 text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all"
-                                                    title="Delete this team"
-                                                >
-                                                    <Trash2 size={15} />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    <AnimatePresence>
-                                        {expandedTeamId === team.id && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: "auto", opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-8 mt-8 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
-                                                    {/* 1. Project Title */}
-                                                    <div className="space-y-3">
-                                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><MapPin size={10} /> Project Title</span>
-                                                        <div className="bg-black/20 rounded-xl p-4 border border-white/5 h-32 overflow-y-auto custom-scrollbar">
-                                                            <p className="text-xs text-white/60 leading-relaxed font-medium whitespace-pre-wrap">{team.problemStatement || "No title defined yet."}</p>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* 2. Final Submissions */}
-                                                    <div className="space-y-3">
-                                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><Globe size={10} /> Final Submissions</span>
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                            {[
-                                                                { label: 'GitHub', url: team.submission?.github, icon: Code },
-                                                                { label: 'Project ZIP', url: team.submission?.projectZip, icon: Upload },
-                                                                { label: 'Pitch', url: team.submission?.presentation, icon: Presentation },
-                                                                { label: 'Demo', url: team.submission?.demo, icon: Play },
-                                                                { label: 'Live', url: team.submission?.deployment, icon: Globe }
-                                                            ].map((link, idx) => {
-                                                                const formattedUrl = link.url && !link.url.match(/^https?:\/\//)
-                                                                    ? `https://${link.url}`
-                                                                    : link.url;
-
-                                                                return (
-                                                                    <a
-                                                                        key={idx}
-                                                                        href={formattedUrl}
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${link.url ? 'bg-green-500/5 border-green-500/20 text-green-400 hover:bg-green-500/10' : 'bg-white/5 border-white/5 text-white/10 pointer-events-none'}`}
-                                                                    >
-                                                                        <link.icon size={14} />
-                                                                        <span className="text-[8px] font-black uppercase">{link.label}</span>
-                                                                    </a>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* 3. Credential recovery */}
-                                                    <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
-                                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><KeyRound size={10} /> Login recovery</span>
-                                                        <button
-                                                            type="button"
-                                                            disabled={!team.teamId || resettingTeamId === team.teamId}
-                                                            onClick={() => { if (team.teamId) void handleResetTeamCredentials(team.teamId, team.team); }}
-                                                            className="inline-flex items-center gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-amber-200 transition hover:bg-amber-400/20 disabled:cursor-wait disabled:opacity-50"
-                                                        >
-                                                            <KeyRound size={13} />
-                                                            {resettingTeamId === team.teamId ? 'Resetting...' : 'Reset & email password'}
-                                                        </button>
-                                                        {credentialResetResult && credentialResetResult.teamId === team.teamId && (
-                                                            <div role="status" aria-live="polite" className="space-y-3 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
-                                                                <p className="text-xs font-bold text-white">New password (shown once)</p>
-                                                                <p className="break-all rounded-lg bg-black/30 p-3 font-mono text-sm text-amber-100">{credentialResetResult.temporaryPassword}</p>
-                                                                <p className="text-xs leading-relaxed text-white/60">
-                                                                    {credentialResetResult.emailAccepted
-                                                                        ? `SMTP accepted the message for ${credentialResetResult.leadEmail}. Check Inbox and Spam; delivery is not confirmed. Share this password only through a verified support channel.`
-                                                                        : `SMTP did not accept the message for ${credentialResetResult.leadEmail}. Share this password only through a verified support channel.`}
-                                                                </p>
-                                                                <div className="flex items-center gap-2">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => void navigator.clipboard.writeText(credentialResetResult.temporaryPassword).then(() => toast.success('Password copied.')).catch(() => toast.error('Clipboard access is unavailable.'))}
-                                                                        className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-bold text-white/80 hover:bg-white/10"
-                                                                    >
-                                                                        <Copy size={12} /> Copy password
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setCredentialResetResult(null)}
-                                                                        className="rounded-lg px-3 py-2 text-[10px] font-bold text-white/50 hover:bg-white/5"
-                                                                    >
-                                                                        Dismiss
-                                                                    </button>
+                                            <AnimatePresence>
+                                                {expandedTeamId === team.id && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-8 mt-8 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
+                                                            {/* 1. Project Title */}
+                                                            <div className="space-y-3">
+                                                                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><MapPin size={10} /> Project Title</span>
+                                                                <div className="bg-black/20 rounded-xl p-4 border border-white/5 h-32 overflow-y-auto custom-scrollbar">
+                                                                    <p className="text-xs text-white/60 leading-relaxed font-medium whitespace-pre-wrap">{team.problemStatement || "No title defined yet."}</p>
                                                                 </div>
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-                            </div>
-                        );
-                    })}
-                    </div>
 
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                        <div className="flex justify-center items-center gap-4 mt-8">
-                            <button
-                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                disabled={currentPage === 1}
-                                className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-50 hover:bg-white/10 transition"
-                            >
-                                Previous
-                            </button>
-                            <span className="text-white/50 text-sm font-bold">
-                                Page {currentPage} of {totalPages}
-                            </span>
-                            <button
-                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                disabled={currentPage === totalPages}
-                                className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-50 hover:bg-white/10 transition"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    )}
-                </div>
-            )}
+                                                            {/* 2. Final Submissions */}
+                                                            <div className="space-y-3">
+                                                                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><Globe size={10} /> Final Submissions</span>
+                                                                <div className="grid grid-cols-2 gap-2">
+                                                                    {[
+                                                                        { label: 'GitHub', url: team.submission?.github, icon: Code },
+                                                                        { label: 'Project ZIP', url: team.submission?.projectZip, icon: Upload },
+                                                                        { label: 'Pitch', url: team.submission?.presentation, icon: Presentation },
+                                                                        { label: 'Demo', url: team.submission?.demo, icon: Play },
+                                                                        { label: 'Live', url: team.submission?.deployment, icon: Globe }
+                                                                    ].map((link, idx) => {
+                                                                        const formattedUrl = link.url && !link.url.match(/^https?:\/\//)
+                                                                            ? `https://${link.url}`
+                                                                            : link.url;
 
-            {/* Judges Tab */}
-            {activeTab === 'judges' && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Add Official Evaluator</h3>
-                            <button
-                                onClick={handleExportJudges}
-                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
-                            >
-                                <Download size={18} /> Export Evaluators CSV
-                            </button>
+                                                                        return (
+                                                                            <a
+                                                                                key={idx}
+                                                                                href={formattedUrl}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${link.url ? 'bg-green-500/5 border-green-500/20 text-green-400 hover:bg-green-500/10' : 'bg-white/5 border-white/5 text-white/10 pointer-events-none'}`}
+                                                                            >
+                                                                                <link.icon size={14} />
+                                                                                <span className="text-[8px] font-black uppercase">{link.label}</span>
+                                                                            </a>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* 3. Credential recovery */}
+                                                            <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
+                                                                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2"><KeyRound size={10} /> Login recovery</span>
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={!team.teamId || resettingTeamId === team.teamId}
+                                                                    onClick={() => { if (team.teamId) void handleResetTeamCredentials(team.teamId, team.team); }}
+                                                                    className="inline-flex items-center gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-amber-200 transition hover:bg-amber-400/20 disabled:cursor-wait disabled:opacity-50"
+                                                                >
+                                                                    <KeyRound size={13} />
+                                                                    {resettingTeamId === team.teamId ? 'Resetting...' : 'Reset & email password'}
+                                                                </button>
+                                                                {credentialResetResult && credentialResetResult.teamId === team.teamId && (
+                                                                    <div role="status" aria-live="polite" className="space-y-3 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
+                                                                        <p className="text-xs font-bold text-white">New password (shown once)</p>
+                                                                        <p className="break-all rounded-lg bg-black/30 p-3 font-mono text-sm text-amber-100">{credentialResetResult.temporaryPassword}</p>
+                                                                        <p className="text-xs leading-relaxed text-white/60">
+                                                                            {credentialResetResult.emailAccepted
+                                                                                ? `SMTP accepted the message for ${credentialResetResult.leadEmail}. Check Inbox and Spam; delivery is not confirmed. Share this password only through a verified support channel.`
+                                                                                : `SMTP did not accept the message for ${credentialResetResult.leadEmail}. Share this password only through a verified support channel.`}
+                                                                        </p>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => void navigator.clipboard.writeText(credentialResetResult.temporaryPassword).then(() => toast.success('Password copied.')).catch(() => toast.error('Clipboard access is unavailable.'))}
+                                                                                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-bold text-white/80 hover:bg-white/10"
+                                                                            >
+                                                                                <Copy size={12} /> Copy password
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => setCredentialResetResult(null)}
+                                                                                className="rounded-lg px-3 py-2 text-[10px] font-bold text-white/50 hover:bg-white/5"
+                                                                            >
+                                                                                Dismiss
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Full Name</label>
-                                <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
-                                    value={newJudge.name}
-                                    placeholder="e.g. Dr. Smith"
-                                    onChange={(e) => setNewJudge({ ...newJudge, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Phone</label>
-                                <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
-                                    value={newJudge.phone || ''}
-                                    placeholder="10 digit number"
-                                    onChange={(e) => setNewJudge({ ...newJudge, phone: e.target.value.replace(/\D/g, '').slice(-10) })}
-                                />
-                            </div>
-                            <div className="flex items-start md:items-end">
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex justify-center items-center gap-4 mt-8">
                                 <button
-                                    onClick={() => {
-                                        if (newJudge.name) {
-                                            addJudge({
-                                                name: newJudge.name,
-                                                specialization: newJudge.specialization || "All 7 Tracks"
-                                            });
-                                            setNewJudge({ name: "", specialization: "", phone: "" });
-                                        }
-                                    }}
-                                    className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-50 hover:bg-white/10 transition"
                                 >
-                                    <Plus size={18} /> Add Evaluator
+                                    Previous
+                                </button>
+                                <span className="text-white/50 text-sm font-bold">
+                                    Page {currentPage} of {totalPages}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-50 hover:bg-white/10 transition"
+                                >
+                                    Next
                                 </button>
                             </div>
-                        </div>
+                        )}
+                    </div>
+                )}
 
-                        <div className="flex justify-between items-center mt-12 mb-6">
-                            <div>
-                                <h3 className="text-xl font-black italic uppercase tracking-tighter text-white">Registered Evaluators</h3>
-                                <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Total: {judges.length} Evaluators</p>
+                {/* Judges Tab */}
+                {activeTab === 'judges' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
+                            <div className="flex justify-between items-center mb-8">
+                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Add Official Evaluator</h3>
+                                <button
+                                    onClick={handleExportJudges}
+                                    className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
+                                >
+                                    <Download size={18} /> Export Evaluators CSV
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Full Name</label>
+                                    <input
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
+                                        value={newJudge.name}
+                                        placeholder="e.g. Dr. Smith"
+                                        onChange={(e) => setNewJudge({ ...newJudge, name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Phone</label>
+                                    <input
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
+                                        value={newJudge.phone || ''}
+                                        placeholder="10 digit number"
+                                        onChange={(e) => setNewJudge({ ...newJudge, phone: e.target.value.replace(/\D/g, '').slice(-10) })}
+                                    />
+                                </div>
+                                <div className="flex items-start md:items-end">
+                                    <button
+                                        onClick={() => {
+                                            if (newJudge.name) {
+                                                addJudge({
+                                                    name: newJudge.name,
+                                                    specialization: newJudge.specialization || "All 7 Tracks"
+                                                });
+                                                setNewJudge({ name: "", specialization: "", phone: "" });
+                                            }
+                                        }}
+                                        className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
+                                    >
+                                        <Plus size={18} /> Add Evaluator
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-center mt-12 mb-6">
+                                <div>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tighter text-white">Registered Evaluators</h3>
+                                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Total: {judges.length} Evaluators</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {judges.length === 0 ? (
+                                    <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                                        <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs font-kanit">No Evaluators Assigned Yet</p>
+                                    </div>
+                                ) : (
+                                    [...judges]
+                                        .sort((a, b) => {
+                                            const idA = parseInt(a.generatedId?.split("-")[1] || "0");
+                                            const idB = parseInt(b.generatedId?.split("-")[1] || "0");
+                                            return idA - idB;
+                                        })
+                                        .map((judge) => (
+                                            <div key={judge.id} className="flex items-center justify-between p-6 bg-white/5 border border-white/10 rounded-2xl group hover:bg-white/10 transition-all">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="w-12 h-12 rounded-xl bg-slate-900/20 flex items-center justify-center text-slate-900"><ShieldCheck size={24} /></div>
+                                                    <div>
+                                                        <div className="flex items-center gap-3">
+                                                            <h4 className="text-lg font-black italic uppercase tracking-tight">{judge.name}</h4>
+                                                            <span className="text-[9px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{judge.generatedId}</span>
+                                                        </div>
+                                                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{judge.specialization}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="text-right">
+                                                        <span className="text-[9px] font-black text-white/20 uppercase block tracking-widest">Credentials</span>
+                                                        <code className="text-[10px] font-mono text-slate-900 font-black">{judge.password ? `PASS: ${judge.password}` : 'Password shown only when issued'}</code>
+                                                    </div>
+                                                    <button onClick={() => removeJudge(judge.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
+                                                </div>
+                                            </div>
+                                        ))
+                                )}
                             </div>
                         </div>
+                    </div>
+                )}
 
-                        <div className="space-y-4">
-                            {judges.length === 0 ? (
-                                <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
-                                    <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs font-kanit">No Evaluators Assigned Yet</p>
+                {/* Volunteers Tab */}
+                {activeTab === 'volunteers' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
+                            <div className="flex justify-between items-center mb-8">
+                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Assign Station Volunteer</h3>
+                                <button
+                                    onClick={handleExportVolunteers}
+                                    className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
+                                >
+                                    <Download size={18} /> Export Volunteers
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Name</label>
+                                    <input
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none"
+                                        value={newVolunteer.name}
+                                        placeholder="e.g. John Doe"
+                                        onChange={(e) => setNewVolunteer({ ...newVolunteer, name: e.target.value })}
+                                    />
                                 </div>
-                            ) : (
-                                [...judges]
-                                    .sort((a, b) => {
-                                        const idA = parseInt(a.generatedId?.split("-")[1] || "0");
-                                        const idB = parseInt(b.generatedId?.split("-")[1] || "0");
-                                        return idA - idB;
-                                    })
-                                    .map((judge) => (
-                                        <div key={judge.id} className="flex items-center justify-between p-6 bg-white/5 border border-white/10 rounded-2xl group hover:bg-white/10 transition-all">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Phone</label>
+                                    <input
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
+                                        value={newVolunteer.phone}
+                                        placeholder="10 digit number"
+                                        onChange={(e) => setNewVolunteer({ ...newVolunteer, phone: e.target.value.replace(/\D/g, '').slice(-10) })}
+                                    />
+                                </div>
+                                <div className="flex items-end">
+                                    <button
+                                        onClick={() => {
+                                            if (newVolunteer.name && newVolunteer.phone) {
+                                                addVolunteer(newVolunteer);
+                                                setNewVolunteer({ name: "", phone: "", role: "" });
+                                            }
+                                        }}
+                                        className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2"
+                                    >
+                                        <Plus size={18} /> Register Staff
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {volunteers.length === 0 ? (
+                                    <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                                        <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs font-kanit">No Volunteers Registered</p>
+                                    </div>
+                                ) : (
+                                    volunteers.map((vol) => (
+                                        <div key={vol.id} className="flex items-center justify-between p-6 bg-white/5 border border-white/10 rounded-2xl group hover:bg-white/10 transition-all">
                                             <div className="flex items-center gap-6">
-                                                <div className="w-12 h-12 rounded-xl bg-slate-900/20 flex items-center justify-center text-slate-900"><ShieldCheck size={24} /></div>
+                                                <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center text-blue-400"><Users size={24} /></div>
                                                 <div>
                                                     <div className="flex items-center gap-3">
-                                                        <h4 className="text-lg font-black italic uppercase tracking-tight">{judge.name}</h4>
-                                                        <span className="text-[9px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{judge.generatedId}</span>
+                                                        <h4 className="text-lg font-black italic uppercase tracking-tight">{vol.name}</h4>
+                                                        <span className="text-[9px] font-black text-blue-400 px-2 py-0.5 border border-blue-400/30 rounded bg-blue-400/5">{vol.generatedId}</span>
                                                     </div>
-                                                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{judge.specialization}</p>
+                                                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{vol.role} • {vol.phone}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <div className="text-right">
                                                     <span className="text-[9px] font-black text-white/20 uppercase block tracking-widest">Credentials</span>
-                                                    <code className="text-[10px] font-mono text-slate-900 font-black">{judge.password ? `PASS: ${judge.password}` : 'Password shown only when issued'}</code>
+                                                    <code className="text-[10px] font-mono text-blue-400 font-black">{vol.password ? `PASS: ${vol.password}` : 'Password shown only when issued'}</code>
                                                 </div>
-                                                <button onClick={() => removeJudge(judge.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
+                                                <button onClick={() => removeVolunteer(vol.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
                                             </div>
                                         </div>
                                     ))
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Volunteers Tab */}
-            {activeTab === 'volunteers' && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Assign Station Volunteer</h3>
-                            <button
-                                onClick={handleExportVolunteers}
-                                className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
-                            >
-                                <Download size={18} /> Export Volunteers
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Name</label>
-                                <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none"
-                                    value={newVolunteer.name}
-                                    placeholder="e.g. John Doe"
-                                    onChange={(e) => setNewVolunteer({ ...newVolunteer, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Phone</label>
-                                <input
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
-                                    value={newVolunteer.phone}
-                                    placeholder="10 digit number"
-                                    onChange={(e) => setNewVolunteer({ ...newVolunteer, phone: e.target.value.replace(/\D/g, '').slice(-10) })}
-                                />
-                            </div>
-                            <div className="flex items-end">
-                                <button
-                                    onClick={() => {
-                                        if (newVolunteer.name && newVolunteer.phone) {
-                                            addVolunteer(newVolunteer);
-                                            setNewVolunteer({ name: "", phone: "", role: "" });
-                                        }
-                                    }}
-                                    className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2"
-                                >
-                                    <Plus size={18} /> Register Staff
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            {volunteers.length === 0 ? (
-                                <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
-                                    <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs font-kanit">No Volunteers Registered</p>
-                                </div>
-                            ) : (
-                                volunteers.map((vol) => (
-                                    <div key={vol.id} className="flex items-center justify-between p-6 bg-white/5 border border-white/10 rounded-2xl group hover:bg-white/10 transition-all">
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center text-blue-400"><Users size={24} /></div>
-                                            <div>
-                                                <div className="flex items-center gap-3">
-                                                    <h4 className="text-lg font-black italic uppercase tracking-tight">{vol.name}</h4>
-                                                    <span className="text-[9px] font-black text-blue-400 px-2 py-0.5 border border-blue-400/30 rounded bg-blue-400/5">{vol.generatedId}</span>
-                                                </div>
-                                                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{vol.role} • {vol.phone}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <div className="text-right">
-                                                <span className="text-[9px] font-black text-white/20 uppercase block tracking-widest">Credentials</span>
-                                                <code className="text-[10px] font-mono text-blue-400 font-black">{vol.password ? `PASS: ${vol.password}` : 'Password shown only when issued'}</code>
-                                            </div>
-                                            <button onClick={() => removeVolunteer(vol.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ═══════════ ADDONS TAB ═══════════ */}
-            {activeTab === 'settings' && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                            <div>
-                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">Purchased Addons</h3>
-                                <p className="mt-1 text-xs text-white/40">View which participants have purchased Networking Passes and Meal Passes.</p>
-                            </div>
-                            <div className="relative w-full md:w-64">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
-                                <input 
-                                    type="text" 
-                                    placeholder="Search name, team, or ID..." 
-                                    value={addonsSearchQuery}
-                                    onChange={(e) => setAddonsSearchQuery(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#14b8a6]/50 transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            {/* LEFT SIDE: NETWORKING PASSES */}
-                            <div className="flex flex-col gap-4">
-                                <h4 className="text-lg font-black text-purple-400 uppercase tracking-widest border-b border-white/10 pb-3">Networking Passes</h4>
-                                <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
-                                    {projects.flatMap(p => 
-                                        (p.members || []).map((m: any, i: number) => {
-                                            const mId = m.participant_id || m.id || `m${i}`;
-                                            const mEmail = m.email;
-                                            const np = p.mealAccess?.networking_passes;
-                                            
-                                            let hasNet = false;
-                                            if (np === true) hasNet = true;
-                                            else if (Array.isArray(np)) {
-                                                if (np.includes('all') || np.length >= (p.members?.length || 0)) hasNet = true;
-                                                else if (np.includes(mId)) hasNet = true;
-                                                else if (mEmail && np.includes(mEmail)) hasNet = true;
-                                            }
-                                            
-                                            if (!hasNet) return null;
-
-                                            const memberName = m.fullName || m.name || "Unknown";
-                                            const teamName = p.team || p.name;
-                                            
-                                            if (addonsSearchQuery) {
-                                                const query = addonsSearchQuery.toLowerCase();
-                                                const matchesSearch = 
-                                                    memberName.toLowerCase().includes(query) || 
-                                                    teamName.toLowerCase().includes(query) || 
-                                                    (p.teamId || '').toLowerCase().includes(query) ||
-                                                    (mId || '').toLowerCase().includes(query);
-                                                
-                                                if (!matchesSearch) return null;
-                                            }
-
-                                            return (
-                                                <div key={`net-${p.teamId}-${i}`} className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-1">
-                                                    <div className="font-bold text-white text-sm">{memberName}</div>
-                                                    <div className="text-xs text-white/50">{teamName} <span className="text-purple-400">({p.teamId})</span></div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* RIGHT SIDE: MEAL PASSES */}
-                            <div className="flex flex-col gap-4">
-                                <h4 className="text-lg font-black text-emerald-400 uppercase tracking-widest border-b border-white/10 pb-3">Meal Passes</h4>
-                                <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
-                                    {projects.flatMap(p => 
-                                        (p.members || []).map((m: any, i: number) => {
-                                            const mId = m.participant_id || m.id || `m${i}`;
-                                            const mEmail = m.email;
-                                            const pm = p.mealAccess?.purchased_meals;
-                                            
-                                            let hasMeal = false;
-                                            if (pm === true) hasMeal = true;
-                                            else if (Array.isArray(pm)) {
-                                                if (pm.includes('all') || pm.length >= (p.members?.length || 0)) hasMeal = true;
-                                                else if (pm.includes(mId)) hasMeal = true;
-                                                else if (mEmail && pm.includes(mEmail)) hasMeal = true;
-                                            }
-                                            
-                                            if (!hasMeal) return null;
-
-                                            const memberName = m.fullName || m.name || "Unknown";
-                                            const teamName = p.team || p.name;
-                                            
-                                            if (addonsSearchQuery) {
-                                                const query = addonsSearchQuery.toLowerCase();
-                                                const matchesSearch = 
-                                                    memberName.toLowerCase().includes(query) || 
-                                                    teamName.toLowerCase().includes(query) || 
-                                                    (p.teamId || '').toLowerCase().includes(query) ||
-                                                    (mId || '').toLowerCase().includes(query);
-                                                
-                                                if (!matchesSearch) return null;
-                                            }
-
-                                            return (
-                                                <div key={`meal-${p.teamId}-${i}`} className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-1">
-                                                    <div className="font-bold text-white text-sm">{memberName}</div>
-                                                    <div className="text-xs text-white/50">{teamName} <span className="text-emerald-400">({p.teamId})</span></div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ═══════════ HELP DESK TAB ═══════════ */}
-            {activeTab === 'helpdesk' && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5 lg:flex-row lg:items-center">
-                        <div>
-                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
-                                <Headphones className="text-[#14b8a6]" size={26} />
-                                Help Desk & Inbound Inquiries
-                            </h2>
-                            <p className="mt-1 text-xs text-white/50">Manage live table requests and inbound email queries from participants.</p>
-                        </div>
-
-                        {/* Sub-tab Selector */}
-                        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-black/40 border border-white/10">
-                            <button
-                                type="button"
-                                onClick={() => setHelpdeskSubTab('tickets')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                                    helpdeskSubTab === 'tickets'
-                                        ? 'bg-[#14b8a6] text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]'
-                                        : 'text-white/60 hover:text-white'
-                                }`}
-                            >
-                                <Clock size={14} />
-                                Onsite Table Queue
-                                {helpTickets.filter(t => t.status === 'open').length > 0 && (
-                                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
-                                        helpdeskSubTab === 'tickets' ? 'bg-black text-[#14b8a6]' : 'bg-amber-400 text-black'
-                                    }`}>
-                                        {helpTickets.filter(t => t.status === 'open').length}
-                                    </span>
                                 )}
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setHelpdeskSubTab('inbox');
-                                    if (inboundEmails.length === 0) void fetchInboundEmails();
-                                }}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                                    helpdeskSubTab === 'inbox'
-                                        ? 'bg-[#14b8a6] text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]'
-                                        : 'text-white/60 hover:text-white'
-                                }`}
-                            >
-                                <Inbox size={14} />
-                                Inbound Mailbox
-                                {inboxStatus?.unseen ? (
-                                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
-                                        helpdeskSubTab === 'inbox' ? 'bg-black text-[#14b8a6]' : 'bg-teal-400 text-black'
-                                    }`}>
-                                        {inboxStatus.unseen}
-                                    </span>
-                                ) : null}
-                            </button>
+                            </div>
                         </div>
                     </div>
+                )}
 
-                    {/* SUB-TAB 1: Onsite Table Queue */}
-                    {helpdeskSubTab === 'tickets' && (
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center px-1">
-                                <span className="text-xs text-white/50 font-bold uppercase tracking-wider">
-                                    Table Assistance Requests
-                                </span>
-                                <button
-                                    onClick={() => void fetchHelpTickets()}
-                                    className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-white/10 cursor-pointer"
-                                >
-                                    <RefreshCw size={12} className={isLoadingTickets ? 'animate-spin' : ''} /> Refresh
-                                </button>
+                {/* ═══════════ ADDONS TAB ═══════════ */}
+                {activeTab === 'settings' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                                <div>
+                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">Purchased Addons</h3>
+                                    <p className="mt-1 text-xs text-white/40">View which participants have purchased Networking Passes and Meal Passes.</p>
+                                </div>
+                                <div className="relative w-full md:w-64">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search name, team, or ID..."
+                                        value={addonsSearchQuery}
+                                        onChange={(e) => setAddonsSearchQuery(e.target.value)}
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#14b8a6]/50 transition-all"
+                                    />
+                                </div>
                             </div>
 
-                            {isLoadingTickets && helpTickets.length === 0 ? (
-                                <div className="flex items-center justify-center py-20">
-                                    <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
-                                </div>
-                            ) : helpTickets.length === 0 ? (
-                                <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
-                                    <Headphones size={48} className="mx-auto mb-4 text-white/10" />
-                                    <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No active table requests</p>
-                                    <p className="text-white/20 text-xs mt-2">Participants can submit mentor and help requests directly from their portal.</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {helpTickets.map(ticket => (
-                                        <div key={ticket.id} className={`p-6 rounded-2xl border transition-all ${
-                                            ticket.status === 'open' ? 'bg-amber-500/5 border-amber-500/20' :
-                                            ticket.status === 'accepted' ? 'bg-teal-500/10 border-teal-500/30' :
-                                            'bg-green-500/5 border-green-500/20 opacity-60'
-                                        }`}>
-                                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                                                <div className="flex items-start gap-4">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                                                        ticket.status === 'open' ? 'bg-amber-500/20 text-amber-400' :
-                                                        ticket.status === 'accepted' ? 'bg-teal-500/20 text-teal-300' :
-                                                        'bg-green-500/20 text-green-400'
-                                                    }`}>
-                                                        {ticket.status === 'open' ? <Clock size={20} /> :
-                                                         ticket.status === 'accepted' ? <MessageSquare size={20} /> :
-                                                         <CheckCircle size={20} />}
-                                                    </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-2 flex-wrap">
-                                                            <h4 className="text-lg font-black italic uppercase tracking-tight text-white">{ticket.teamName}</h4>
-                                                            {ticket.teamId && ticket.teamId !== 'NO_TEAM_ID' && ticket.teamId !== 'GUEST' ? (
-                                                                <span className="text-[9px] font-mono font-black px-2 py-0.5 rounded bg-white/10 text-white/70 border border-white/15">
-                                                                    ID: {ticket.teamId}
-                                                                </span>
-                                                            ) : (
-                                                                <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                                                                    No Team ID Entered
-                                                                </span>
-                                                            )}
-                                                            <span className={`text-[9px] font-black px-2 py-0.5 rounded ${
-                                                                ticket.category === 'Technical' ? 'bg-teal-500/20 text-teal-300' :
-                                                                ticket.category === 'WiFi/Infra' ? 'bg-red-500/20 text-red-300' :
-                                                                ticket.category === 'Email Query' ? 'bg-teal-500/20 text-teal-300' :
-                                                                'bg-purple-500/20 text-purple-300'
-                                                            }`}>{ticket.category}</span>
-                                                            {ticket.source === 'edit_registration' && (
-                                                                <span className="text-[9px] font-black px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
-                                                                    Registration Portal
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <p className="text-sm text-white/70 mt-1 whitespace-pre-wrap">{ticket.description}</p>
-                                                        {ticket.tableNumber && <p className="text-[10px] text-white/40 mt-1 font-bold">📍 Table: {ticket.tableNumber}</p>}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                {/* LEFT SIDE: NETWORKING PASSES */}
+                                <div className="flex flex-col gap-4">
+                                    <h4 className="text-lg font-black text-purple-400 uppercase tracking-widest border-b border-white/10 pb-3">Networking Passes</h4>
+                                    <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                                        {projects.flatMap(p =>
+                                            (p.members || []).map((m: any, i: number) => {
+                                                const mId = m.participant_id || m.id || `m${i}`;
+                                                const mEmail = m.email;
+                                                const np = p.mealAccess?.networking_passes;
 
-                                                        {/* POC Contact Information & Quick Actions */}
-                                                        {(ticket.contactName || ticket.contactPhone || ticket.contactEmail) && (
-                                                            <div className="mt-2.5 p-2.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-wrap items-center gap-2.5 text-xs">
-                                                                {ticket.contactName && (
-                                                                    <span className="text-white/90 font-bold flex items-center gap-1.5">
-                                                                        <span className="text-white/40 font-semibold text-[10px] uppercase tracking-wider">POC:</span>
-                                                                        {ticket.contactName}
-                                                                    </span>
-                                                                )}
-                                                                {ticket.contactPhone && (
-                                                                    <div className="flex items-center gap-2">
-                                                                        <a
-                                                                            href={`tel:${ticket.contactPhone}`}
-                                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/30 text-teal-300 font-bold text-[11px] transition"
-                                                                            title="Call Contact"
-                                                                        >
-                                                                            <Phone size={11} />
-                                                                            <span>Call: {ticket.contactPhone}</span>
-                                                                        </a>
-                                                                        <a
-                                                                            href={`https://wa.me/${ticket.contactPhone.replace(/[^0-9]/g, '')}`}
-                                                                            target="_blank"
-                                                                            rel="noreferrer"
-                                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-[11px] transition"
-                                                                            title="WhatsApp POC"
-                                                                        >
-                                                                            <MessageSquare size={11} />
-                                                                            <span>WhatsApp</span>
-                                                                        </a>
-                                                                    </div>
-                                                                )}
-                                                                {ticket.contactEmail && (
-                                                                    <a
-                                                                        href={`mailto:${ticket.contactEmail}`}
-                                                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white text-[11px] transition"
-                                                                        title="Email POC"
-                                                                    >
-                                                                        <Mail size={11} />
-                                                                        <span>{ticket.contactEmail}</span>
-                                                                    </a>
-                                                                )}
-                                                            </div>
-                                                        )}
+                                                let hasNet = false;
+                                                if (np === true) hasNet = true;
+                                                else if (Array.isArray(np)) {
+                                                    if (np.includes('all') || np.length >= (p.members?.length || 0)) hasNet = true;
+                                                    else if (np.includes(mId)) hasNet = true;
+                                                    else if (mEmail && np.includes(mEmail)) hasNet = true;
+                                                }
 
-                                                        <p className="text-[9px] text-white/30 mt-1.5">{new Date(ticket.createdAt).toLocaleTimeString()}{ticket.acceptedBy ? ` • Accepted by ${ticket.acceptedBy}` : ''}</p>
+                                                if (!hasNet) return null;
+
+                                                const memberName = m.fullName || m.name || "Unknown";
+                                                const teamName = p.team || p.name;
+
+                                                if (addonsSearchQuery) {
+                                                    const query = addonsSearchQuery.toLowerCase();
+                                                    const matchesSearch =
+                                                        memberName.toLowerCase().includes(query) ||
+                                                        teamName.toLowerCase().includes(query) ||
+                                                        (p.teamId || '').toLowerCase().includes(query) ||
+                                                        (mId || '').toLowerCase().includes(query);
+
+                                                    if (!matchesSearch) return null;
+                                                }
+
+                                                return (
+                                                    <div key={`net-${p.teamId}-${i}`} className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-1">
+                                                        <div className="font-bold text-white text-sm">{memberName}</div>
+                                                        <div className="text-xs text-white/50">{teamName} <span className="text-purple-400">({p.teamId})</span></div>
                                                     </div>
-                                                </div>
-                                                <div className="flex items-center gap-2 shrink-0">
-                                                    {ticket.status === 'open' && (
-                                                        <button
-                                                            onClick={() => handleTicketAction(ticket.id, 'accept')}
-                                                            className="px-4 py-2 rounded-xl bg-teal-500/20 border border-teal-500/30 text-teal-300 text-[10px] font-black uppercase tracking-wider hover:bg-teal-500/30 transition cursor-pointer"
-                                                        >
-                                                            Accept
-                                                        </button>
-                                                    )}
-                                                    {(ticket.status === 'open' || ticket.status === 'accepted') && (
-                                                        <button
-                                                            onClick={() => handleTicketAction(ticket.id, 'resolve')}
-                                                            className="px-4 py-2 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-[10px] font-black uppercase tracking-wider hover:bg-green-500/30 transition cursor-pointer"
-                                                        >
-                                                            Resolve
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        onClick={() => handleTicketAction(ticket.id, 'cancel')}
-                                                        className="px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition cursor-pointer"
-                                                    >
-                                                        <X size={14} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                                );
+                                            })
+                                        )}
+                                    </div>
                                 </div>
-                            )}
+
+                                {/* RIGHT SIDE: MEAL PASSES */}
+                                <div className="flex flex-col gap-4">
+                                    <h4 className="text-lg font-black text-emerald-400 uppercase tracking-widest border-b border-white/10 pb-3">Meal Passes</h4>
+                                    <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                                        {projects.flatMap(p =>
+                                            (p.members || []).map((m: any, i: number) => {
+                                                const mId = m.participant_id || m.id || `m${i}`;
+                                                const mEmail = m.email;
+                                                const pm = p.mealAccess?.purchased_meals;
+
+                                                let hasMeal = false;
+                                                if (pm === true) hasMeal = true;
+                                                else if (Array.isArray(pm)) {
+                                                    if (pm.includes('all') || pm.length >= (p.members?.length || 0)) hasMeal = true;
+                                                    else if (pm.includes(mId)) hasMeal = true;
+                                                    else if (mEmail && pm.includes(mEmail)) hasMeal = true;
+                                                }
+
+                                                if (!hasMeal) return null;
+
+                                                const memberName = m.fullName || m.name || "Unknown";
+                                                const teamName = p.team || p.name;
+
+                                                if (addonsSearchQuery) {
+                                                    const query = addonsSearchQuery.toLowerCase();
+                                                    const matchesSearch =
+                                                        memberName.toLowerCase().includes(query) ||
+                                                        teamName.toLowerCase().includes(query) ||
+                                                        (p.teamId || '').toLowerCase().includes(query) ||
+                                                        (mId || '').toLowerCase().includes(query);
+
+                                                    if (!matchesSearch) return null;
+                                                }
+
+                                                return (
+                                                    <div key={`meal-${p.teamId}-${i}`} className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-1">
+                                                        <div className="font-bold text-white text-sm">{memberName}</div>
+                                                        <div className="text-xs text-white/50">{teamName} <span className="text-emerald-400">({p.teamId})</span></div>
+                                                    </div>
+                                                );
+                                            })
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {/* SUB-TAB 2: cPanel Inbound Mailbox */}
-                    {helpdeskSubTab === 'inbox' && (
-                        <div className="space-y-4">
-                            {/* Mailbox Status Banner */}
-                            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-400 flex items-center justify-center shrink-0">
-                                        <Inbox size={20} />
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-mono text-xs font-bold text-white">business@happeno.in</span>
-                                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">cPanel IMAP (SSL:993)</span>
-                                        </div>
-                                        <p className="text-[11px] text-white/40 mt-0.5">
-                                            Server: {inboxStatus?.host || 'cloud-xent.crazzydns.com'} • {inboxStatus?.total ?? inboundEmails.length} messages ({inboxStatus?.unseen ?? 0} unread)
-                                        </p>
-                                    </div>
-                                </div>
+                {/* ═══════════ HELP DESK TAB ═══════════ */}
+                {activeTab === 'helpdesk' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5 lg:flex-row lg:items-center">
+                            <div>
+                                <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
+                                    <Headphones className="text-[#14b8a6]" size={26} />
+                                    Help Desk & Inbound Inquiries
+                                </h2>
+                                <p className="mt-1 text-xs text-white/50">Manage live table requests and inbound email queries from participants.</p>
+                            </div>
+
+                            {/* Sub-tab Selector */}
+                            <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-black/40 border border-white/10">
+                                <button
+                                    type="button"
+                                    onClick={() => setHelpdeskSubTab('tickets')}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${helpdeskSubTab === 'tickets'
+                                        ? 'bg-[#14b8a6] text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]'
+                                        : 'text-white/60 hover:text-white'
+                                        }`}
+                                >
+                                    <Clock size={14} />
+                                    Onsite Table Queue
+                                    {helpTickets.filter(t => t.status === 'open').length > 0 && (
+                                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${helpdeskSubTab === 'tickets' ? 'bg-black text-[#14b8a6]' : 'bg-amber-400 text-black'
+                                            }`}>
+                                            {helpTickets.filter(t => t.status === 'open').length}
+                                        </span>
+                                    )}
+                                </button>
 
                                 <button
                                     type="button"
-                                    onClick={fetchInboundEmails}
-                                    disabled={isLoadingEmails}
-                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0"
+                                    onClick={() => {
+                                        setHelpdeskSubTab('inbox');
+                                        if (inboundEmails.length === 0) void fetchInboundEmails();
+                                    }}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${helpdeskSubTab === 'inbox'
+                                        ? 'bg-[#14b8a6] text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]'
+                                        : 'text-white/60 hover:text-white'
+                                        }`}
                                 >
-                                    <RefreshCw size={14} className={isLoadingEmails ? 'animate-spin' : ''} />
-                                    {isLoadingEmails ? 'Syncing...' : 'Sync Mailbox'}
+                                    <Inbox size={14} />
+                                    Inbound Mailbox
+                                    {inboxStatus?.unseen ? (
+                                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${helpdeskSubTab === 'inbox' ? 'bg-black text-[#14b8a6]' : 'bg-teal-400 text-black'
+                                            }`}>
+                                            {inboxStatus.unseen}
+                                        </span>
+                                    ) : null}
                                 </button>
                             </div>
+                        </div>
 
-                            {/* Error State */}
-                            {emailError && (
-                                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center gap-3">
-                                    <AlertTriangle size={18} className="shrink-0 text-red-400" />
-                                    <div>
-                                        <p className="font-bold">IMAP Sync Error</p>
-                                        <p className="text-white/60 text-[11px] mt-0.5">{emailError}</p>
+                        {/* SUB-TAB 1: Onsite Table Queue */}
+                        {helpdeskSubTab === 'tickets' && (
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center px-1">
+                                    <span className="text-xs text-white/50 font-bold uppercase tracking-wider">
+                                        Table Assistance Requests
+                                    </span>
+                                    <button
+                                        onClick={() => void fetchHelpTickets()}
+                                        className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-white/10 cursor-pointer"
+                                    >
+                                        <RefreshCw size={12} className={isLoadingTickets ? 'animate-spin' : ''} /> Refresh
+                                    </button>
+                                </div>
+
+                                {isLoadingTickets && helpTickets.length === 0 ? (
+                                    <div className="flex items-center justify-center py-20">
+                                        <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
                                     </div>
-                                </div>
-                            )}
-
-                            {/* Inbound Emails List */}
-                            {isLoadingEmails && inboundEmails.length === 0 ? (
-                                <div className="flex items-center justify-center py-20">
-                                    <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
-                                </div>
-                            ) : inboundEmails.length === 0 ? (
-                                <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
-                                    <Inbox size={48} className="mx-auto mb-4 text-white/10" />
-                                    <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No emails in inbox</p>
-                                    <p className="text-white/20 text-xs mt-2">Replies to your passes or queries to business@happeno.in will appear here.</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {inboundEmails.map(email => (
-                                        <div
-                                            key={email.id}
-                                            className={`p-5 rounded-2xl border transition-all ${
-                                                email.isUnread
-                                                    ? 'bg-teal-500/[0.06] border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]'
-                                                    : 'bg-white/[0.02] border-white/10'
-                                            }`}
-                                        >
-                                            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-                                                <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                                                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                                                        email.isUnread ? 'bg-[#14b8a6]/20 text-[#14b8a6] border border-[#14b8a6]/40' : 'bg-white/10 text-white/50'
-                                                    }`}>
-                                                        <Mail size={16} />
-                                                    </div>
-
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className="flex items-center gap-2 flex-wrap">
-                                                            <span className="font-bold text-sm text-white">{email.fromName || email.fromEmail}</span>
-                                                            <span className="text-[11px] font-mono text-white/40">({email.fromEmail})</span>
-
-                                                            {/* Matched Team Pill */}
-                                                            {email.matchedTeamName && (
-                                                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
-                                                                    Team: {email.matchedTeamName} {email.matchedTeamId ? `(${email.matchedTeamId})` : ''}
-                                                                </span>
-                                                            )}
-
-                                                            {email.isUnread && (
-                                                                <span className="px-2 py-0.5 rounded-full bg-teal-400 text-black text-[9px] font-black uppercase">
-                                                                    New
-                                                                </span>
-                                                            )}
+                                ) : helpTickets.length === 0 ? (
+                                    <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                                        <Headphones size={48} className="mx-auto mb-4 text-white/10" />
+                                        <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No active table requests</p>
+                                        <p className="text-white/20 text-xs mt-2">Participants can submit mentor and help requests directly from their portal.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {helpTickets.map(ticket => (
+                                            <div key={ticket.id} className={`p-6 rounded-2xl border transition-all ${ticket.status === 'open' ? 'bg-amber-500/5 border-amber-500/20' :
+                                                ticket.status === 'accepted' ? 'bg-teal-500/10 border-teal-500/30' :
+                                                    'bg-green-500/5 border-green-500/20 opacity-60'
+                                                }`}>
+                                                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                                    <div className="flex items-start gap-4">
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${ticket.status === 'open' ? 'bg-amber-500/20 text-amber-400' :
+                                                            ticket.status === 'accepted' ? 'bg-teal-500/20 text-teal-300' :
+                                                                'bg-green-500/20 text-green-400'
+                                                            }`}>
+                                                            {ticket.status === 'open' ? <Clock size={20} /> :
+                                                                ticket.status === 'accepted' ? <MessageSquare size={20} /> :
+                                                                    <CheckCircle size={20} />}
                                                         </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <h4 className="text-lg font-black italic uppercase tracking-tight text-white">{ticket.teamName}</h4>
+                                                                {ticket.teamId && ticket.teamId !== 'NO_TEAM_ID' && ticket.teamId !== 'GUEST' ? (
+                                                                    <span className="text-[9px] font-mono font-black px-2 py-0.5 rounded bg-white/10 text-white/70 border border-white/15">
+                                                                        ID: {ticket.teamId}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                                                                        No Team ID Entered
+                                                                    </span>
+                                                                )}
+                                                                <span className={`text-[9px] font-black px-2 py-0.5 rounded ${ticket.category === 'Technical' ? 'bg-teal-500/20 text-teal-300' :
+                                                                    ticket.category === 'WiFi/Infra' ? 'bg-red-500/20 text-red-300' :
+                                                                        ticket.category === 'Email Query' ? 'bg-teal-500/20 text-teal-300' :
+                                                                            'bg-purple-500/20 text-purple-300'
+                                                                    }`}>{ticket.category}</span>
+                                                                {ticket.source === 'edit_registration' && (
+                                                                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                                                                        Registration Portal
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-sm text-white/70 mt-1 whitespace-pre-wrap">{ticket.description}</p>
+                                                            {ticket.tableNumber && <p className="text-[10px] text-white/40 mt-1 font-bold">📍 Table: {ticket.tableNumber}</p>}
 
-                                                        <h4 className="text-sm font-bold text-white mt-1.5 leading-snug">
-                                                            {email.subject}
-                                                        </h4>
+                                                            {/* POC Contact Information & Quick Actions */}
+                                                            {(ticket.contactName || ticket.contactPhone || ticket.contactEmail) && (
+                                                                <div className="mt-2.5 p-2.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-wrap items-center gap-2.5 text-xs">
+                                                                    {ticket.contactName && (
+                                                                        <span className="text-white/90 font-bold flex items-center gap-1.5">
+                                                                            <span className="text-white/40 font-semibold text-[10px] uppercase tracking-wider">POC:</span>
+                                                                            {ticket.contactName}
+                                                                        </span>
+                                                                    )}
+                                                                    {ticket.contactPhone && (
+                                                                        <div className="flex items-center gap-2">
+                                                                            <a
+                                                                                href={`tel:${ticket.contactPhone}`}
+                                                                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/30 text-teal-300 font-bold text-[11px] transition"
+                                                                                title="Call Contact"
+                                                                            >
+                                                                                <Phone size={11} />
+                                                                                <span>Call: {ticket.contactPhone}</span>
+                                                                            </a>
+                                                                            <a
+                                                                                href={`https://wa.me/${ticket.contactPhone.replace(/[^0-9]/g, '')}`}
+                                                                                target="_blank"
+                                                                                rel="noreferrer"
+                                                                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-[11px] transition"
+                                                                                title="WhatsApp POC"
+                                                                            >
+                                                                                <MessageSquare size={11} />
+                                                                                <span>WhatsApp</span>
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+                                                                    {ticket.contactEmail && (
+                                                                        <a
+                                                                            href={`mailto:${ticket.contactEmail}`}
+                                                                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white text-[11px] transition"
+                                                                            title="Email POC"
+                                                                        >
+                                                                            <Mail size={11} />
+                                                                            <span>{ticket.contactEmail}</span>
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+                                                            )}
 
-                                                        <p className="text-xs text-white/60 mt-1 line-clamp-2 leading-relaxed">
-                                                            {email.snippet || '(No message preview)'}
-                                                        </p>
-
-                                                        <p className="text-[10px] text-white/30 font-mono mt-2">
-                                                            {new Date(email.date).toLocaleString()}
-                                                        </p>
+                                                            <p className="text-[9px] text-white/30 mt-1.5">{new Date(ticket.createdAt).toLocaleTimeString()}{ticket.acceptedBy ? ` • Accepted by ${ticket.acceptedBy}` : ''}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-
-                                                {/* Action Buttons for Inbound Email */}
-                                                <div className="flex items-center gap-2 shrink-0 self-end lg:self-start">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setReplyModalEmail(email)}
-                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 text-[11px] font-bold transition cursor-pointer"
-                                                    >
-                                                        <Reply size={13} /> Reply
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        disabled={isConvertingTicket === email.id}
-                                                        onClick={() => void handleConvertEmailToTicket(email)}
-                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer disabled:opacity-40"
-                                                    >
-                                                        <Plus size={13} /> {isConvertingTicket === email.id ? 'Creating...' : 'Create Ticket'}
-                                                    </button>
+                                                    <div className="flex items-center gap-2 shrink-0">
+                                                        {ticket.status === 'open' && (
+                                                            <button
+                                                                onClick={() => handleTicketAction(ticket.id, 'accept')}
+                                                                className="px-4 py-2 rounded-xl bg-teal-500/20 border border-teal-500/30 text-teal-300 text-[10px] font-black uppercase tracking-wider hover:bg-teal-500/30 transition cursor-pointer"
+                                                            >
+                                                                Accept
+                                                            </button>
+                                                        )}
+                                                        {(ticket.status === 'open' || ticket.status === 'accepted') && (
+                                                            <button
+                                                                onClick={() => handleTicketAction(ticket.id, 'resolve')}
+                                                                className="px-4 py-2 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-[10px] font-black uppercase tracking-wider hover:bg-green-500/30 transition cursor-pointer"
+                                                            >
+                                                                Resolve
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            onClick={() => handleTicketAction(ticket.id, 'cancel')}
+                                                            className="px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition cursor-pointer"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* SUB-TAB 2: cPanel Inbound Mailbox */}
+                        {helpdeskSubTab === 'inbox' && (
+                            <div className="space-y-4">
+                                {/* Mailbox Status Banner */}
+                                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-400 flex items-center justify-center shrink-0">
+                                            <Inbox size={20} />
                                         </div>
-                                    ))}
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-mono text-xs font-bold text-white">business@happeno.in</span>
+                                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                                <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">cPanel IMAP (SSL:993)</span>
+                                            </div>
+                                            <p className="text-[11px] text-white/40 mt-0.5">
+                                                Server: {inboxStatus?.host || 'cloud-xent.crazzydns.com'} • {inboxStatus?.total ?? inboundEmails.length} messages ({inboxStatus?.unseen ?? 0} unread)
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={fetchInboundEmails}
+                                        disabled={isLoadingEmails}
+                                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0"
+                                    >
+                                        <RefreshCw size={14} className={isLoadingEmails ? 'animate-spin' : ''} />
+                                        {isLoadingEmails ? 'Syncing...' : 'Sync Mailbox'}
+                                    </button>
                                 </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            )}
 
-            {/* ═══════════ CSV EXPORTS TAB ═══════════ */}
-            {activeTab === 'exports' && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-6 lg:flex-row lg:items-center">
-                        <div>
-                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
-                                <FileSpreadsheet className="text-[#14b8a6]" size={28} />
-                                One-Click CSV Export Hub
-                            </h2>
-                            <p className="mt-1 text-xs text-white/50 max-w-2xl">
-                                Instantly download live Hackathon datasets formatted for Excel, Google Sheets, Mailchimp, and printer-ready ceremony packets.
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => handleCSVExport('master', 'Master Event Dump')}
-                                disabled={isExporting !== null}
-                                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase text-xs tracking-wider transition-all shadow-[0_0_20px_rgba(20,184,166,0.25)] active:scale-95 disabled:opacity-50"
-                            >
-                                <Database size={16} />
-                                {isExporting === 'master' ? 'Generating...' : 'Export Complete Master Archive'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Section 1: Ceremony & Evaluation */}
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
-                            <Award size={16} />
-                            <span>1. Judging, Ceremony & Deliverables</span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {[
-                                { 
-                                    type: 'standings', 
-                                    label: 'Final Scores & Standings', 
-                                    desc: 'Team rank, track, problem statement, Round 1 score, Round 2 score, total score, and judge comments. Essential for closing ceremony awards.', 
-                                    badge: 'Closing Ceremony',
-                                    icon: Award, 
-                                    color: 'amber' 
-                                },
-                                { 
-                                    type: 'submissions', 
-                                    label: 'Project Deliverables & Links', 
-                                    desc: 'Live deployment URLs, GitHub repository links, demo video links, and presentation slide decks for judging review.', 
-                                    badge: 'Jury Review',
-                                    icon: Presentation, 
-                                    color: 'teal' 
-                                },
-                                { 
-                                    type: 'contributions', 
-                                    label: 'Team Contributions', 
-                                    desc: 'Detailed breakdown of what each team member contributed to the project during the hackathon.', 
-                                    badge: 'Review',
-                                    icon: Users, 
-                                    color: 'purple' 
-                                },
-                            ].map(exp => (
-                                <button
-                                    key={exp.type}
-                                    onClick={() => handleCSVExport(exp.type, exp.label)}
-                                    disabled={isExporting !== null}
-                                    className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50 relative overflow-hidden"
-                                >
-                                    <div className="flex items-start justify-between">
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                                            exp.color === 'amber' ? 'bg-amber-500/20 text-amber-300' : 'bg-teal-500/20 text-teal-400'
-                                        }`}>
-                                            <exp.icon size={22} />
+                                {/* Error State */}
+                                {emailError && (
+                                    <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center gap-3">
+                                        <AlertTriangle size={18} className="shrink-0 text-red-400" />
+                                        <div>
+                                            <p className="font-bold">IMAP Sync Error</p>
+                                            <p className="text-white/60 text-[11px] mt-0.5">{emailError}</p>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-white/70">
-                                                {exp.badge}
-                                            </span>
+                                    </div>
+                                )}
+
+                                {/* Inbound Emails List */}
+                                {isLoadingEmails && inboundEmails.length === 0 ? (
+                                    <div className="flex items-center justify-center py-20">
+                                        <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                ) : inboundEmails.length === 0 ? (
+                                    <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                                        <Inbox size={48} className="mx-auto mb-4 text-white/10" />
+                                        <p className="text-white/30 font-bold uppercase tracking-[0.3em] text-xs">No emails in inbox</p>
+                                        <p className="text-white/20 text-xs mt-2">Replies to your passes or queries to business@happeno.in will appear here.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {inboundEmails.map(email => (
+                                            <div
+                                                key={email.id}
+                                                className={`p-5 rounded-2xl border transition-all ${email.isUnread
+                                                    ? 'bg-teal-500/[0.06] border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]'
+                                                    : 'bg-white/[0.02] border-white/10'
+                                                    }`}
+                                            >
+                                                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                                                    <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${email.isUnread ? 'bg-[#14b8a6]/20 text-[#14b8a6] border border-[#14b8a6]/40' : 'bg-white/10 text-white/50'
+                                                            }`}>
+                                                            <Mail size={16} />
+                                                        </div>
+
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <span className="font-bold text-sm text-white">{email.fromName || email.fromEmail}</span>
+                                                                <span className="text-[11px] font-mono text-white/40">({email.fromEmail})</span>
+
+                                                                {/* Matched Team Pill */}
+                                                                {email.matchedTeamName && (
+                                                                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
+                                                                        Team: {email.matchedTeamName} {email.matchedTeamId ? `(${email.matchedTeamId})` : ''}
+                                                                    </span>
+                                                                )}
+
+                                                                {email.isUnread && (
+                                                                    <span className="px-2 py-0.5 rounded-full bg-teal-400 text-black text-[9px] font-black uppercase">
+                                                                        New
+                                                                    </span>
+                                                                )}
+                                                            </div>
+
+                                                            <h4 className="text-sm font-bold text-white mt-1.5 leading-snug">
+                                                                {email.subject}
+                                                            </h4>
+
+                                                            <p className="text-xs text-white/60 mt-1 line-clamp-2 leading-relaxed">
+                                                                {email.snippet || '(No message preview)'}
+                                                            </p>
+
+                                                            <p className="text-[10px] text-white/30 font-mono mt-2">
+                                                                {new Date(email.date).toLocaleString()}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Action Buttons for Inbound Email */}
+                                                    <div className="flex items-center gap-2 shrink-0 self-end lg:self-start">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setReplyModalEmail(email)}
+                                                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 text-[11px] font-bold transition cursor-pointer"
+                                                        >
+                                                            <Reply size={13} /> Reply
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            disabled={isConvertingTicket === email.id}
+                                                            onClick={() => void handleConvertEmailToTicket(email)}
+                                                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer disabled:opacity-40"
+                                                        >
+                                                            <Plus size={13} /> {isConvertingTicket === email.id ? 'Creating...' : 'Create Ticket'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* ═══════════ CSV EXPORTS TAB ═══════════ */}
+                {activeTab === 'exports' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-6 lg:flex-row lg:items-center">
+                            <div>
+                                <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
+                                    <FileSpreadsheet className="text-[#14b8a6]" size={28} />
+                                    One-Click CSV Export Hub
+                                </h2>
+                                <p className="mt-1 text-xs text-white/50 max-w-2xl">
+                                    Instantly download live Hackathon datasets formatted for Excel, Google Sheets, Mailchimp, and printer-ready ceremony packets.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => handleCSVExport('master', 'Master Event Dump')}
+                                    disabled={isExporting !== null}
+                                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase text-xs tracking-wider transition-all shadow-[0_0_20px_rgba(20,184,166,0.25)] active:scale-95 disabled:opacity-50"
+                                >
+                                    <Database size={16} />
+                                    {isExporting === 'master' ? 'Generating...' : 'Export Complete Master Archive'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Section 1: Ceremony & Evaluation */}
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                                <Award size={16} />
+                                <span>1. Judging, Ceremony & Deliverables</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {[
+                                    {
+                                        type: 'standings',
+                                        label: 'Final Scores & Standings',
+                                        desc: 'Team rank, track, problem statement, Round 1 score, Round 2 score, total score, and judge comments. Essential for closing ceremony awards.',
+                                        badge: 'Closing Ceremony',
+                                        icon: Award,
+                                        color: 'amber'
+                                    },
+                                    {
+                                        type: 'submissions',
+                                        label: 'Project Deliverables & Links',
+                                        desc: 'Live deployment URLs, GitHub repository links, demo video links, and presentation slide decks for judging review.',
+                                        badge: 'Jury Review',
+                                        icon: Presentation,
+                                        color: 'teal'
+                                    },
+                                    {
+                                        type: 'contributions',
+                                        label: 'Team Contributions',
+                                        desc: 'Detailed breakdown of what each team member contributed to the project during the hackathon.',
+                                        badge: 'Review',
+                                        icon: Users,
+                                        color: 'purple'
+                                    },
+                                ].map(exp => (
+                                    <button
+                                        key={exp.type}
+                                        onClick={() => handleCSVExport(exp.type, exp.label)}
+                                        disabled={isExporting !== null}
+                                        className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50 relative overflow-hidden"
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${exp.color === 'amber' ? 'bg-amber-500/20 text-amber-300' : 'bg-teal-500/20 text-teal-400'
+                                                }`}>
+                                                <exp.icon size={22} />
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                                                    {exp.badge}
+                                                </span>
+                                                {isExporting === exp.type ? (
+                                                    <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                                ) : (
+                                                    <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                                )}
+                                            </div>
+                                        </div>
+                                        <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
+                                        <p className="mt-1 text-xs text-white/50 leading-relaxed">{exp.desc}</p>
+                                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                            <FileSpreadsheet size={13} />
+                                            Download CSV
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Section 2: Catering & Venue Logistics */}
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                                <Coffee size={16} />
+                                <span>2. Catering & Venue Operations</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {[
+                                    {
+                                        type: 'meals',
+                                        label: 'Meal Claims & Catering Audit',
+                                        desc: 'Detailed log of breakfast, lunch, snacks, and dinner claims across Day 1 & Day 2. Perfect for catering vendor invoice reconciliation.',
+                                        icon: Coffee,
+                                        color: 'red'
+                                    },
+                                    {
+                                        type: 'dietary',
+                                        label: 'Dietary Restrictions',
+                                        desc: 'Special diet requirements, vegetarian/vegan preferences, and allergies for food preparation.',
+                                        icon: Coffee,
+                                        color: 'orange'
+                                    },
+                                    {
+                                        type: 'checkin',
+                                        label: 'Gate Check-in & Rooms',
+                                        desc: 'Participant arrival timestamps, assigned rooms, assigned volunteer guide, and Wi-Fi credentials.',
+                                        icon: ScanLine,
+                                        color: 'green'
+                                    },
+                                ].map(exp => (
+                                    <button
+                                        key={exp.type}
+                                        onClick={() => handleCSVExport(exp.type, exp.label)}
+                                        disabled={isExporting !== null}
+                                        className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${exp.color === 'red' ? 'bg-rose-500/20 text-rose-300' :
+                                                exp.color === 'orange' ? 'bg-orange-500/20 text-orange-300' :
+                                                    'bg-emerald-500/20 text-emerald-300'
+                                                }`}>
+                                                <exp.icon size={22} />
+                                            </div>
                                             {isExporting === exp.type ? (
                                                 <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
                                             ) : (
                                                 <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
                                             )}
                                         </div>
-                                    </div>
-                                    <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
-                                    <p className="mt-1 text-xs text-white/50 leading-relaxed">{exp.desc}</p>
-                                    <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
-                                        <FileSpreadsheet size={13} />
-                                        Download CSV
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Section 2: Catering & Venue Logistics */}
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
-                            <Coffee size={16} />
-                            <span>2. Catering & Venue Operations</span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {[
-                                { 
-                                    type: 'meals', 
-                                    label: 'Meal Claims & Catering Audit', 
-                                    desc: 'Detailed log of breakfast, lunch, snacks, and dinner claims across Day 1 & Day 2. Perfect for catering vendor invoice reconciliation.', 
-                                    icon: Coffee, 
-                                    color: 'red' 
-                                },
-                                { 
-                                    type: 'dietary', 
-                                    label: 'Dietary Restrictions', 
-                                    desc: 'Special diet requirements, vegetarian/vegan preferences, and allergies for food preparation.', 
-                                    icon: Coffee, 
-                                    color: 'orange' 
-                                },
-                                { 
-                                    type: 'checkin', 
-                                    label: 'Gate Check-in & Rooms', 
-                                    desc: 'Participant arrival timestamps, assigned rooms, assigned volunteer guide, and Wi-Fi credentials.', 
-                                    icon: ScanLine, 
-                                    color: 'green' 
-                                },
-                            ].map(exp => (
-                                <button
-                                    key={exp.type}
-                                    onClick={() => handleCSVExport(exp.type, exp.label)}
-                                    disabled={isExporting !== null}
-                                    className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
-                                >
-                                    <div className="flex items-start justify-between">
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                                            exp.color === 'red' ? 'bg-rose-500/20 text-rose-300' :
-                                            exp.color === 'orange' ? 'bg-orange-500/20 text-orange-300' :
-                                            'bg-emerald-500/20 text-emerald-300'
-                                        }`}>
-                                            <exp.icon size={22} />
+                                        <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
+                                        <p className="mt-1 text-xs text-white/50 leading-relaxed">{exp.desc}</p>
+                                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                            <FileSpreadsheet size={13} />
+                                            Download CSV
                                         </div>
-                                        {isExporting === exp.type ? (
-                                            <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
-                                        ) : (
-                                            <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
-                                        )}
-                                    </div>
-                                    <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
-                                    <p className="mt-1 text-xs text-white/50 leading-relaxed">{exp.desc}</p>
-                                    <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
-                                        <FileSpreadsheet size={13} />
-                                        Download CSV
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Section 3: Communications & Staff Directories */}
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
-                            <Users size={16} />
-                            <span>3. Communications & People Directories</span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {[
-                                { 
-                                    type: 'emails', 
-                                    label: 'Participant Emails (Mail Merge)', 
-                                    desc: 'Every participant email, name, phone, team name, and track for newsletters and announcements.', 
-                                    icon: ClipboardList, 
-                                    color: 'blue' 
-                                },
-                                { 
-                                    type: 'teams', 
-                                    label: 'All Registered Teams', 
-                                    desc: 'Complete teams roster with captain contacts, college, and track selections.', 
-                                    icon: Users, 
-                                    color: 'teal' 
-                                },
-                                { 
-                                    type: 'judges', 
-                                    label: 'Judges Directory', 
-                                    desc: 'Official judge IDs, names, and assigned domain specializations.', 
-                                    icon: ShieldCheck, 
-                                    color: 'purple' 
-                                },
-                                { 
-                                    type: 'volunteers', 
-                                    label: 'Volunteers Directory', 
-                                    desc: 'Floor operations staff, contact phone numbers, and event roles.', 
-                                    icon: Users, 
-                                    color: 'blue' 
-                                },
-                            ].map(exp => (
-                                <button
-                                    key={exp.type}
-                                    onClick={() => handleCSVExport(exp.type, exp.label)}
-                                    disabled={isExporting !== null}
-                                    className="group p-5 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
-                                >
-                                    <div className="flex items-start justify-between">
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                                            exp.color === 'blue' ? 'bg-sky-500/20 text-sky-300' :
-                                            exp.color === 'teal' ? 'bg-teal-500/20 text-teal-300' :
-                                            'bg-purple-500/20 text-purple-300'
-                                        }`}>
-                                            <exp.icon size={18} />
-                                        </div>
-                                        {isExporting === exp.type ? (
-                                            <div className="w-4 h-4 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
-                                        ) : (
-                                            <Download size={14} className="text-white/20 group-hover:text-[#14b8a6] transition" />
-                                        )}
-                                    </div>
-                                    <h3 className="mt-3 text-base font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
-                                    <p className="mt-1 text-[11px] text-white/50 leading-relaxed">{exp.desc}</p>
-                                    <div className="mt-3 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#14b8a6]">
-                                        <FileSpreadsheet size={11} />
-                                        Download CSV
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ═══════════ QR CHECK-IN TAB ═══════════ */}
-            {activeTab === 'checkin' && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
-                        <div>
-                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">QR Check-in Scanner</h2>
-                            <p className="mt-1 text-xs text-white/45">Scan participant QR codes to mark them as checked-in at the venue.</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => {
-                                        if (confirm('Are you sure you want to clear ALL gate check-ins?')) {
-                                            resetBulkCheckins('gate');
-                                        }
-                                    }}
-                                    className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
-                                >
-                                    Clear Gate
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (confirm('Are you sure you want to clear ALL meal check-ins?')) {
-                                            resetBulkCheckins('meals');
-                                        }
-                                    }}
-                                    className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
-                                >
-                                    Clear Meals
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (confirm('Are you sure you want to clear ALL networking check-ins?')) {
-                                            resetBulkCheckins('networking');
-                                        }
-                                    }}
-                                    className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
-                                >
-                                    Clear Networking
-                                </button>
-                            </div>
-                            <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2">
-                                {recentView === 'gate' && (
-                                    <>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Checked In</span>
-                                        <span className="text-xl font-black italic text-[#14b8a6]">{projects.filter(p => p.isCheckedIn).length}</span>
-                                        <span className="text-white/30 font-bold">/</span>
-                                        <span className="text-lg font-black text-white/50">{projects.length}</span>
-                                    </>
-                                )}
-                                {recentView === 'meals' && (() => {
-                                    const mealsScannedCount = projects.reduce((acc, p) => acc + (Array.isArray(p.mealAccess?.dinner_claimed) ? p.mealAccess.dinner_claimed.length : 0), 0);
-                                    return (
-                                        <>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Meals Claimed</span>
-                                            <span className="text-xl font-black italic text-[#14b8a6]">{mealsScannedCount}</span>
-                                        </>
-                                    );
-                                })()}
-                                {recentView === 'networking' && (() => {
-                                    const networkingScannedCount = projects.reduce((acc, p) => acc + (Array.isArray(p.mealAccess?.networking_claimed) ? p.mealAccess.networking_claimed.length : 0), 0);
-                                    return (
-                                        <>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Networking Claimed</span>
-                                            <span className="text-xl font-black italic text-[#14b8a6]">{networkingScannedCount}</span>
-                                        </>
-                                    );
-                                })()}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Scanner Panel */}
-                        <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 overflow-hidden">
-                            {showCheckinScanner ? (
-                                <div className="space-y-4">
-                                    <QRScanner
-                                        onScan={handleCheckinScan}
-                                        onClose={() => { setShowCheckinScanner(false); setCheckinResult(null); }}
-                                        showCloseButton={true}
-                                        continuous={true}
-                                        embedded={true}
-                                    />
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-16 space-y-6">
-                                    <div className="w-24 h-24 rounded-3xl bg-[#14b8a6]/10 border border-[#14b8a6]/20 flex items-center justify-center">
-                                        <ScanLine size={48} className="text-[#14b8a6]" />
-                                    </div>
-                                    <div className="text-center">
-                                        <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Ready to Scan</h3>
-                                        <p className="text-xs text-white/40 mt-1">Open the camera to start scanning participant QR codes</p>
-                                    </div>
-                                    <button
-                                        onClick={() => setShowCheckinScanner(true)}
-                                        className="px-8 py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(20,184,166,0.2)]"
-                                    >
-                                        Open Scanner
                                     </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Recent Check-ins */}
-                        <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-black italic uppercase tracking-tight text-white">Recent Check-ins</h3>
-                                <div className="flex bg-white/5 rounded-lg p-1">
-                                    {(['gate', 'meals', 'networking'] as const).map(view => (
-                                        <button
-                                            key={view}
-                                            onClick={() => setRecentView(view)}
-                                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-md transition-all ${
-                                                recentView === view
-                                                    ? 'bg-[#14b8a6] text-black shadow-[0_0_10px_rgba(20,184,166,0.3)]'
-                                                    : 'text-white/40 hover:text-white hover:bg-white/5'
-                                            }`}
-                                        >
-                                            {view}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
-                                {recentView === 'gate' && (
-                                    projects.filter(p => p.isCheckedIn).length === 0 ? (
-                                        <div className="py-12 text-center">
-                                            <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No teams checked in yet</p>
-                                        </div>
-                                    ) : (
-                                        projects
-                                            .filter(p => p.isCheckedIn)
-                                            .sort((a, b) => {
-                                                const aTime = a.checkedInAt ? new Date(a.checkedInAt).getTime() : 0;
-                                                const bTime = b.checkedInAt ? new Date(b.checkedInAt).getTime() : 0;
-                                                return bTime - aTime;
-                                            })
-                                            .slice(0, 50)
-                                            .map(team => (
-                                                <div key={team.id} className="flex items-center gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10">
-                                                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">
-                                                        <CheckCircle size={16} />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-bold text-white truncate">{team.team}</p>
-                                                        <p className="text-[10px] text-white/40">{team.teamId}{team.checkedInAt ? ` • ${new Date(team.checkedInAt).toLocaleTimeString()}` : ''}</p>
-                                                    </div>
-                                                </div>
-                                            ))
-                                    )
-                                )}
-                                {recentView === 'meals' && (() => {
-                                    const meals = projects.flatMap(p => 
-                                        (Array.isArray(p.mealAccess?.dinner_claimed) ? p.mealAccess.dinner_claimed : []).map((memberId: string) => ({
-                                            teamName: p.team,
-                                            teamId: p.teamId,
-                                            memberName: (p.members?.find((m: any) => (m?.participant_id || m?.id) === memberId) as any)?.fullName || "Unknown Member"
-                                        }))
-                                    ).slice(0, 50);
-
-                                    return meals.length === 0 ? (
-                                        <div className="py-12 text-center">
-                                            <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No meal claims yet</p>
-                                        </div>
-                                    ) : meals.map((claim: any, idx) => (
-                                        <div key={`meal-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                                            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                                                <Coffee size={16} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-white truncate">{claim.teamName} <span className="text-xs font-normal text-white/50">({claim.memberName})</span></p>
-                                                <p className="text-[10px] text-white/40">{claim.teamId} • Dinner</p>
-                                            </div>
-                                        </div>
-                                    ));
-                                })()}
-                                {recentView === 'networking' && (() => {
-                                    const net = projects.flatMap(p => 
-                                        (Array.isArray(p.mealAccess?.networking_claimed) ? p.mealAccess.networking_claimed : []).map((memberId: string) => ({
-                                            teamName: p.team,
-                                            teamId: p.teamId,
-                                            memberName: (p.members?.find((m: any) => (m?.participant_id || m?.id) === memberId) as any)?.fullName || "Unknown Member"
-                                        }))
-                                    ).slice(0, 50);
-
-                                    return net.length === 0 ? (
-                                        <div className="py-12 text-center">
-                                            <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No networking claims yet</p>
-                                        </div>
-                                    ) : net.map((claim: any, idx) => (
-                                        <div key={`net-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 border border-purple-500/10">
-                                            <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
-                                                <Users size={16} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-white truncate">{claim.teamName} <span className="text-xs font-normal text-white/50">({claim.memberName})</span></p>
-                                                <p className="text-[10px] text-white/40">{claim.teamId} • Networking</p>
-                                            </div>
-                                        </div>
-                                    ));
-                                })()}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Grant Passes Form */}
-                    <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 mb-6">
-                        <h3 className="text-lg font-black italic uppercase tracking-tight text-white mb-4">Manage Activity Passes</h3>
-                        <div className="flex flex-col gap-4">
-                            <div className="flex flex-col md:flex-row gap-4 items-end">
-                                <div className="flex-1 w-full space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase">Search Team ID</label>
-                                    <input 
-                                        type="text" 
-                                        value={grantPassTeamId}
-                                        onChange={(e) => setGrantPassTeamId(e.target.value.toUpperCase())}
-                                        placeholder="e.g. TRI12345"
-                                        className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white font-mono placeholder:text-white/20 focus:outline-none focus:border-[#14b8a6]"
-                                    />
-                                </div>
-                            </div>
-                            
-                            {(() => {
-                                const searchedTeam = projects.find(p => p.teamId === grantPassTeamId || String(p.id) === grantPassTeamId);
-                                if (!grantPassTeamId) return null;
-                                if (!searchedTeam) return <p className="text-sm font-bold text-red-400">Team not found in current event data.</p>;
-
-                                const hasMealPass = Array.isArray(searchedTeam.mealAccess?.purchased_meals) && (searchedTeam.mealAccess.purchased_meals.includes('all') || searchedTeam.mealAccess.purchased_meals.length > 0);
-                                const hasNetworkingPass = Array.isArray(searchedTeam.mealAccess?.networking_passes) && (searchedTeam.mealAccess.networking_passes.includes('all') || searchedTeam.mealAccess.networking_passes.length > 0);
-
-                                return (
-                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h4 className="font-bold text-white text-lg">{searchedTeam.team}</h4>
-                                                <p className="text-xs text-white/40">Captain: {searchedTeam.captain}</p>
-                                            </div>
-                                            <div className="flex gap-2 text-[10px] font-black uppercase tracking-widest">
-                                                <span className={`px-2 py-1 rounded-md ${hasMealPass ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/10 text-red-400/50 border border-red-500/20'}`}>
-                                                    Meal Pass: {hasMealPass ? 'ACTIVE' : 'NONE'}
-                                                </span>
-                                                <span className={`px-2 py-1 rounded-md ${hasNetworkingPass ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-red-500/10 text-red-400/50 border border-red-500/20'}`}>
-                                                    Networking: {hasNetworkingPass ? 'ACTIVE' : 'NONE'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col md:flex-row gap-4 items-end pt-4 border-t border-white/5">
-                                            <div className="flex-1 w-full space-y-2">
-                                                <label className="text-xs font-bold text-white/40 uppercase">Action</label>
-                                                <select 
-                                                    value={grantPassType}
-                                                    onChange={(e) => setGrantPassType(e.target.value)}
-                                                    className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white font-bold focus:outline-none focus:border-[#14b8a6] appearance-none [&>option]:bg-slate-900 [&>option]:text-white"
-                                                >
-                                                    <option value="both">Grant Both Passes</option>
-                                                    <option value="meal">Grant Meal Only</option>
-                                                    <option value="networking">Grant Networking Only</option>
-                                                </select>
-                                            </div>
-                                            <button 
-                                                onClick={handleGrantPass}
-                                                disabled={grantPassLoading || (hasMealPass && grantPassType === 'meal') || (hasNetworkingPass && grantPassType === 'networking') || (hasMealPass && hasNetworkingPass && grantPassType === 'both')}
-                                                className="w-full md:w-auto px-8 py-3 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 font-black uppercase tracking-widest hover:bg-purple-500/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                            >
-                                                {grantPassLoading ? 'Granting...' : 'Grant Access'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })()}
-                        </div>
-                        {grantPassMessage && (
-                            <div className={`mt-4 p-3 rounded-xl text-xs font-bold ${grantPassMessage.includes('Error') ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
-                                {grantPassMessage}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Scan result feedback */}
-                    <AnimatePresence>
-                        {checkinResult && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 20 }}
-                                className={`p-6 rounded-2xl border ${
-                                    checkinResult.status === 'PERMITTED' ? 'bg-green-500/10 border-green-500/20' :
-                                    checkinResult.status === 'ALREADY_CHECKED_IN' ? 'bg-amber-500/10 border-amber-500/20' :
-                                    'bg-red-500/10 border-red-500/20'
-                                }`}
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                                        checkinResult.status === 'PERMITTED' ? 'bg-green-500 text-white' :
-                                        checkinResult.status === 'ALREADY_CHECKED_IN' ? 'bg-amber-500 text-white' :
-                                        'bg-red-500 text-white'
-                                    }`}>
-                                        {checkinResult.status === 'PERMITTED' ? <CheckCircle size={24} /> :
-                                         checkinResult.status === 'ALREADY_CHECKED_IN' ? <AlertTriangle size={24} /> :
-                                         <X size={24} />}
-                                    </div>
-                                    <div>
-                                        <h4 className="text-xl font-black italic uppercase tracking-tight text-white">{checkinResult.teamName}</h4>
-                                        <p className="text-sm text-white/60">
-                                            {checkinResult.status === 'PERMITTED' ? 'Successfully checked in!' :
-                                             checkinResult.status === 'ALREADY_CHECKED_IN' ? 'This team was already checked in.' :
-                                             'Check-in failed.'}
-                                        </p>
-                                    </div>
-                                    <button onClick={() => setCheckinResult(null)} className="ml-auto p-2 text-white/30 hover:text-white"><X size={20} /></button>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            )}
-
-            {/* Reserved panel intentionally disabled. */}
-            {false && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                        <div>
-                            <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white">Team status</h3>
-                            <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Change a team’s eligibility status. Restoring a team is available at any time.</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4">
-                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Active</span>
-                                <span className="text-2xl font-black italic text-green-400">{projects.length}</span>
-                            </div>
-                            <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4">
-                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Registered</span>
-                                <span className="text-2xl font-black italic text-green-400">{projects.length}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="relative mb-8">
-                        <input
-                            type="text"
-                            placeholder="Search registered team..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pl-14 text-white font-medium focus:outline-none focus:border-slate-800/50 transition-all"
-                        />
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-white/20" size={24} />
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-4">
-                        {filteredTeams.map((team) => (
-                            <div
-                                key={team.id}
-                                className="flex items-center justify-between p-6 rounded-3xl border border-white/10 bg-white/5 transition-all"
-                            >
-                                <div className="flex items-center gap-6">
-                                    <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black bg-green-500/20 text-green-400">
-                                        {team.team ? team.team[0] : "?"}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-3">
-                                            <h4 className="text-xl font-black italic uppercase tracking-tighter text-white">{team.team}</h4>
-                                            <span className="text-[10px] font-black text-white/40 px-2 py-0.5 border border-white/10 rounded">{team.teamId}</span>
-                                        </div>
-                                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">{team.track}</p>
-                                    </div>
-                                </div>
-
-                                <button
-                                    disabled
-                                    className="px-8 py-4 rounded-2xl font-black uppercase italic text-xs tracking-widest bg-white/10 text-white/40"
-                                >
-                                    Registered
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            <AnimatePresence>
-                {showMergeModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-xl max-h-[85vh] overflow-y-auto bg-[#0B0114] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
-                            <div className="flex items-center justify-between mb-8">
-                                <div>
-                                    <h3 className="text-3xl font-black italic uppercase text-white tracking-tighter">Merge Teams</h3>
-                                    <p className="text-xs text-white/50 font-bold uppercase tracking-widest mt-2">Combine Solo/Duo Registrations</p>
-                                </div>
-                                <button onClick={() => setShowMergeModal(false)} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
-                                    <Trash2 size={20} className="text-white/50" />
-                                </button>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">New Team Name</label>
-                                    <input value={mergeTeamName} onChange={(e) => setMergeTeamName(e.target.value)} placeholder="e.g. The Innovators" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]" />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Search Teams to Merge</label>
-                                    <div className="relative">
-                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={16} />
-                                        <input value={mergeSearchQuery} onChange={(e) => setMergeSearchQuery(e.target.value)} placeholder="Search by name, ID, or captain..." className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white outline-none focus:border-[#14b8a6]" />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Select Teams ({selectedMergeTeams.length} selected)</label>
-                                    <div className="bg-black/30 border border-white/5 rounded-2xl p-2 h-64 overflow-y-auto space-y-1">
-                                        {projects.filter(p => !mergeSearchQuery || p.team.toLowerCase().includes(mergeSearchQuery.toLowerCase()) || p.teamId?.toLowerCase().includes(mergeSearchQuery.toLowerCase()) || p.captain?.toLowerCase().includes(mergeSearchQuery.toLowerCase())).map(team => (
-                                            <label key={team.id} className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl cursor-pointer border border-transparent hover:border-white/5 transition-colors">
-                                                <input type="checkbox" checked={selectedMergeTeams.includes(team.id.toString())} onChange={(e) => {
-                                                    if (e.target.checked) setSelectedMergeTeams([...selectedMergeTeams, team.id.toString()]);
-                                                    else setSelectedMergeTeams(selectedMergeTeams.filter(id => id !== team.id.toString()));
-                                                }} className="w-4 h-4 rounded bg-black border-white/20 text-[#14b8a6] focus:ring-[#14b8a6] focus:ring-offset-black" />
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-sm font-bold text-white truncate">{team.team}</span>
-                                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-white/50">{team.teamId}</span>
-                                                    </div>
-                                                    <div className="text-[10px] text-white/40 truncate">{team.captain} • {team.members?.length || 0} member(s)</div>
-                                                </div>
-                                            </label>
-                                        ))}
-                                        {projects.length === 0 && <div className="p-4 text-center text-white/40 text-xs">No teams found</div>}
-                                    </div>
-                                </div>
-
-                                <button onClick={handleMergeTeams} disabled={isMerging || selectedMergeTeams.length < 2 || !mergeTeamName} className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic text-sm tracking-widest shadow-[0_0_20px_rgba(20,184,166,0.2)] hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 transition-all flex items-center justify-center gap-2">
-                                    {isMerging ? <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : <Users size={18} />}
-                                    {isMerging ? "Merging Teams..." : "Confirm Merge"}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            <AnimatePresence>
-                {mergeResult && (
-                    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-                        <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0B0114] p-7 shadow-2xl">
-                            <div className="mb-6">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14b8a6]">Merge complete</p>
-                                <h3 className="mt-2 text-2xl font-black uppercase text-white">{mergeResult.teamName}</h3>
-                                <p className="mt-1 text-sm text-white/50">{mergeResult.memberCount} members can use these participant credentials.</p>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Team ID</p>
-                                    <p className="mt-2 select-all font-mono text-lg font-bold text-white">{mergeResult.teamId}</p>
-                                </div>
-                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Password</p>
-                                    <p className="mt-2 select-all break-all font-mono text-lg font-bold text-[#14b8a6]">{mergeResult.password}</p>
-                                </div>
-                            </div>
-                            <button onClick={() => { setMergeResult(null); window.location.reload(); }} className="mt-6 w-full rounded-xl bg-[#14b8a6] py-3 text-sm font-black uppercase tracking-wider text-black transition hover:bg-white">Done</button>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-            
-            <AnimatePresence>
-                {showBulkMealModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-xl max-h-[85vh] overflow-y-auto bg-[#0B0114] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">Bulk Meal Assign</h2>
-                                    <p className="text-xs text-white/50 font-bold uppercase tracking-widest mt-2">Grant access for selected meals to all active teams.</p>
-                                </div>
-                                <button onClick={() => setShowBulkMealModal(false)} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
-                                    <X size={20} className="text-white/50" />
-                                </button>
-                            </div>
-                            <div className="space-y-4">
-                                {EVENT_MEALS.map((meal) => (
-                                    <label key={meal.key} className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-colors">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedBulkMeals.includes(meal.key)}
-                                            onChange={(e) => {
-                                                if (e.target.checked) setSelectedBulkMeals(prev => [...prev, meal.key]);
-                                                else setSelectedBulkMeals(prev => prev.filter(k => k !== meal.key));
-                                            }}
-                                            className="w-5 h-5 rounded border-white/20 bg-black/50 text-[#14b8a6] focus:ring-[#14b8a6]"
-                                        />
-                                        <div>
-                                            <div className="font-bold text-white uppercase text-sm tracking-wider">{meal.mealLabel}</div>
-                                            <div className="text-[10px] text-white/40 uppercase tracking-widest">{meal.dayLabel}</div>
-                                        </div>
-                                    </label>
                                 ))}
                             </div>
-                            <div className="mt-8">
-                                <button
-                                    onClick={handleBulkMealAssign}
-                                    disabled={isBulkAssigning || selectedBulkMeals.length === 0}
-                                    className="w-full py-4 rounded-xl font-black uppercase italic tracking-widest transition-all bg-[#14b8a6] text-black hover:bg-[#14b8a6]/80 disabled:opacity-50"
-                                >
-                                    {isBulkAssigning ? 'ASSIGNING...' : selectedTeamIds.length > 0 ? `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ${selectedTeamIds.length} TEAMS` : `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ALL`}
-                                </button>
+                        </div>
+
+                        {/* Section 3: Communications & Staff Directories */}
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                                <Users size={16} />
+                                <span>3. Communications & People Directories</span>
                             </div>
-                        </motion.div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {[
+                                    {
+                                        type: 'emails',
+                                        label: 'Participant Emails (Mail Merge)',
+                                        desc: 'Every participant email, name, phone, team name, and track for newsletters and announcements.',
+                                        icon: ClipboardList,
+                                        color: 'blue'
+                                    },
+                                    {
+                                        type: 'teams',
+                                        label: 'All Registered Teams',
+                                        desc: 'Complete teams roster with captain contacts, college, and track selections.',
+                                        icon: Users,
+                                        color: 'teal'
+                                    },
+                                    {
+                                        type: 'judges',
+                                        label: 'Judges Directory',
+                                        desc: 'Official judge IDs, names, and assigned domain specializations.',
+                                        icon: ShieldCheck,
+                                        color: 'purple'
+                                    },
+                                    {
+                                        type: 'volunteers',
+                                        label: 'Volunteers Directory',
+                                        desc: 'Floor operations staff, contact phone numbers, and event roles.',
+                                        icon: Users,
+                                        color: 'blue'
+                                    },
+                                ].map(exp => (
+                                    <button
+                                        key={exp.type}
+                                        onClick={() => handleCSVExport(exp.type, exp.label)}
+                                        disabled={isExporting !== null}
+                                        className="group p-5 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${exp.color === 'blue' ? 'bg-sky-500/20 text-sky-300' :
+                                                exp.color === 'teal' ? 'bg-teal-500/20 text-teal-300' :
+                                                    'bg-purple-500/20 text-purple-300'
+                                                }`}>
+                                                <exp.icon size={18} />
+                                            </div>
+                                            {isExporting === exp.type ? (
+                                                <div className="w-4 h-4 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <Download size={14} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                            )}
+                                        </div>
+                                        <h3 className="mt-3 text-base font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
+                                        <p className="mt-1 text-[11px] text-white/50 leading-relaxed">{exp.desc}</p>
+                                        <div className="mt-3 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                            <FileSpreadsheet size={11} />
+                                            Download CSV
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 )}
-            </AnimatePresence>
 
-            {/* ═══════════ FLOATING BULK ACTIONS TOOLBAR ═══════════ */}
-            <AnimatePresence>
-                {selectedTeamIds.length > 0 && (
-                    <motion.div
-                        initial={{ y: 100, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 100, opacity: 0 }}
-                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-4xl bg-[#0D0219]/95 border-2 border-[#14b8a6]/50 rounded-2xl p-4 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl flex flex-wrap items-center justify-between gap-4"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="w-9 h-9 rounded-xl bg-[#14b8a6] text-black font-black flex items-center justify-center text-sm shadow-[0_0_15px_rgba(20,184,166,0.5)]">
-                                {selectedTeamIds.length}
-                            </span>
+                {/* ═══════════ QR CHECK-IN TAB ═══════════ */}
+                {activeTab === 'checkin' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center">
                             <div>
-                                <span className="text-white font-black text-sm uppercase italic tracking-wider block">
-                                    {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'} Selected
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={clearSelection}
-                                    className="text-[10px] text-white/50 hover:text-white underline uppercase tracking-widest transition-colors"
-                                >
-                                    Deselect all
-                                </button>
+                                <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">QR Check-in Scanner</h2>
+                                <p className="mt-1 text-xs text-white/45">Scan participant QR codes to mark them as checked-in at the venue.</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => {
+                                            if (confirm('Are you sure you want to clear ALL gate check-ins?')) {
+                                                resetBulkCheckins('gate');
+                                            }
+                                        }}
+                                        className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
+                                    >
+                                        Clear Gate
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (confirm('Are you sure you want to clear ALL meal check-ins?')) {
+                                                resetBulkCheckins('meals');
+                                            }
+                                        }}
+                                        className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
+                                    >
+                                        Clear Meals
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (confirm('Are you sure you want to clear ALL networking check-ins?')) {
+                                                resetBulkCheckins('networking');
+                                            }
+                                        }}
+                                        className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500/20 transition-all"
+                                    >
+                                        Clear Networking
+                                    </button>
+                                </div>
+                                <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2">
+                                    {recentView === 'gate' && (
+                                        <>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Checked In</span>
+                                            <span className="text-xl font-black italic text-[#14b8a6]">{projects.filter(p => p.isCheckedIn).length}</span>
+                                            <span className="text-white/30 font-bold">/</span>
+                                            <span className="text-lg font-black text-white/50">{projects.length}</span>
+                                        </>
+                                    )}
+                                    {recentView === 'meals' && (() => {
+                                        const mealsScannedCount = projects.reduce((acc, p) => acc + (Array.isArray(p.mealAccess?.dinner_claimed) ? p.mealAccess.dinner_claimed.length : 0), 0);
+                                        return (
+                                            <>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Meals Claimed</span>
+                                                <span className="text-xl font-black italic text-[#14b8a6]">{mealsScannedCount}</span>
+                                            </>
+                                        );
+                                    })()}
+                                    {recentView === 'networking' && (() => {
+                                        const networkingScannedCount = projects.reduce((acc, p) => acc + (Array.isArray(p.mealAccess?.networking_claimed) ? p.mealAccess.networking_claimed.length : 0), 0);
+                                        return (
+                                            <>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Networking Claimed</span>
+                                                <span className="text-xl font-black italic text-[#14b8a6]">{networkingScannedCount}</span>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 flex-wrap">
-                            {/* Move Track */}
-                            <button
-                                type="button"
-                                onClick={() => setShowMoveTrackModal(true)}
-                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 hover:bg-blue-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
-                            >
-                                <ArrowRightLeft size={14} /> Move Track
-                            </button>
-
-                            {/* Assign Room */}
-                            <button
-                                type="button"
-                                onClick={() => setShowMoveRoomModal(true)}
-                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
-                            >
-                                <DoorOpen size={14} /> Assign Room
-                            </button>
-
-                            {/* Bulk Check-In */}
-                            <button
-                                type="button"
-                                onClick={handleBulkCheckIn}
-                                disabled={isBulkProcessing}
-                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#14b8a6]/20 border border-[#14b8a6]/40 text-[#14b8a6] hover:bg-[#14b8a6]/30 text-xs font-black uppercase italic tracking-wider transition-all disabled:opacity-50"
-                            >
-                                <CheckCircle2 size={14} /> Check In ({selectedTeamIds.length})
-                            </button>
-
-                            {/* Assign Meals */}
-                            <button
-                                type="button"
-                                onClick={() => setShowBulkMealModal(true)}
-                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
-                            >
-                                <Coffee size={14} /> Assign Meals
-                            </button>
-
-                            {/* Merge (if >= 2 selected) */}
-                            {selectedTeamIds.length >= 2 && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setSelectedMergeTeams(selectedTeamIds);
-                                        setShowMergeModal(true);
-                                    }}
-                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 hover:bg-purple-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
-                                >
-                                    <Users size={14} /> Merge ({selectedTeamIds.length})
-                                </button>
-                            )}
-
-                            {/* Clear Submissions */}
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setClearSubmissionsTarget('selected');
-                                    setShowClearSubmissionsModal(true);
-                                }}
-                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
-                            >
-                                <RotateCcw size={14} /> Clear Submissions ({selectedTeamIds.length})
-                            </button>
-
-
-                            {/* Bulk Delete */}
-                            <button
-                                type="button"
-                                onClick={() => setShowDeleteModal(true)}
-                                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
-                            >
-                                <Trash2 size={14} /> Delete
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ BULK DELETE MODAL ═══════════ */}
-            <AnimatePresence>
-                {showDeleteModal && (
-                    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-red-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
-                            <div className="flex items-center gap-4 mb-5">
-                                <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center shrink-0">
-                                    <Trash2 size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
-                                        Delete {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'}?
-                                    </h3>
-                                    <p className="text-xs text-red-400 font-bold uppercase tracking-widest mt-0.5">Irreversible Permanent Deletion</p>
-                                </div>
-                            </div>
-
-                            <p className="text-xs text-white/70 leading-relaxed mb-4">
-                                This action will permanently remove the <strong className="text-white">{selectedTeamIds.length}</strong> selected registration{selectedTeamIds.length === 1 ? '' : 's'} from the database. All associated member rosters, login credentials, evaluation scores, and final submissions will be permanently purged.
-                            </p>
-
-                            <div className="max-h-36 overflow-y-auto custom-scrollbar p-3 rounded-xl bg-black/40 border border-white/5 space-y-1.5 mb-6 text-xs font-mono text-white/60">
-                                {selectedTeamIds.slice(0, 10).map(id => {
-                                    const t = projects.find(p => (p.teamId || String(p.id)) === id);
-                                    return (
-                                        <div key={id} className="flex justify-between items-center py-0.5 border-b border-white/5 last:border-0">
-                                            <span className="text-white truncate">{t?.team || t?.name || id}</span>
-                                            <span className="text-[#14b8a6] text-[10px] ml-2 shrink-0">{id}</span>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Scanner Panel */}
+                            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 overflow-hidden">
+                                {showCheckinScanner ? (
+                                    <div className="space-y-4">
+                                        <QRScanner
+                                            onScan={handleCheckinScan}
+                                            onClose={() => { setShowCheckinScanner(false); setCheckinResult(null); }}
+                                            showCloseButton={true}
+                                            continuous={true}
+                                            embedded={true}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-16 space-y-6">
+                                        <div className="w-24 h-24 rounded-3xl bg-[#14b8a6]/10 border border-[#14b8a6]/20 flex items-center justify-center">
+                                            <ScanLine size={48} className="text-[#14b8a6]" />
                                         </div>
-                                    );
-                                })}
-                                {selectedTeamIds.length > 10 && (
-                                    <div className="text-[10px] text-white/40 italic pt-1">
-                                        ...and {selectedTeamIds.length - 10} more teams
+                                        <div className="text-center">
+                                            <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Ready to Scan</h3>
+                                            <p className="text-xs text-white/40 mt-1">Open the camera to start scanning participant QR codes</p>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowCheckinScanner(true)}
+                                            className="px-8 py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(20,184,166,0.2)]"
+                                        >
+                                            Open Scanner
+                                        </button>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowDeleteModal(false)}
-                                    disabled={isBulkProcessing}
-                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleConfirmBulkDelete}
-                                    disabled={isBulkProcessing}
-                                    className="flex-1 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
-                                >
-                                    {isBulkProcessing ? 'Deleting...' : `Yes, Delete (${selectedTeamIds.length})`}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ MOVE TRACK MODAL ═══════════ */}
-            <AnimatePresence>
-                {showMoveTrackModal && (
-                    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-blue-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
-                            <div className="flex items-center gap-4 mb-5">
-                                <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center justify-center shrink-0">
-                                    <ArrowRightLeft size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
-                                        Move {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'}
-                                    </h3>
-                                    <p className="text-xs text-blue-400 font-bold uppercase tracking-widest mt-0.5">Bulk Track Reassignment</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4 mb-6">
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Select Target Track</label>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
-                                        {TRACKS.map(track => (
+                            {/* Recent Check-ins */}
+                            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-black italic uppercase tracking-tight text-white">Recent Check-ins</h3>
+                                    <div className="flex bg-white/5 rounded-lg p-1">
+                                        {(['gate', 'meals', 'networking'] as const).map(view => (
                                             <button
-                                                key={track}
-                                                type="button"
-                                                onClick={() => {
-                                                    setSelectedTargetTrack(track);
-                                                    setCustomTargetTrack("");
-                                                }}
-                                                className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${
-                                                    selectedTargetTrack === track && !customTargetTrack
-                                                        ? 'bg-blue-500/20 border-blue-400 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                                                        : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
-                                                }`}
+                                                key={view}
+                                                onClick={() => setRecentView(view)}
+                                                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-md transition-all ${recentView === view
+                                                    ? 'bg-[#14b8a6] text-black shadow-[0_0_10px_rgba(20,184,166,0.3)]'
+                                                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                                                    }`}
                                             >
-                                                {track}
+                                                {view}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
-
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Or Custom Track Name</label>
-                                    <input
-                                        type="text"
-                                        value={customTargetTrack}
-                                        onChange={(e) => setCustomTargetTrack(e.target.value)}
-                                        placeholder="e.g. Web3 & DeFi, Robotics, etc."
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-blue-400 transition-all font-semibold"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowMoveTrackModal(false)}
-                                    disabled={isBulkProcessing}
-                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleConfirmMoveTrack}
-                                    disabled={isBulkProcessing}
-                                    className="flex-1 py-3.5 rounded-xl bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
-                                >
-                                    {isBulkProcessing ? 'Moving...' : `Apply to ${selectedTeamIds.length} Teams`}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ ASSIGN ROOM MODAL ═══════════ */}
-            <AnimatePresence>
-                {showMoveRoomModal && (
-                    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-emerald-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
-                            <div className="flex items-center gap-4 mb-5">
-                                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                                    <DoorOpen size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
-                                        Assign Room ({selectedTeamIds.length} Teams)
-                                    </h3>
-                                    <p className="text-xs text-emerald-400 font-bold uppercase tracking-widest mt-0.5">Venue Location Allocation</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4 mb-6">
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Room / Hall Location *</label>
-                                    <input
-                                        type="text"
-                                        value={targetRoom}
-                                        onChange={(e) => setTargetRoom(e.target.value)}
-                                        placeholder="e.g. Auditorium 2 - Row B, Lab 401"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Wi-Fi Network SSID (Optional)</label>
-                                        <input
-                                            type="text"
-                                            value={targetWifiSSID}
-                                            onChange={(e) => setTargetWifiSSID(e.target.value)}
-                                            placeholder="e.g. TRICITY_HACK_5G"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Wi-Fi Password (Optional)</label>
-                                        <input
-                                            type="text"
-                                            value={targetWifiPass}
-                                            onChange={(e) => setTargetWifiPass(e.target.value)}
-                                            placeholder="e.g. hack2026pass"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowMoveRoomModal(false)}
-                                    disabled={isBulkProcessing}
-                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleConfirmMoveRoom}
-                                    disabled={isBulkProcessing || !targetRoom.trim()}
-                                    className="flex-1 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
-                                >
-                                    {isBulkProcessing ? 'Assigning...' : `Assign to ${selectedTeamIds.length} Teams`}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ ON-SCREEN DIGITAL PASS MODAL ═══════════ */}
-            <AnimatePresence>
-                {passModalTeam && (
-                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            transition={{ duration: 0.2 }}
-                            className={`w-full max-w-md ${
-                                passTheme === 'light'
-                                    ? 'bg-white text-slate-900 border border-slate-200 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)]'
-                                    : 'bg-[#0a0216] text-white border-2 border-[#14b8a6]/40 shadow-[0_0_60px_rgba(20,184,166,0.25)]'
-                            } rounded-[2.2rem] p-6 sm:p-7 overflow-hidden relative`}
-                        >
-                            {/* VIP Lanyard Notch */}
-                            <div className={`w-14 h-1.5 rounded-full mx-auto -mt-2 mb-4 ${
-                                passTheme === 'light' ? 'bg-slate-300' : 'bg-white/20'
-                            }`} />
-
-                            <div className={`flex items-center justify-between pb-4 border-b mb-4 ${
-                                passTheme === 'light' ? 'border-slate-200' : 'border-white/10'
-                            }`}>
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
-                                        passTheme === 'light'
-                                            ? 'bg-teal-50 border-teal-200 text-teal-700 shadow-sm'
-                                            : 'bg-[#14b8a6]/20 border-[#14b8a6]/40 text-[#14b8a6] shadow-[0_0_15px_rgba(20,184,166,0.25)]'
-                                    }`}>
-                                        <QrCode size={20} />
-                                    </div>
-                                    <div>
-                                        <h3 className={`text-lg font-black uppercase italic tracking-tight leading-tight ${
-                                            passTheme === 'light' ? 'text-slate-900' : 'text-white'
-                                        }`}>
-                                            Event Digital Pass
-                                        </h3>
-                                        <p className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mt-0.5 ${
-                                            passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
-                                        }`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${
-                                                passTheme === 'light' ? 'bg-teal-600' : 'bg-[#14b8a6]'
-                                            }`} />
-                                            Happeno Hackathon OS
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setPassTheme(passTheme === 'light' ? 'dark' : 'light')}
-                                        className={`w-8 h-8 rounded-full border flex items-center justify-center transition cursor-pointer ${
-                                            passTheme === 'light'
-                                                ? 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-600'
-                                                : 'border-white/15 bg-white/10 hover:bg-white/20 text-white/80'
-                                        }`}
-                                        title={`Switch to ${passTheme === 'light' ? 'Dark' : 'Light'} Pass`}
-                                    >
-                                        {passTheme === 'light' ? <Moon size={15} /> : <Sun size={15} />}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setPassModalTeam(null)}
-                                        className={`w-8 h-8 rounded-full border flex items-center justify-center transition cursor-pointer ${
-                                            passTheme === 'light'
-                                                ? 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-600'
-                                                : 'border-white/10 text-white/60 hover:text-white'
-                                        }`}
-                                        style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.08)' } : undefined}
-                                        title="Close Pass"
-                                    >
-                                        <X size={16} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Pass Card with QR */}
-                            <div
-                                className={`border rounded-2xl p-5 mb-4 text-center relative overflow-hidden shadow-sm ${
-                                    passTheme === 'light' ? 'border-slate-200' : 'border-white/10 shadow-inner'
-                                }`}
-                                style={
-                                    passTheme === 'light'
-                                        ? { background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)' }
-                                        : { background: 'linear-gradient(180deg, rgba(25, 10, 46, 0.8) 0%, rgba(12, 3, 24, 0.95) 100%)' }
-                                }
-                            >
-                                {/* Sci-fi Corner Brackets around QR */}
-                                <div className="relative inline-block mb-3.5">
-                                    <div className={`absolute -top-1.5 -left-1.5 w-4 h-4 border-t-2 border-l-2 rounded-tl pointer-events-none ${
-                                        passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
-                                    }`} />
-                                    <div className={`absolute -top-1.5 -right-1.5 w-4 h-4 border-t-2 border-r-2 rounded-tr pointer-events-none ${
-                                        passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
-                                    }`} />
-                                    <div className={`absolute -bottom-1.5 -left-1.5 w-4 h-4 border-b-2 border-l-2 rounded-bl pointer-events-none ${
-                                        passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
-                                    }`} />
-                                    <div className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 border-b-2 border-r-2 rounded-br pointer-events-none ${
-                                        passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
-                                    }`} />
-
-                                    <div className={`p-3 bg-white rounded-2xl border ${
-                                        passTheme === 'light'
-                                            ? 'border-slate-200/90 shadow-sm'
-                                            : 'border-white/10 shadow-[0_0_30px_rgba(20,184,166,0.25)]'
-                                    }`}>
-                                        {passQrDataUrl ? (
-                                            <img src={passQrDataUrl} alt="Check-in QR" className="w-44 h-44 sm:w-52 sm:h-52 mx-auto object-contain block" />
-                                        ) : (
-                                            <div className="w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center text-slate-400">
-                                                <div className="h-6 w-6 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
+                                <div className="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
+                                    {recentView === 'gate' && (
+                                        projects.filter(p => p.isCheckedIn).length === 0 ? (
+                                            <div className="py-12 text-center">
+                                                <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No teams checked in yet</p>
                                             </div>
-                                        )}
+                                        ) : (
+                                            projects
+                                                .filter(p => p.isCheckedIn)
+                                                .sort((a, b) => {
+                                                    const aTime = a.checkedInAt ? new Date(a.checkedInAt).getTime() : 0;
+                                                    const bTime = b.checkedInAt ? new Date(b.checkedInAt).getTime() : 0;
+                                                    return bTime - aTime;
+                                                })
+                                                .slice(0, 50)
+                                                .map(team => (
+                                                    <div key={team.id} className="flex items-center gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10">
+                                                        <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">
+                                                            <CheckCircle size={16} />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-bold text-white truncate">{team.team}</p>
+                                                            <p className="text-[10px] text-white/40">{team.teamId}{team.checkedInAt ? ` • ${new Date(team.checkedInAt).toLocaleTimeString()}` : ''}</p>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                        )
+                                    )}
+                                    {recentView === 'meals' && (() => {
+                                        const meals = projects.flatMap(p =>
+                                            (Array.isArray(p.mealAccess?.dinner_claimed) ? p.mealAccess.dinner_claimed : []).map((memberId: string) => ({
+                                                teamName: p.team,
+                                                teamId: p.teamId,
+                                                memberName: (p.members?.find((m: any) => (m?.participant_id || m?.id) === memberId) as any)?.fullName || "Unknown Member"
+                                            }))
+                                        ).slice(0, 50);
+
+                                        return meals.length === 0 ? (
+                                            <div className="py-12 text-center">
+                                                <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No meal claims yet</p>
+                                            </div>
+                                        ) : meals.map((claim: any, idx) => (
+                                            <div key={`meal-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                                                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                                                    <Coffee size={16} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-bold text-white truncate">{claim.teamName} <span className="text-xs font-normal text-white/50">({claim.memberName})</span></p>
+                                                    <p className="text-[10px] text-white/40">{claim.teamId} • Dinner</p>
+                                                </div>
+                                            </div>
+                                        ));
+                                    })()}
+                                    {recentView === 'networking' && (() => {
+                                        const net = projects.flatMap(p =>
+                                            (Array.isArray(p.mealAccess?.networking_claimed) ? p.mealAccess.networking_claimed : []).map((memberId: string) => ({
+                                                teamName: p.team,
+                                                teamId: p.teamId,
+                                                memberName: (p.members?.find((m: any) => (m?.participant_id || m?.id) === memberId) as any)?.fullName || "Unknown Member"
+                                            }))
+                                        ).slice(0, 50);
+
+                                        return net.length === 0 ? (
+                                            <div className="py-12 text-center">
+                                                <p className="text-white/20 font-bold uppercase tracking-[0.3em] text-xs">No networking claims yet</p>
+                                            </div>
+                                        ) : net.map((claim: any, idx) => (
+                                            <div key={`net-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 border border-purple-500/10">
+                                                <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
+                                                    <Users size={16} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-bold text-white truncate">{claim.teamName} <span className="text-xs font-normal text-white/50">({claim.memberName})</span></p>
+                                                    <p className="text-[10px] text-white/40">{claim.teamId} • Networking</p>
+                                                </div>
+                                            </div>
+                                        ));
+                                    })()}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Grant Passes Form */}
+                        <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 mb-6">
+                            <h3 className="text-lg font-black italic uppercase tracking-tight text-white mb-4">Manage Activity Passes</h3>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col md:flex-row gap-4 items-end">
+                                    <div className="flex-1 w-full space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase">Search Team ID</label>
+                                        <input
+                                            type="text"
+                                            value={grantPassTeamId}
+                                            onChange={(e) => setGrantPassTeamId(e.target.value.toUpperCase())}
+                                            placeholder="e.g. TRI12345"
+                                            className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white font-mono placeholder:text-white/20 focus:outline-none focus:border-[#14b8a6]"
+                                        />
                                     </div>
                                 </div>
 
-                                <div className={`text-[10px] font-mono tracking-widest uppercase font-black mb-1.5 ${
-                                    passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
-                                }`}>
-                                    OFFICIAL ENTRY BADGE
+                                {(() => {
+                                    const searchedTeam = projects.find(p => p.teamId === grantPassTeamId || String(p.id) === grantPassTeamId);
+                                    if (!grantPassTeamId) return null;
+                                    if (!searchedTeam) return <p className="text-sm font-bold text-red-400">Team not found in current event data.</p>;
+
+                                    const hasMealPass = Array.isArray(searchedTeam.mealAccess?.purchased_meals) && (searchedTeam.mealAccess.purchased_meals.includes('all') || searchedTeam.mealAccess.purchased_meals.length > 0);
+                                    const hasNetworkingPass = Array.isArray(searchedTeam.mealAccess?.networking_passes) && (searchedTeam.mealAccess.networking_passes.includes('all') || searchedTeam.mealAccess.networking_passes.length > 0);
+
+                                    return (
+                                        <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h4 className="font-bold text-white text-lg">{searchedTeam.team}</h4>
+                                                    <p className="text-xs text-white/40">Captain: {searchedTeam.captain}</p>
+                                                </div>
+                                                <div className="flex gap-2 text-[10px] font-black uppercase tracking-widest">
+                                                    <span className={`px-2 py-1 rounded-md ${hasMealPass ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/10 text-red-400/50 border border-red-500/20'}`}>
+                                                        Meal Pass: {hasMealPass ? 'ACTIVE' : 'NONE'}
+                                                    </span>
+                                                    <span className={`px-2 py-1 rounded-md ${hasNetworkingPass ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-red-500/10 text-red-400/50 border border-red-500/20'}`}>
+                                                        Networking: {hasNetworkingPass ? 'ACTIVE' : 'NONE'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col md:flex-row gap-4 items-end pt-4 border-t border-white/5">
+                                                <div className="flex-1 w-full space-y-2">
+                                                    <label className="text-xs font-bold text-white/40 uppercase">Action</label>
+                                                    <select
+                                                        value={grantPassType}
+                                                        onChange={(e) => setGrantPassType(e.target.value)}
+                                                        className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white font-bold focus:outline-none focus:border-[#14b8a6] appearance-none [&>option]:bg-slate-900 [&>option]:text-white"
+                                                    >
+                                                        <option value="both">Grant Both Passes</option>
+                                                        <option value="meal">Grant Meal Only</option>
+                                                        <option value="networking">Grant Networking Only</option>
+                                                    </select>
+                                                </div>
+                                                <button
+                                                    onClick={handleGrantPass}
+                                                    disabled={grantPassLoading || (hasMealPass && grantPassType === 'meal') || (hasNetworkingPass && grantPassType === 'networking') || (hasMealPass && hasNetworkingPass && grantPassType === 'both')}
+                                                    className="w-full md:w-auto px-8 py-3 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 font-black uppercase tracking-widest hover:bg-purple-500/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                >
+                                                    {grantPassLoading ? 'Granting...' : 'Grant Access'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                            {grantPassMessage && (
+                                <div className={`mt-4 p-3 rounded-xl text-xs font-bold ${grantPassMessage.includes('Error') ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                                    {grantPassMessage}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Scan result feedback */}
+                        <AnimatePresence>
+                            {checkinResult && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    className={`p-6 rounded-2xl border ${checkinResult.status === 'PERMITTED' ? 'bg-green-500/10 border-green-500/20' :
+                                        checkinResult.status === 'ALREADY_CHECKED_IN' ? 'bg-amber-500/10 border-amber-500/20' :
+                                            'bg-red-500/10 border-red-500/20'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${checkinResult.status === 'PERMITTED' ? 'bg-green-500 text-white' :
+                                            checkinResult.status === 'ALREADY_CHECKED_IN' ? 'bg-amber-500 text-white' :
+                                                'bg-red-500 text-white'
+                                            }`}>
+                                            {checkinResult.status === 'PERMITTED' ? <CheckCircle size={24} /> :
+                                                checkinResult.status === 'ALREADY_CHECKED_IN' ? <AlertTriangle size={24} /> :
+                                                    <X size={24} />}
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xl font-black italic uppercase tracking-tight text-white">{checkinResult.teamName}</h4>
+                                            <p className="text-sm text-white/60">
+                                                {checkinResult.status === 'PERMITTED' ? 'Successfully checked in!' :
+                                                    checkinResult.status === 'ALREADY_CHECKED_IN' ? 'This team was already checked in.' :
+                                                        'Check-in failed.'}
+                                            </p>
+                                        </div>
+                                        <button onClick={() => setCheckinResult(null)} className="ml-auto p-2 text-white/30 hover:text-white"><X size={20} /></button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                )}
+
+                {/* Certificate & Feedback Hub */}
+                {activeTab === 'certificates' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <CertificateManager />
+                    </div>
+                )}
+
+                <AnimatePresence>
+                    {showMergeModal && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-xl max-h-[85vh] overflow-y-auto bg-[#0B0114] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div>
+                                        <h3 className="text-3xl font-black italic uppercase text-white tracking-tighter">Merge Teams</h3>
+                                        <p className="text-xs text-white/50 font-bold uppercase tracking-widest mt-2">Combine Solo/Duo Registrations</p>
+                                    </div>
+                                    <button onClick={() => setShowMergeModal(false)} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                                        <Trash2 size={20} className="text-white/50" />
+                                    </button>
                                 </div>
 
-                                <h4 className={`text-2xl font-black italic uppercase tracking-tight leading-tight ${
-                                    passTheme === 'light' ? 'text-slate-900' : 'text-white'
-                                }`}>
-                                    {passModalTeam.team || passModalTeam.name}
-                                </h4>
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">New Team Name</label>
+                                        <input value={mergeTeamName} onChange={(e) => setMergeTeamName(e.target.value)} placeholder="e.g. The Innovators" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]" />
+                                    </div>
 
-                                <div className={`inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full border shadow-xs ${
-                                    passTheme === 'light'
-                                        ? 'bg-teal-50 border-teal-200/90 text-teal-800'
-                                        : 'border-[#14b8a6]/40 text-[#14b8a6]'
-                                }`} style={passTheme === 'dark' ? { backgroundColor: 'rgba(20, 184, 166, 0.12)' } : undefined}>
-                                    <span className="font-mono text-xs font-black tracking-wider">{passModalTeam.teamId || passModalTeam.id}</span>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Search Teams to Merge</label>
+                                        <div className="relative">
+                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+                                            <input value={mergeSearchQuery} onChange={(e) => setMergeSearchQuery(e.target.value)} placeholder="Search by name, ID, or captain..." className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white outline-none focus:border-[#14b8a6]" />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Select Teams ({selectedMergeTeams.length} selected)</label>
+                                        <div className="bg-black/30 border border-white/5 rounded-2xl p-2 h-64 overflow-y-auto space-y-1">
+                                            {projects.filter(p => !mergeSearchQuery || p.team.toLowerCase().includes(mergeSearchQuery.toLowerCase()) || p.teamId?.toLowerCase().includes(mergeSearchQuery.toLowerCase()) || p.captain?.toLowerCase().includes(mergeSearchQuery.toLowerCase())).map(team => (
+                                                <label key={team.id} className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl cursor-pointer border border-transparent hover:border-white/5 transition-colors">
+                                                    <input type="checkbox" checked={selectedMergeTeams.includes(team.id.toString())} onChange={(e) => {
+                                                        if (e.target.checked) setSelectedMergeTeams([...selectedMergeTeams, team.id.toString()]);
+                                                        else setSelectedMergeTeams(selectedMergeTeams.filter(id => id !== team.id.toString()));
+                                                    }} className="w-4 h-4 rounded bg-black border-white/20 text-[#14b8a6] focus:ring-[#14b8a6] focus:ring-offset-black" />
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm font-bold text-white truncate">{team.team}</span>
+                                                            <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-white/50">{team.teamId}</span>
+                                                        </div>
+                                                        <div className="text-[10px] text-white/40 truncate">{team.captain} • {team.members?.length || 0} member(s)</div>
+                                                    </div>
+                                                </label>
+                                            ))}
+                                            {projects.length === 0 && <div className="p-4 text-center text-white/40 text-xs">No teams found</div>}
+                                        </div>
+                                    </div>
+
+                                    <button onClick={handleMergeTeams} disabled={isMerging || selectedMergeTeams.length < 2 || !mergeTeamName} className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic text-sm tracking-widest shadow-[0_0_20px_rgba(20,184,166,0.2)] hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 transition-all flex items-center justify-center gap-2">
+                                        {isMerging ? <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : <Users size={18} />}
+                                        {isMerging ? "Merging Teams..." : "Confirm Merge"}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    {mergeResult && (
+                        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+                            <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0B0114] p-7 shadow-2xl">
+                                <div className="mb-6">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14b8a6]">Merge complete</p>
+                                    <h3 className="mt-2 text-2xl font-black uppercase text-white">{mergeResult.teamName}</h3>
+                                    <p className="mt-1 text-sm text-white/50">{mergeResult.memberCount} members can use these participant credentials.</p>
+                                </div>
+                                <div className="space-y-3">
+                                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Team ID</p>
+                                        <p className="mt-2 select-all font-mono text-lg font-bold text-white">{mergeResult.teamId}</p>
+                                    </div>
+                                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Password</p>
+                                        <p className="mt-2 select-all break-all font-mono text-lg font-bold text-[#14b8a6]">{mergeResult.password}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => { setMergeResult(null); window.location.reload(); }} className="mt-6 w-full rounded-xl bg-[#14b8a6] py-3 text-sm font-black uppercase tracking-wider text-black transition hover:bg-white">Done</button>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    {showBulkMealModal && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-xl max-h-[85vh] overflow-y-auto bg-[#0B0114] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div>
+                                        <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">Bulk Meal Assign</h2>
+                                        <p className="text-xs text-white/50 font-bold uppercase tracking-widest mt-2">Grant access for selected meals to all active teams.</p>
+                                    </div>
+                                    <button onClick={() => setShowBulkMealModal(false)} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                                        <X size={20} className="text-white/50" />
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    {EVENT_MEALS.map((meal) => (
+                                        <label key={meal.key} className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedBulkMeals.includes(meal.key)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) setSelectedBulkMeals(prev => [...prev, meal.key]);
+                                                    else setSelectedBulkMeals(prev => prev.filter(k => k !== meal.key));
+                                                }}
+                                                className="w-5 h-5 rounded border-white/20 bg-black/50 text-[#14b8a6] focus:ring-[#14b8a6]"
+                                            />
+                                            <div>
+                                                <div className="font-bold text-white uppercase text-sm tracking-wider">{meal.mealLabel}</div>
+                                                <div className="text-[10px] text-white/40 uppercase tracking-widest">{meal.dayLabel}</div>
+                                            </div>
+                                        </label>
+                                    ))}
+                                </div>
+                                <div className="mt-8">
+                                    <button
+                                        onClick={handleBulkMealAssign}
+                                        disabled={isBulkAssigning || selectedBulkMeals.length === 0}
+                                        className="w-full py-4 rounded-xl font-black uppercase italic tracking-widest transition-all bg-[#14b8a6] text-black hover:bg-[#14b8a6]/80 disabled:opacity-50"
+                                    >
+                                        {isBulkAssigning ? 'ASSIGNING...' : selectedTeamIds.length > 0 ? `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ${selectedTeamIds.length} TEAMS` : `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ALL`}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ FLOATING BULK ACTIONS TOOLBAR ═══════════ */}
+                <AnimatePresence>
+                    {selectedTeamIds.length > 0 && (
+                        <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-4xl bg-[#0D0219]/95 border-2 border-[#14b8a6]/50 rounded-2xl p-4 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl flex flex-wrap items-center justify-between gap-4"
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className="w-9 h-9 rounded-xl bg-[#14b8a6] text-black font-black flex items-center justify-center text-sm shadow-[0_0_15px_rgba(20,184,166,0.5)]">
+                                    {selectedTeamIds.length}
+                                </span>
+                                <div>
+                                    <span className="text-white font-black text-sm uppercase italic tracking-wider block">
+                                        {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'} Selected
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={clearSelection}
+                                        className="text-[10px] text-white/50 hover:text-white underline uppercase tracking-widest transition-colors"
+                                    >
+                                        Deselect all
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 flex-wrap">
+                                {/* Move Track */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMoveTrackModal(true)}
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 hover:bg-blue-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                                >
+                                    <ArrowRightLeft size={14} /> Move Track
+                                </button>
+
+                                {/* Assign Room */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMoveRoomModal(true)}
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                                >
+                                    <DoorOpen size={14} /> Assign Room
+                                </button>
+
+                                {/* Bulk Check-In */}
+                                <button
+                                    type="button"
+                                    onClick={handleBulkCheckIn}
+                                    disabled={isBulkProcessing}
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#14b8a6]/20 border border-[#14b8a6]/40 text-[#14b8a6] hover:bg-[#14b8a6]/30 text-xs font-black uppercase italic tracking-wider transition-all disabled:opacity-50"
+                                >
+                                    <CheckCircle2 size={14} /> Check In ({selectedTeamIds.length})
+                                </button>
+
+                                {/* Assign Meals */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowBulkMealModal(true)}
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                                >
+                                    <Coffee size={14} /> Assign Meals
+                                </button>
+
+                                {/* Merge (if >= 2 selected) */}
+                                {selectedTeamIds.length >= 2 && (
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            void navigator.clipboard.writeText(passModalTeam.teamId || passModalTeam.id);
-                                            toast.success("Team ID copied!");
+                                            setSelectedMergeTeams(selectedTeamIds);
+                                            setShowMergeModal(true);
                                         }}
-                                        className={`transition p-0.5 ${
-                                            passTheme === 'light' ? 'text-teal-600 hover:text-teal-900' : 'text-[#14b8a6]/70 hover:text-white'
-                                        }`}
-                                        title="Copy Team ID"
+                                        className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 hover:bg-purple-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
                                     >
-                                        <Copy size={13} />
+                                        <Users size={14} /> Merge ({selectedTeamIds.length})
                                     </button>
+                                )}
+
+                                {/* Clear Submissions */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setClearSubmissionsTarget('selected');
+                                        setShowClearSubmissionsModal(true);
+                                    }}
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                                >
+                                    <RotateCcw size={14} /> Clear Submissions ({selectedTeamIds.length})
+                                </button>
+
+
+                                {/* Bulk Delete */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowDeleteModal(true)}
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                                >
+                                    <Trash2 size={14} /> Delete
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ BULK DELETE MODAL ═══════════ */}
+                <AnimatePresence>
+                    {showDeleteModal && (
+                        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-red-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                                <div className="flex items-center gap-4 mb-5">
+                                    <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center shrink-0">
+                                        <Trash2 size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
+                                            Delete {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'}?
+                                        </h3>
+                                        <p className="text-xs text-red-400 font-bold uppercase tracking-widest mt-0.5">Irreversible Permanent Deletion</p>
+                                    </div>
                                 </div>
 
-                                {/* Details Grid */}
-                                <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4 pt-4 border-t text-left text-xs ${
-                                    passTheme === 'light' ? 'border-slate-200' : 'border-white/10'
-                                }`}>
-                                    <div
-                                        className={`rounded-xl p-3 border ${
-                                            passTheme === 'light' ? 'bg-slate-100/70 border-slate-200' : 'border-white/10'
-                                        }`}
-                                        style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.04)' } : undefined}
+                                <p className="text-xs text-white/70 leading-relaxed mb-4">
+                                    This action will permanently remove the <strong className="text-white">{selectedTeamIds.length}</strong> selected registration{selectedTeamIds.length === 1 ? '' : 's'} from the database. All associated member rosters, login credentials, evaluation scores, and final submissions will be permanently purged.
+                                </p>
+
+                                <div className="max-h-36 overflow-y-auto custom-scrollbar p-3 rounded-xl bg-black/40 border border-white/5 space-y-1.5 mb-6 text-xs font-mono text-white/60">
+                                    {selectedTeamIds.slice(0, 10).map(id => {
+                                        const t = projects.find(p => (p.teamId || String(p.id)) === id);
+                                        return (
+                                            <div key={id} className="flex justify-between items-center py-0.5 border-b border-white/5 last:border-0">
+                                                <span className="text-white truncate">{t?.team || t?.name || id}</span>
+                                                <span className="text-[#14b8a6] text-[10px] ml-2 shrink-0">{id}</span>
+                                            </div>
+                                        );
+                                    })}
+                                    {selectedTeamIds.length > 10 && (
+                                        <div className="text-[10px] text-white/40 italic pt-1">
+                                            ...and {selectedTeamIds.length - 10} more teams
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowDeleteModal(false)}
+                                        disabled={isBulkProcessing}
+                                        className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
                                     >
-                                        <span className={`text-[9px] uppercase tracking-wider font-black block mb-0.5 ${
-                                            passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
-                                        }`}>
-                                            Team Lead
-                                        </span>
-                                        <span className={`font-bold text-sm block leading-tight ${
-                                            passTheme === 'light' ? 'text-slate-900' : 'text-white'
-                                        }`}>
-                                            {passModalTeam.captain || 'N/A'}
-                                        </span>
-                                        {passModalTeam.captainMobile && (
-                                            <span className={`text-[11px] font-mono block mt-1 ${
-                                                passTheme === 'light' ? 'text-slate-600' : 'text-white/60'
-                                            }`}>
-                                                {passModalTeam.captainMobile}
-                                            </span>
-                                        )}
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleConfirmBulkDelete}
+                                        disabled={isBulkProcessing}
+                                        className="flex-1 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
+                                    >
+                                        {isBulkProcessing ? 'Deleting...' : `Yes, Delete (${selectedTeamIds.length})`}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ MOVE TRACK MODAL ═══════════ */}
+                <AnimatePresence>
+                    {showMoveTrackModal && (
+                        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-blue-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                                <div className="flex items-center gap-4 mb-5">
+                                    <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center justify-center shrink-0">
+                                        <ArrowRightLeft size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
+                                            Move {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'}
+                                        </h3>
+                                        <p className="text-xs text-blue-400 font-bold uppercase tracking-widest mt-0.5">Bulk Track Reassignment</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 mb-6">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Select Target Track</label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
+                                            {TRACKS.map(track => (
+                                                <button
+                                                    key={track}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedTargetTrack(track);
+                                                        setCustomTargetTrack("");
+                                                    }}
+                                                    className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${selectedTargetTrack === track && !customTargetTrack
+                                                        ? 'bg-blue-500/20 border-blue-400 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                                                        : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                                                        }`}
+                                                >
+                                                    {track}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
 
-                                    <div
-                                        className={`rounded-xl p-3 border ${
-                                            passTheme === 'light' ? 'bg-slate-100/70 border-slate-200' : 'border-white/10'
-                                        }`}
-                                        style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.04)' } : undefined}
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Or Custom Track Name</label>
+                                        <input
+                                            type="text"
+                                            value={customTargetTrack}
+                                            onChange={(e) => setCustomTargetTrack(e.target.value)}
+                                            placeholder="e.g. Web3 & DeFi, Robotics, etc."
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-blue-400 transition-all font-semibold"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMoveTrackModal(false)}
+                                        disabled={isBulkProcessing}
+                                        className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
                                     >
-                                        <span className={`text-[9px] uppercase tracking-wider font-black block mb-0.5 ${
-                                            passTheme === 'light' ? 'text-purple-700' : 'text-purple-400'
-                                        }`}>
-                                            Track & Room
-                                        </span>
-                                        <span className={`font-bold text-xs block leading-snug break-words ${
-                                            passTheme === 'light' ? 'text-slate-900' : 'text-white'
-                                        }`}>
-                                            {passModalTeam.track || 'General Track'}
-                                        </span>
-                                        <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-                                            <span className={`text-[10px] uppercase font-semibold ${
-                                                passTheme === 'light' ? 'text-slate-500' : 'text-white/50'
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleConfirmMoveTrack}
+                                        disabled={isBulkProcessing}
+                                        className="flex-1 py-3.5 rounded-xl bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+                                    >
+                                        {isBulkProcessing ? 'Moving...' : `Apply to ${selectedTeamIds.length} Teams`}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ ASSIGN ROOM MODAL ═══════════ */}
+                <AnimatePresence>
+                    {showMoveRoomModal && (
+                        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-emerald-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                                <div className="flex items-center gap-4 mb-5">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                                        <DoorOpen size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
+                                            Assign Room ({selectedTeamIds.length} Teams)
+                                        </h3>
+                                        <p className="text-xs text-emerald-400 font-bold uppercase tracking-widest mt-0.5">Venue Location Allocation</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 mb-6">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Room / Hall Location *</label>
+                                        <input
+                                            type="text"
+                                            value={targetRoom}
+                                            onChange={(e) => setTargetRoom(e.target.value)}
+                                            placeholder="e.g. Auditorium 2 - Row B, Lab 401"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Wi-Fi Network SSID (Optional)</label>
+                                            <input
+                                                type="text"
+                                                value={targetWifiSSID}
+                                                onChange={(e) => setTargetWifiSSID(e.target.value)}
+                                                placeholder="e.g. Happeno_HACK_5G"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-2">Wi-Fi Password (Optional)</label>
+                                            <input
+                                                type="text"
+                                                value={targetWifiPass}
+                                                onChange={(e) => setTargetWifiPass(e.target.value)}
+                                                placeholder="e.g. hack2026pass"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-emerald-400 transition-all font-semibold"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMoveRoomModal(false)}
+                                        disabled={isBulkProcessing}
+                                        className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleConfirmMoveRoom}
+                                        disabled={isBulkProcessing || !targetRoom.trim()}
+                                        className="flex-1 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                                    >
+                                        {isBulkProcessing ? 'Assigning...' : `Assign to ${selectedTeamIds.length} Teams`}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ ON-SCREEN DIGITAL PASS MODAL ═══════════ */}
+                <AnimatePresence>
+                    {passModalTeam && (
+                        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                transition={{ duration: 0.2 }}
+                                className={`w-full max-w-md ${passTheme === 'light'
+                                    ? 'bg-white text-slate-900 border border-slate-200 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)]'
+                                    : 'bg-[#0a0216] text-white border-2 border-[#14b8a6]/40 shadow-[0_0_60px_rgba(20,184,166,0.25)]'
+                                    } rounded-[2.2rem] p-6 sm:p-7 overflow-hidden relative`}
+                            >
+                                {/* VIP Lanyard Notch */}
+                                <div className={`w-14 h-1.5 rounded-full mx-auto -mt-2 mb-4 ${passTheme === 'light' ? 'bg-slate-300' : 'bg-white/20'
+                                    }`} />
+
+                                <div className={`flex items-center justify-between pb-4 border-b mb-4 ${passTheme === 'light' ? 'border-slate-200' : 'border-white/10'
+                                    }`}>
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${passTheme === 'light'
+                                            ? 'bg-teal-50 border-teal-200 text-teal-700 shadow-sm'
+                                            : 'bg-[#14b8a6]/20 border-[#14b8a6]/40 text-[#14b8a6] shadow-[0_0_15px_rgba(20,184,166,0.25)]'
                                             }`}>
-                                                Location:
+                                            <QrCode size={20} />
+                                        </div>
+                                        <div>
+                                            <h3 className={`text-lg font-black uppercase italic tracking-tight leading-tight ${passTheme === 'light' ? 'text-slate-900' : 'text-white'
+                                                }`}>
+                                                Event Digital Pass
+                                            </h3>
+                                            <p className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mt-0.5 ${passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                                }`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${passTheme === 'light' ? 'bg-teal-600' : 'bg-[#14b8a6]'
+                                                    }`} />
+                                                Happeno Hackathon OS
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setPassTheme(passTheme === 'light' ? 'dark' : 'light')}
+                                            className={`w-8 h-8 rounded-full border flex items-center justify-center transition cursor-pointer ${passTheme === 'light'
+                                                ? 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-600'
+                                                : 'border-white/15 bg-white/10 hover:bg-white/20 text-white/80'
+                                                }`}
+                                            title={`Switch to ${passTheme === 'light' ? 'Dark' : 'Light'} Pass`}
+                                        >
+                                            {passTheme === 'light' ? <Moon size={15} /> : <Sun size={15} />}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPassModalTeam(null)}
+                                            className={`w-8 h-8 rounded-full border flex items-center justify-center transition cursor-pointer ${passTheme === 'light'
+                                                ? 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-600'
+                                                : 'border-white/10 text-white/60 hover:text-white'
+                                                }`}
+                                            style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.08)' } : undefined}
+                                            title="Close Pass"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Pass Card with QR */}
+                                <div
+                                    className={`border rounded-2xl p-5 mb-4 text-center relative overflow-hidden shadow-sm ${passTheme === 'light' ? 'border-slate-200' : 'border-white/10 shadow-inner'
+                                        }`}
+                                    style={
+                                        passTheme === 'light'
+                                            ? { background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)' }
+                                            : { background: 'linear-gradient(180deg, rgba(25, 10, 46, 0.8) 0%, rgba(12, 3, 24, 0.95) 100%)' }
+                                    }
+                                >
+                                    {/* Sci-fi Corner Brackets around QR */}
+                                    <div className="relative inline-block mb-3.5">
+                                        <div className={`absolute -top-1.5 -left-1.5 w-4 h-4 border-t-2 border-l-2 rounded-tl pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                            }`} />
+                                        <div className={`absolute -top-1.5 -right-1.5 w-4 h-4 border-t-2 border-r-2 rounded-tr pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                            }`} />
+                                        <div className={`absolute -bottom-1.5 -left-1.5 w-4 h-4 border-b-2 border-l-2 rounded-bl pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                            }`} />
+                                        <div className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 border-b-2 border-r-2 rounded-br pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                            }`} />
+
+                                        <div className={`p-3 bg-white rounded-2xl border ${passTheme === 'light'
+                                            ? 'border-slate-200/90 shadow-sm'
+                                            : 'border-white/10 shadow-[0_0_30px_rgba(20,184,166,0.25)]'
+                                            }`}>
+                                            {passQrDataUrl ? (
+                                                <img src={passQrDataUrl} alt="Check-in QR" className="w-44 h-44 sm:w-52 sm:h-52 mx-auto object-contain block" />
+                                            ) : (
+                                                <div className="w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center text-slate-400">
+                                                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className={`text-[10px] font-mono tracking-widest uppercase font-black mb-1.5 ${passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                        }`}>
+                                        OFFICIAL ENTRY BADGE
+                                    </div>
+
+                                    <h4 className={`text-2xl font-black italic uppercase tracking-tight leading-tight ${passTheme === 'light' ? 'text-slate-900' : 'text-white'
+                                        }`}>
+                                        {passModalTeam.team || passModalTeam.name}
+                                    </h4>
+
+                                    <div className={`inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full border shadow-xs ${passTheme === 'light'
+                                        ? 'bg-teal-50 border-teal-200/90 text-teal-800'
+                                        : 'border-[#14b8a6]/40 text-[#14b8a6]'
+                                        }`} style={passTheme === 'dark' ? { backgroundColor: 'rgba(20, 184, 166, 0.12)' } : undefined}>
+                                        <span className="font-mono text-xs font-black tracking-wider">{passModalTeam.teamId || passModalTeam.id}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                void navigator.clipboard.writeText(passModalTeam.teamId || passModalTeam.id);
+                                                toast.success("Team ID copied!");
+                                            }}
+                                            className={`transition p-0.5 ${passTheme === 'light' ? 'text-teal-600 hover:text-teal-900' : 'text-[#14b8a6]/70 hover:text-white'
+                                                }`}
+                                            title="Copy Team ID"
+                                        >
+                                            <Copy size={13} />
+                                        </button>
+                                    </div>
+
+                                    {/* Details Grid */}
+                                    <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4 pt-4 border-t text-left text-xs ${passTheme === 'light' ? 'border-slate-200' : 'border-white/10'
+                                        }`}>
+                                        <div
+                                            className={`rounded-xl p-3 border ${passTheme === 'light' ? 'bg-slate-100/70 border-slate-200' : 'border-white/10'
+                                                }`}
+                                            style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.04)' } : undefined}
+                                        >
+                                            <span className={`text-[9px] uppercase tracking-wider font-black block mb-0.5 ${passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                                }`}>
+                                                Team Lead
                                             </span>
-                                            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
-                                                passModalTeam.room 
-                                                    ? (passTheme === 'light' 
-                                                        ? 'bg-amber-100 text-amber-900 border-amber-300' 
+                                            <span className={`font-bold text-sm block leading-tight ${passTheme === 'light' ? 'text-slate-900' : 'text-white'
+                                                }`}>
+                                                {passModalTeam.captain || 'N/A'}
+                                            </span>
+                                            {passModalTeam.captainMobile && (
+                                                <span className={`text-[11px] font-mono block mt-1 ${passTheme === 'light' ? 'text-slate-600' : 'text-white/60'
+                                                    }`}>
+                                                    {passModalTeam.captainMobile}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div
+                                            className={`rounded-xl p-3 border ${passTheme === 'light' ? 'bg-slate-100/70 border-slate-200' : 'border-white/10'
+                                                }`}
+                                            style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.04)' } : undefined}
+                                        >
+                                            <span className={`text-[9px] uppercase tracking-wider font-black block mb-0.5 ${passTheme === 'light' ? 'text-purple-700' : 'text-purple-400'
+                                                }`}>
+                                                Track & Room
+                                            </span>
+                                            <span className={`font-bold text-xs block leading-snug break-words ${passTheme === 'light' ? 'text-slate-900' : 'text-white'
+                                                }`}>
+                                                {passModalTeam.track || 'General Track'}
+                                            </span>
+                                            <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                                                <span className={`text-[10px] uppercase font-semibold ${passTheme === 'light' ? 'text-slate-500' : 'text-white/50'
+                                                    }`}>
+                                                    Location:
+                                                </span>
+                                                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${passModalTeam.room
+                                                    ? (passTheme === 'light'
+                                                        ? 'bg-amber-100 text-amber-900 border-amber-300'
                                                         : 'bg-amber-400/15 text-amber-300 border-amber-400/30')
                                                     : (passTheme === 'light'
                                                         ? 'bg-slate-100 text-slate-500 border-slate-200'
                                                         : 'bg-white/5 text-white/50 border-white/10')
-                                            }`}>
-                                                {passModalTeam.room ? `Room ${passModalTeam.room}` : 'Unassigned'}
-                                            </span>
+                                                    }`}>
+                                                    {passModalTeam.room ? `Room ${passModalTeam.room}` : 'Unassigned'}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Status Badge */}
-                                <div className="mt-3.5 flex items-center justify-center">
-                                    {passModalTeam.isCheckedIn ? (
-                                        <span className={`px-4 py-1.5 rounded-full border text-xs font-black uppercase tracking-wider flex items-center gap-2 ${
-                                            passTheme === 'light'
+                                    {/* Status Badge */}
+                                    <div className="mt-3.5 flex items-center justify-center">
+                                        {passModalTeam.isCheckedIn ? (
+                                            <span className={`px-4 py-1.5 rounded-full border text-xs font-black uppercase tracking-wider flex items-center gap-2 ${passTheme === 'light'
                                                 ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs'
                                                 : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-                                        }`}>
-                                            <span className={`w-2 h-2 rounded-full animate-pulse ${
-                                                passTheme === 'light' ? 'bg-emerald-600' : 'bg-emerald-400'
-                                            }`} />
-                                            <CheckCircle size={15} /> Checked In & Verified
-                                        </span>
-                                    ) : (
-                                        <span className={`px-4 py-1.5 rounded-full border text-xs font-black uppercase tracking-wider flex items-center gap-2 ${
-                                            passTheme === 'light'
+                                                }`}>
+                                                <span className={`w-2 h-2 rounded-full animate-pulse ${passTheme === 'light' ? 'bg-emerald-600' : 'bg-emerald-400'
+                                                    }`} />
+                                                <CheckCircle size={15} /> Checked In & Verified
+                                            </span>
+                                        ) : (
+                                            <span className={`px-4 py-1.5 rounded-full border text-xs font-black uppercase tracking-wider flex items-center gap-2 ${passTheme === 'light'
                                                 ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-xs'
                                                 : 'bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
-                                        }`}>
-                                            <span className={`w-2 h-2 rounded-full animate-ping ${
-                                                passTheme === 'light' ? 'bg-amber-500' : 'bg-amber-400'
-                                            }`} />
-                                            <Clock size={15} /> Pending Check-In
-                                        </span>
-                                    )}
+                                                }`}>
+                                                <span className={`w-2 h-2 rounded-full animate-ping ${passTheme === 'light' ? 'bg-amber-500' : 'bg-amber-400'
+                                                    }`} />
+                                                <Clock size={15} /> Pending Check-In
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row items-center gap-2.5">
-                                {!passModalTeam.isCheckedIn && (
-                                    <button
-                                        type="button"
-                                        disabled={isCheckingInFromPass}
-                                        onClick={async () => {
-                                            setIsCheckingInFromPass(true);
-                                            try {
-                                                const ok = await checkInTeam(passModalTeam.id);
-                                                if (ok) {
-                                                    setPassModalTeam((prev: any) => prev ? { ...prev, isCheckedIn: true } : null);
-                                                    toast.success("Team marked as checked-in successfully!");
+                                {/* Action Buttons */}
+                                <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                                    {!passModalTeam.isCheckedIn && (
+                                        <button
+                                            type="button"
+                                            disabled={isCheckingInFromPass}
+                                            onClick={async () => {
+                                                setIsCheckingInFromPass(true);
+                                                try {
+                                                    const ok = await checkInTeam(passModalTeam.id);
+                                                    if (ok) {
+                                                        setPassModalTeam((prev: any) => prev ? { ...prev, isCheckedIn: true } : null);
+                                                        toast.success("Team marked as checked-in successfully!");
+                                                    }
+                                                } finally {
+                                                    setIsCheckingInFromPass(false);
                                                 }
-                                            } finally {
-                                                setIsCheckingInFromPass(false);
-                                            }
-                                        }}
-                                        className={`w-full py-3.5 rounded-xl active:scale-95 font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md ${
-                                            passTheme === 'light'
+                                            }}
+                                            className={`w-full py-3.5 rounded-xl active:scale-95 font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md ${passTheme === 'light'
                                                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25'
                                                 : 'bg-gradient-to-r from-emerald-500 via-[#14b8a6] to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-[0_0_25px_rgba(20,184,166,0.35)]'
-                                        }`}
-                                    >
-                                        <CheckCircle size={16} /> {isCheckingInFromPass ? 'Checking in...' : 'Check-In Team Now'}
-                                    </button>
-                                )}
+                                                }`}
+                                        >
+                                            <CheckCircle size={16} /> {isCheckingInFromPass ? 'Checking in...' : 'Check-In Team Now'}
+                                        </button>
+                                    )}
 
-                                {passQrDataUrl && (
-                                    <a
-                                        href={passQrDataUrl}
-                                        download={`tricity-pass-${passModalTeam.teamId || passModalTeam.id}.png`}
-                                        className={`w-full py-3.5 rounded-xl border font-bold uppercase tracking-wider text-xs transition text-center flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
-                                            passTheme === 'light'
+                                    {passQrDataUrl && (
+                                        <a
+                                            href={passQrDataUrl}
+                                            download={`Happeno-pass-${passModalTeam.teamId || passModalTeam.id}.png`}
+                                            className={`w-full py-3.5 rounded-xl border font-bold uppercase tracking-wider text-xs transition text-center flex items-center justify-center gap-2 cursor-pointer shadow-xs ${passTheme === 'light'
                                                 ? 'border-slate-300 bg-slate-900 hover:bg-slate-800 text-white'
                                                 : 'border-white/15 text-white hover:border-[#14b8a6]/50 hover:text-[#14b8a6]'
-                                        }`}
-                                        style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.06)' } : undefined}
+                                                }`}
+                                            style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.06)' } : undefined}
+                                        >
+                                            <Download size={15} /> Download Pass Image
+                                        </a>
+                                    )}
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ EDIT TEAM CONTACT MODAL ═══════════ */}
+                <AnimatePresence>
+                    {editModalTeam && (
+                        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-blue-500/40 rounded-[2rem] p-6 sm:p-7 shadow-2xl overflow-hidden">
+                                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center">
+                                            <Edit3 size={20} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Edit Team Contact</h3>
+                                            <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">{editModalTeam.teamId || editModalTeam.id}</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditModalTeam(null)}
+                                        className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
+                                        style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                                        title="Close"
                                     >
-                                        <Download size={15} /> Download Pass Image
-                                    </a>
-                                )}
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ EDIT TEAM CONTACT MODAL ═══════════ */}
-            <AnimatePresence>
-                {editModalTeam && (
-                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-blue-500/40 rounded-[2rem] p-6 sm:p-7 shadow-2xl overflow-hidden">
-                            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center">
-                                        <Edit3 size={20} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Edit Team Contact</h3>
-                                        <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">{editModalTeam.teamId || editModalTeam.id}</p>
-                                    </div>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setEditModalTeam(null)}
-                                    className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
-                                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
-                                    title="Close"
-                                >
-                                    <X size={16} />
-                                </button>
-                            </div>
-
-                            <form onSubmit={(e) => { e.preventDefault(); void handleSaveTeamEdit(); }} className="space-y-3.5">
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Team Name</label>
-                                    <input
-                                        type="text"
-                                        value={editFormData.teamName}
-                                        onChange={e => setEditFormData({ ...editFormData, teamName: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
-                                        required
-                                    />
+                                        <X size={16} />
+                                    </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <form onSubmit={(e) => { e.preventDefault(); void handleSaveTeamEdit(); }} className="space-y-3.5">
                                     <div>
-                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Captain / Lead Name</label>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Team Name</label>
                                         <input
                                             type="text"
-                                            value={editFormData.captain}
-                                            onChange={e => setEditFormData({ ...editFormData, captain: e.target.value })}
+                                            value={editFormData.teamName}
+                                            onChange={e => setEditFormData({ ...editFormData, teamName: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
                                             required
                                         />
                                     </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Captain / Lead Name</label>
+                                            <input
+                                                type="text"
+                                                value={editFormData.captain}
+                                                onChange={e => setEditFormData({ ...editFormData, captain: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Captain Mobile Number</label>
+                                            <input
+                                                type="text"
+                                                value={editFormData.captainMobile}
+                                                onChange={e => setEditFormData({ ...editFormData, captainMobile: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-mono font-semibold"
+                                                placeholder="10-digit mobile"
+                                            />
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Captain Mobile Number</label>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                            Captain Email Address <span className="text-amber-400 text-[9px]">(Fix typos here)</span>
+                                        </label>
                                         <input
-                                            type="text"
-                                            value={editFormData.captainMobile}
-                                            onChange={e => setEditFormData({ ...editFormData, captainMobile: e.target.value })}
+                                            type="email"
+                                            value={editFormData.email}
+                                            onChange={e => setEditFormData({ ...editFormData, email: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-mono font-semibold"
-                                            placeholder="10-digit mobile"
+                                            required
                                         />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">College</label>
+                                            <input
+                                                type="text"
+                                                value={editFormData.college}
+                                                onChange={e => setEditFormData({ ...editFormData, college: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Assigned Room</label>
+                                            <input
+                                                type="text"
+                                                value={editFormData.room}
+                                                onChange={e => setEditFormData({ ...editFormData, room: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                                placeholder="e.g. Lab 3 / Desk 12"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Track Preferences (Up to 3)</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {[
+                                                "SaaSsum AI (IT & AI)",
+                                                "Maceco (Analytics)",
+                                                "Tobofu (Marketing)",
+                                                "Promtal (HR Tech)",
+                                                "Skill Tank (EdTech)",
+                                                "Vriddhi (FinTech)",
+                                                "Open Innovation"
+                                            ].map(t => {
+                                                const currentTracks = (editFormData.track || '').split(',').map(s => s.trim()).filter(Boolean);
+                                                const isSelected = currentTracks.includes(t);
+                                                return (
+                                                    <label key={t} className={`flex items-center gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-colors ${isSelected ? 'bg-blue-500/20 border-blue-500/50 text-blue-300 font-bold' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}>
+                                                        <input
+                                                            type="checkbox"
+                                                            className="hidden"
+                                                            checked={isSelected}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    if (currentTracks.length < 3) {
+                                                                        setEditFormData({ ...editFormData, track: [...currentTracks, t].join(', ') });
+                                                                    }
+                                                                } else {
+                                                                    setEditFormData({ ...editFormData, track: currentTracks.filter(x => x !== t).join(', ') });
+                                                                }
+                                                            }}
+                                                        />
+                                                        <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${isSelected ? 'border-blue-400 bg-blue-500' : 'border-white/20 bg-black/40'}`}>
+                                                            {isSelected && <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                                                        </span>
+                                                        {t}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                                        <label className="flex items-center gap-2.5 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={editFormData.resendPass}
+                                                onChange={e => setEditFormData({ ...editFormData, resendPass: e.target.checked })}
+                                                className="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer"
+                                            />
+                                            <span className="text-xs text-amber-200 font-semibold">
+                                                Generate new credentials & email fresh pass to this address immediately
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 pt-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditModalTeam(null)}
+                                            className="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={isSavingEdit}
+                                            className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                                        >
+                                            {isSavingEdit ? 'Saving...' : 'Save & Update'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ CREDENTIAL REVEAL MODAL ═══════════ */}
+                <AnimatePresence>
+                    {credentialResetResult && (
+                        <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md bg-[#0D0219] border-2 border-amber-400/50 rounded-[2rem] p-6 sm:p-7 shadow-[0_0_40px_rgba(251,191,36,0.25)] overflow-hidden">
+                                <div className="flex items-center gap-3.5 mb-4">
+                                    <div className="w-11 h-11 rounded-2xl bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center shrink-0">
+                                        <KeyRound size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Login Credentials Issued</h3>
+                                        <p className="text-[10px] text-amber-300 font-bold uppercase tracking-widest">{credentialResetResult.teamName}</p>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
-                                        Captain Email Address <span className="text-amber-400 text-[9px]">(Fix typos here)</span>
+                                <p className="text-xs text-white/70 leading-relaxed mb-4">
+                                    A fresh login password has been generated for team <strong className="text-white">{credentialResetResult.teamId}</strong>.
+                                </p>
+
+                                <div className="p-4 rounded-xl bg-black/50 border border-amber-400/30 space-y-2 mb-4">
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Team ID:</span>
+                                        <span className="text-[#14b8a6] font-mono font-bold">{credentialResetResult.teamId}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">New Password:</span>
+                                        <span className="text-amber-300 font-mono font-black text-sm select-all bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                                            {credentialResetResult.temporaryPassword}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-xs pt-1 border-t border-white/5">
+                                        <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Recipient:</span>
+                                        <span className="text-white/70 font-mono truncate max-w-[200px]">{credentialResetResult.leadEmail}</span>
+                                    </div>
+                                </div>
+
+                                {/* Email delivery indicator */}
+                                <div className={`p-2.5 rounded-xl border text-xs mb-5 flex items-center gap-2 ${credentialResetResult.emailAccepted ? 'bg-green-500/10 border-green-500/30 text-green-300' : 'bg-amber-500/10 border-amber-500/30 text-amber-300'}`}>
+                                    {credentialResetResult.emailAccepted ? <CheckCircle size={15} /> : <AlertTriangle size={15} />}
+                                    <span className="text-[11px] leading-tight">
+                                        {credentialResetResult.emailAccepted
+                                            ? 'Email successfully accepted by SMTP server for delivery.'
+                                            : 'SMTP failed or offline. Give this password directly to the team lead.'}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            void navigator.clipboard.writeText(`Team ID: ${credentialResetResult.teamId}\nPassword: ${credentialResetResult.temporaryPassword}\nLogin: https://happeno.in/login`);
+                                            toast.success("Credentials copied to clipboard!");
+                                        }}
+                                        className="flex-1 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-black font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+                                    >
+                                        <Copy size={14} /> Copy Credentials
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setCredentialResetResult(null)}
+                                        className="py-3 px-5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                    >
+                                        Dismiss
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ PURGE DEMO REGISTRATIONS MODAL ═══════════ */}
+                <AnimatePresence>
+                    {showPurgeModal && (
+                        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-red-500/40 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center shrink-0">
+                                        <AlertTriangle size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Purge Demo Registrations</h3>
+                                        <p className="text-xs text-red-400 font-bold uppercase tracking-widest mt-0.5">Pre-Import Database Wipe</p>
+                                    </div>
+                                </div>
+
+                                <p className="text-xs text-white/70 leading-relaxed mb-4">
+                                    This will completely wipe all demo / mock registrations in Supabase to give you a pristine database prior to importing the official registration CSV. Admin accounts, settings, and judging configs will remain intact.
+                                </p>
+
+                                <div className="mb-5">
+                                    <label className="text-[10px] font-black uppercase text-red-300 tracking-wider block mb-1.5">
+                                        Type <span className="font-mono text-white bg-red-950/60 px-1.5 py-0.5 rounded border border-red-500/30">PURGE_ALL_MOCK_REGISTRATIONS</span> to confirm:
                                     </label>
                                     <input
-                                        type="email"
-                                        value={editFormData.email}
-                                        onChange={e => setEditFormData({ ...editFormData, email: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-mono font-semibold"
-                                        required
+                                        type="text"
+                                        value={purgeConfirmText}
+                                        onChange={e => setPurgeConfirmText(e.target.value)}
+                                        placeholder="PURGE_ALL_MOCK_REGISTRATIONS"
+                                        className="w-full bg-white/5 border border-red-500/30 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 outline-none focus:border-red-500 font-mono font-bold"
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">College</label>
-                                        <input
-                                            type="text"
-                                            value={editFormData.college}
-                                            onChange={e => setEditFormData({ ...editFormData, college: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Assigned Room</label>
-                                        <input
-                                            type="text"
-                                            value={editFormData.room}
-                                            onChange={e => setEditFormData({ ...editFormData, room: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
-                                            placeholder="e.g. Lab 3 / Desk 12"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">Track Preferences (Up to 3)</label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {[
-                                            "SaaSsum AI (IT & AI)",
-                                            "Maceco (Analytics)",
-                                            "Tobofu (Marketing)",
-                                            "Promtal (HR Tech)",
-                                            "Skill Tank (EdTech)",
-                                            "Vriddhi (FinTech)",
-                                            "Open Innovation"
-                                        ].map(t => {
-                                            const currentTracks = (editFormData.track || '').split(',').map(s => s.trim()).filter(Boolean);
-                                            const isSelected = currentTracks.includes(t);
-                                            return (
-                                                <label key={t} className={`flex items-center gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-colors ${isSelected ? 'bg-blue-500/20 border-blue-500/50 text-blue-300 font-bold' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}>
-                                                    <input
-                                                        type="checkbox"
-                                                        className="hidden"
-                                                        checked={isSelected}
-                                                        onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                if (currentTracks.length < 3) {
-                                                                    setEditFormData({ ...editFormData, track: [...currentTracks, t].join(', ') });
-                                                                }
-                                                            } else {
-                                                                setEditFormData({ ...editFormData, track: currentTracks.filter(x => x !== t).join(', ') });
-                                                            }
-                                                        }}
-                                                    />
-                                                    <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${isSelected ? 'border-blue-400 bg-blue-500' : 'border-white/20 bg-black/40'}`}>
-                                                        {isSelected && <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                                                    </span>
-                                                    {t}
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
-                                    <label className="flex items-center gap-2.5 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={editFormData.resendPass}
-                                            onChange={e => setEditFormData({ ...editFormData, resendPass: e.target.checked })}
-                                            className="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer"
-                                        />
-                                        <span className="text-xs text-amber-200 font-semibold">
-                                            Generate new credentials & email fresh pass to this address immediately
-                                        </span>
-                                    </label>
-                                </div>
-
-                                <div className="flex items-center gap-3 pt-3">
+                                <div className="flex items-center gap-3">
                                     <button
                                         type="button"
-                                        onClick={() => setEditModalTeam(null)}
-                                        className="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                        onClick={() => setShowPurgeModal(false)}
+                                        disabled={isPurging}
+                                        className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
                                     >
                                         Cancel
                                     </button>
                                     <button
-                                        type="submit"
-                                        disabled={isSavingEdit}
-                                        className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                                        type="button"
+                                        onClick={handlePurgeDemo}
+                                        disabled={isPurging || purgeConfirmText !== 'PURGE_ALL_MOCK_REGISTRATIONS'}
+                                        className="flex-1 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-40 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
                                     >
-                                        {isSavingEdit ? 'Saving...' : 'Save & Update'}
+                                        {isPurging ? 'Purging...' : 'Wipe Database Clean'}
                                     </button>
                                 </div>
-                            </form>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
 
-            {/* ═══════════ CREDENTIAL REVEAL MODAL ═══════════ */}
-            <AnimatePresence>
-                {credentialResetResult && (
-                    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md bg-[#0D0219] border-2 border-amber-400/50 rounded-[2rem] p-6 sm:p-7 shadow-[0_0_40px_rgba(251,191,36,0.25)] overflow-hidden">
-                            <div className="flex items-center gap-3.5 mb-4">
-                                <div className="w-11 h-11 rounded-2xl bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center shrink-0">
-                                    <KeyRound size={22} />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Login Credentials Issued</h3>
-                                    <p className="text-[10px] text-amber-300 font-bold uppercase tracking-widest">{credentialResetResult.teamName}</p>
-                                </div>
-                            </div>
-
-                            <p className="text-xs text-white/70 leading-relaxed mb-4">
-                                A fresh login password has been generated for team <strong className="text-white">{credentialResetResult.teamId}</strong>.
-                            </p>
-
-                            <div className="p-4 rounded-xl bg-black/50 border border-amber-400/30 space-y-2 mb-4">
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Team ID:</span>
-                                    <span className="text-[#14b8a6] font-mono font-bold">{credentialResetResult.teamId}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">New Password:</span>
-                                    <span className="text-amber-300 font-mono font-black text-sm select-all bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
-                                        {credentialResetResult.temporaryPassword}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center text-xs pt-1 border-t border-white/5">
-                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Recipient:</span>
-                                    <span className="text-white/70 font-mono truncate max-w-[200px]">{credentialResetResult.leadEmail}</span>
-                                </div>
-                            </div>
-
-                            {/* Email delivery indicator */}
-                            <div className={`p-2.5 rounded-xl border text-xs mb-5 flex items-center gap-2 ${credentialResetResult.emailAccepted ? 'bg-green-500/10 border-green-500/30 text-green-300' : 'bg-amber-500/10 border-amber-500/30 text-amber-300'}`}>
-                                {credentialResetResult.emailAccepted ? <CheckCircle size={15} /> : <AlertTriangle size={15} />}
-                                <span className="text-[11px] leading-tight">
-                                    {credentialResetResult.emailAccepted
-                                        ? 'Email successfully accepted by SMTP server for delivery.'
-                                        : 'SMTP failed or offline. Give this password directly to the team lead.'}
-                                </span>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        void navigator.clipboard.writeText(`Team ID: ${credentialResetResult.teamId}\nPassword: ${credentialResetResult.temporaryPassword}\nLogin: https://happeno.in/login`);
-                                        toast.success("Credentials copied to clipboard!");
-                                    }}
-                                    className="flex-1 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-black font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
-                                >
-                                    <Copy size={14} /> Copy Credentials
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setCredentialResetResult(null)}
-                                    className="py-3 px-5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
-                                >
-                                    Dismiss
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ PURGE DEMO REGISTRATIONS MODAL ═══════════ */}
-            <AnimatePresence>
-                {showPurgeModal && (
-                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-red-500/40 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center shrink-0">
-                                    <AlertTriangle size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Purge Demo Registrations</h3>
-                                    <p className="text-xs text-red-400 font-bold uppercase tracking-widest mt-0.5">Pre-Import Database Wipe</p>
-                                </div>
-                            </div>
-
-                            <p className="text-xs text-white/70 leading-relaxed mb-4">
-                                This will completely wipe all demo / mock registrations in Supabase to give you a pristine database prior to importing the official registration CSV. Admin accounts, settings, and judging configs will remain intact.
-                            </p>
-
-                            <div className="mb-5">
-                                <label className="text-[10px] font-black uppercase text-red-300 tracking-wider block mb-1.5">
-                                    Type <span className="font-mono text-white bg-red-950/60 px-1.5 py-0.5 rounded border border-red-500/30">PURGE_ALL_MOCK_REGISTRATIONS</span> to confirm:
-                                </label>
-                                <input
-                                    type="text"
-                                    value={purgeConfirmText}
-                                    onChange={e => setPurgeConfirmText(e.target.value)}
-                                    placeholder="PURGE_ALL_MOCK_REGISTRATIONS"
-                                    className="w-full bg-white/5 border border-red-500/30 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 outline-none focus:border-red-500 font-mono font-bold"
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPurgeModal(false)}
-                                    disabled={isPurging}
-                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handlePurgeDemo}
-                                    disabled={isPurging || purgeConfirmText !== 'PURGE_ALL_MOCK_REGISTRATIONS'}
-                                    className="flex-1 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-40 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
-                                >
-                                    {isPurging ? 'Purging...' : 'Wipe Database Clean'}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ CLEAR SUBMISSIONS MODAL ═══════════ */}
-            <AnimatePresence>
-                {showClearSubmissionsModal && (
-                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-amber-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(245,158,11,0.2)] overflow-hidden">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
-                                    <RotateCcw size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
-                                        Clear Team Submissions
-                                    </h3>
-                                    <p className="text-xs text-amber-400 font-bold uppercase tracking-widest mt-0.5">
-                                        {clearSubmissionsTarget === 'all'
-                                            ? `All ${projects.length} Teams Across Event`
-                                            : `${selectedTeamIds.length} Selected Team${selectedTeamIds.length === 1 ? '' : 's'}`}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <p className="text-xs text-white/70 leading-relaxed mb-5">
-                                This will wipe deliverable links and reset submission status so that participant dashboards feel clean, fresh, and ready for official project uploads.
-                            </p>
-
-                            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3 mb-5 text-xs">
-                                <div className="flex items-start gap-2.5 text-white/80">
-                                    <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
-                                    <span>
-                                        Clears GitHub repository, demo video, presentation slide deck, and live product URLs.
-                                    </span>
-                                </div>
-                                <div className="flex items-start gap-2.5 text-white/80">
-                                    <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
-                                    <span>
-                                        Resets project status back to <strong>In progress</strong>.
-                                    </span>
-                                </div>
-
-                                <label className="flex items-center gap-3 pt-3 mt-2 border-t border-white/10 cursor-pointer select-none">
-                                    <input
-                                        type="checkbox"
-                                        checked={clearIdeationToo}
-                                        onChange={e => setClearIdeationToo(e.target.checked)}
-                                        className="w-4 h-4 rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0 cursor-pointer"
-                                    />
-                                    <div className="flex-1">
-                                        <span className="font-bold text-white block">Also reset Problem Statement & Tech Stack locks</span>
-                                        <span className="text-[11px] text-white/40 block">Participants can pick fresh problem statements from scratch</span>
-                                    </div>
-                                </label>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowClearSubmissionsModal(false)}
-                                    disabled={isClearingSubmissions}
-                                    className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleClearSubmissions}
-                                    disabled={isClearingSubmissions}
-                                    className="flex-1 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition disabled:opacity-40 shadow-[0_0_20px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 cursor-pointer"
-                                >
-                                    {isClearingSubmissions ? (
-                                        <>
-                                            <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                                            <span>Clearing...</span>
-                                        </>
-                                    ) : (
-                                        <span>Yes, Clear Submissions</span>
-                                    )}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ PASS & CREDENTIAL DISPATCHER MODAL ═══════════ */}
-            <AnimatePresence>
-                {showDispatchModal && (
-                    <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl bg-[#0D0219] border-2 border-emerald-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(16,185,129,0.2)] overflow-hidden">
-                            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
-                                <div className="flex items-center gap-3.5">
-                                    <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center shrink-0">
-                                        <Mail size={22} />
+                {/* ═══════════ CLEAR SUBMISSIONS MODAL ═══════════ */}
+                <AnimatePresence>
+                    {showClearSubmissionsModal && (
+                        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-amber-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(245,158,11,0.2)] overflow-hidden">
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+                                        <RotateCcw size={24} />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black uppercase italic tracking-tight text-white">Pass & Credential Dispatcher</h3>
-                                        <p className="text-xs text-emerald-400 font-bold uppercase tracking-widest mt-0.5">High-Volume Batch Email Delivery</p>
-                                    </div>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (isDispatching) {
-                                            toast.warning("Please pause or let the current batch finish before closing.");
-                                            return;
-                                        }
-                                        setShowDispatchModal(false);
-                                    }}
-                                    className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
-                                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
-                                    title="Close"
-                                >
-                                    <X size={16} />
-                                </button>
-                            </div>
-
-                            {/* Status Metrics */}
-                            <div className="grid grid-cols-3 gap-3 mb-5">
-                                <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
-                                    <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold block mb-1">Total Teams</span>
-                                    <span className="text-2xl font-black text-white italic">{dispatchStatus?.total ?? projects.length}</span>
-                                </div>
-                                <div className="bg-emerald-500/10 rounded-2xl p-4 border border-emerald-500/20 text-center">
-                                    <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block mb-1">Passes Issued</span>
-                                    <span className="text-2xl font-black text-emerald-400 italic">{dispatchStatus?.issued ?? 0}</span>
-                                </div>
-                                <div className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/20 text-center">
-                                    <span className="text-[10px] uppercase tracking-wider text-amber-300 font-bold block mb-1">Pending Delivery</span>
-                                    <span className="text-2xl font-black text-amber-300 italic">{dispatchStatus?.pending ?? projects.length}</span>
-                                </div>
-                            </div>
-
-                            {/* Progress Bar */}
-                            <div className="mb-5 bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
-                                <div className="flex justify-between text-xs font-bold">
-                                    <span className="text-white/60">Dispatch Progress</span>
-                                    <span className="text-emerald-400">
-                                        {dispatchStatus?.total ? Math.round(((dispatchStatus.issued) / dispatchStatus.total) * 100) : 0}% Delivered
-                                    </span>
-                                </div>
-                                <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
-                                    <div
-                                        className="bg-gradient-to-r from-emerald-500 to-[#14b8a6] h-full transition-all duration-300 rounded-full"
-                                        style={{
-                                            width: `${dispatchStatus?.total ? Math.min(100, Math.round(((dispatchStatus.issued) / dispatchStatus.total) * 100)) : 0}%`
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex justify-between text-[11px] text-white/40 font-mono pt-1">
-                                    <span>Processed: {dispatchStats.processed}</span>
-                                    <span className="text-emerald-400">Sent: {dispatchStats.success}</span>
-                                    <span className="text-red-400">Failed: {dispatchStats.failed}</span>
-                                </div>
-                            </div>
-
-                            {/* Real-time Activity Logs */}
-                            <div className="mb-6">
-                                <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold block mb-2">Live Delivery Log</span>
-                                <div className="h-36 overflow-y-auto custom-scrollbar p-3 rounded-xl bg-black/50 border border-white/5 font-mono text-[11px] text-white/60 space-y-1">
-                                    {dispatchLogs.length === 0 ? (
-                                        <div className="text-white/30 italic text-center py-10">Click &ldquo;Start Dispatch&rdquo; below to begin sending passes in controlled batches.</div>
-                                    ) : (
-                                        dispatchLogs.map((log, idx) => (
-                                            <div key={idx} className="leading-tight py-0.5 border-b border-white/5 last:border-0 truncate">
-                                                {log}
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Controller Buttons */}
-                            <div className="flex items-center gap-3">
-                                {!isDispatching ? (
-                                    <button
-                                        type="button"
-                                        onClick={handleStartDispatch}
-                                        disabled={dispatchStatus?.pending === 0}
-                                        className="flex-1 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:opacity-40"
-                                    >
-                                        <PlayCircle size={16} /> Start Safe Batch Dispatch
-                                    </button>
-                                ) : (
-                                    <button
-                                        type="button"
-                                        onClick={handleTogglePauseDispatch}
-                                        className={`flex-1 py-3.5 rounded-xl font-black italic text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 ${isDispatchPaused ? 'bg-emerald-500 hover:bg-emerald-600 text-black' : 'bg-amber-500 hover:bg-amber-600 text-black'}`}
-                                    >
-                                        {isDispatchPaused ? <PlayCircle size={16} /> : <Pause size={16} />}
-                                        {isDispatchPaused ? 'Resume Dispatch' : 'Pause Dispatcher'}
-                                    </button>
-                                )}
-
-                                <button
-                                    type="button"
-                                    onClick={() => void fetchDispatchStatus()}
-                                    className="py-3.5 px-4 rounded-xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition"
-                                    title="Refresh counts"
-                                >
-                                    <RefreshCw size={16} />
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ CHUNKED CSV IMPORT PROGRESS MODAL ═══════════ */}
-            <AnimatePresence>
-                {importProgress?.isImporting && (
-                    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md bg-[#0D0219] border-2 border-purple-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(168,85,247,0.25)] text-center">
-                            <div className="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center mx-auto mb-4 animate-pulse">
-                                <Upload size={26} />
-                            </div>
-                            <h3 className="text-xl font-black uppercase italic tracking-tight text-white">Importing Registrations</h3>
-                            <p className="text-xs text-purple-300 font-bold uppercase tracking-widest mt-1 mb-5">
-                                Chunk {importProgress.currentChunk} of {importProgress.totalChunks}
-                            </p>
-
-                            <div className="space-y-2 mb-6 text-left">
-                                <div className="flex justify-between text-xs font-bold">
-                                    <span className="text-white/60">Ingesting into database...</span>
-                                    <span className="text-purple-400">{Math.round((importProgress.processedTeams / importProgress.totalTeams) * 100)}%</span>
-                                </div>
-                                <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
-                                    <div
-                                        className="bg-gradient-to-r from-purple-500 to-[#14b8a6] h-full transition-all duration-300 rounded-full"
-                                        style={{
-                                            width: `${Math.round((importProgress.processedTeams / importProgress.totalTeams) * 100)}%`
-                                        }}
-                                    />
-                                </div>
-                                <p className="text-[11px] text-white/40 text-center font-mono">
-                                    {importProgress.processedTeams} / {importProgress.totalTeams} teams imported
-                                </p>
-                            </div>
-
-                            <p className="text-[11px] text-white/40 italic">
-                                Please keep this tab open while teams are written to Supabase.
-                            </p>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════ EMAIL REPLY MODAL ═══════════ */}
-            <AnimatePresence>
-                {replyModalEmail && (
-                    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="w-full max-w-xl bg-[#0D0219] border-2 border-blue-500/40 rounded-[2rem] p-6 sm:p-8 shadow-2xl overflow-hidden"
-                        >
-                            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center shrink-0">
-                                        <Reply size={20} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Reply to Inbound Email</h3>
-                                        <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">
-                                            Sending via business@happeno.in (cPanel SMTP)
+                                        <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
+                                            Clear Team Submissions
+                                        </h3>
+                                        <p className="text-xs text-amber-400 font-bold uppercase tracking-widest mt-0.5">
+                                            {clearSubmissionsTarget === 'all'
+                                                ? `All ${projects.length} Teams Across Event`
+                                                : `${selectedTeamIds.length} Selected Team${selectedTeamIds.length === 1 ? '' : 's'}`}
                                         </p>
                                     </div>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setReplyModalEmail(null)}
-                                    className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
-                                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
-                                    title="Close"
-                                >
-                                    <X size={16} />
-                                </button>
-                            </div>
 
-                            {/* Email Details Overview */}
-                            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 mb-4">
-                                <div className="flex items-center justify-between gap-2 flex-wrap text-xs">
-                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">To:</span>
-                                    <span className="font-bold text-white font-mono">{replyModalEmail.fromEmail}</span>
-                                </div>
-                                {replyModalEmail.matchedTeamName && (
-                                    <div className="flex items-center justify-between gap-2 text-xs">
-                                        <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Registered Team:</span>
-                                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">
-                                            {replyModalEmail.matchedTeamName} {replyModalEmail.matchedTeamId ? `(${replyModalEmail.matchedTeamId})` : ''}
+                                <p className="text-xs text-white/70 leading-relaxed mb-5">
+                                    This will wipe deliverable links and reset submission status so that participant dashboards feel clean, fresh, and ready for official project uploads.
+                                </p>
+
+                                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3 mb-5 text-xs">
+                                    <div className="flex items-start gap-2.5 text-white/80">
+                                        <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                                        <span>
+                                            Clears GitHub repository, demo video, presentation slide deck, and live product URLs.
                                         </span>
                                     </div>
-                                )}
-                                <div className="flex items-center justify-between gap-2 text-xs">
-                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Subject:</span>
-                                    <span className="font-bold text-white/90 truncate max-w-sm">Re: {replyModalEmail.subject}</span>
-                                </div>
-                            </div>
+                                    <div className="flex items-start gap-2.5 text-white/80">
+                                        <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                                        <span>
+                                            Resets project status back to <strong>In progress</strong>.
+                                        </span>
+                                    </div>
 
-                            {/* Original Message Snippet */}
-                            <div className="mb-4">
-                                <label className="text-[10px] font-black uppercase text-white/40 tracking-wider block mb-1">
-                                    Original Message Snippet
-                                </label>
-                                <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs text-white/60 italic max-h-24 overflow-y-auto">
-                                    {replyModalEmail.snippet || '(No text preview available)'}
-                                </div>
-                            </div>
-
-                            {/* Quick Response Templates */}
-                            <div className="mb-4">
-                                <label className="text-[10px] font-black uppercase text-white/40 tracking-wider block mb-1.5">
-                                    Quick Response Templates
-                                </label>
-                                <div className="flex gap-2 flex-wrap">
-                                    <button
-                                        type="button"
-                                        onClick={() => setReplyText(`Hello,\n\nWe have verified your registration details. Your digital pass and login credentials have been re-issued. Please check your inbox or visit the onsite help desk if you need immediate printouts.\n\nBest regards,\nHappeno Organizing Committee`)}
-                                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
-                                    >
-                                        Pass Verification
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setReplyText(`Hello,\n\nThank you for reaching out! A volunteer or mentor has been notified. You can also raise an instant ticket at the Help Desk section of your team portal or visit Desk 1 at the venue.\n\nBest regards,\nHappeno Technical Support`)}
-                                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
-                                    >
-                                        Mentor/Desk Info
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Reply Input Form */}
-                            <form onSubmit={(e) => { e.preventDefault(); void handleSendEmailReply(); }} className="space-y-4">
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
-                                        Your Response Message
+                                    <label className="flex items-center gap-3 pt-3 mt-2 border-t border-white/10 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox"
+                                            checked={clearIdeationToo}
+                                            onChange={e => setClearIdeationToo(e.target.checked)}
+                                            className="w-4 h-4 rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0 cursor-pointer"
+                                        />
+                                        <div className="flex-1">
+                                            <span className="font-bold text-white block">Also reset Problem Statement & Tech Stack locks</span>
+                                            <span className="text-[11px] text-white/40 block">Participants can pick fresh problem statements from scratch</span>
+                                        </div>
                                     </label>
-                                    <textarea
-                                        rows={5}
-                                        value={replyText}
-                                        onChange={e => setReplyText(e.target.value)}
-                                        placeholder="Type your response to the participant here..."
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-blue-400 transition leading-relaxed"
-                                        required
-                                    />
                                 </div>
 
-                                <div className="flex items-center gap-3 pt-2">
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowClearSubmissionsModal(false)}
+                                        disabled={isClearingSubmissions}
+                                        className="flex-1 py-3.5 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleClearSubmissions}
+                                        disabled={isClearingSubmissions}
+                                        className="flex-1 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition disabled:opacity-40 shadow-[0_0_20px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 cursor-pointer"
+                                    >
+                                        {isClearingSubmissions ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                                                <span>Clearing...</span>
+                                            </>
+                                        ) : (
+                                            <span>Yes, Clear Submissions</span>
+                                        )}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ PASS & CREDENTIAL DISPATCHER MODAL ═══════════ */}
+                <AnimatePresence>
+                    {showDispatchModal && (
+                        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl bg-[#0D0219] border-2 border-emerald-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(16,185,129,0.2)] overflow-hidden">
+                                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                                            <Mail size={22} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-black uppercase italic tracking-tight text-white">Pass & Credential Dispatcher</h3>
+                                            <p className="text-xs text-emerald-400 font-bold uppercase tracking-widest mt-0.5">High-Volume Batch Email Delivery</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (isDispatching) {
+                                                toast.warning("Please pause or let the current batch finish before closing.");
+                                                return;
+                                            }
+                                            setShowDispatchModal(false);
+                                        }}
+                                        className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
+                                        style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                                        title="Close"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+
+                                {/* Status Metrics */}
+                                <div className="grid grid-cols-3 gap-3 mb-5">
+                                    <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                                        <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold block mb-1">Total Teams</span>
+                                        <span className="text-2xl font-black text-white italic">{dispatchStatus?.total ?? projects.length}</span>
+                                    </div>
+                                    <div className="bg-emerald-500/10 rounded-2xl p-4 border border-emerald-500/20 text-center">
+                                        <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block mb-1">Passes Issued</span>
+                                        <span className="text-2xl font-black text-emerald-400 italic">{dispatchStatus?.issued ?? 0}</span>
+                                    </div>
+                                    <div className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/20 text-center">
+                                        <span className="text-[10px] uppercase tracking-wider text-amber-300 font-bold block mb-1">Pending Delivery</span>
+                                        <span className="text-2xl font-black text-amber-300 italic">{dispatchStatus?.pending ?? projects.length}</span>
+                                    </div>
+                                </div>
+
+                                {/* Progress Bar */}
+                                <div className="mb-5 bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
+                                    <div className="flex justify-between text-xs font-bold">
+                                        <span className="text-white/60">Dispatch Progress</span>
+                                        <span className="text-emerald-400">
+                                            {dispatchStatus?.total ? Math.round(((dispatchStatus.issued) / dispatchStatus.total) * 100) : 0}% Delivered
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                                        <div
+                                            className="bg-gradient-to-r from-emerald-500 to-[#14b8a6] h-full transition-all duration-300 rounded-full"
+                                            style={{
+                                                width: `${dispatchStatus?.total ? Math.min(100, Math.round(((dispatchStatus.issued) / dispatchStatus.total) * 100)) : 0}%`
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between text-[11px] text-white/40 font-mono pt-1">
+                                        <span>Processed: {dispatchStats.processed}</span>
+                                        <span className="text-emerald-400">Sent: {dispatchStats.success}</span>
+                                        <span className="text-red-400">Failed: {dispatchStats.failed}</span>
+                                    </div>
+                                </div>
+
+                                {/* Real-time Activity Logs */}
+                                <div className="mb-6">
+                                    <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold block mb-2">Live Delivery Log</span>
+                                    <div className="h-36 overflow-y-auto custom-scrollbar p-3 rounded-xl bg-black/50 border border-white/5 font-mono text-[11px] text-white/60 space-y-1">
+                                        {dispatchLogs.length === 0 ? (
+                                            <div className="text-white/30 italic text-center py-10">Click &ldquo;Start Dispatch&rdquo; below to begin sending passes in controlled batches.</div>
+                                        ) : (
+                                            dispatchLogs.map((log, idx) => (
+                                                <div key={idx} className="leading-tight py-0.5 border-b border-white/5 last:border-0 truncate">
+                                                    {log}
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Controller Buttons */}
+                                <div className="flex items-center gap-3">
+                                    {!isDispatching ? (
+                                        <button
+                                            type="button"
+                                            onClick={handleStartDispatch}
+                                            disabled={dispatchStatus?.pending === 0}
+                                            className="flex-1 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-black font-black italic text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:opacity-40"
+                                        >
+                                            <PlayCircle size={16} /> Start Safe Batch Dispatch
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={handleTogglePauseDispatch}
+                                            className={`flex-1 py-3.5 rounded-xl font-black italic text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 ${isDispatchPaused ? 'bg-emerald-500 hover:bg-emerald-600 text-black' : 'bg-amber-500 hover:bg-amber-600 text-black'}`}
+                                        >
+                                            {isDispatchPaused ? <PlayCircle size={16} /> : <Pause size={16} />}
+                                            {isDispatchPaused ? 'Resume Dispatch' : 'Pause Dispatcher'}
+                                        </button>
+                                    )}
+
+                                    <button
+                                        type="button"
+                                        onClick={() => void fetchDispatchStatus()}
+                                        className="py-3.5 px-4 rounded-xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition"
+                                        title="Refresh counts"
+                                    >
+                                        <RefreshCw size={16} />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ CHUNKED CSV IMPORT PROGRESS MODAL ═══════════ */}
+                <AnimatePresence>
+                    {importProgress?.isImporting && (
+                        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md bg-[#0D0219] border-2 border-purple-500/40 rounded-[2rem] p-7 shadow-[0_0_50px_rgba(168,85,247,0.25)] text-center">
+                                <div className="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                                    <Upload size={26} />
+                                </div>
+                                <h3 className="text-xl font-black uppercase italic tracking-tight text-white">Importing Registrations</h3>
+                                <p className="text-xs text-purple-300 font-bold uppercase tracking-widest mt-1 mb-5">
+                                    Chunk {importProgress.currentChunk} of {importProgress.totalChunks}
+                                </p>
+
+                                <div className="space-y-2 mb-6 text-left">
+                                    <div className="flex justify-between text-xs font-bold">
+                                        <span className="text-white/60">Ingesting into database...</span>
+                                        <span className="text-purple-400">{Math.round((importProgress.processedTeams / importProgress.totalTeams) * 100)}%</span>
+                                    </div>
+                                    <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                                        <div
+                                            className="bg-gradient-to-r from-purple-500 to-[#14b8a6] h-full transition-all duration-300 rounded-full"
+                                            style={{
+                                                width: `${Math.round((importProgress.processedTeams / importProgress.totalTeams) * 100)}%`
+                                            }}
+                                        />
+                                    </div>
+                                    <p className="text-[11px] text-white/40 text-center font-mono">
+                                        {importProgress.processedTeams} / {importProgress.totalTeams} teams imported
+                                    </p>
+                                </div>
+
+                                <p className="text-[11px] text-white/40 italic">
+                                    Please keep this tab open while teams are written to Supabase.
+                                </p>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ EMAIL REPLY MODAL ═══════════ */}
+                <AnimatePresence>
+                    {replyModalEmail && (
+                        <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="w-full max-w-xl bg-[#0D0219] border-2 border-blue-500/40 rounded-[2rem] p-6 sm:p-8 shadow-2xl overflow-hidden"
+                            >
+                                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center shrink-0">
+                                            <Reply size={20} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Reply to Inbound Email</h3>
+                                            <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">
+                                                Sending via business@happeno.in (cPanel SMTP)
+                                            </p>
+                                        </div>
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={() => setReplyModalEmail(null)}
-                                        className="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition cursor-pointer"
+                                        className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
+                                        style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                                        title="Close"
                                     >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={isSendingReply || !replyText.trim()}
-                                        className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)] cursor-pointer"
-                                    >
-                                        <Send size={14} className={isSendingReply ? 'animate-spin' : ''} />
-                                        {isSendingReply ? 'Sending Reply...' : 'Send Email Response'}
+                                        <X size={16} />
                                     </button>
                                 </div>
-                            </form>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
 
-            {/* ═══════════ ROSTER CORRECTION WINDOW & AUDIT MODAL ═══════════ */}
-            <AnimatePresence>
-                {showRosterModal && (
-                    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="w-full max-w-4xl max-h-[90vh] bg-[#0D0219] border-2 border-teal-500/40 rounded-[2.5rem] p-6 sm:p-8 shadow-2xl overflow-y-auto custom-scrollbar"
-                        >
-                            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
-                                <div className="flex items-center gap-3.5">
-                                    <div className="w-12 h-12 rounded-2xl bg-teal-500/20 text-[#14b8a6] border border-teal-500/40 flex items-center justify-center shrink-0">
-                                        <GitMerge size={24} />
+                                {/* Email Details Overview */}
+                                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 mb-4">
+                                    <div className="flex items-center justify-between gap-2 flex-wrap text-xs">
+                                        <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">To:</span>
+                                        <span className="font-bold text-white font-mono">{replyModalEmail.fromEmail}</span>
                                     </div>
-                                    <div>
-                                        <h3 className="text-xl font-black uppercase italic tracking-tight text-white">
-                                            Team Edit Window & Activity Logs
-                                        </h3>
-                                        <p className="text-xs text-teal-400 font-bold uppercase tracking-widest mt-0.5">
-                                            Self-Service Control Hub (Oct 5–6 Team Edit Window)
-                                        </p>
-                                    </div>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowRosterModal(false)}
-                                    className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
-                                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
-                                    title="Close"
-                                >
-                                    <X size={16} />
-                                </button>
-                            </div>
-
-                            {/* Section 1: Window Status & Live Override */}
-                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/10 mb-6 space-y-4">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                    <div>
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">
-                                            Current Participant Portal Status
-                                        </span>
-                                        <div className="flex items-center gap-2.5 mt-1">
-                                            <span className={`w-2.5 h-2.5 rounded-full ${
-                                                rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' :
-                                                rosterPortalMode === 'event' ? 'bg-blue-400' : 'bg-amber-400'
-                                            }`} />
-                                            <span className="text-base font-black italic uppercase text-white">
-                                                {rosterPortalMode === 'edit' ? 'Correction Window Open (Edit Mode)' :
-                                                 rosterPortalMode === 'event' ? 'Event Workspace Active (Hackathon Live)' :
-                                                 'Locked / Frozen (Countdown Active)'}
-                                            </span>
-                                            <span className="px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60">
-                                                Override: {rosterOverride}
+                                    {replyModalEmail.matchedTeamName && (
+                                        <div className="flex items-center justify-between gap-2 text-xs">
+                                            <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Registered Team:</span>
+                                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">
+                                                {replyModalEmail.matchedTeamName} {replyModalEmail.matchedTeamId ? `(${replyModalEmail.matchedTeamId})` : ''}
                                             </span>
                                         </div>
+                                    )}
+                                    <div className="flex items-center justify-between gap-2 text-xs">
+                                        <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Subject:</span>
+                                        <span className="font-bold text-white/90 truncate max-w-sm">Re: {replyModalEmail.subject}</span>
                                     </div>
+                                </div>
 
-                                    {/* Override Controls */}
-                                    <div className="flex items-center gap-2 flex-wrap">
+                                {/* Original Message Snippet */}
+                                <div className="mb-4">
+                                    <label className="text-[10px] font-black uppercase text-white/40 tracking-wider block mb-1">
+                                        Original Message Snippet
+                                    </label>
+                                    <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs text-white/60 italic max-h-24 overflow-y-auto">
+                                        {replyModalEmail.snippet || '(No text preview available)'}
+                                    </div>
+                                </div>
+
+                                {/* Quick Response Templates */}
+                                <div className="mb-4">
+                                    <label className="text-[10px] font-black uppercase text-white/40 tracking-wider block mb-1.5">
+                                        Quick Response Templates
+                                    </label>
+                                    <div className="flex gap-2 flex-wrap">
                                         <button
                                             type="button"
-                                            onClick={() => void handleSetRosterOverride('open')}
-                                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                                                rosterOverride === 'open' ? 'bg-emerald-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
-                                            }`}
+                                            onClick={() => setReplyText(`Hello,\n\nWe have verified your registration details. Your digital pass and login credentials have been re-issued. Please check your inbox or visit the onsite help desk if you need immediate printouts.\n\nBest regards,\nHappeno Organizing Committee`)}
+                                            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
                                         >
-                                            Force Open
+                                            Pass Verification
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => void handleSetRosterOverride('closed')}
-                                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                                                rosterOverride === 'closed' ? 'bg-amber-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
-                                            }`}
+                                            onClick={() => setReplyText(`Hello,\n\nThank you for reaching out! A volunteer or mentor has been notified. You can also raise an instant ticket at the Help Desk section of your team portal or visit Desk 1 at the venue.\n\nBest regards,\nHappeno Technical Support`)}
+                                            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
                                         >
-                                            Force Lock
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => void handleSetRosterOverride('auto')}
-                                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                                                rosterOverride === 'auto' ? 'bg-teal-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
-                                            }`}
-                                        >
-                                            Auto (Oct 5–6)
+                                            Mentor/Desk Info
                                         </button>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Section 2: Launch Campaign Dispatchers */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                {/* Lead Dispatcher Card */}
-                                <div className="p-5 rounded-3xl bg-teal-500/[0.05] border border-teal-500/30 space-y-3">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-xl bg-teal-500/20 text-[#14b8a6] flex items-center justify-center font-bold">
-                                            <Mail size={16} />
+                                {/* Reply Input Form */}
+                                <form onSubmit={(e) => { e.preventDefault(); void handleSendEmailReply(); }} className="space-y-4">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-white/50 tracking-wider block mb-1.5">
+                                            Your Response Message
+                                        </label>
+                                        <textarea
+                                            rows={5}
+                                            value={replyText}
+                                            onChange={e => setReplyText(e.target.value)}
+                                            placeholder="Type your response to the participant here..."
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-blue-400 transition leading-relaxed"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center gap-3 pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setReplyModalEmail(null)}
+                                            className="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold text-xs uppercase hover:bg-white/5 transition cursor-pointer"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={isSendingReply || !replyText.trim()}
+                                            className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)] cursor-pointer"
+                                        >
+                                            <Send size={14} className={isSendingReply ? 'animate-spin' : ''} />
+                                            {isSendingReply ? 'Sending Reply...' : 'Send Email Response'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* ═══════════ ROSTER CORRECTION WINDOW & AUDIT MODAL ═══════════ */}
+                <AnimatePresence>
+                    {showRosterModal && (
+                        <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="w-full max-w-4xl max-h-[90vh] bg-[#0D0219] border-2 border-teal-500/40 rounded-[2.5rem] p-6 sm:p-8 shadow-2xl overflow-y-auto custom-scrollbar"
+                            >
+                                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="w-12 h-12 rounded-2xl bg-teal-500/20 text-[#14b8a6] border border-teal-500/40 flex items-center justify-center shrink-0">
+                                            <GitMerge size={24} />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-white text-sm">1. Magic Links to Team Leads</h4>
-                                            <span className="text-[10px] text-teal-400 font-semibold">Primary Roster Access</span>
+                                            <h3 className="text-xl font-black uppercase italic tracking-tight text-white">
+                                                Team Edit Window & Activity Logs
+                                            </h3>
+                                            <p className="text-xs text-teal-400 font-bold uppercase tracking-widest mt-0.5">
+                                                Self-Service Control Hub (Oct 5–6 Team Edit Window)
+                                            </p>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-white/60 leading-relaxed">
-                                        Emails each Team Captain their private, encrypted link to <strong>/help</strong> so they can raise support tickets for any name changes or merging issues.
-                                    </p>
                                     <button
                                         type="button"
-                                        disabled={isDispatchingRosterLinks}
-                                        onClick={() => void handleDispatchRosterEmails('leads')}
-                                        className="w-full py-2.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
+                                        onClick={() => setShowRosterModal(false)}
+                                        className="w-8 h-8 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
+                                        style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                                        title="Close"
                                     >
-                                        {isDispatchingRosterLinks && rosterDispatchTarget === 'leads' ? 'Dispatching Leads...' : 'Dispatch Magic Links to Leads'}
+                                        <X size={16} />
                                     </button>
                                 </div>
 
-                                {/* Member Dispatcher Card */}
-                                <div className="p-5 rounded-3xl bg-blue-500/[0.05] border border-blue-500/30 space-y-3">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
-                                            <Users size={16} />
-                                        </div>
+                                {/* Section 1: Window Status & Live Override */}
+                                <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/10 mb-6 space-y-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                         <div>
-                                            <h4 className="font-bold text-white text-sm">2. Confirmation to Members</h4>
-                                            <span className="text-[10px] text-blue-300 font-semibold">Read-Only Notice</span>
-                                        </div>
-                                    </div>
-                                    <p className="text-xs text-white/60 leading-relaxed">
-                                        Sends read-only confirmation to all participants so they know they are registered and gives them their lead&apos;s contact for coordination.
-                                    </p>
-                                    <button
-                                        type="button"
-                                        disabled={isDispatchingRosterLinks}
-                                        onClick={() => void handleDispatchRosterEmails('members')}
-                                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
-                                    >
-                                        {isDispatchingRosterLinks && rosterDispatchTarget === 'members' ? 'Dispatching Members...' : 'Dispatch Member Notices'}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Live Dispatch Progress */}
-                            {isDispatchingRosterLinks && (
-                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 mb-6 space-y-2">
-                                    <div className="flex justify-between text-xs font-bold text-white">
-                                        <span>Dispatching to {rosterDispatchTarget}...</span>
-                                        <span className="text-teal-400">Processed: {rosterDispatchProgress.processed} (Sent: {rosterDispatchProgress.sent})</span>
-                                    </div>
-                                    <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                        <div className="bg-teal-400 h-full animate-pulse w-full rounded-full" />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Section 3: Live Immutable Audit Trail */}
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between px-1">
-                                    <div className="flex items-center gap-2">
-                                        <History size={16} className="text-[#14b8a6]" />
-                                        <h4 className="font-bold text-white text-sm">Live Roster Audit Trail</h4>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={fetchRosterSettings}
-                                        className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
-                                    >
-                                        <RefreshCw size={12} className={isLoadingRosterSettings ? 'animate-spin' : ''} /> Refresh
-                                    </button>
-                                </div>
-
-                                {rosterAuditLogs.length === 0 ? (
-                                    <div className="py-12 text-center rounded-2xl border border-dashed border-white/10">
-                                        <History size={32} className="mx-auto mb-2 text-white/20" />
-                                        <p className="text-xs text-white/40 uppercase tracking-widest font-bold">No roster modifications yet</p>
-                                        <p className="text-[11px] text-white/20 mt-1">Changes made during Oct 5–6 will appear here in real-time with IP addresses.</p>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
-                                        {rosterAuditLogs.map((log: any) => (
-                                            <div
-                                                key={log.id}
-                                                className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
-                                            >
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
-                                                            log.action === 'MERGE_TEAMS' ? 'bg-purple-500/20 text-purple-300' :
-                                                            log.action === 'REPLACE_MEMBER' ? 'bg-amber-500/20 text-amber-300' :
-                                                            'bg-teal-500/20 text-teal-300'
-                                                        }`}>
-                                                            {log.action}
-                                                        </span>
-                                                        <span className="font-mono font-bold text-white">{log.teamId}</span>
-                                                        <span className="text-white/40 text-[11px]">• {log.actor}</span>
-                                                    </div>
-                                                    <p className="text-white/70 text-[11px]">{log.summary}</p>
-                                                </div>
-
-                                                <div className="text-right shrink-0 text-[10px] font-mono text-white/30">
-                                                    <div>{new Date(log.timestamp).toLocaleTimeString()}</div>
-                                                    <div>IP: {log.ip}</div>
-                                                </div>
+                                            <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">
+                                                Current Participant Portal Status
+                                            </span>
+                                            <div className="flex items-center gap-2.5 mt-1">
+                                                <span className={`w-2.5 h-2.5 rounded-full ${rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' :
+                                                    rosterPortalMode === 'event' ? 'bg-blue-400' : 'bg-amber-400'
+                                                    }`} />
+                                                <span className="text-base font-black italic uppercase text-white">
+                                                    {rosterPortalMode === 'edit' ? 'Correction Window Open (Edit Mode)' :
+                                                        rosterPortalMode === 'event' ? 'Event Workspace Active (Hackathon Live)' :
+                                                            'Locked / Frozen (Countdown Active)'}
+                                                </span>
+                                                <span className="px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60">
+                                                    Override: {rosterOverride}
+                                                </span>
                                             </div>
-                                        ))}
+                                        </div>
+
+                                        {/* Override Controls */}
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <button
+                                                type="button"
+                                                onClick={() => void handleSetRosterOverride('open')}
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${rosterOverride === 'open' ? 'bg-emerald-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
+                                                    }`}
+                                            >
+                                                Force Open
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => void handleSetRosterOverride('closed')}
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${rosterOverride === 'closed' ? 'bg-amber-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
+                                                    }`}
+                                            >
+                                                Force Lock
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => void handleSetRosterOverride('auto')}
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${rosterOverride === 'auto' ? 'bg-teal-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
+                                                    }`}
+                                            >
+                                                Auto (Oct 5–6)
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Section 2: Launch Campaign Dispatchers */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    {/* Lead Dispatcher Card */}
+                                    <div className="p-5 rounded-3xl bg-teal-500/[0.05] border border-teal-500/30 space-y-3">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 rounded-xl bg-teal-500/20 text-[#14b8a6] flex items-center justify-center font-bold">
+                                                <Mail size={16} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-white text-sm">1. Magic Links to Team Leads</h4>
+                                                <span className="text-[10px] text-teal-400 font-semibold">Primary Roster Access</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-white/60 leading-relaxed">
+                                            Emails each Team Captain their private, encrypted link to <strong>/help</strong> so they can raise support tickets for any name changes or merging issues.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            disabled={isDispatchingRosterLinks}
+                                            onClick={() => void handleDispatchRosterEmails('leads')}
+                                            className="w-full py-2.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
+                                        >
+                                            {isDispatchingRosterLinks && rosterDispatchTarget === 'leads' ? 'Dispatching Leads...' : 'Dispatch Magic Links to Leads'}
+                                        </button>
+                                    </div>
+
+                                    {/* Member Dispatcher Card */}
+                                    <div className="p-5 rounded-3xl bg-blue-500/[0.05] border border-blue-500/30 space-y-3">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                                                <Users size={16} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-white text-sm">2. Confirmation to Members</h4>
+                                                <span className="text-[10px] text-blue-300 font-semibold">Read-Only Notice</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-white/60 leading-relaxed">
+                                            Sends read-only confirmation to all participants so they know they are registered and gives them their lead&apos;s contact for coordination.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            disabled={isDispatchingRosterLinks}
+                                            onClick={() => void handleDispatchRosterEmails('members')}
+                                            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
+                                        >
+                                            {isDispatchingRosterLinks && rosterDispatchTarget === 'members' ? 'Dispatching Members...' : 'Dispatch Member Notices'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Live Dispatch Progress */}
+                                {isDispatchingRosterLinks && (
+                                    <div className="p-4 rounded-2xl bg-white/5 border border-white/10 mb-6 space-y-2">
+                                        <div className="flex justify-between text-xs font-bold text-white">
+                                            <span>Dispatching to {rosterDispatchTarget}...</span>
+                                            <span className="text-teal-400">Processed: {rosterDispatchProgress.processed} (Sent: {rosterDispatchProgress.sent})</span>
+                                        </div>
+                                        <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                                            <div className="bg-teal-400 h-full animate-pulse w-full rounded-full" />
+                                        </div>
                                     </div>
                                 )}
-                            </div>
-                        </motion.div>
+
+                                {/* Section 3: Live Immutable Audit Trail */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between px-1">
+                                        <div className="flex items-center gap-2">
+                                            <History size={16} className="text-[#14b8a6]" />
+                                            <h4 className="font-bold text-white text-sm">Live Roster Audit Trail</h4>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={fetchRosterSettings}
+                                            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold text-white/70 hover:text-white transition cursor-pointer"
+                                        >
+                                            <RefreshCw size={12} className={isLoadingRosterSettings ? 'animate-spin' : ''} /> Refresh
+                                        </button>
+                                    </div>
+
+                                    {rosterAuditLogs.length === 0 ? (
+                                        <div className="py-12 text-center rounded-2xl border border-dashed border-white/10">
+                                            <History size={32} className="mx-auto mb-2 text-white/20" />
+                                            <p className="text-xs text-white/40 uppercase tracking-widest font-bold">No roster modifications yet</p>
+                                            <p className="text-[11px] text-white/20 mt-1">Changes made during Oct 5–6 will appear here in real-time with IP addresses.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                                            {rosterAuditLogs.map((log: any) => (
+                                                <div
+                                                    key={log.id}
+                                                    className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                                                >
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${log.action === 'MERGE_TEAMS' ? 'bg-purple-500/20 text-purple-300' :
+                                                                log.action === 'REPLACE_MEMBER' ? 'bg-amber-500/20 text-amber-300' :
+                                                                    'bg-teal-500/20 text-teal-300'
+                                                                }`}>
+                                                                {log.action}
+                                                            </span>
+                                                            <span className="font-mono font-bold text-white">{log.teamId}</span>
+                                                            <span className="text-white/40 text-[11px]">• {log.actor}</span>
+                                                        </div>
+                                                        <p className="text-white/70 text-[11px]">{log.summary}</p>
+                                                    </div>
+
+                                                    <div className="text-right shrink-0 text-[10px] font-mono text-white/30">
+                                                        <div>{new Date(log.timestamp).toLocaleTimeString()}</div>
+                                                        <div>IP: {log.ip}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+                {/* ═══════════ RESTRUCTURE TAB ═══════════ */}
+                {activeTab === 'restructure' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <TeamRestructure />
                     </div>
                 )}
-            </AnimatePresence>
-            {/* ═══════════ RESTRUCTURE TAB ═══════════ */}
-            {activeTab === 'restructure' && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <TeamRestructure />
-                </div>
-            )}
-            
-            {/* 🟢 PRE-SCORES TAB 🟢 */}
-            {activeTab === 'prescores' && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-slate-200 bg-white p-5 lg:flex-row lg:items-center">
-                        <div>
-                            <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-slate-800 flex items-center gap-3">
-                                <Award className="text-[#14b8a6]" size={28} />
-                                Rabbit Race Scores
-                            </h2>
-                            <p className="mt-1 max-w-xl text-sm font-medium text-slate-500">
-                                View pre-scores assigned to teams by the agency (e.g., Rabbit Race marks). These are automatically added to their final evaluation score out of 500.
-                            </p>
+
+                {/* 🟢 PRE-SCORES TAB 🟢 */}
+                {activeTab === 'prescores' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-slate-200 bg-white p-5 lg:flex-row lg:items-center">
+                            <div>
+                                <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-slate-800 flex items-center gap-3">
+                                    <Award className="text-[#14b8a6]" size={28} />
+                                    Rabbit Race Scores
+                                </h2>
+                                <p className="mt-1 max-w-xl text-sm font-medium text-slate-500">
+                                    View pre-scores assigned to teams by the agency (e.g., Rabbit Race marks). These are automatically added to their final evaluation score out of 500.
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div className="rounded-[1.5rem] border border-slate-200 bg-white p-1 overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm text-slate-700">
-                                <thead className="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                                    <tr>
-                                        <th className="px-6 py-4">Team ID</th>
-                                        <th className="px-6 py-4">Team Name</th>
-                                        <th className="px-6 py-4">Track</th>
-                                        <th className="px-6 py-4 text-right">Rabbit Race Score</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 bg-white">
-                                    {projects.filter(p => p.preScore !== undefined && p.preScore > 0).map(project => (
-                                        <tr key={project.id} className="transition-colors hover:bg-slate-50">
-                                            <td className="px-6 py-4 font-bold text-slate-800">{project.teamId}</td>
-                                            <td className="px-6 py-4 font-semibold text-slate-600">{project.team}</td>
-                                            <td className="px-6 py-4 text-xs font-semibold text-slate-500">{project.track || 'Unassigned'}</td>
-                                            <td className="px-6 py-4 text-right font-black text-[#14b8a6]">{project.preScore} / 100</td>
-                                        </tr>
-                                    ))}
-                                    {projects.filter(p => p.preScore !== undefined && p.preScore > 0).length === 0 && (
+
+                        <div className="rounded-[1.5rem] border border-slate-200 bg-white p-1 overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm text-slate-700">
+                                    <thead className="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-500">
                                         <tr>
-                                            <td colSpan={4} className="px-6 py-12 text-center text-sm font-semibold text-slate-500">
-                                                No teams have a pre-score assigned yet.
-                                            </td>
+                                            <th className="px-6 py-4">Team ID</th>
+                                            <th className="px-6 py-4">Team Name</th>
+                                            <th className="px-6 py-4">Track</th>
+                                            <th className="px-6 py-4 text-right">Rabbit Race Score</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 bg-white">
+                                        {projects.filter(p => p.preScore !== undefined && p.preScore > 0).map(project => (
+                                            <tr key={project.id} className="transition-colors hover:bg-slate-50">
+                                                <td className="px-6 py-4 font-bold text-slate-800">{project.teamId}</td>
+                                                <td className="px-6 py-4 font-semibold text-slate-600">{project.team}</td>
+                                                <td className="px-6 py-4 text-xs font-semibold text-slate-500">{project.track || 'Unassigned'}</td>
+                                                <td className="px-6 py-4 text-right font-black text-[#14b8a6]">{project.preScore} / 100</td>
+                                            </tr>
+                                        ))}
+                                        {projects.filter(p => p.preScore !== undefined && p.preScore > 0).length === 0 && (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-sm font-semibold text-slate-500">
+                                                    No teams have a pre-score assigned yet.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-</div>
+                )}
+            </div>
         </DashboardLayout>
     );
 }

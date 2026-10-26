@@ -70,7 +70,7 @@ export default function About() {
         <FadeIn delay={0.2}>
           <p className="font-body text-base sm:text-lg text-gray-600 max-w-3xl leading-relaxed mb-6">
             The <strong className="text-gray-900 font-semibold">Happeno Hackathon OS</strong> is a
-            purpose-built operating system replacing fragmented spreadsheets, manual forms, and WhatsApp groups with a unified platform for hackathons.
+            purpose-built HMSreplacing fragmented spreadsheets, manual forms, and WhatsApp groups with a unified platform for hackathons.
           </p>
         </FadeIn>
 
@@ -84,7 +84,7 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {PILLARS.map((pillar, i) => (
             <FadeIn key={pillar.name} delay={0.2 + i * 0.1}>
-              <div 
+              <div
                 className="bg-white rounded-xl p-8 h-full flex flex-col justify-between border border-gray-200 hover:border-teal-600 transition-all duration-300 shadow-sm relative group"
               >
                 <div>

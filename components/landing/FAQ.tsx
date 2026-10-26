@@ -11,7 +11,7 @@ interface FAQ {
 const FAQS: FAQ[] = [
   {
     q: 'How does Happeno streamline hackathon management?',
-    a: 'Happeno replaces multiple disconnected tools (Google Forms, Excel spreadsheets, manual paper lists, and WhatsApp groups) with a unified, real-time operating system covering registration, sub-second QR venue access, meal token logistics, stage pipelines, and live judging.',
+    a: 'Happeno replaces multiple disconnected tools (Google Forms, Excel spreadsheets, manual paper lists, and WhatsApp groups) with a unified, real-time HMScovering registration, sub-second QR venue access, meal token logistics, stage pipelines, and live judging.',
   },
   {
     q: 'How do QR passes and meal tracking prevent fraud?',
@@ -67,9 +67,8 @@ function FAQItem({ faq, index }: FAQItemProps) {
           </span>
         </div>
         <span
-          className={`flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 text-sm transition-all duration-200 ${
-            open ? 'rotate-45 border-[#0f766e] text-[#0f766e] bg-teal-50' : ''
-          }`}
+          className={`flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 text-sm transition-all duration-200 ${open ? 'rotate-45 border-[#0f766e] text-[#0f766e] bg-teal-50' : ''
+            }`}
         >
           +
         </span>

@@ -384,4 +384,42 @@ grant execute on function next_staff_id(text) to service_role;
 revoke all on function scan_volunteer_pass(text, text, text, text) from public, anon, authenticated;
 grant execute on function scan_volunteer_pass(text, text, text, text) to service_role;
 
+create table if not exists certificate_feedback (
+    id uuid primary key default gen_random_uuid(),
+    team_id text not null,
+    team_name text not null default '',
+    submitted_by_name text not null default '',
+    submitted_by_email text not null default '',
+    rating_overall int not null default 5,
+    rating_organization int not null default 5,
+    rating_mentorship int not null default 5,
+    rating_judging int not null default 5,
+    rating_food int not null default 5,
+    feedback_text text not null default '',
+    highlight text not null default '',
+    created_at timestamptz not null default now()
+);
+
+create index if not exists idx_certificate_feedback_team on certificate_feedback(team_id);
+
+create table if not exists certificate_claims (
+    id uuid primary key default gen_random_uuid(),
+    certificate_id text unique not null,
+    team_id text not null,
+    team_name text not null default '',
+    member_name text not null,
+    member_email text not null default '',
+    role text not null default 'Participant',
+    verification_hash text not null default '',
+    issued_at timestamptz not null default now()
+);
+
+create index if not exists idx_certificate_claims_cert_id on certificate_claims(certificate_id);
+create index if not exists idx_certificate_claims_team_id on certificate_claims(team_id);
+
+alter table certificate_feedback enable row level security;
+alter table certificate_claims enable row level security;
+grant all on certificate_feedback, certificate_claims to service_role;
+
 notify pgrst, 'reload schema';
+

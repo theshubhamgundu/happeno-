@@ -7,7 +7,7 @@ const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_RE
     ? new Redis({
         url: process.env.UPSTASH_REDIS_REST_URL,
         token: process.env.UPSTASH_REDIS_REST_TOKEN,
-      })
+    })
     : null;
 
 // Global rate limit: 60 requests per 1 minute per IP
@@ -27,17 +27,17 @@ async function verifySignatureEdge(payload: string, signatureBase64url: string, 
         false,
         ['verify']
     );
-    
+
     const signatureBase64 = signatureBase64url.replace(/-/g, '+').replace(/_/g, '/');
     const pad = signatureBase64.length % 4;
     const padded = pad ? signatureBase64 + '='.repeat(4 - pad) : signatureBase64;
-    
+
     const signatureStr = atob(padded);
     const signatureBytes = new Uint8Array(signatureStr.length);
     for (let i = 0; i < signatureStr.length; i++) {
         signatureBytes[i] = signatureStr.charCodeAt(i);
     }
-    
+
     return await crypto.subtle.verify(
         'HMAC',
         key,
@@ -52,7 +52,7 @@ export async function proxy(request: NextRequest) {
         if (globalRateLimit) {
             const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
             const { success } = await globalRateLimit.limit(`global_api_${ip}`);
-            
+
             if (!success) {
                 return new NextResponse(
                     JSON.stringify({ error: 'Too many requests. Please slow down.' }),
@@ -64,8 +64,8 @@ export async function proxy(request: NextRequest) {
 
     // 2. Admin Dashboard Protection
     if (request.nextUrl.pathname.startsWith('/dashboard/admin')) {
-        const cookie = request.cookies.get('tricity_session');
-        
+        const cookie = request.cookies.get('Happeno_session');
+
         if (!cookie) {
             return NextResponse.redirect(new URL('/login', request.url));
         }
@@ -73,7 +73,7 @@ export async function proxy(request: NextRequest) {
         try {
             const token = decodeURIComponent(cookie.value);
             const [payload, signature, extra] = token.split('.');
-            
+
             if (!payload || !signature || extra) {
                 return NextResponse.redirect(new URL('/login', request.url));
             }
@@ -84,18 +84,18 @@ export async function proxy(request: NextRequest) {
             }
 
             const isValid = await verifySignatureEdge(payload, signature, secret);
-            
+
             if (!isValid) {
                 return NextResponse.redirect(new URL('/login', request.url));
             }
 
             const decodedPayload = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
             const session = JSON.parse(decodedPayload);
-            
+
             if (session.expiresAt <= Date.now() || session.role !== 'admin') {
                 return NextResponse.redirect(new URL('/login', request.url));
             }
-            
+
             return NextResponse.next();
         } catch (error) {
             console.error('Middleware session verification failed:', error);
