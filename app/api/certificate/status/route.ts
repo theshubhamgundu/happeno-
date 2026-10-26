@@ -5,7 +5,8 @@ import {
     getCertificateConfig,
     evaluateWindowState,
     hasTeamSubmittedFeedback,
-    generateCertificateMetadata
+    generateCertificateMetadata,
+    getNormalizedTeamMembers
 } from '@/lib/certificate';
 
 export const dynamic = 'force-dynamic';
@@ -64,22 +65,8 @@ export async function GET(req: Request) {
                     }
                 }
 
-                // Prepare normalized member list
-                const rawMembers = Array.isArray(team.members) ? team.members : [];
-                const membersList = [
-                    {
-                        name: team.captain || 'Team Lead',
-                        email: team.email || '',
-                        role: 'Team Lead',
-                        index: 0
-                    },
-                    ...rawMembers.map((m: any, idx: number) => ({
-                        name: m.fullName || m.name || `Member ${idx + 1}`,
-                        email: m.email || '',
-                        role: 'Team Member',
-                        index: idx + 1
-                    }))
-                ];
+                // Prepare normalized and deduplicated member list
+                const membersList = getNormalizedTeamMembers(team);
 
                 const membersWithCerts = membersList.map((m) => {
                     const meta = generateCertificateMetadata(team.team_id, m.index, m.name);

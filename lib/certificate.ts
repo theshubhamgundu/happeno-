@@ -59,7 +59,7 @@ export interface CertificateClaimRecord {
 export const DEFAULT_CERTIFICATE_CONFIG: CertificateConfig = {
     is_enabled: true,
     unlock_at: null,
-    require_feedback: false,
+    require_feedback: true,
     require_checkin: false,
     event_title: 'Happeno Hackathon',
     issuer_name: 'Happeno Council of Organizers',
@@ -310,6 +310,70 @@ export function generateCertificateMetadata(teamId: string, memberIndex: number,
     };
 }
 
+export interface NormalizedMember {
+    name: string;
+    email: string;
+    role: string;
+    index: number;
+}
+
+/**
+ * Deduplicate and normalize team members so team leads and members are never duplicated
+ */
+export function getNormalizedTeamMembers(team: {
+    captain?: string | null;
+    email?: string | null;
+    members?: any[] | null;
+}): NormalizedMember[] {
+    const rawMembers: any[] = Array.isArray(team.members) ? team.members : [];
+    const captainName = (team.captain || '').trim();
+    const result: NormalizedMember[] = [];
+    const seenNames = new Set<string>();
+
+    const clean = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    // Process members from rawMembers
+    rawMembers.forEach((m, idx) => {
+        const name = (typeof m === 'string' ? m : m.fullName || m.name || '').trim();
+        if (!name) return;
+        const key = clean(name);
+        if (seenNames.has(key)) return;
+        seenNames.add(key);
+
+        const isLead = Boolean(
+            m.is_lead || 
+            (captainName && clean(captainName) === key) || 
+            (idx === 0 && (!captainName || clean(captainName) === key))
+        );
+
+        result.push({
+            name,
+            email: m.email || (isLead ? (team.email || '') : ''),
+            role: isLead ? 'Team Lead' : 'Team Member',
+            index: result.length
+        });
+    });
+
+    // If captain was not found in rawMembers, prepend captain
+    if (captainName && !seenNames.has(clean(captainName))) {
+        result.unshift({
+            name: captainName,
+            email: team.email || '',
+            role: 'Team Lead',
+            index: 0
+        });
+        // Re-index
+        result.forEach((m, i) => { m.index = i; });
+    }
+
+    // Ensure at least one member has role 'Team Lead'
+    if (result.length > 0 && !result.some(m => m.role === 'Team Lead')) {
+        result[0].role = 'Team Lead';
+    }
+
+    return result;
+}
+
 /**
  * Fetch or record certificate claim
  */
@@ -427,16 +491,13 @@ export async function verifyCertificateById(certificateId: string): Promise<Cert
                     return raw.certificate_claims[cleanId];
                 }
 
-                // If not recorded yet, verify if the hash matches any member in that team
-                const members: Array<{ fullName?: string; name?: string; email?: string }> = [
-                    { fullName: team.captain, name: team.captain },
-                    ...(Array.isArray(team.members) ? team.members : [])
-                ];
+                // Verify against normalized members (deduplicated)
+                const members = getNormalizedTeamMembers(team);
 
                 for (let i = 0; i < members.length; i++) {
-                    const mName = members[i].fullName || members[i].name || '';
+                    const mName = members[i].name;
                     if (!mName) continue;
-                    const meta = generateCertificateMetadata(team.team_id, i, mName);
+                    const meta = generateCertificateMetadata(team.team_id, members[i].index, mName);
                     if (meta.certificate_id === cleanId) {
                         return {
                             certificate_id: cleanId,
@@ -444,7 +505,7 @@ export async function verifyCertificateById(certificateId: string): Promise<Cert
                             team_name: team.team_name,
                             member_name: mName,
                             member_email: members[i].email || '',
-                            role: i === 0 ? 'Team Lead' : 'Team Member',
+                            role: members[i].role,
                             issued_at: team.raw_data?.feedbackSubmittedAt || new Date().toISOString(),
                             verification_hash: meta.verification_hash
                         };
