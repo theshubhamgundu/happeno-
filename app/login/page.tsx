@@ -90,13 +90,7 @@ export default function LoginPage() {
                 return;
             }
 
-            // Reject participant logins since event has concluded
-            if (id.toUpperCase().startsWith("TRI")) {
-                setError("Participant portal session inactive. Please contact your hackathon organizer.");
-                return;
-            }
-
-            // Fallback Participant check
+            // Try Participant / Team
             response = await fetch('/api/auth/team', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -104,7 +98,13 @@ export default function LoginPage() {
             });
             data = await response.json();
 
-            if (response.status === 403 && data.error) {
+            if (response.ok && data.success) {
+                setDetectedRole("Team");
+                login('team', { teamId: data.teamId, name: data.teamName, portalMode: data.portalMode || 'event' });
+                return;
+            }
+
+            if (data?.error) {
                 setError(data.error);
                 return;
             }
