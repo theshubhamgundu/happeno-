@@ -29,12 +29,12 @@ export async function getParticipantPortalMode(now = new Date()): Promise<Partic
     const editStart = Date.parse(String(settings.get('participant_edit_start') || '2026-10-05T00:01:00+05:30'));
     const editEnd = Date.parse(String(settings.get('participant_edit_end') || '2026-10-07T17:30:00+05:30'));
     const eventStart = Date.parse(String(settings.get('event_access_start') || '2026-10-07T17:30:00+05:30'));
-    const eventEnd = Date.parse(String(settings.get('event_access_end') || '2026-10-12T10:00:00+05:30'));
+    const eventEnd = Date.parse(String(settings.get('event_access_end') || '2026-12-31T23:59:59+05:30'));
     const current = now.getTime();
 
     if (Number.isFinite(editStart) && Number.isFinite(editEnd) && current >= editStart && current < editEnd) return 'edit';
     if (Number.isFinite(eventStart) && Number.isFinite(eventEnd) && current >= eventStart && current < eventEnd) return 'event';
     
-    return 'closed';
+    return 'event'; // Default to active event mode for workspace and certificate access
 }
 

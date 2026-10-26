@@ -22,19 +22,14 @@ export default function LoginPage() {
     const [isVerifying, setIsVerifying] = useState(false);
     const [detectedRole, setDetectedRole] = useState<string | null>(null);
 
-    // Redirect if already logged in as staff
+    // Redirect if already logged in
     useEffect(() => {
         if (!isLoading && user && user.role) {
-            if (user.role === 'team') {
-                // Event is closed: clear participant session
-                void logout();
-                return;
-            }
             router.replace(`/dashboard/${user.role}`);
         }
-    }, [user, isLoading, router, logout]);
+    }, [user, isLoading, router]);
 
-    if (isLoading || (user && user.role && user.role !== 'team')) {
+    if (isLoading || (user && user.role)) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="w-12 h-12 border-4 border-teal-200 border-t-[#0f766e] rounded-full animate-spin" />

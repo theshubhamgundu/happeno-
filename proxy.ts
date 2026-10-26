@@ -64,7 +64,7 @@ export async function proxy(request: NextRequest) {
 
     // 2. Admin Dashboard Protection
     if (request.nextUrl.pathname.startsWith('/dashboard/admin')) {
-        const cookie = request.cookies.get('Happeno_session');
+        const cookie = request.cookies.get('happeno_session') || request.cookies.get('Happeno_session');
 
         if (!cookie) {
             return NextResponse.redirect(new URL('/login', request.url));
