@@ -149,8 +149,8 @@ export default function LoginPage() {
                     <p className="font-body text-zinc-400 text-sm md:text-base">
                         Workspace & Access Portal
                     </p>
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-950/40 border border-orange-500/30 text-orange-400 text-xs font-medium mt-3 shadow-xs">
-                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                    <div className="badge-orange-grain mt-3">
+                        <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
                         <span>Happeno Hackathon</span>
                     </div>
                 </motion.div>

@@ -769,22 +769,20 @@ body :not(#printable-certificate):not(#printable-certificate *).text-\[\#1A1A1A\
   color: #ffffff !important;
 }
 
-/* Secondary Typography & All Grey Text -> Pure White */
+/* Secondary Typography & Descriptions -> Readable Light Zinc */
 body :not(#printable-certificate):not(#printable-certificate *).text-slate-700,
 body :not(#printable-certificate):not(#printable-certificate *).text-slate-600,
+body :not(#printable-certificate):not(#printable-certificate *).text-gray-700,
+body :not(#printable-certificate):not(#printable-certificate *).text-gray-600 {
+  color: #d4d4d8 !important;
+}
+
+/* Muted Labels, Metadata, & Subtitles -> Soft Muted Zinc */
 body :not(#printable-certificate):not(#printable-certificate *).text-slate-500,
 body :not(#printable-certificate):not(#printable-certificate *).text-slate-400,
-body :not(#printable-certificate):not(#printable-certificate *).text-gray-700,
-body :not(#printable-certificate):not(#printable-certificate *).text-gray-600,
 body :not(#printable-certificate):not(#printable-certificate *).text-gray-500,
-body :not(#printable-certificate):not(#printable-certificate *).text-gray-400,
-body :not(#printable-certificate):not(#printable-certificate *).text-zinc-500,
-body :not(#printable-certificate):not(#printable-certificate *).text-zinc-400,
-body :not(#printable-certificate):not(#printable-certificate *).text-zinc-300,
-body :not(#printable-certificate):not(#printable-certificate *).text-neutral-500,
-body :not(#printable-certificate):not(#printable-certificate *).text-neutral-400,
-body :not(#printable-certificate):not(#printable-certificate *).text-muted-foreground {
-  color: #ffffff !important;
+body :not(#printable-certificate):not(#printable-certificate *).text-gray-400 {
+  color: #a1a1aa !important;
 }
 
 /* Form Inputs, Selects, and Textareas */
