@@ -57,11 +57,11 @@ export interface CertificateClaimRecord {
 }
 
 export const DEFAULT_CERTIFICATE_CONFIG: CertificateConfig = {
-    is_enabled: false,
+    is_enabled: true,
     unlock_at: null,
-    require_feedback: true,
-    require_checkin: true,
-    event_title: 'Happeno hackathonSprint',
+    require_feedback: false,
+    require_checkin: false,
+    event_title: 'Happeno Hackathon',
     issuer_name: 'Happeno Council of Organizers',
     signatory_1_name: 'Organizing Chair',
     signatory_1_title: 'Head of Operations',

@@ -235,7 +235,7 @@ export default function CertificatePreview({
             {/* Action Bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
                 <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold">
+                    <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold">
                         <ShieldCheck size={20} />
                     </div>
                     <div>
