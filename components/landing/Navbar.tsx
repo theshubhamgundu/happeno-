@@ -40,14 +40,14 @@ export default function Navbar() {
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           {/* Logo */}
           <a href="#hero" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-md bg-[#ea580c] flex items-center justify-center text-white font-display font-extrabold text-sm shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 via-orange-600 to-orange-700 flex items-center justify-center text-white font-display font-black text-sm shadow-[0_0_15px_rgba(234,88,12,0.45)] border border-orange-400/40">
               H
             </div>
             <div className="flex flex-col">
               <span className="font-display font-bold text-sm tracking-wider uppercase text-white">
                 Happeno
               </span>
-              <span className="text-[10px] font-mono text-orange-500 uppercase tracking-widest -mt-0.5 font-bold">
+              <span className="text-[10px] font-mono text-orange-400 uppercase tracking-widest -mt-0.5 font-bold">
                 Hackathon
               </span>
             </div>

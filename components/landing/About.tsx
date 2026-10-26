@@ -50,10 +50,10 @@ export default function About() {
         {/* Section label */}
         <FadeIn>
           <div className="flex items-center gap-3 mb-4">
-            <span className="font-mono text-xs tracking-[0.25em] uppercase text-[#ea580c] font-semibold">
+            <span className="font-mono text-xs tracking-[0.25em] uppercase text-orange-400 font-bold">
               01
             </span>
-            <span className="h-[1px] w-10 bg-orange-500/40" />
+            <span className="h-[1px] w-10 bg-gradient-to-r from-orange-500/60 to-transparent" />
             <span className="font-mono text-xs tracking-[0.25em] uppercase text-zinc-500">
               The Mission
             </span>
@@ -63,7 +63,7 @@ export default function About() {
         <FadeIn delay={0.1}>
           <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-white leading-tight mb-6">
             Engineered for Competitions.{' '}
-            <span className="text-[#ea580c]">Built for Builders.</span>
+            <span className="text-orange-gradient font-black">Built for Builders.</span>
           </h2>
         </FadeIn>
 
@@ -85,20 +85,20 @@ export default function About() {
           {PILLARS.map((pillar, i) => (
             <FadeIn key={pillar.name} delay={0.2 + i * 0.1}>
               <div
-                className="bg-[#0d0d12] rounded-xl p-8 h-full flex flex-col justify-between border border-zinc-800 hover:border-orange-500/60 transition-all duration-300 shadow-sm relative group"
+                className="pro-card rounded-2xl p-8 h-full flex flex-col justify-between transition-all duration-300 relative group"
               >
                 <div>
-                  <div className="inline-block px-3 py-1 rounded text-[11px] font-mono font-medium tracking-wide uppercase bg-orange-950/40 text-orange-400 border border-orange-500/30 mb-4">
+                  <div className="inline-block px-3.5 py-1 rounded-full text-[11px] font-mono font-medium tracking-wide uppercase badge-orange-grain mb-4">
                     {pillar.tag}
                   </div>
-                  <h3 className="font-display font-bold text-xl text-white mb-3">
+                  <h3 className="font-display font-bold text-xl text-white mb-3 group-hover:text-orange-300 transition-colors">
                     {pillar.name}
                   </h3>
                   <p className="font-body text-sm text-zinc-400 leading-relaxed">{pillar.desc}</p>
                 </div>
                 <div className="pt-6 mt-6 border-t border-zinc-800/80 flex items-center justify-between text-xs font-mono text-zinc-500">
                   <span>Happeno Platform</span>
-                  <span className="text-orange-500 font-semibold">Core Feature</span>
+                  <span className="text-orange-400 font-semibold">Core Feature</span>
                 </div>
               </div>
             </FadeIn>

@@ -45,15 +45,18 @@ export default function Hero() {
         }}
       />
 
+      {/* Atmospheric warm ambient glow behind hero */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[360px] bg-gradient-to-b from-orange-600/20 via-amber-600/10 to-transparent blur-[130px] rounded-full pointer-events-none" />
+
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto">
-        {/* Date & Location Badge */}
+        {/* Date & Location Badge with grain and glow */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-3 sm:px-4 py-1.5 rounded-full border border-orange-500/30 bg-orange-950/40 text-orange-300"
+          className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-4 py-1.5 rounded-full badge-orange-grain backdrop-blur-md"
         >
-          <span className="w-2 h-2 shrink-0 rounded-full bg-orange-500 animate-pulse" />
+          <span className="w-2 h-2 shrink-0 rounded-full bg-orange-400 animate-pulse shadow-[0_0_8px_rgba(251,146,60,0.8)]" />
           <span className="font-mono text-[10px] sm:text-xs tracking-wider uppercase font-semibold text-center leading-snug">
             HAPPENO · HMS
           </span>
@@ -67,7 +70,7 @@ export default function Hero() {
           className="font-display font-extrabold text-[2.5rem] sm:text-6xl md:text-7xl lg:text-8xl leading-[1.08] tracking-tight text-white mb-4 sm:mb-6"
         >
           Happeno
-          <span className="block text-lg sm:text-3xl md:text-4xl font-semibold text-[#ea580c] tracking-normal mt-1 sm:mt-2">
+          <span className="block text-lg sm:text-3xl md:text-4xl font-extrabold text-orange-gradient tracking-normal mt-1 sm:mt-2">
             The Modern Hackathon Operating System
           </span>
         </motion.h1>

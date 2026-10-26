@@ -88,8 +88,10 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${montserrat.variable} ${dmSans.variable} ${syne.variable} ${spaceMono.variable} ${poppins.className} antialiased overflow-x-hidden bg-black text-white`}
+          className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${montserrat.variable} ${dmSans.variable} ${syne.variable} ${spaceMono.variable} ${poppins.className} antialiased overflow-x-hidden bg-black text-white relative`}
         >
+          {/* Subtle tactile film grain texture overlay */}
+          <div className="grain-overlay" aria-hidden="true" />
           <AuthProvider>
             <HackathonProvider>
               <SmoothScroll>

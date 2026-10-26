@@ -19,22 +19,22 @@ export default function FinalCTA() {
           transition={{ duration: 0.6, ease: [0.25, 0.8, 0.25, 1] }}
         >
           {/* Date Badge */}
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full border border-orange-500/30 bg-orange-950/40 text-orange-400">
-            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full badge-orange-grain">
+            <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse shadow-[0_0_8px_rgba(251,146,60,0.8)]" />
             <span className="font-mono text-xs tracking-wider uppercase font-semibold">
               Happeno · The Modern Hackathon OS
             </span>
           </div>
 
           <h2 className="font-display font-extrabold text-3xl sm:text-5xl md:text-6xl text-white leading-tight mb-4">
-            Build with the Happeno Community
+            Build with the <span className="text-orange-gradient">Happeno Community</span>
           </h2>
 
           <p className="font-body text-base sm:text-lg text-zinc-400 max-w-xl mx-auto leading-relaxed mb-3">
             Join thousands of developers, organizers, and mentors executing world-class hackathons with zero chaos.
           </p>
 
-          <p className="font-mono text-xs text-orange-500 mb-10 font-medium">
+          <p className="font-mono text-xs text-orange-400 mb-10 font-medium">
             Stage Pipelines · Live Rubrics · Sub-Second QR Passes
           </p>
 

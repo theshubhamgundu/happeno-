@@ -93,12 +93,12 @@ export default function TeamSubmissions() {
                         return (
                             <div key={item.key} className="grid gap-3 py-4 md:grid-cols-[180px_minmax(0,1fr)_auto] md:items-center">
                                 <div className="flex items-center gap-3">
-                                    <span className={`grid h-9 w-9 place-items-center rounded-xl ${ready ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}>
-                                        {ready ? <Check size={16} /> : <Icon size={16} />}
+                                    <span className={`grid h-9 w-9 place-items-center rounded-xl ${ready ? "bg-black text-white border border-zinc-800" : "bg-zinc-900 text-white"}`}>
+                                        {ready ? <Check size={16} className="text-orange-500" /> : <Icon size={16} />}
                                     </span>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-700">{item.label}{item.required && <span className="ml-1 text-rose-500">*</span>}</p>
-                                        <p className="text-xs text-slate-400">{item.help}</p>
+                                        <p className="text-sm font-semibold text-white">{item.label}{item.required && <span className="ml-1 text-orange-500">*</span>}</p>
+                                        <p className="text-xs text-white">{item.help}</p>
                                     </div>
                                 </div>
                                 <input
@@ -108,13 +108,13 @@ export default function TeamSubmissions() {
                                     onChange={(event) => setValues({ ...values, [item.key]: event.target.value })}
                                     placeholder={item.placeholder}
                                     aria-label={`${item.label} URL`}
-                                    className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#df6d59] disabled:bg-slate-50"
+                                    className="h-10 w-full rounded-lg border border-zinc-800 bg-black px-3 text-sm text-white outline-none focus:border-orange-500 disabled:bg-zinc-950"
                                 />
                                 <button
                                     type="button"
                                     disabled={locked || saving === item.key}
                                     onClick={() => void save(item.key)}
-                                    className="h-10 rounded-lg bg-teal-600 px-3 text-xs font-semibold text-white disabled:bg-slate-200"
+                                    className="h-10 rounded-lg bg-black border border-zinc-700 px-3 text-xs font-semibold text-white hover:bg-zinc-900 disabled:opacity-50"
                                 >
                                     {saving === item.key ? "Saving…" : ready ? "Update" : "Save"}
                                 </button>
@@ -124,25 +124,25 @@ export default function TeamSubmissions() {
                 </div>
             </section>
             <aside className="space-y-4">
-                <section className="rounded-2xl border border-slate-200 bg-white p-5">
-                    <p className="text-xs font-semibold text-slate-400">SUBMISSION CHECKLIST</p>
+                <section className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-5">
+                    <p className="text-xs font-semibold text-white">SUBMISSION CHECKLIST</p>
                     <div className="mt-4 space-y-3">
                         {items.map((item) => (
                             <div key={item.key} className="flex items-center gap-2 text-sm">
-                                <span className={`grid h-5 w-5 place-items-center rounded-full ${values[item.key] ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-400"}`}>
-                                    {values[item.key] && <Check size={12} />}
+                                <span className={`grid h-5 w-5 place-items-center rounded-full ${values[item.key] ? "bg-black text-white border border-zinc-700" : "bg-zinc-900 text-white"}`}>
+                                    {values[item.key] && <Check size={12} className="text-orange-500" />}
                                 </span>
-                                <span className={values[item.key] ? "text-slate-700" : "text-slate-400"}>
-                                    {item.label}{!item.required && <span className="ml-1 text-xs text-slate-400">(optional)</span>}
+                                <span className="text-white">
+                                    {item.label}{!item.required && <span className="ml-1 text-xs text-white/80">(optional)</span>}
                                 </span>
                             </div>
                         ))}
                     </div>
                 </section>
-                <section className="rounded-2xl border border-[#f3d8d1] bg-[#fdf1ed] p-5">
-                    <CircleAlert size={18} className="text-[#c85847]" />
-                    <p className="mt-3 text-sm font-semibold text-slate-800">Before you submit</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">Make sure links are accessible to anyone with the link. Judges cannot access private files.</p>
+                <section className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-5">
+                    <CircleAlert size={18} className="text-orange-500" />
+                    <p className="mt-3 text-sm font-semibold text-white">Before you submit</p>
+                    <p className="mt-1 text-xs leading-5 text-white">Make sure links are accessible to anyone with the link. Judges cannot access private files.</p>
                 </section>
             </aside>
         </div>

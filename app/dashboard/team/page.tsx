@@ -348,28 +348,28 @@ export default function TeamDashboard() {
     return <DashboardLayout type="team" title="Project overview">
         <div className="flex flex-col gap-4">
             {/* 1. Compact Header Section */}
-            <section className="flex flex-col lg:flex-row gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <div className="flex-1 p-4 flex items-center justify-between border-b lg:border-b-0 lg:border-r border-slate-100">
+            <section className="flex flex-col lg:flex-row gap-4 overflow-hidden rounded-2xl border border-zinc-800 bg-[#0d0d12]">
+                <div className="flex-1 p-4 flex items-center justify-between border-b lg:border-b-0 lg:border-r border-zinc-800">
                     <div className="flex items-center gap-3">
-                        <div className="grid h-12 w-12 place-items-center rounded-xl bg-orange-600 text-lg font-bold text-white">{team.team.charAt(0)}</div>
+                        <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 shadow-[0_0_15px_rgba(234,88,12,0.4)] border border-orange-400/40 text-lg font-bold text-white">{team.team.charAt(0)}</div>
                         <div>
-                            <div className="flex items-center gap-2"><h2 className="text-lg font-semibold text-slate-900">{team.team}</h2><span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Active</span></div>
-                            <p className="text-xs text-slate-500">{team.teamId} · {actualTrack}</p>
+                            <div className="flex items-center gap-2"><h2 className="text-lg font-semibold text-white">{team.team}</h2><span className="rounded-full bg-black border border-zinc-800 px-2 py-0.5 text-[10px] font-bold text-white">Active</span></div>
+                            <p className="text-xs text-white">{team.teamId} · {actualTrack}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                        <Link href="/dashboard/team/submissions" className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition"><ArrowUpRight size={14} /> Submission</Link>
-                        <Link href="/dashboard/team/certificate" className="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-3 py-2 text-xs font-semibold text-white hover:bg-orange-700 transition shadow-sm"><Award size={14} /> Certificates</Link>
+                        <Link href="/dashboard/team/submissions" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-zinc-900 transition"><ArrowUpRight size={14} /> Submission</Link>
+                        <Link href="/dashboard/team/certificate" className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 px-3 py-2 text-xs font-semibold text-white hover:opacity-90 transition shadow-sm"><Award size={14} /> Certificates</Link>
                     </div>
                 </div>
-                <div className="flex-1 grid grid-cols-2 divide-x divide-slate-100">
+                <div className="flex-1 grid grid-cols-2 divide-x divide-zinc-800">
                     <div className="p-4 flex flex-col justify-center">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><FolderKanban size={12}/> Track</p>
-                        <p className="text-sm font-medium text-slate-900 truncate">{actualTrack || "Not selected"}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-white mb-1 flex items-center gap-1"><FolderKanban size={12}/> Track</p>
+                        <p className="text-sm font-medium text-white truncate">{actualTrack || "Not selected"}</p>
                     </div>
                     <div className="p-4 flex flex-col justify-center">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1"><CheckCircle2 size={12}/> Status</p>
-                        <p className="text-sm font-medium text-slate-900 truncate">{submitted ? "Submitted" : effectiveSubmissionLocked ? "Locked" : "In progress"}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-white mb-1 flex items-center gap-1"><CheckCircle2 size={12}/> Status</p>
+                        <p className="text-sm font-medium text-white truncate">{submitted ? "Submitted" : effectiveSubmissionLocked ? "Locked" : "In progress"}</p>
                     </div>
                 </div>
             </section>
@@ -380,38 +380,38 @@ export default function TeamDashboard() {
                 {/* Column 1 (Left): Problem Statement & Tech Stack */}
                 <div className="lg:col-span-4 flex flex-col gap-4">
                     {/* Problem Statement Card */}
-                    <section className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <section className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-4">
                         <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-sm font-bold text-slate-800">Problem Statement</h3>
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12}/> Locked</span>
+                            <h3 className="text-sm font-bold text-white">Problem Statement</h3>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-black border border-zinc-800 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12} className="text-orange-500"/> Locked</span>
                         </div>
-                        <div className="rounded-xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-700 border border-slate-100">
+                        <div className="rounded-xl bg-black p-3 text-xs leading-relaxed text-white border border-zinc-800">
                             {actualPS || "Not selected yet"}
                         </div>
                     </section>
 
                     {/* Tech Stack Card */}
-                    <section className="rounded-2xl border border-slate-200 bg-white p-4 flex-1">
+                    <section className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-4 flex-1">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-bold text-slate-800">Tech Stack</h3>
+                            <h3 className="text-sm font-bold text-white">Tech Stack</h3>
                             {!effectiveSubmissionLocked && !effectiveTSLocked && (
-                                <button onClick={() => editingTS ? saveTechStack() : setEditingTS(true)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${editingTS ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+                                <button onClick={() => editingTS ? saveTechStack() : setEditingTS(true)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${editingTS ? "bg-black border border-zinc-700 text-white" : "bg-zinc-900 text-white hover:bg-zinc-800"}`}>
                                     {editingTS ? <Save size={12} /> : <Edit3 size={12} />} {editingTS ? "Save" : "Edit"}
                                 </button>
                             )}
-                            {effectiveTSLocked && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12}/> Locked</span>}
+                            {effectiveTSLocked && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-black border border-zinc-800 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12} className="text-orange-500"/> Locked</span>}
                         </div>
                         <div className="space-y-4">
                             {Object.entries(TECH_CATEGORIES).map(([category, techs]) => (
                                 <div key={category}>
-                                    <p className="text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">{category}</p>
+                                    <p className="text-[10px] font-bold text-white mb-1.5 uppercase tracking-wider">{category}</p>
                                     {editingTS ? (
                                         <div className="flex flex-wrap gap-1.5">
                                             {techs.map(tech => {
                                                 const current = techStack[category] || [];
                                                 const isSelected = current.includes(tech);
                                                 return (
-                                                    <label key={tech} className={`cursor-pointer inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium border transition-colors ${isSelected ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-teal-500"}`}>
+                                                    <label key={tech} className={`cursor-pointer inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium border transition-colors ${isSelected ? "bg-black text-white border-orange-500" : "bg-black text-white border-zinc-800 hover:border-zinc-700"}`}>
                                                         <input type="checkbox" className="hidden" checked={isSelected} onChange={(e) => {
                                                             setTechStack({ ...techStack, [category]: e.target.checked ? [...current, tech] : current.filter(t => t !== tech) });
                                                         }} />
@@ -419,7 +419,7 @@ export default function TeamDashboard() {
                                                     </label>
                                                 );
                                             })}
-                                            <label className={`cursor-pointer inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium border transition-colors ${otherTechEnabled[category] ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-teal-500"}`}>
+                                            <label className={`cursor-pointer inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium border transition-colors ${otherTechEnabled[category] ? "bg-black text-white border-orange-500" : "bg-black text-white border-zinc-800 hover:border-zinc-700"}`}>
                                                 <input
                                                     type="checkbox"
                                                     className="hidden"
@@ -434,17 +434,17 @@ export default function TeamDashboard() {
                                                     value={otherTechInput[category] || ""}
                                                     onChange={(event) => setOtherTechInput({ ...otherTechInput, [category]: event.target.value })}
                                                     placeholder={`Enter other ${category.toLowerCase()} technology`}
-                                                    className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-teal-500"
+                                                    className="mt-2 w-full rounded-lg border border-zinc-800 bg-black px-3 py-2 text-xs text-white outline-none placeholder:text-zinc-600 focus:border-orange-500"
                                                 />
                                             )}
                                         </div>
                                     ) : (
                                         <div className="flex flex-wrap gap-1.5">
                                             {techStack[category] && techStack[category].length > 0 ? techStack[category].map(tech => (
-                                                <span key={tech} className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium bg-slate-50 text-slate-700 border border-slate-200">
+                                                <span key={tech} className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium bg-black text-white border border-zinc-800">
                                                     {tech}
                                                 </span>
-                                            )) : <span className="text-[10px] text-slate-400 italic">None</span>}
+                                            )) : <span className="text-[10px] text-white italic">None</span>}
                                         </div>
                                     )}
                                 </div>
@@ -455,18 +455,18 @@ export default function TeamDashboard() {
 
                 {/* Column 2 (Middle): Proposed Idea */}
                 <div className="lg:col-span-5 h-full">
-                    <section className="rounded-2xl border border-slate-200 bg-white p-4 h-full flex flex-col">
+                    <section className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-4 h-full flex flex-col">
                         <div className="flex items-center justify-between mb-3 shrink-0">
                             <div>
-                                <h3 className="text-sm font-bold text-slate-800">Proposed Idea</h3>
-                                <p className="text-[10px] text-slate-500 mt-0.5"><Presentation size={10} className="inline mr-1 mb-0.5"/>Visible to your judges</p>
+                                <h3 className="text-sm font-bold text-white">Proposed Idea</h3>
+                                <p className="text-[10px] text-white mt-0.5"><Presentation size={10} className="inline mr-1 mb-0.5"/>Visible to your judges</p>
                             </div>
                             {!effectiveSubmissionLocked && !effectivePILocked && (
-                                <button onClick={() => editingPI ? saveField('proposedIdea', proposedIdea, setEditingPI) : setEditingPI(true)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${editingPI ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+                                <button onClick={() => editingPI ? saveField('proposedIdea', proposedIdea, setEditingPI) : setEditingPI(true)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${editingPI ? "bg-black border border-zinc-700 text-white" : "bg-zinc-900 text-white hover:bg-zinc-800"}`}>
                                     {editingPI ? <Save size={12} /> : <Edit3 size={12} />} {editingPI ? "Save" : "Edit"}
                                 </button>
                             )}
-                            {effectivePILocked && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12}/> Locked</span>}
+                            {effectivePILocked && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-black border border-zinc-800 px-2 py-1 rounded-md uppercase tracking-wider"><CheckCircle2 size={12} className="text-orange-500"/> Locked</span>}
                         </div>
                         {editingPI ? (
                             <>

@@ -97,10 +97,10 @@ export default function Features() {
       <div className="relative max-w-6xl mx-auto">
         <FadeIn>
           <div className="flex items-center gap-3 mb-4">
-            <span className="font-mono text-xs tracking-[0.25em] uppercase text-[#ea580c] font-semibold">
+            <span className="font-mono text-xs tracking-[0.25em] uppercase text-orange-400 font-bold">
               02
             </span>
-            <span className="h-[1px] w-10 bg-orange-500/40" />
+            <span className="h-[1px] w-10 bg-gradient-to-r from-orange-500/60 to-transparent" />
             <span className="font-mono text-xs tracking-[0.25em] uppercase text-zinc-500">
               Platform Architecture
             </span>
@@ -123,20 +123,20 @@ export default function Features() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((feature, i) => (
             <FadeIn key={feature.id} delay={0.1 + i * 0.07}>
-              <div className="pro-card rounded-xl p-7 bg-[#0d0d12] hover:bg-[#13131a] border border-zinc-800 hover:border-orange-500/60 transition-all duration-300 flex flex-col justify-between min-h-[260px] group shadow-sm hover:shadow-md">
+              <div className="pro-card rounded-2xl p-7 transition-all duration-300 flex flex-col justify-between min-h-[260px] group">
                 <div>
                   {/* Card Header */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className="font-mono text-xs font-bold tracking-widest text-[#ea580c] uppercase">
+                    <span className="font-mono text-xs font-bold tracking-widest text-orange-400 uppercase">
                       {feature.number} · {feature.category}
                     </span>
-                    <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-medium tracking-wide uppercase bg-orange-950/40 text-orange-400 border border-orange-500/30">
+                    <span className="inline-block px-3 py-0.5 rounded-full text-[10px] font-mono font-medium tracking-wide uppercase badge-orange-grain">
                       {feature.badge}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="font-display font-bold text-xl text-white mb-2.5 group-hover:text-[#ea580c] transition-colors">
+                  <h3 className="font-display font-bold text-xl text-white mb-2.5 group-hover:text-orange-300 transition-colors">
                     {feature.title}
                   </h3>
 
@@ -148,7 +148,7 @@ export default function Features() {
 
                 <div className="pt-4 mt-6 border-t border-zinc-800/80 flex items-center justify-between text-xs font-mono text-zinc-500">
                   <span>Happeno Engine</span>
-                  <span className="text-[#ea580c] font-semibold flex items-center gap-1">
+                  <span className="text-orange-400 font-semibold flex items-center gap-1">
                     Integrated
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
