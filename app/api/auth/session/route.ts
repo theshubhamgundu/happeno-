@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     const session = getSession(req);
-    if (!session) return NextResponse.json({ authenticated: false }, { status: 401 });
+    if (!session) return NextResponse.json({ authenticated: false }, { status: 200, headers: { 'Cache-Control': 'no-store' } });
     const portalMode = session.role === 'team'
         ? (session.portalMode || await getParticipantPortalMode())
         : undefined;

@@ -51,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 const response = await fetch('/api/auth/session', { cache: 'no-store' });
                 if (!response.ok) {
-                    if (active && response.status === 401) {
+                    if (active) {
                         setUser(null);
                         router.replace('/login');
                     }
@@ -59,7 +59,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
 
                 const session = await response.json();
-                if (!active || !session?.authenticated || session.role !== 'team') return;
+                if (!active) return;
+                if (!session?.authenticated) {
+                    setUser(null);
+                    router.replace('/login');
+                    return;
+                }
+                if (session.role !== 'team') return;
                 const portalMode = session.portalMode as 'edit' | 'event' | 'closed';
                 setUser(current => {
                     if (current?.role !== 'team' || current.portalMode === portalMode) return current;
