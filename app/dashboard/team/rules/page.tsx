@@ -54,7 +54,7 @@ export default function RulesPage() {
                 {/* General Rules */}
                 <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
-                        <span className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-100 text-indigo-700">
+                        <span className="grid h-10 w-10 place-items-center rounded-xl bg-orange-100 text-orange-700">
                             <BookOpen size={20} />
                         </span>
                         <div>

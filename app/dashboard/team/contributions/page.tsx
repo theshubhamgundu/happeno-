@@ -66,7 +66,7 @@ export default function TeamContributionsPage() {
             <div className="mx-auto max-w-4xl space-y-5">
                 <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-7">
                     <div className="flex items-start gap-3 border-b border-slate-100 pb-5">
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-50 text-indigo-700">
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30">
                             <UsersRound size={20} />
                         </span>
                         <div>
@@ -97,7 +97,7 @@ export default function TeamContributionsPage() {
                                             maxLength={MAX_CONTRIBUTION_LENGTH}
                                             rows={3}
                                             placeholder={`Describe ${name}'s contribution to the project…`}
-                                            className="w-full resize-y rounded-xl border border-slate-200 bg-white p-3 text-sm leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                                            className="w-full resize-y rounded-xl border border-slate-200 bg-white p-3 text-sm leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                                         />
                                         <p className="mt-1 text-right text-xs text-slate-400">
                                             {(contributions[index] || "").length}/{MAX_CONTRIBUTION_LENGTH}
@@ -118,7 +118,7 @@ export default function TeamContributionsPage() {
                             type="button"
                             onClick={() => void saveContributions()}
                             disabled={!team || !members.length || saving || isSubmissionLocked}
-                            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-orange-600 px-4 text-sm font-semibold text-white transition hover:bg-orange-500 disabled:cursor-not-allowed disabled:bg-slate-300"
                         >
                             {saving ? <Save size={16} className="animate-pulse" /> : <Check size={16} />}
                             {saving ? "Saving…" : "Save contributions"}

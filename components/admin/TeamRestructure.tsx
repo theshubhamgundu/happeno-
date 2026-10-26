@@ -206,7 +206,7 @@ export function TeamRestructure() {
                                     onClick={() => setAction('SPLIT')}
                                     className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all ${
                                         action === 'SPLIT' 
-                                        ? 'bg-indigo-50/50 border-indigo-500 text-indigo-700 shadow-sm' 
+                                        ? 'bg-amber-50/50 border-amber-500 text-amber-700 shadow-sm' 
                                         : 'bg-[#fafafa] border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                                     }`}
                                 >

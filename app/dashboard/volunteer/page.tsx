@@ -234,7 +234,7 @@ export default function VolunteerDashboard() {
                         onClick={() => { setActiveModule('networking'); setLastScanEntry(null); setIsRapidMode(true); }}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
                             activeModule === 'networking'
-                                ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/50'
+                                ? 'bg-white text-orange-600 shadow-sm border border-slate-200/50'
                                 : 'text-slate-500 hover:bg-slate-200/50'
                         }`}
                     >
@@ -246,7 +246,7 @@ export default function VolunteerDashboard() {
                 {/* Mode & Sound controls bar */}
                 <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
-                        <span className={`h-2.5 w-2.5 rounded-full animate-pulse ${activeModule === 'checkin' ? 'bg-[#14b8a6]' : (activeModule === 'networking' ? 'bg-indigo-500' : 'bg-amber-500')}`} />
+                        <span className={`h-2.5 w-2.5 rounded-full animate-pulse ${activeModule === 'checkin' ? 'bg-[#14b8a6]' : (activeModule === 'networking' ? 'bg-orange-500' : 'bg-amber-500')}`} />
                         <span className="text-xs font-black uppercase tracking-wider text-slate-800">
                             {activeModule === 'checkin' ? 'Gate QR Scanner' : (activeModule === 'networking' ? 'Networking QR Scanner' : 'Dinner QR Scanner')}
                         </span>

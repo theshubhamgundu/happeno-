@@ -33,8 +33,8 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.8, 0.25, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-            ? 'bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm'
-            : 'bg-white/70 backdrop-blur-sm border-b border-transparent'
+            ? 'bg-black/90 backdrop-blur-md border-b border-zinc-800 shadow-sm'
+            : 'bg-black/70 backdrop-blur-sm border-b border-transparent'
           }`}
       >
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
@@ -44,10 +44,10 @@ export default function Navbar() {
               H
             </div>
             <div className="flex flex-col">
-              <span className="font-display font-bold text-sm tracking-wider uppercase text-[#0f172a]">
+              <span className="font-display font-bold text-sm tracking-wider uppercase text-white">
                 Happeno
               </span>
-              <span className="text-[10px] font-mono text-orange-600 uppercase tracking-widest -mt-0.5">
+              <span className="text-[10px] font-mono text-orange-500 uppercase tracking-widest -mt-0.5 font-bold">
                 Hackathon
               </span>
             </div>
@@ -59,7 +59,7 @@ export default function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 font-mono text-xs tracking-wider uppercase text-gray-600 hover:text-[#0f172a] hover:font-semibold transition-colors duration-200"
+                className="px-4 py-2 font-mono text-xs tracking-wider uppercase text-zinc-400 hover:text-white hover:font-semibold transition-colors duration-200"
               >
                 {link.label}
               </a>
@@ -70,7 +70,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             <a
               href="/login"
-              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#0f172a] hover:bg-[#ea580c] text-white font-display text-xs font-semibold tracking-wider uppercase shadow-sm transition-all duration-200"
+              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-[#ea580c] hover:border-[#ea580c] text-white font-display text-xs font-semibold tracking-wider uppercase shadow-sm transition-all duration-200"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -85,19 +85,19 @@ export default function Navbar() {
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-md border border-gray-200 text-[#0f172a]"
+              className="lg:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-md border border-zinc-800 text-white"
               aria-label="Toggle menu"
             >
               <span
-                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-[4.5px]' : ''
+                className={`block w-5 h-[1.5px] bg-white transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-[4.5px]' : ''
                   }`}
               />
               <span
-                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''
+                className={`block w-5 h-[1.5px] bg-white transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''
                   }`}
               />
               <span
-                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-[4.5px]' : ''
+                className={`block w-5 h-[1.5px] bg-white transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-[4.5px]' : ''
                   }`}
               />
             </button>
@@ -113,7 +113,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-40 bg-white flex flex-col items-center justify-center gap-6 px-6"
+            className="fixed inset-0 z-40 bg-black flex flex-col items-center justify-center gap-6 px-6"
           >
             {NAV_LINKS.map((link, i) => (
               <motion.a
@@ -123,7 +123,7 @@ export default function Navbar() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="font-display text-2xl font-bold text-gray-800 hover:text-[#ea580c] transition-colors"
+                className="font-display text-2xl font-bold text-white hover:text-[#ea580c] transition-colors"
               >
                 {link.label}
               </motion.a>

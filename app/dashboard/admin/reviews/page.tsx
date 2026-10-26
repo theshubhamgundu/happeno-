@@ -404,7 +404,7 @@ export default function AdminReviewsPage() {
                     <StatCard label="Links Submitted" value={stats.submitted} accent="text-teal-700" sub={`${Math.round((stats.submitted / (stats.total || 1)) * 100)}%`} />
                     <StatCard label="Finalized" value={stats.finalized} accent="text-emerald-700" />
                     <StatCard label="Missing Links" value={stats.missing} accent="text-rose-600" />
-                    <StatCard label="R1 Evaluated" value={stats.r1Count} accent="text-cyan-700" />
+                    <StatCard label="R1 Evaluated" value={stats.r1Count} accent="text-orange-600" />
                     <StatCard label="R2 Evaluated" value={stats.r2Count} accent="text-pink-600" />
                     <StatCard label="Rabbit Scored" value={stats.rabbitCount} accent="text-amber-600" />
                 </section>
@@ -615,7 +615,7 @@ export default function AdminReviewsPage() {
                                                             label="Live App"
                                                             url={submission.deployment}
                                                             icon={Globe}
-                                                            color="blue"
+                                                            color="orange"
                                                             onCopy={() => copyToClipboard(submission.deployment, "Deployment")}
                                                         />
 
@@ -669,7 +669,7 @@ export default function AdminReviewsPage() {
                                                 >
                                                     {scores.roundScores['round1'] !== null ? (
                                                         <div>
-                                                            <span className="font-mono text-sm font-black text-cyan-800">
+                                                            <span className="font-mono text-sm font-black text-orange-600">
                                                                 {scores.roundScores['round1'].toFixed(1)}
                                                             </span>
                                                             <span className="text-[10px] text-slate-400 font-bold ml-0.5">/ 200</span>
@@ -861,10 +861,10 @@ export default function AdminReviewsPage() {
 
                         <div className="space-y-4">
                             {/* Round 1 Score */}
-                            <div className="rounded-2xl border border-cyan-100 bg-cyan-50/40 p-4 space-y-1.5">
-                                <label className="flex items-center justify-between text-xs font-bold text-cyan-950">
+                            <div className="rounded-2xl border border-orange-200 bg-orange-50/40 p-4 space-y-1.5">
+                                <label className="flex items-center justify-between text-xs font-bold text-orange-950">
                                     <span>Round 1 Score (/200)</span>
-                                    <span className="text-[10px] text-cyan-700 font-medium">0 - 200 pts</span>
+                                    <span className="text-[10px] text-orange-600 font-medium">0 - 200 pts</span>
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <input
@@ -875,7 +875,7 @@ export default function AdminReviewsPage() {
                                         placeholder="e.g. 175.0 (leave blank to clear)"
                                         value={r1Input}
                                         onChange={e => setR1Input(e.target.value)}
-                                        className="h-10 w-full rounded-xl border border-cyan-200 bg-white px-3 text-sm font-bold text-slate-900 outline-none focus:border-cyan-500"
+                                        className="h-10 w-full rounded-xl border border-orange-200 bg-white px-3 text-sm font-bold text-slate-900 outline-none focus:border-orange-500"
                                     />
                                     {r1Input && (
                                         <button
@@ -1111,7 +1111,7 @@ function SubmissionPill({
     label: string;
     url?: string;
     icon: any;
-    color: "slate" | "amber" | "rose" | "blue" | "purple";
+    color: "slate" | "amber" | "rose" | "orange" | "purple";
     onCopy: () => void;
 }) {
     if (!url) {
@@ -1127,7 +1127,7 @@ function SubmissionPill({
         slate: "border-slate-300 bg-slate-50 text-slate-800 hover:bg-slate-100",
         amber: "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100",
         rose: "border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100",
-        blue: "border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100",
+        orange: "border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100",
         purple: "border-purple-200 bg-purple-50 text-purple-800 hover:bg-purple-100",
     }[color];
 

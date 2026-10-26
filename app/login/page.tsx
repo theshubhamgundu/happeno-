@@ -31,8 +31,8 @@ export default function LoginPage() {
 
     if (isLoading || (user && user.role)) {
         return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-orange-200 border-t-[#ea580c] rounded-full animate-spin" />
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-orange-500/20 border-t-[#ea580c] rounded-full animate-spin" />
             </div>
         );
     }
@@ -119,20 +119,20 @@ export default function LoginPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gradient-to-b from-[#F8F9FA] via-white to-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <main className="min-h-screen bg-black flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Subtle grid pattern background */}
             <div
                 className="absolute inset-0 opacity-[0.035] pointer-events-none"
                 style={{
-                    backgroundImage: `linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)`,
+                    backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
                     backgroundSize: '40px 40px',
                 }}
             />
 
             {/* Background glow */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-teal-100/10 blur-[160px] rounded-full" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-teal-100/10 blur-[160px] rounded-full" />
+                <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-orange-600/10 blur-[160px] rounded-full" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-orange-600/10 blur-[160px] rounded-full" />
             </div>
 
             <div className="relative z-10 w-full max-w-2xl">
@@ -143,14 +143,14 @@ export default function LoginPage() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-10"
                 >
-                    <h1 className="font-display font-extrabold text-4xl md:text-5xl text-[#0f172a] mb-2">
+                    <h1 className="font-display font-extrabold text-4xl md:text-5xl text-white mb-2">
                         Happeno
                     </h1>
-                    <p className="font-body text-gray-600 text-sm md:text-base">
+                    <p className="font-body text-zinc-400 text-sm md:text-base">
                         Workspace & Access Portal
                     </p>
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-medium mt-3 shadow-xs">
-                        <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-950/40 border border-orange-500/30 text-orange-400 text-xs font-medium mt-3 shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
                         <span>Happeno Hackathon</span>
                     </div>
                 </motion.div>
@@ -164,13 +164,13 @@ export default function LoginPage() {
                     transition={{ duration: 0.4 }}
                     className="w-full max-w-md mx-auto"
                 >
-                    <div className="pro-card rounded-xl p-8 bg-white border border-gray-200 shadow-sm relative overflow-hidden">
+                    <div className="pro-card rounded-xl p-8 bg-[#0d0d12] border border-zinc-800 shadow-sm relative overflow-hidden">
                         <div className="relative z-10 space-y-6">
 
 
                             {/* ID Field */}
                             <div className="space-y-2">
-                                <label className="text-xs font-mono font-semibold uppercase tracking-wider text-gray-600">
+                                <label className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-400">
                                     Login ID
                                 </label>
                                 <input
@@ -181,13 +181,13 @@ export default function LoginPage() {
                                     value={loginId}
                                     onChange={(e) => { setLoginId(e.target.value); setError(""); }}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-base font-body text-[#0f172a] placeholder:text-gray-400 focus:outline-none focus:border-[#ea580c] focus:ring-1 focus:ring-orange-500/20 transition-all"
+                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-base font-body text-white placeholder:text-zinc-500 focus:outline-none focus:border-[#ea580c] focus:ring-1 focus:ring-orange-500/20 transition-all"
                                 />
                             </div>
 
                             {/* Password Field */}
                             <div className="space-y-2">
-                                <label className="text-xs font-mono font-semibold uppercase tracking-wider text-gray-600">
+                                <label className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-400">
                                     Password
                                 </label>
                                 <div className="relative">
@@ -199,12 +199,12 @@ export default function LoginPage() {
                                         value={loginPass}
                                         onChange={(e) => { setLoginPass(e.target.value); setError(""); }}
                                         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-base font-body text-[#0f172a] placeholder:text-gray-400 focus:outline-none focus:border-[#ea580c] focus:ring-1 focus:ring-orange-500/20 transition-all pr-12"
+                                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-base font-body text-white placeholder:text-zinc-500 focus:outline-none focus:border-[#ea580c] focus:ring-1 focus:ring-orange-500/20 transition-all pr-12"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors p-1"
                                     >
                                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
@@ -216,17 +216,17 @@ export default function LoginPage() {
                                 <motion.div
                                     initial={{ opacity: 0, y: -4 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="p-3 rounded-lg bg-red-50 border border-red-200"
+                                    className="p-3 rounded-lg bg-red-950/40 border border-red-500/30"
                                 >
-                                    <p className="text-red-700 text-xs font-body font-semibold">{error}</p>
+                                    <p className="text-red-400 text-xs font-body font-semibold">{error}</p>
                                 </motion.div>
                             )}
 
                             {/* Detected role indicator */}
                             {detectedRole && !error && (
-                                <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-emerald-50 border border-emerald-200">
-                                    <ShieldCheck size={16} className="text-emerald-600" />
-                                    <span className="text-emerald-700 text-xs font-body font-semibold uppercase tracking-wider">
+                                <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/30">
+                                    <ShieldCheck size={16} className="text-emerald-400" />
+                                    <span className="text-emerald-300 text-xs font-body font-semibold uppercase tracking-wider">
                                         {detectedRole} verified — redirecting...
                                     </span>
                                 </div>
@@ -240,7 +240,7 @@ export default function LoginPage() {
                             >
                                 {isVerifying ? (
                                     <>
-                                        <div className="w-5 h-5 border-2 border-[#0f172a]/20 border-t-[#0f172a] rounded-full animate-spin" />
+                                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                                         <span>Verifying...</span>
                                     </>
                                 ) : (
@@ -252,11 +252,11 @@ export default function LoginPage() {
                             </button>
 
                             {/* Credentials hint */}
-                            <div className="pt-4 border-t border-gray-100 text-center">
-                                <p className="font-body text-xs text-gray-500 mb-1">
+                            <div className="pt-4 border-t border-zinc-800 text-center">
+                                <p className="font-body text-xs text-zinc-500 mb-1">
                                     Happeno Hackathon
                                 </p>
-                                <div className="font-body text-xs text-gray-600 font-medium">
+                                <div className="font-body text-xs text-zinc-400 font-medium">
                                     <p>support@happeno.in</p>
                                 </div>
                             </div>

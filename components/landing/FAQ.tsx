@@ -51,7 +51,7 @@ function FAQItem({ faq, index }: FAQItemProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.05, ease: [0.25, 0.8, 0.25, 1] }}
-      className="border-b border-gray-200 last:border-b-0"
+      className="border-b border-zinc-800 last:border-b-0"
     >
       <button
         onClick={() => setOpen(!open)}
@@ -62,12 +62,12 @@ function FAQItem({ faq, index }: FAQItemProps) {
           <span className="font-mono text-xs text-[#ea580c] font-semibold mt-1 flex-shrink-0">
             {String(index + 1).padStart(2, '0')}
           </span>
-          <span className="font-display font-semibold text-base text-[#0f172a] group-hover:text-[#ea580c] transition-colors">
+          <span className="font-display font-semibold text-base text-white group-hover:text-[#ea580c] transition-colors">
             {faq.q}
           </span>
         </div>
         <span
-          className={`flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 text-sm transition-all duration-200 ${open ? 'rotate-45 border-[#ea580c] text-[#ea580c] bg-orange-50' : ''
+          className={`flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-400 text-sm transition-all duration-200 ${open ? 'rotate-45 border-[#ea580c] text-[#ea580c] bg-orange-950/40' : ''
             }`}
         >
           +
@@ -83,7 +83,7 @@ function FAQItem({ faq, index }: FAQItemProps) {
             transition={{ duration: 0.25, ease: [0.25, 0.8, 0.25, 1] }}
             className="overflow-hidden"
           >
-            <p className="pl-9 pr-6 pb-5 font-body text-sm sm:text-base text-gray-600 leading-relaxed">
+            <p className="pl-9 pr-6 pb-5 font-body text-sm sm:text-base text-zinc-400 leading-relaxed">
               {faq.a}
             </p>
           </motion.div>
@@ -98,7 +98,7 @@ export default function FAQ() {
   const inView = useInView(sectionRef, { once: true, margin: '-100px' });
 
   return (
-    <section id="faq" className="relative py-24 sm:py-32 px-6 bg-white" ref={sectionRef}>
+    <section id="faq" className="relative py-24 sm:py-32 px-6 bg-black" ref={sectionRef}>
       <div className="relative max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -110,20 +110,20 @@ export default function FAQ() {
               03
             </span>
             <span className="h-[1px] w-10 bg-orange-500/40" />
-            <span className="font-mono text-xs tracking-[0.25em] uppercase text-gray-500">
+            <span className="font-mono text-xs tracking-[0.25em] uppercase text-zinc-500">
               Questions
             </span>
           </div>
 
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-[#0f172a] leading-tight mb-3">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-white leading-tight mb-3">
             Frequently Asked Questions
           </h2>
-          <p className="font-body text-base text-gray-600 max-w-xl leading-relaxed mb-10">
+          <p className="font-body text-base text-zinc-400 max-w-xl leading-relaxed mb-10">
             Key operational details about the Happeno Hackathon Operating System.
           </p>
         </motion.div>
 
-        <div className="pro-card rounded-xl p-6 sm:p-8 bg-[#F8F9FA] border border-gray-200">
+        <div className="pro-card rounded-xl p-6 sm:p-8 bg-[#0d0d12] border border-zinc-800">
           {FAQS.map((faq, i) => (
             <FAQItem key={i} faq={faq} index={i} />
           ))}

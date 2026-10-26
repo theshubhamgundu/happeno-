@@ -14,9 +14,9 @@ const criteria = [
         weight: 20,
         title: "AI/SaaS Relevance",
         description: "AI must meaningfully improve the solution.",
-        color: "bg-indigo-500",
-        textColor: "text-indigo-700",
-        background: "bg-indigo-50",
+        color: "bg-orange-500",
+        textColor: "text-orange-700",
+        background: "bg-orange-50",
     },
     {
         weight: 15,
@@ -46,9 +46,9 @@ const criteria = [
         weight: 10,
         title: "Demo & Pitch",
         description: "Clear explanation of problem, solution and future scope.",
-        color: "bg-sky-500",
-        textColor: "text-sky-700",
-        background: "bg-sky-50",
+        color: "bg-emerald-500",
+        textColor: "text-emerald-700",
+        background: "bg-emerald-50",
     },
 ];
 

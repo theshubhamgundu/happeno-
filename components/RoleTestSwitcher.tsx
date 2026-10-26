@@ -71,14 +71,14 @@ export default function RoleTestSwitcher() {
 
     return (
         <div className="relative z-50 print:hidden">
-            {/* Top Quick-Switcher Pill Bar - Crisp Light Theme */}
-            <div className="bg-white border-b border-slate-200 text-slate-800 px-4 py-2 flex flex-wrap items-center justify-between gap-2.5 text-xs shadow-sm">
+            {/* Top Quick-Switcher Pill Bar - Crisp Dark Theme */}
+            <div className="bg-[#0d0d12] border-b border-zinc-800 text-white px-4 py-2 flex flex-wrap items-center justify-between gap-2.5 text-xs shadow-sm">
                 <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold text-[10px] tracking-wider uppercase">
-                        <Sparkles size={11} className="text-amber-600" /> Test Suite
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-950/40 text-amber-300 border border-amber-500/30 font-bold text-[10px] tracking-wider uppercase">
+                        <Sparkles size={11} className="text-amber-500" /> Test Suite
                     </span>
-                    <span className="text-slate-400 hidden sm:inline">Active Role:</span>
-                    <span className="font-bold text-slate-800 capitalize bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-[11px]">
+                    <span className="text-zinc-400 hidden sm:inline">Active Role:</span>
+                    <span className="font-bold text-white capitalize bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded text-[11px]">
                         {user?.role === 'judge' ? 'Evaluator' : user?.role === 'team' ? 'Participant' : user?.role || 'Guest'}
                     </span>
                 </div>
@@ -90,7 +90,7 @@ export default function RoleTestSwitcher() {
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all border ${
                             user?.role === 'team'
                                 ? "bg-orange-600 text-white border-orange-600 shadow-sm"
-                                : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
+                                : "bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border-zinc-800"
                         }`}
                         title="Switch session to Participant Portal"
                     >
@@ -105,7 +105,7 @@ export default function RoleTestSwitcher() {
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all border ${
                             user?.role === 'judge'
                                 ? "bg-orange-600 text-white border-orange-600 shadow-sm"
-                                : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
+                                : "bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border-zinc-800"
                         }`}
                         title="Switch session to Evaluator Portal"
                     >
@@ -120,7 +120,7 @@ export default function RoleTestSwitcher() {
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all border ${
                             user?.role === 'volunteer'
                                 ? "bg-orange-600 text-white border-orange-600 shadow-sm"
-                                : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
+                                : "bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border-zinc-800"
                         }`}
                         title="Switch session to Volunteer Portal"
                     >
@@ -135,7 +135,7 @@ export default function RoleTestSwitcher() {
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all border ${
                             user?.role === 'admin'
                                 ? "bg-orange-600 text-white border-orange-600 shadow-sm"
-                                : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
+                                : "bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border-zinc-800"
                         }`}
                         title="Switch session to Admin Dashboard"
                     >
@@ -156,22 +156,22 @@ export default function RoleTestSwitcher() {
                 </div>
             </div>
 
-            {/* Expanded "Test All at Once" Multi-Role Modal / Tray - Crisp Light Theme */}
+            {/* Expanded "Test All at Once" Multi-Role Modal / Tray - Crisp Dark Theme */}
             {isExpanded && (
-                <div className="bg-slate-50 border-b border-slate-200 text-slate-800 p-5 shadow-lg animate-in slide-in-from-top-2 duration-200">
+                <div className="bg-[#09090b] border-b border-zinc-800 text-white p-5 shadow-lg animate-in slide-in-from-top-2 duration-200">
                     <div className="max-w-6xl mx-auto space-y-4">
-                        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                        <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
                             <div>
-                                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <h3 className="text-base font-bold text-white flex items-center gap-2">
                                     <Laptop size={18} className="text-orange-600" /> Test All 3 Dashboards Simultaneously
                                 </h3>
-                                <p className="text-xs text-slate-500 mt-0.5">
+                                <p className="text-xs text-zinc-400 mt-0.5">
                                     Because browser cookies isolate accounts per window, use these direct links and credentials to test Participant, Evaluator, and Volunteer screens all at once!
                                 </p>
                             </div>
                             <button
                                 onClick={() => setIsExpanded(false)}
-                                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200 transition-colors"
+                                className="text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-zinc-800 transition-colors"
                             >
                                 <X size={18} />
                             </button>
@@ -180,26 +180,26 @@ export default function RoleTestSwitcher() {
                         {/* 3 Role Cards with Test Actions */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* Card 1: Participant */}
-                            <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 shadow-sm">
+                            <div className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-4 space-y-3 shadow-sm">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-orange-700 font-bold text-sm">
-                                        <Award size={16} className="text-orange-600" /> 1. Participant
+                                    <div className="flex items-center gap-2 text-orange-400 font-bold text-sm">
+                                        <Award size={16} className="text-orange-500" /> 1. Participant
                                     </div>
-                                    <span className="text-[10px] font-mono bg-orange-50 text-orange-600 border border-orange-200 px-2 py-0.5 rounded">
+                                    <span className="text-[10px] font-mono bg-orange-950/40 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded">
                                         /dashboard/team
                                     </span>
                                 </div>
-                                <p className="text-[11px] text-slate-600 leading-relaxed">
+                                <p className="text-[11px] text-zinc-400 leading-relaxed">
                                     Tests problem statement submission, github/demo URLs, team members, and live digital pass.
                                 </p>
-                                <div className="space-y-1.5 pt-2 border-t border-slate-100 text-[11px]">
-                                    <div className="flex items-center justify-between text-slate-500">
+                                <div className="space-y-1.5 pt-2 border-t border-zinc-800 text-[11px]">
+                                    <div className="flex items-center justify-between text-zinc-400">
                                         <span>Test ID:</span>
-                                        <code className="text-orange-600 font-mono font-bold bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">TRI26009</code>
+                                        <code className="text-orange-400 font-mono font-bold bg-orange-950/40 px-1.5 py-0.5 rounded border border-orange-500/30">TRI26009</code>
                                     </div>
-                                    <div className="flex items-center justify-between text-slate-500">
+                                    <div className="flex items-center justify-between text-zinc-400">
                                         <span>Mode:</span>
-                                        <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Event Live (Open)</span>
+                                        <span className="text-emerald-400 font-bold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">Event Live (Open)</span>
                                     </div>
                                 </div>
                                 <div className="pt-2 flex gap-2">
@@ -214,26 +214,26 @@ export default function RoleTestSwitcher() {
                             </div>
 
                             {/* Card 2: Evaluator */}
-                            <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 shadow-sm">
+                            <div className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-4 space-y-3 shadow-sm">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-                                        <ShieldCheck size={16} className="text-orange-600" /> 2. Evaluator
+                                    <div className="flex items-center gap-2 text-white font-bold text-sm">
+                                        <ShieldCheck size={16} className="text-orange-500" /> 2. Evaluator
                                     </div>
-                                    <span className="text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded">
+                                    <span className="text-[10px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-800 px-2 py-0.5 rounded">
                                         /dashboard/judge
                                     </span>
                                 </div>
-                                <p className="text-[11px] text-slate-600 leading-relaxed">
+                                <p className="text-[11px] text-zinc-400 leading-relaxed">
                                     Tests team lookup, rubric scoring (1-10), feedback, and offline phone resilience.
                                 </p>
-                                <div className="space-y-1.5 pt-2 border-t border-slate-100 text-[11px]">
-                                    <div className="flex items-center justify-between text-slate-500">
+                                <div className="space-y-1.5 pt-2 border-t border-zinc-800 text-[11px]">
+                                    <div className="flex items-center justify-between text-zinc-400">
                                         <span>Role:</span>
-                                        <span className="text-slate-800 font-bold">Evaluator Panel</span>
+                                        <span className="text-white font-bold">Evaluator Panel</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-slate-500">
+                                    <div className="flex items-center justify-between text-zinc-400">
                                         <span>Offline Queue:</span>
-                                        <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Active & Synced</span>
+                                        <span className="text-emerald-400 font-bold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">Active & Synced</span>
                                     </div>
                                 </div>
                                 <div className="pt-2 flex gap-2">
@@ -248,26 +248,26 @@ export default function RoleTestSwitcher() {
                             </div>
 
                             {/* Card 3: Volunteer */}
-                            <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 shadow-sm">
+                            <div className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-4 space-y-3 shadow-sm">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-                                        <Phone size={16} className="text-orange-600" /> 3. Volunteer
+                                    <div className="flex items-center gap-2 text-white font-bold text-sm">
+                                        <Phone size={16} className="text-orange-500" /> 3. Volunteer
                                     </div>
-                                    <span className="text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded">
+                                    <span className="text-[10px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-800 px-2 py-0.5 rounded">
                                         /dashboard/volunteer
                                     </span>
                                 </div>
-                                <p className="text-[11px] text-slate-600 leading-relaxed">
+                                <p className="text-[11px] text-zinc-400 leading-relaxed">
                                     Tests continuous QR barcode scanner, rapid check-in, and meal pass verification.
                                 </p>
-                                <div className="space-y-1.5 pt-2 border-t border-slate-100 text-[11px]">
-                                    <div className="flex items-center justify-between text-slate-500">
+                                <div className="space-y-1.5 pt-2 border-t border-zinc-800 text-[11px]">
+                                    <div className="flex items-center justify-between text-zinc-400">
                                         <span>Scanner:</span>
-                                        <span className="text-slate-800 font-bold">Live Camera / Manual</span>
+                                        <span className="text-white font-bold">Live Camera / Manual</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-slate-500">
+                                    <div className="flex items-center justify-between text-zinc-400">
                                         <span>Status:</span>
-                                        <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Ready</span>
+                                        <span className="text-emerald-400 font-bold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">Ready</span>
                                     </div>
                                 </div>
                                 <div className="pt-2 flex gap-2">
@@ -283,13 +283,13 @@ export default function RoleTestSwitcher() {
                         </div>
 
                         {/* Live 3-in-1 Simulator Link & Multi-window Instructions */}
-                        <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                        <div className="rounded-xl border border-zinc-800 bg-[#0d0d12] p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                             <div className="space-y-1">
-                                <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
                                     <Laptop size={14} className="text-orange-600" />
                                     How to test all 3 simultaneously:
                                 </h4>
-                                <p className="text-[11px] text-slate-500 leading-relaxed">
+                                <p className="text-[11px] text-zinc-400 leading-relaxed">
                                     Option 1: Open <strong>Evaluator</strong> in this tab, open <strong>Participant</strong> in an Incognito window, and open <strong>Volunteer</strong> in a secondary browser (or phone).
                                     <br />
                                     Option 2: Open our <strong>Live 3-in-1 Dashboard Simulator</strong> to preview all three screens side-by-side!

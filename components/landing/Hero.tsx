@@ -16,12 +16,12 @@ function PlatformHighlights() {
       {highlights.map((h) => (
         <div
           key={h.title}
-          className="flex flex-col items-center bg-white border border-gray-200 hover:border-orange-500 rounded-lg p-3 text-center transition-all duration-200 shadow-sm"
+          className="flex flex-col items-center bg-[#0d0d12] border border-zinc-800 hover:border-orange-500/60 rounded-lg p-3 text-center transition-all duration-200 shadow-sm"
         >
-          <span className="font-display font-bold text-xs sm:text-sm text-[#0f172a]">
+          <span className="font-display font-bold text-xs sm:text-sm text-white">
             {h.title}
           </span>
-          <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-orange-600 mt-0.5 font-semibold">
+          <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-orange-500 mt-0.5 font-semibold">
             {h.sub}
           </span>
         </div>
@@ -34,13 +34,13 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[100svh] pt-24 pb-16 sm:pt-32 sm:pb-24 flex items-center justify-center bg-gradient-to-b from-[#F8F9FA] via-white to-white overflow-hidden"
+      className="relative min-h-[100svh] pt-24 pb-16 sm:pt-32 sm:pb-24 flex items-center justify-center bg-black overflow-hidden"
     >
       {/* Subtle grid pattern */}
       <div
         className="absolute inset-0 opacity-[0.035] pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
           backgroundSize: '40px 40px',
         }}
       />
@@ -51,7 +51,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-3 sm:px-4 py-1.5 rounded-full border border-orange-200 bg-orange-50 text-orange-950"
+          className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-3 sm:px-4 py-1.5 rounded-full border border-orange-500/30 bg-orange-950/40 text-orange-300"
         >
           <span className="w-2 h-2 shrink-0 rounded-full bg-orange-500 animate-pulse" />
           <span className="font-mono text-[10px] sm:text-xs tracking-wider uppercase font-semibold text-center leading-snug">
@@ -64,7 +64,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15 }}
-          className="font-display font-extrabold text-[2.5rem] sm:text-6xl md:text-7xl lg:text-8xl leading-[1.08] tracking-tight text-[#0f172a] mb-4 sm:mb-6"
+          className="font-display font-extrabold text-[2.5rem] sm:text-6xl md:text-7xl lg:text-8xl leading-[1.08] tracking-tight text-white mb-4 sm:mb-6"
         >
           Happeno
           <span className="block text-lg sm:text-3xl md:text-4xl font-semibold text-[#ea580c] tracking-normal mt-1 sm:mt-2">
@@ -77,7 +77,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="font-body text-sm sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2 sm:px-0"
+          className="font-body text-sm sm:text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2 sm:px-0"
         >
           End-to-end competition management engineered for tech fests, universities, and builder communities. Stage-wise pipelines, sub-second QR entry passes, transparent judge rubrics, and team workspaces.
         </motion.p>
@@ -121,7 +121,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.7 }}
-          className="mt-10 pt-8 sm:mt-16 sm:pt-12 border-t border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"
+          className="mt-10 pt-8 sm:mt-16 sm:pt-12 border-t border-zinc-800 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"
         >
           {[
             { value: '5000+', label: 'Active Builders' },
@@ -130,10 +130,10 @@ export default function Hero() {
             { value: '100%', label: 'Real-Time Scoring' },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
-              <div className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-[#0f172a]">
+              <div className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-white">
                 {stat.value}
               </div>
-              <div className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-gray-500 mt-1">
+              <div className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-zinc-400 mt-1">
                 {stat.label}
               </div>
             </div>

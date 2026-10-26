@@ -46,8 +46,8 @@ interface ExistingMemberChoice {
 
 const AVATAR_GRADIENTS = [
     "bg-gradient-to-br from-[#14b8a6] to-teal-700 border-slate-900 text-white shadow-md",
-    "bg-gradient-to-br from-indigo-500 to-purple-700 border-slate-900 text-white shadow-md",
-    "bg-gradient-to-br from-teal-500 to-cyan-600 border-slate-900 text-white shadow-md",
+    "bg-gradient-to-br from-orange-500 to-amber-700 border-slate-900 text-white shadow-md",
+    "bg-gradient-to-br from-amber-500 to-orange-600 border-slate-900 text-white shadow-md",
     "bg-gradient-to-br from-rose-500 to-pink-600 border-slate-900 text-white shadow-md",
     "bg-gradient-to-br from-violet-500 to-fuchsia-600 border-slate-900 text-white shadow-md",
     "bg-gradient-to-br from-emerald-500 to-green-600 border-slate-900 text-white shadow-md",

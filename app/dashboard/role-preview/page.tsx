@@ -73,7 +73,7 @@ export default function RolePreviewPage() {
                         </button>
                         <button
                             onClick={() => setActiveTab('volunteer')}
-                            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${activeTab === 'volunteer' ? 'bg-indigo-500 text-white' : 'text-white/60 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${activeTab === 'volunteer' ? 'bg-orange-600 text-white' : 'text-white/60 hover:text-white'}`}
                         >
                             Volunteer
                         </button>
@@ -191,12 +191,12 @@ export default function RolePreviewPage() {
 
                     {/* PANEL 3: VOLUNTEER */}
                     {(activeTab === 'all' || activeTab === 'volunteer') && (
-                        <div className="flex flex-col rounded-3xl border border-indigo-500/30 bg-slate-900/60 shadow-2xl overflow-hidden min-h-[750px]">
-                            <div className="px-5 py-3.5 bg-indigo-950/40 border-b border-indigo-500/20 flex items-center justify-between">
+                        <div className="flex flex-col rounded-3xl border border-orange-500/30 bg-zinc-900/60 shadow-2xl overflow-hidden min-h-[750px]">
+                            <div className="px-5 py-3.5 bg-orange-950/40 border-b border-orange-500/20 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Phone size={18} className="text-indigo-400" />
+                                    <Phone size={18} className="text-orange-400" />
                                     <div>
-                                        <h2 className="text-xs font-black uppercase tracking-wider text-indigo-300">
+                                        <h2 className="text-xs font-black uppercase tracking-wider text-orange-300">
                                             3. Volunteer Portal
                                         </h2>
                                         <span className="text-[10px] text-white/40 font-mono">/dashboard/volunteer</span>
@@ -207,7 +207,7 @@ export default function RolePreviewPage() {
                                         href="/dashboard/volunteer"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 text-xs font-bold inline-flex items-center gap-1"
+                                        className="p-1.5 rounded-lg bg-orange-500/10 text-orange-300 hover:bg-orange-500/20 text-xs font-bold inline-flex items-center gap-1"
                                         title="Open in new window"
                                     >
                                         <ExternalLink size={12} />

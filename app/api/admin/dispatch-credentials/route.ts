@@ -153,7 +153,7 @@ export async function POST(req: Request) {
                             <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:20px 0;">
                                 <p style="margin:0 0 8px;font-size:13px;color:#475569;"><strong>Team Login ID:</strong> <span style="font-family:monospace;font-size:15px;color:#0f172a;background:#e2e8f0;padding:2px 6px;border-radius:4px;">${safeTeamId}</span></p>
                                 <p style="margin:0 0 8px;font-size:13px;color:#475569;"><strong>Access Password:</strong> <span style="font-family:monospace;font-size:15px;color:#1e293b;background:#fef08a;padding:2px 6px;border-radius:4px;font-weight:bold;">${safePassword}</span></p>
-                                <p style="margin:0;font-size:13px;color:#475569;"><strong>Team Portal:</strong> <a href="${appUrl}/login" style="color:#2563eb;text-decoration:none;font-weight:bold;">${appUrl}/login</a></p>
+                                <p style="margin:0;font-size:13px;color:#475569;"><strong>Team Portal:</strong> <a href="${appUrl}/login" style="color:#ea580c;text-decoration:none;font-weight:bold;">${appUrl}/login</a></p>
                             </div>
 
                             <p style="font-size:13px;color:#334155;"><strong>Your Check-in Passes:</strong> Please log in to the team dashboard using the link above to download your individual check-in QR passes. You will need to show these passes at the registration desk upon your arrival.</p>

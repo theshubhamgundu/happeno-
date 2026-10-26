@@ -1889,11 +1889,11 @@ export default function AdminDashboard() {
                                     volunteers.map((vol) => (
                                         <div key={vol.id} className="flex items-center justify-between p-6 bg-white/5 border border-white/10 rounded-2xl group hover:bg-white/10 transition-all">
                                             <div className="flex items-center gap-6">
-                                                <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center text-blue-400"><Users size={24} /></div>
+                                                <div className="w-12 h-12 rounded-xl bg-orange-600/20 flex items-center justify-center text-orange-400"><Users size={24} /></div>
                                                 <div>
                                                     <div className="flex items-center gap-3">
                                                         <h4 className="text-lg font-black italic uppercase tracking-tight">{vol.name}</h4>
-                                                        <span className="text-[9px] font-black text-blue-400 px-2 py-0.5 border border-blue-400/30 rounded bg-blue-400/5">{vol.generatedId}</span>
+                                                        <span className="text-[9px] font-black text-orange-400 px-2 py-0.5 border border-orange-400/30 rounded bg-orange-400/5">{vol.generatedId}</span>
                                                     </div>
                                                     <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{vol.role} • {vol.phone}</p>
                                                 </div>
@@ -1901,7 +1901,7 @@ export default function AdminDashboard() {
                                             <div className="flex items-center gap-4">
                                                 <div className="text-right">
                                                     <span className="text-[9px] font-black text-white/20 uppercase block tracking-widest">Credentials</span>
-                                                    <code className="text-[10px] font-mono text-blue-400 font-black">{vol.password ? `PASS: ${vol.password}` : 'Password shown only when issued'}</code>
+                                                    <code className="text-[10px] font-mono text-orange-400 font-black">{vol.password ? `PASS: ${vol.password}` : 'Password shown only when issued'}</code>
                                                 </div>
                                                 <button onClick={() => removeVolunteer(vol.id)} className="p-3 rounded-xl bg-slate-900/10 text-slate-900 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-800 hover:text-white"><Trash2 size={18} /></button>
                                             </div>
@@ -2340,7 +2340,7 @@ export default function AdminDashboard() {
                                                         <button
                                                             type="button"
                                                             onClick={() => setReplyModalEmail(email)}
-                                                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 text-[11px] font-bold transition cursor-pointer"
+                                                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 text-orange-300 text-[11px] font-bold transition cursor-pointer"
                                                         >
                                                             <Reply size={13} /> Reply
                                                         </button>
@@ -2528,7 +2528,7 @@ export default function AdminDashboard() {
                                         label: 'Participant Emails (Mail Merge)',
                                         desc: 'Every participant email, name, phone, team name, and track for newsletters and announcements.',
                                         icon: ClipboardList,
-                                        color: 'blue'
+                                        color: 'orange'
                                     },
                                     {
                                         type: 'teams',
@@ -2549,7 +2549,7 @@ export default function AdminDashboard() {
                                         label: 'Volunteers Directory',
                                         desc: 'Floor operations staff, contact phone numbers, and event roles.',
                                         icon: Users,
-                                        color: 'blue'
+                                        color: 'orange'
                                     },
                                 ].map(exp => (
                                     <button
@@ -2559,7 +2559,7 @@ export default function AdminDashboard() {
                                         className="group p-5 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50"
                                     >
                                         <div className="flex items-start justify-between">
-                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${exp.color === 'blue' ? 'bg-sky-500/20 text-sky-300' :
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${exp.color === 'orange' ? 'bg-orange-500/20 text-orange-300' :
                                                 exp.color === 'teal' ? 'bg-orange-500/20 text-orange-300' :
                                                     'bg-purple-500/20 text-purple-300'
                                                 }`}>
@@ -3070,7 +3070,7 @@ export default function AdminDashboard() {
                                 <button
                                     type="button"
                                     onClick={() => setShowMoveTrackModal(true)}
-                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 hover:bg-blue-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-300 hover:bg-orange-500/30 text-xs font-black uppercase italic tracking-wider transition-all"
                                 >
                                     <ArrowRightLeft size={14} /> Move Track
                                 </button>
@@ -3208,16 +3208,16 @@ export default function AdminDashboard() {
                 <AnimatePresence>
                     {showMoveTrackModal && (
                         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-blue-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-orange-500/30 rounded-[2rem] p-7 shadow-2xl overflow-hidden">
                                 <div className="flex items-center gap-4 mb-5">
-                                    <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center justify-center shrink-0">
+                                    <div className="w-12 h-12 rounded-2xl bg-orange-500/20 text-orange-300 border border-orange-500/30 flex items-center justify-center shrink-0">
                                         <ArrowRightLeft size={24} />
                                     </div>
                                     <div>
                                         <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
                                             Move {selectedTeamIds.length} Team{selectedTeamIds.length === 1 ? '' : 's'}
                                         </h3>
-                                        <p className="text-xs text-blue-400 font-bold uppercase tracking-widest mt-0.5">Bulk Track Reassignment</p>
+                                        <p className="text-xs text-orange-400 font-bold uppercase tracking-widest mt-0.5">Bulk Track Reassignment</p>
                                     </div>
                                 </div>
 
@@ -3234,7 +3234,7 @@ export default function AdminDashboard() {
                                                         setCustomTargetTrack("");
                                                     }}
                                                     className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${selectedTargetTrack === track && !customTargetTrack
-                                                        ? 'bg-blue-500/20 border-blue-400 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                                                        ? 'bg-orange-500/20 border-orange-400 text-white shadow-[0_0_15px_rgba(234, 88, 12, 0.3)]'
                                                         : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
                                                         }`}
                                                 >
@@ -3251,7 +3251,7 @@ export default function AdminDashboard() {
                                             value={customTargetTrack}
                                             onChange={(e) => setCustomTargetTrack(e.target.value)}
                                             placeholder="e.g. Web3 & DeFi, Robotics, etc."
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-blue-400 transition-all font-semibold"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-orange-400 transition-all font-semibold"
                                         />
                                     </div>
                                 </div>
@@ -3269,7 +3269,7 @@ export default function AdminDashboard() {
                                         type="button"
                                         onClick={handleConfirmMoveTrack}
                                         disabled={isBulkProcessing}
-                                        className="flex-1 py-3.5 rounded-xl bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+                                        className="flex-1 py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(234, 88, 12, 0.4)]"
                                     >
                                         {isBulkProcessing ? 'Moving...' : `Apply to ${selectedTeamIds.length} Teams`}
                                     </button>
@@ -3615,15 +3615,15 @@ export default function AdminDashboard() {
                 <AnimatePresence>
                     {editModalTeam && (
                         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-blue-500/40 rounded-[2rem] p-6 sm:p-7 shadow-2xl overflow-hidden">
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-[#0D0219] border-2 border-orange-500/40 rounded-[2rem] p-6 sm:p-7 shadow-2xl overflow-hidden">
                                 <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center">
+                                        <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center">
                                             <Edit3 size={20} />
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Edit Team Contact</h3>
-                                            <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">{editModalTeam.teamId || editModalTeam.id}</p>
+                                            <p className="text-[10px] text-orange-400 font-bold uppercase tracking-widest">{editModalTeam.teamId || editModalTeam.id}</p>
                                         </div>
                                     </div>
                                     <button
@@ -3644,7 +3644,7 @@ export default function AdminDashboard() {
                                             type="text"
                                             value={editFormData.teamName}
                                             onChange={e => setEditFormData({ ...editFormData, teamName: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-orange-400 transition font-semibold"
                                             required
                                         />
                                     </div>
@@ -3656,7 +3656,7 @@ export default function AdminDashboard() {
                                                 type="text"
                                                 value={editFormData.captain}
                                                 onChange={e => setEditFormData({ ...editFormData, captain: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-orange-400 transition font-semibold"
                                                 required
                                             />
                                         </div>
@@ -3666,7 +3666,7 @@ export default function AdminDashboard() {
                                                 type="text"
                                                 value={editFormData.captainMobile}
                                                 onChange={e => setEditFormData({ ...editFormData, captainMobile: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-mono font-semibold"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-orange-400 transition font-mono font-semibold"
                                                 placeholder="10-digit mobile"
                                             />
                                         </div>
@@ -3680,7 +3680,7 @@ export default function AdminDashboard() {
                                             type="email"
                                             value={editFormData.email}
                                             onChange={e => setEditFormData({ ...editFormData, email: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-mono font-semibold"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-orange-400 transition font-mono font-semibold"
                                             required
                                         />
                                     </div>
@@ -3692,7 +3692,7 @@ export default function AdminDashboard() {
                                                 type="text"
                                                 value={editFormData.college}
                                                 onChange={e => setEditFormData({ ...editFormData, college: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-orange-400 transition font-semibold"
                                             />
                                         </div>
                                         <div>
@@ -3701,7 +3701,7 @@ export default function AdminDashboard() {
                                                 type="text"
                                                 value={editFormData.room}
                                                 onChange={e => setEditFormData({ ...editFormData, room: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-blue-400 transition font-semibold"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-orange-400 transition font-semibold"
                                                 placeholder="e.g. Lab 3 / Desk 12"
                                             />
                                         </div>
@@ -3722,7 +3722,7 @@ export default function AdminDashboard() {
                                                 const currentTracks = (editFormData.track || '').split(',').map(s => s.trim()).filter(Boolean);
                                                 const isSelected = currentTracks.includes(t);
                                                 return (
-                                                    <label key={t} className={`flex items-center gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-colors ${isSelected ? 'bg-blue-500/20 border-blue-500/50 text-blue-300 font-bold' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}>
+                                                    <label key={t} className={`flex items-center gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-colors ${isSelected ? 'bg-orange-500/20 border-orange-500/50 text-orange-300 font-bold' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}>
                                                         <input
                                                             type="checkbox"
                                                             className="hidden"
@@ -3737,7 +3737,7 @@ export default function AdminDashboard() {
                                                                 }
                                                             }}
                                                         />
-                                                        <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${isSelected ? 'border-blue-400 bg-blue-500' : 'border-white/20 bg-black/40'}`}>
+                                                        <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${isSelected ? 'border-orange-400 bg-orange-500' : 'border-white/20 bg-black/40'}`}>
                                                             {isSelected && <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                                                         </span>
                                                         {t}
@@ -3753,7 +3753,7 @@ export default function AdminDashboard() {
                                                 type="checkbox"
                                                 checked={editFormData.resendPass}
                                                 onChange={e => setEditFormData({ ...editFormData, resendPass: e.target.checked })}
-                                                className="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer"
+                                                className="w-4 h-4 rounded text-orange-600 focus:ring-0 cursor-pointer"
                                             />
                                             <span className="text-xs text-amber-200 font-semibold">
                                                 Generate new credentials & email fresh pass to this address immediately
@@ -3772,7 +3772,7 @@ export default function AdminDashboard() {
                                         <button
                                             type="submit"
                                             disabled={isSavingEdit}
-                                            className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                                            className="flex-1 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 shadow-[0_0_20px_rgba(234, 88, 12, 0.4)]"
                                         >
                                             {isSavingEdit ? 'Saving...' : 'Save & Update'}
                                         </button>
@@ -4161,16 +4161,16 @@ export default function AdminDashboard() {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="w-full max-w-xl bg-[#0D0219] border-2 border-blue-500/40 rounded-[2rem] p-6 sm:p-8 shadow-2xl overflow-hidden"
+                                className="w-full max-w-xl bg-[#0D0219] border-2 border-orange-500/40 rounded-[2rem] p-6 sm:p-8 shadow-2xl overflow-hidden"
                             >
                                 <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center shrink-0">
+                                        <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0">
                                             <Reply size={20} />
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-black uppercase italic tracking-tight text-white">Reply to Inbound Email</h3>
-                                            <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">
+                                            <p className="text-[10px] text-orange-400 font-bold uppercase tracking-widest">
                                                 Sending via business@happeno.in (cPanel SMTP)
                                             </p>
                                         </div>
@@ -4250,7 +4250,7 @@ export default function AdminDashboard() {
                                             value={replyText}
                                             onChange={e => setReplyText(e.target.value)}
                                             placeholder="Type your response to the participant here..."
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-blue-400 transition leading-relaxed"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-orange-400 transition leading-relaxed"
                                             required
                                         />
                                     </div>
@@ -4266,7 +4266,7 @@ export default function AdminDashboard() {
                                         <button
                                             type="submit"
                                             disabled={isSendingReply || !replyText.trim()}
-                                            className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)] cursor-pointer"
+                                            className="flex-1 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 active:scale-95 text-white font-black italic text-xs uppercase tracking-wider transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(234, 88, 12, 0.4)] cursor-pointer"
                                         >
                                             <Send size={14} className={isSendingReply ? 'animate-spin' : ''} />
                                             {isSendingReply ? 'Sending Reply...' : 'Send Email Response'}
@@ -4322,7 +4322,7 @@ export default function AdminDashboard() {
                                             </span>
                                             <div className="flex items-center gap-2.5 mt-1">
                                                 <span className={`w-2.5 h-2.5 rounded-full ${rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' :
-                                                    rosterPortalMode === 'event' ? 'bg-blue-400' : 'bg-amber-400'
+                                                    rosterPortalMode === 'event' ? 'bg-orange-400' : 'bg-amber-400'
                                                     }`} />
                                                 <span className="text-base font-black italic uppercase text-white">
                                                     {rosterPortalMode === 'edit' ? 'Correction Window Open (Edit Mode)' :
@@ -4392,14 +4392,14 @@ export default function AdminDashboard() {
                                     </div>
 
                                     {/* Member Dispatcher Card */}
-                                    <div className="p-5 rounded-3xl bg-blue-500/[0.05] border border-blue-500/30 space-y-3">
+                                    <div className="p-5 rounded-3xl bg-orange-500/[0.05] border border-orange-500/30 space-y-3">
                                         <div className="flex items-center gap-2.5">
-                                            <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                                            <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold">
                                                 <Users size={16} />
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-white text-sm">2. Confirmation to Members</h4>
-                                                <span className="text-[10px] text-blue-300 font-semibold">Read-Only Notice</span>
+                                                <span className="text-[10px] text-orange-300 font-semibold">Read-Only Notice</span>
                                             </div>
                                         </div>
                                         <p className="text-xs text-white/60 leading-relaxed">
@@ -4409,7 +4409,7 @@ export default function AdminDashboard() {
                                             type="button"
                                             disabled={isDispatchingRosterLinks}
                                             onClick={() => void handleDispatchRosterEmails('members')}
-                                            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
+                                            className="w-full py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
                                         >
                                             {isDispatchingRosterLinks && rosterDispatchTarget === 'members' ? 'Dispatching Members...' : 'Dispatch Member Notices'}
                                         </button>
@@ -4545,12 +4545,11 @@ export default function AdminDashboard() {
     );
 }
 
-function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: number | string; icon: LucideIcon; tone: "purple" | "amber" | "green" | "blue" | "orange" | "red" }) {
+function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: number | string; icon: LucideIcon; tone: "purple" | "amber" | "green" | "orange" | "red" }) {
     const tones = {
         purple: "bg-purple-50 text-purple-700 border-purple-200",
         amber: "bg-amber-50 text-amber-700 border-amber-200",
         green: "bg-emerald-50 text-emerald-700 border-emerald-200",
-        blue: "bg-teal-50 text-orange-600 border-teal-200",
         orange: "bg-orange-50 text-orange-700 border-orange-200",
         red: "bg-rose-50 text-rose-700 border-rose-200",
     };

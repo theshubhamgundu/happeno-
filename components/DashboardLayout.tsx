@@ -122,18 +122,18 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
     }
 
     return (
-        <div className={`dashboard-app dashboard-${type} min-h-screen bg-[#f1eeeb] p-0 text-slate-900`}>
+        <div className={`dashboard-app dashboard-${type} min-h-screen bg-black p-0 text-white`}>
 
             <div className="p-0 lg:p-3">
-                <div className={`mx-auto min-h-screen max-w-[1600px] overflow-hidden bg-[#faf9f7] lg:min-h-[calc(100vh-24px)] lg:rounded-2xl lg:border lg:border-white lg:shadow-[0_12px_36px_rgba(77,57,48,0.08)] ${hasSidebar ? (isSidebarCollapsed ? "lg:grid lg:grid-cols-[68px_minmax(0,1fr)]" : "lg:grid lg:grid-cols-[218px_minmax(0,1fr)]") : "block"}`}>
+                <div className={`mx-auto min-h-screen max-w-[1600px] overflow-hidden bg-[#09090b] lg:min-h-[calc(100vh-24px)] lg:rounded-2xl lg:border lg:border-zinc-800 lg:shadow-[0_12px_36px_rgba(0,0,0,0.5)] ${hasSidebar ? (isSidebarCollapsed ? "lg:grid lg:grid-cols-[68px_minmax(0,1fr)]" : "lg:grid lg:grid-cols-[218px_minmax(0,1fr)]") : "block"}`}>
                     {hasSidebar && (
-                        <aside className={`hidden lg:flex lg:flex-col lg:border-r lg:border-slate-200/80 lg:bg-white ${isSidebarCollapsed ? "lg:p-2" : "lg:p-3"}`}>
+                        <aside className={`hidden lg:flex lg:flex-col lg:border-r lg:border-zinc-800 lg:bg-[#0d0d12] ${isSidebarCollapsed ? "lg:p-2" : "lg:p-3"}`}>
                             <div className={`flex items-center ${isSidebarCollapsed ? "flex-col gap-2" : "justify-between"}`}>
-                                <Link href="/" aria-label="Happeno home" className={`flex items-center gap-2.5 rounded-xl px-2 py-2.5 transition hover:bg-slate-50 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-                                    <div className="grid h-9 w-9 place-items-center rounded-lg bg-teal-600 text-base font-bold text-white shadow-sm">H</div>
+                                <Link href="/" aria-label="Happeno home" className={`flex items-center gap-2.5 rounded-xl px-2 py-2.5 transition hover:bg-zinc-800/60 ${isSidebarCollapsed ? "justify-center" : ""}`}>
+                                    <div className="grid h-9 w-9 place-items-center rounded-lg bg-orange-600 text-base font-bold text-white shadow-sm">H</div>
                                     {!isSidebarCollapsed && <div>
-                                        <HappenoMark compact className="text-lg" />
-                                        <p className="mt-1 text-[9px] font-bold uppercase tracking-[.19em] text-slate-400">Hackathon</p>
+                                        <HappenoMark compact className="text-lg text-white" />
+                                        <p className="mt-1 text-[9px] font-bold uppercase tracking-[.19em] text-zinc-500">Hackathon</p>
                                     </div>}
                                 </Link>
                                 <button
@@ -141,26 +141,26 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                                     onClick={() => setIsSidebarCollapsed(collapsed => !collapsed)}
                                     aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                                     title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                                    className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                                    className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
                                 >
                                     <ChevronRight size={17} className={`transition-transform ${isSidebarCollapsed ? "" : "rotate-180"}`} />
                                 </button>
                             </div>
 
-                            {!isSidebarCollapsed && <div className="mt-6 px-3 text-[9px] font-bold uppercase tracking-[.18em] text-slate-400">Navigation</div>}
+                            {!isSidebarCollapsed && <div className="mt-6 px-3 text-[9px] font-bold uppercase tracking-[.18em] text-zinc-500">Navigation</div>}
                             <nav className={`mt-2 space-y-1 ${isSidebarCollapsed ? "mt-5" : ""}`}>
                                 {menuItems[type].map((item: any) => {
                                     const isActive = pathname === item.href;
-                                    return <Link key={item.href} href={item.href} title={isSidebarCollapsed ? item.label : undefined} aria-label={isSidebarCollapsed ? item.label : undefined} className={`group flex items-center gap-2.5 rounded-lg py-2 text-xs font-semibold transition ${isSidebarCollapsed ? "justify-center px-2" : "px-2.5"} ${isActive ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}>
-                                        <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-[#c85847]"}`}><item.icon size={14} /></span>
+                                    return <Link key={item.href} href={item.href} title={isSidebarCollapsed ? item.label : undefined} aria-label={isSidebarCollapsed ? item.label : undefined} className={`group flex items-center gap-2.5 rounded-lg py-2 text-xs font-semibold transition ${isSidebarCollapsed ? "justify-center px-2" : "px-2.5"} ${isActive ? "bg-orange-600 text-white shadow-sm" : "text-zinc-400 hover:bg-zinc-800 hover:text-white"}`}>
+                                        <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-zinc-800 text-zinc-400 group-hover:bg-zinc-700 group-hover:text-orange-400"}`}><item.icon size={14} /></span>
                                         {!isSidebarCollapsed && <span>{item.label}</span>}
-                                        {!isSidebarCollapsed && (item.label === "Submissions" || item.label === "Sponsor APIs") && effectiveSubmissionLocked && <Lock size={13} className={isActive ? "ml-auto text-indigo-200" : "ml-auto text-slate-400"} />}
+                                        {!isSidebarCollapsed && (item.label === "Submissions" || item.label === "Sponsor APIs") && effectiveSubmissionLocked && <Lock size={13} className={isActive ? "ml-auto text-orange-200" : "ml-auto text-zinc-500"} />}
                                     </Link>;
                                 })}
                             </nav>
 
                             {type === "admin" && <div className="mt-5">
-                                {!isSidebarCollapsed && <div className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[.16em] text-slate-400">Manage event operations</div>}
+                                {!isSidebarCollapsed && <div className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[.16em] text-zinc-500">Manage event operations</div>}
                                 <nav className="space-y-1" aria-label="Manage event operations">
                                     {adminOperationItems.map(item => {
                                         const isActive = pathname === "/dashboard/admin" && activeAdminSection === item.section;
@@ -170,39 +170,39 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                                             onClick={() => window.dispatchEvent(new CustomEvent("admin-section-change", { detail: item.section }))}
                                             title={isSidebarCollapsed ? item.label : undefined}
                                             aria-label={isSidebarCollapsed ? item.label : undefined}
-                                            className={`group flex items-center gap-2.5 rounded-lg py-2 text-xs font-semibold transition ${isSidebarCollapsed ? "justify-center px-2" : "ml-2 px-2.5"} ${isActive ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-[#f7ece8] hover:text-slate-900"}`}
+                                            className={`group flex items-center gap-2.5 rounded-lg py-2 text-xs font-semibold transition ${isSidebarCollapsed ? "justify-center px-2" : "ml-2 px-2.5"} ${isActive ? "bg-orange-600 text-white shadow-sm" : "text-zinc-400 hover:bg-zinc-800 hover:text-white"}`}
                                         >
-                                            <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-[#c85847]"}`}><item.icon size={14} /></span>
+                                            <span className={`grid h-6 w-6 place-items-center rounded-md ${isActive ? "bg-white/15 text-white" : "bg-zinc-800 text-zinc-400 group-hover:bg-zinc-700 group-hover:text-orange-400"}`}><item.icon size={14} /></span>
                                             {!isSidebarCollapsed && <span>{item.label}</span>}
                                         </Link>;
                                     })}
                                 </nav>
                             </div>}
 
-                            <div className={`mt-auto rounded-2xl border border-slate-200 bg-[#fafafa] ${isSidebarCollapsed ? "p-1.5" : "p-3"}`}>
+                            <div className={`mt-auto rounded-2xl border border-zinc-800 bg-zinc-900/60 ${isSidebarCollapsed ? "p-1.5" : "p-3"}`}>
                                 <div className={`flex items-center gap-3 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-                                    <div className="grid h-9 w-9 place-items-center rounded-full bg-[#fbe5df] text-[#c85847]"><User size={17} /></div>
-                                    {!isSidebarCollapsed && <div className="min-w-0"><p className="truncate text-sm font-bold text-slate-800">{displayName}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{type} access</p></div>}
+                                    <div className="grid h-9 w-9 place-items-center rounded-full bg-orange-950/60 border border-orange-500/20 text-orange-400"><User size={17} /></div>
+                                    {!isSidebarCollapsed && <div className="min-w-0"><p className="truncate text-sm font-bold text-white">{displayName}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{type} access</p></div>}
                                 </div>
                             </div>
                         </aside>
                     )}
 
                     <div className={`min-w-0 ${hasSidebar ? "lg:col-start-2" : ""}`}>
-                        <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 backdrop-blur-md md:px-5">
+                        <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-zinc-800 bg-[#0d0d12]/90 px-4 backdrop-blur-md md:px-5">
                             <div className="flex items-center gap-3">
                                 {hasSidebar ? (
                                     <>
-                                        <button onClick={() => setIsMobileMenuOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 lg:hidden"><Menu size={20} /></button>
-                                        <div className="lg:hidden"><p className="text-sm font-black text-teal-700">HAPPENO</p><p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Workspace</p></div>
-                                        <div className="hidden lg:block"><p className="text-xs font-semibold text-slate-400">{type.charAt(0).toUpperCase() + type.slice(1)} workspace</p><p className="text-sm font-bold text-slate-700">Happeno Hackathon</p></div>
+                                        <button onClick={() => setIsMobileMenuOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-zinc-800 text-zinc-400 hover:text-white lg:hidden"><Menu size={20} /></button>
+                                        <div className="lg:hidden"><p className="text-sm font-black text-orange-500">HAPPENO</p><p className="text-[9px] font-bold uppercase tracking-wider text-zinc-400">Workspace</p></div>
+                                        <div className="hidden lg:block"><p className="text-xs font-semibold text-zinc-400">{type.charAt(0).toUpperCase() + type.slice(1)} workspace</p><p className="text-sm font-bold text-white">Happeno Hackathon</p></div>
                                     </>
                                 ) : (
                                     <Link href="/" aria-label="Happeno home" className="flex items-center gap-2.5 rounded-xl transition hover:opacity-85">
-                                        <div className="grid h-9 w-9 place-items-center rounded-lg bg-teal-600 text-base font-bold text-white shadow-sm">H</div>
+                                        <div className="grid h-9 w-9 place-items-center rounded-lg bg-orange-600 text-base font-bold text-white shadow-sm">H</div>
                                         <div>
-                                            <p className="text-sm font-black text-slate-800 tracking-tight leading-none">Happeno OS</p>
-                                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mt-0.5">
+                                            <p className="text-sm font-black text-white tracking-tight leading-none">Happeno OS</p>
+                                            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mt-0.5">
                                                 {type === 'judge' ? 'Evaluator Portal' : type === 'volunteer' ? 'Volunteer Scanner' : 'Portal'}
                                             </p>
                                         </div>
@@ -211,8 +211,8 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                             </div>
                             <div className="flex items-center gap-3">
                                 {!hasSidebar && (
-                                    <div className="hidden sm:flex items-center gap-2 rounded-lg border border-slate-200 bg-[#fafafa] px-2.5 py-1.5 text-xs font-bold text-slate-700">
-                                        <User size={14} className="text-[#c85847]" />
+                                    <div className="hidden sm:flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 px-2.5 py-1.5 text-xs font-bold text-white">
+                                        <User size={14} className="text-orange-400" />
                                         <span className="truncate max-w-[150px]">{displayName}</span>
                                     </div>
                                 )}
@@ -220,21 +220,21 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                                     onClick={logout}
                                     aria-label="Sign out"
                                     title="Sign out"
-                                    className="flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-200 px-2 text-xs font-semibold text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 sm:px-3"
+                                    className="flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-800 px-2 text-xs font-semibold text-zinc-400 transition hover:border-rose-900 hover:bg-rose-950/40 hover:text-rose-400 sm:px-3"
                                 >
                                     <LogOut size={15} />
                                     <span className="hidden sm:inline">Sign out</span>
                                 </button>
                                 {hasSidebar && (
-                                    <div className="grid h-9 w-9 place-items-center rounded-full bg-[#fbe5df] text-[#c85847]"><User size={17} /></div>
+                                    <div className="grid h-9 w-9 place-items-center rounded-full bg-orange-950/60 border border-orange-500/20 text-orange-400"><User size={17} /></div>
                                 )}
                             </div>
                         </header>
 
                         <main className="mx-auto w-full max-w-[1480px] px-4 py-4 md:px-5 md:py-5">
                             {type !== "admin" && !hideHeader && <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
-                                <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#c85847]">{type === 'judge' ? 'evaluator' : type} portal</p><h1 className="mt-1 text-xl font-semibold tracking-[-0.025em] text-slate-900 md:text-2xl">{title}</h1></div>
-                                <p className="max-w-sm text-[13px] leading-5 text-slate-500">{subtitle || "Stay informed, complete your tasks, and keep the event moving."}</p>
+                                <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-orange-400">{type === 'judge' ? 'evaluator' : type} portal</p><h1 className="mt-1 text-xl font-semibold tracking-[-0.025em] text-white md:text-2xl">{title}</h1></div>
+                                <p className="max-w-sm text-[13px] leading-5 text-zinc-400">{subtitle || "Stay informed, complete your tasks, and keep the event moving."}</p>
                             </div>}
                             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="dashboard-content min-w-0">{children}</motion.div>
                         </main>
@@ -243,25 +243,25 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
             </div>
 
             <AnimatePresence>
-                {hasSidebar && isMobileMenuOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-slate-950/25 p-4 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-                    <motion.div initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -24, opacity: 0 }} onClick={(event) => event.stopPropagation()} className="flex h-full w-full max-w-[320px] flex-col rounded-2xl bg-white p-5 shadow-2xl">
-                        <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600 font-bold text-white">H</div><HappenoMark compact className="text-xl" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500"><X size={21} /></button></div>
-                        <p className="mt-9 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Workspace</p>
+                {hasSidebar && isMobileMenuOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/80 p-4 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
+                    <motion.div initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -24, opacity: 0 }} onClick={(event) => event.stopPropagation()} className="flex h-full w-full max-w-[320px] flex-col rounded-2xl bg-[#0d0d12] border border-zinc-800 p-5 shadow-2xl text-white">
+                        <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-orange-600 font-bold text-white">H</div><HappenoMark compact className="text-xl text-white" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-zinc-400 hover:text-white"><X size={21} /></button></div>
+                        <p className="mt-9 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-zinc-500">Workspace</p>
                         <nav className="mt-3 space-y-1">{menuItems[type].map((item: any) => {
                             const isActive = pathname === item.href;
                             const isLocked = (item.label === "Submissions" || item.label === "Sponsor APIs") && effectiveSubmissionLocked;
                             return (
-                                <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${isActive ? "bg-teal-600 text-white" : "text-slate-600"}`}>
+                                <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${isActive ? "bg-orange-600 text-white" : "text-zinc-400 hover:text-white"}`}>
                                     <item.icon size={18} />
                                     <span>{item.label}</span>
-                                    {isLocked && <Lock size={15} className={`ml-auto ${isActive ? "text-indigo-200" : "text-slate-400"}`} />}
+                                    {isLocked && <Lock size={15} className={`ml-auto ${isActive ? "text-orange-200" : "text-zinc-500"}`} />}
                                 </Link>
                             );
                         })}</nav>
                         {type === "admin" && <div className="mt-6">
-                            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Manage event operations</p>
+                            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-zinc-500">Manage event operations</p>
                             <nav className="space-y-1" aria-label="Manage event operations">
-                                {adminOperationItems.map(item => <Link key={item.section} href={item.href} onClick={() => { window.dispatchEvent(new CustomEvent("admin-section-change", { detail: item.section })); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${pathname === "/dashboard/admin" && activeAdminSection === item.section ? "bg-teal-600 text-white" : "text-slate-600"}`}><item.icon size={18} />{item.label}</Link>)}
+                                {adminOperationItems.map(item => <Link key={item.section} href={item.href} onClick={() => { window.dispatchEvent(new CustomEvent("admin-section-change", { detail: item.section })); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${pathname === "/dashboard/admin" && activeAdminSection === item.section ? "bg-orange-600 text-white" : "text-zinc-400 hover:text-white"}`}><item.icon size={18} />{item.label}</Link>)}
                             </nav>
                         </div>}
                     </motion.div>

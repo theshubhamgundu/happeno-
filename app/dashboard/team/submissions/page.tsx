@@ -82,7 +82,7 @@ export default function TeamSubmissions() {
                     </div>
                     {locked && <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700"><Lock size={13} /> Locked until Oct 11th</span>}
                 </div>
-                <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
+                <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm leading-6 text-orange-950">
                     <p className="font-semibold">Upload your project as a ZIP file to Google Drive</p>
                     <p className="mt-1 text-xs">Keep the ZIP at or below 10 MB. Exclude dependency folders and generated/library files such as <code>node_modules</code>, build outputs, and virtual environments. Set Drive sharing to anyone with the link can view, then paste the link below.</p>
                 </div>

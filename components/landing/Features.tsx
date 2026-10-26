@@ -93,7 +93,7 @@ function FadeIn({ children, delay = 0, className = '' }: FadeInProps) {
 
 export default function Features() {
   return (
-    <section id="features" className="relative py-24 sm:py-32 px-6 bg-white">
+    <section id="features" className="relative py-24 sm:py-32 px-6 bg-black">
       <div className="relative max-w-6xl mx-auto">
         <FadeIn>
           <div className="flex items-center gap-3 mb-4">
@@ -101,20 +101,20 @@ export default function Features() {
               02
             </span>
             <span className="h-[1px] w-10 bg-orange-500/40" />
-            <span className="font-mono text-xs tracking-[0.25em] uppercase text-gray-500">
+            <span className="font-mono text-xs tracking-[0.25em] uppercase text-zinc-500">
               Platform Architecture
             </span>
           </div>
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-[#0f172a] leading-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-white leading-tight mb-4">
             Everything Required to Run a Flawless Hackathon
           </h2>
         </FadeIn>
 
         <FadeIn delay={0.2}>
-          <p className="font-body text-base sm:text-lg text-gray-600 max-w-2xl leading-relaxed mb-14">
+          <p className="font-body text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed mb-14">
             Happeno replaces chaotic spreadsheets, disconnected forms, and manual judging sheets with one cohesive, battle-tested platform.
           </p>
         </FadeIn>
@@ -123,30 +123,30 @@ export default function Features() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((feature, i) => (
             <FadeIn key={feature.id} delay={0.1 + i * 0.07}>
-              <div className="pro-card rounded-xl p-7 bg-[#F8F9FA] hover:bg-white border border-gray-200 hover:border-orange-500/60 transition-all duration-300 flex flex-col justify-between min-h-[260px] group shadow-sm hover:shadow-md">
+              <div className="pro-card rounded-xl p-7 bg-[#0d0d12] hover:bg-[#13131a] border border-zinc-800 hover:border-orange-500/60 transition-all duration-300 flex flex-col justify-between min-h-[260px] group shadow-sm hover:shadow-md">
                 <div>
                   {/* Card Header */}
                   <div className="flex items-center justify-between mb-4">
                     <span className="font-mono text-xs font-bold tracking-widest text-[#ea580c] uppercase">
                       {feature.number} · {feature.category}
                     </span>
-                    <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-medium tracking-wide uppercase bg-orange-50 text-orange-800 border border-orange-200">
+                    <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-medium tracking-wide uppercase bg-orange-950/40 text-orange-400 border border-orange-500/30">
                       {feature.badge}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="font-display font-bold text-xl text-[#0f172a] mb-2.5 group-hover:text-[#ea580c] transition-colors">
+                  <h3 className="font-display font-bold text-xl text-white mb-2.5 group-hover:text-[#ea580c] transition-colors">
                     {feature.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="font-body text-sm text-gray-600 leading-relaxed">
+                  <p className="font-body text-sm text-zinc-400 leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
 
-                <div className="pt-4 mt-6 border-t border-gray-200/80 flex items-center justify-between text-xs font-mono text-gray-500">
+                <div className="pt-4 mt-6 border-t border-zinc-800/80 flex items-center justify-between text-xs font-mono text-zinc-500">
                   <span>Happeno Engine</span>
                   <span className="text-[#ea580c] font-semibold flex items-center gap-1">
                     Integrated

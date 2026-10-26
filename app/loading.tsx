@@ -4,12 +4,12 @@ import React from "react";
 
 export default function Loading() {
     return (
-        <div className="fixed inset-0 z-[9999] bg-gradient-to-b from-[#F8F9FA] via-white to-white flex flex-col items-center justify-center">
-            {/* Subtle grid pattern — same as hero */}
+        <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center">
+            {/* Subtle grid pattern */}
             <div
                 className="absolute inset-0 opacity-[0.035] pointer-events-none"
                 style={{
-                    backgroundImage: `linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)`,
+                    backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
                     backgroundSize: '40px 40px',
                 }}
             />
@@ -18,7 +18,7 @@ export default function Loading() {
                 {/* Spinner */}
                 <div className="relative mb-8">
                     {/* Outer ring */}
-                    <div className="w-16 h-16 rounded-full border-2 border-gray-200" />
+                    <div className="w-16 h-16 rounded-full border-2 border-zinc-800" />
                     {/* Spinning arc */}
                     <div className="absolute inset-0 w-16 h-16 rounded-full border-2 border-transparent border-t-[#ea580c] animate-spin" />
                     {/* Center logo mark */}
@@ -30,12 +30,12 @@ export default function Loading() {
                 </div>
 
                 {/* Title */}
-                <h2 className="font-display font-bold text-lg sm:text-xl tracking-tight text-[#0f172a] mb-2 text-center">
+                <h2 className="font-display font-bold text-lg sm:text-xl tracking-tight text-white mb-2 text-center">
                     Happeno
                 </h2>
 
                 {/* Subtitle */}
-                <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-orange-600 mb-6 font-semibold">
+                <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-orange-500 mb-6 font-semibold">
                     Hackathon Operating System
                 </p>
 
