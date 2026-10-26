@@ -24,18 +24,45 @@ export async function GET(req: Request) {
         const analytics = await getFeedbackAnalytics();
 
         if (exportCsv) {
-            // Generate CSV
-            const headers = ['Team ID', 'Team Name', 'Submitter Name', 'Submitter Email', 'Overall (1-5)', 'Organization (1-5)', 'Mentorship (1-5)', 'Judging (1-5)', 'Food/Venue (1-5)', 'Highlight', 'Feedback Text'];
+            // Generate CSV with comprehensive Likert matrix fields
+            const headers = [
+                'Team ID',
+                'Team Name',
+                'Submitter Name',
+                'Submitter Email',
+                'Overall Rating (1-5)',
+                'Food: Lunch (Day 1)',
+                'Food: Dinner (Day 1)',
+                'Food: Food stall facilities',
+                'Venue: Classroom / workspace comfort',
+                'Venue: Wi-Fi & power points',
+                'Venue: Cleanliness & restrooms',
+                'Venue: Safety & security during the night',
+                'Venue: Help from volunteers',
+                'Tech: Access to technical credentials / tools provided',
+                'Tech: Mentor support during the build',
+                'Tech: Fairness of the Evaluation',
+                'Highlight of the Hackathon',
+                'Suggestions & Feedback Text'
+            ];
+
             const rows = analytics.recentFeedbacks.map(f => [
                 f.team_id,
                 `"${(f.team_name || '').replace(/"/g, '""')}"`,
                 `"${(f.submitted_by_name || '').replace(/"/g, '""')}"`,
                 `"${(f.submitted_by_email || '').replace(/"/g, '""')}"`,
                 f.rating_overall,
-                f.rating_organization,
-                f.rating_mentorship,
-                f.rating_judging,
-                f.rating_food,
+                `"${f.food_lunch_d1 || 'N/A'}"`,
+                `"${f.food_dinner_d1 || 'N/A'}"`,
+                `"${f.food_stalls || 'N/A'}"`,
+                `"${f.venue_workspace || 'N/A'}"`,
+                `"${f.venue_wifi_power || 'N/A'}"`,
+                `"${f.venue_restrooms || 'N/A'}"`,
+                `"${f.venue_night_security || 'N/A'}"`,
+                `"${f.venue_volunteers || 'N/A'}"`,
+                `"${f.tech_credentials || 'N/A'}"`,
+                `"${f.tech_mentor_support || 'N/A'}"`,
+                `"${f.tech_evaluation_fairness || 'N/A'}"`,
                 `"${(f.highlight || '').replace(/"/g, '""')}"`,
                 `"${(f.feedback_text || '').replace(/"/g, '""')}"`
             ]);

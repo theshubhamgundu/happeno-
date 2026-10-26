@@ -17,18 +17,32 @@ export interface CertificateConfig {
     custom_subtitle: string;
 }
 
+export type LikertRating = "Excellent" | "Good" | "Average" | "Poor" | "Didn't attend / use";
+
 export interface CertificateFeedbackPayload {
     team_id: string;
     team_name?: string;
     submitted_by_name: string;
     submitted_by_email: string;
     rating_overall: number;
-    rating_organization: number;
-    rating_mentorship: number;
-    rating_judging: number;
-    rating_food: number;
+    // Food ratings
+    food_lunch_d1?: LikertRating;
+    food_dinner_d1?: LikertRating;
+    food_stalls?: LikertRating;
+    // Venue & facilities
+    venue_workspace?: LikertRating;
+    venue_wifi_power?: LikertRating;
+    venue_restrooms?: LikertRating;
+    venue_night_security?: LikertRating;
+    venue_volunteers?: LikertRating;
+    // Technical support & evaluation
+    tech_credentials?: LikertRating;
+    tech_mentor_support?: LikertRating;
+    tech_evaluation_fairness?: LikertRating;
+    // Qualitative
     feedback_text: string;
     highlight: string;
+    created_at?: string;
 }
 
 export interface CertificateClaimRecord {
@@ -211,6 +225,15 @@ export async function hasTeamSubmittedFeedback(teamId: string): Promise<boolean>
     return false;
 }
 
+export function likertToScore(val?: LikertRating): number | null {
+    if (!val) return null;
+    if (val === "Excellent") return 5;
+    if (val === "Good") return 4;
+    if (val === "Average") return 3;
+    if (val === "Poor") return 2;
+    return null; // "Didn't attend / use"
+}
+
 /**
  * Submit feedback with dual-layer persistence
  */
@@ -226,10 +249,6 @@ export async function submitCertificateFeedback(payload: CertificateFeedbackPayl
             submitted_by_name: payload.submitted_by_name || '',
             submitted_by_email: payload.submitted_by_email || '',
             rating_overall: Math.min(5, Math.max(1, Number(payload.rating_overall) || 5)),
-            rating_organization: Math.min(5, Math.max(1, Number(payload.rating_organization) || 5)),
-            rating_mentorship: Math.min(5, Math.max(1, Number(payload.rating_mentorship) || 5)),
-            rating_judging: Math.min(5, Math.max(1, Number(payload.rating_judging) || 5)),
-            rating_food: Math.min(5, Math.max(1, Number(payload.rating_food) || 5)),
             feedback_text: payload.feedback_text || '',
             highlight: payload.highlight || '',
             created_at: now
@@ -238,7 +257,7 @@ export async function submitCertificateFeedback(payload: CertificateFeedbackPayl
         console.warn('certificate_feedback table insert notice, using raw_data fallback:', err);
     }
 
-    // 2. Guaranteed fallback in registrations.raw_data
+    // 2. Guaranteed fallback in registrations.raw_data with full matrix
     try {
         const { data: teamData } = await supabase
             .from('registrations')
@@ -513,22 +532,42 @@ export async function getFeedbackAnalytics(): Promise<{
             };
         }
 
-        const sum = fallbackList.reduce((acc, row) => ({
-            overall: acc.overall + (Number(row.rating_overall) || 0),
-            organization: acc.organization + (Number(row.rating_organization) || 0),
-            mentorship: acc.mentorship + (Number(row.rating_mentorship) || 0),
-            judging: acc.judging + (Number(row.rating_judging) || 0),
-            food: acc.food + (Number(row.rating_food) || 0)
-        }), { overall: 0, organization: 0, mentorship: 0, judging: 0, food: 0 });
+        const computeAvg = (scores: (number | null)[]) => {
+            const valid = scores.filter((s): s is number => typeof s === 'number');
+            if (valid.length === 0) return 5;
+            return Number((valid.reduce((a, b) => a + b, 0) / valid.length).toFixed(1));
+        };
+
+        const allFoodScores: (number | null)[] = [];
+        const allVenueScores: (number | null)[] = [];
+        const allTechScores: (number | null)[] = [];
+        let totalOverall = 0;
+
+        fallbackList.forEach(row => {
+            totalOverall += Number(row.rating_overall) || 5;
+            allFoodScores.push(likertToScore(row.food_lunch_d1), likertToScore(row.food_dinner_d1), likertToScore(row.food_stalls));
+            allVenueScores.push(
+                likertToScore(row.venue_workspace),
+                likertToScore(row.venue_wifi_power),
+                likertToScore(row.venue_restrooms),
+                likertToScore(row.venue_night_security),
+                likertToScore(row.venue_volunteers)
+            );
+            allTechScores.push(
+                likertToScore(row.tech_credentials),
+                likertToScore(row.tech_mentor_support),
+                likertToScore(row.tech_evaluation_fairness)
+            );
+        });
 
         return {
             totalSubmissions: count,
             averageRatings: {
-                overall: Number((sum.overall / count).toFixed(1)),
-                organization: Number((sum.organization / count).toFixed(1)),
-                mentorship: Number((sum.mentorship / count).toFixed(1)),
-                judging: Number((sum.judging / count).toFixed(1)),
-                food: Number((sum.food / count).toFixed(1))
+                overall: Number((totalOverall / count).toFixed(1)),
+                organization: computeAvg(allVenueScores),
+                mentorship: computeAvg(allTechScores),
+                judging: computeAvg(fallbackList.map(r => likertToScore(r.tech_evaluation_fairness))),
+                food: computeAvg(allFoodScores)
             },
             recentFeedbacks: fallbackList.slice(0, 100)
         };

@@ -70,14 +70,38 @@ export default function TeamCertificatePage() {
     // Countdown state
     const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
 
-    // Feedback Form state
+    type LikertRating = "Excellent" | "Good" | "Average" | "Poor" | "Didn't attend / use";
+
+    // Feedback Form state matching Likert Matrix questions
     const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-    const [feedbackForm, setFeedbackForm] = useState({
+    const [feedbackForm, setFeedbackForm] = useState<{
+        rating_overall: number;
+        food_lunch_d1: LikertRating;
+        food_dinner_d1: LikertRating;
+        food_stalls: LikertRating;
+        venue_workspace: LikertRating;
+        venue_wifi_power: LikertRating;
+        venue_restrooms: LikertRating;
+        venue_night_security: LikertRating;
+        venue_volunteers: LikertRating;
+        tech_credentials: LikertRating;
+        tech_mentor_support: LikertRating;
+        tech_evaluation_fairness: LikertRating;
+        highlight: string;
+        feedback_text: string;
+    }>({
         rating_overall: 5,
-        rating_organization: 5,
-        rating_mentorship: 5,
-        rating_judging: 5,
-        rating_food: 5,
+        food_lunch_d1: "Good",
+        food_dinner_d1: "Good",
+        food_stalls: "Good",
+        venue_workspace: "Good",
+        venue_wifi_power: "Good",
+        venue_restrooms: "Good",
+        venue_night_security: "Good",
+        venue_volunteers: "Good",
+        tech_credentials: "Good",
+        tech_mentor_support: "Good",
+        tech_evaluation_fairness: "Good",
         highlight: "",
         feedback_text: ""
     });
@@ -315,59 +339,88 @@ export default function TeamCertificatePage() {
                                 </p>
                             </div>
 
-                            <form onSubmit={handleFeedbackSubmit} className="space-y-8">
-                                {/* Rating Grids */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Overall Experience */}
-                                    <RatingField
-                                        label="Overall Hackathon Experience"
-                                        description="General impression, atmosphere, and platform execution."
-                                        value={feedbackForm.rating_overall}
-                                        onChange={(val) => setFeedbackForm({ ...feedbackForm, rating_overall: val })}
-                                    />
+                            <form onSubmit={handleFeedbackSubmit} className="space-y-10">
+                                {/* Section 1: Rate the food */}
+                                <MatrixQuestionSection
+                                    title="Rate the food"
+                                    columns={["Excellent", "Good", "Average", "Poor", "Didn't attend / use"]}
+                                    rows={[
+                                        { key: "food_lunch_d1", label: "Lunch (Day 1)" },
+                                        { key: "food_dinner_d1", label: "Dinner (Day 1)" },
+                                        { key: "food_stalls", label: "Food stall facilities" }
+                                    ]}
+                                    values={feedbackForm}
+                                    onChange={(key, val) => setFeedbackForm({ ...feedbackForm, [key]: val })}
+                                />
 
-                                    {/* Organization & Logistics */}
-                                    <RatingField
-                                        label="Organization & Help Desk"
-                                        description="Schedule coordination, announcements, and volunteer assistance."
-                                        value={feedbackForm.rating_organization}
-                                        onChange={(val) => setFeedbackForm({ ...feedbackForm, rating_organization: val })}
-                                    />
+                                {/* Section 2: Rate the venue & facilities */}
+                                <MatrixQuestionSection
+                                    title="Rate the venue & facilities"
+                                    columns={["Excellent", "Good", "Average", "Poor", "Didn't attend / use"]}
+                                    rows={[
+                                        { key: "venue_workspace", label: "Classroom / workspace comfort" },
+                                        { key: "venue_wifi_power", label: "Wi-Fi & power points" },
+                                        { key: "venue_restrooms", label: "Cleanliness & restrooms" },
+                                        { key: "venue_night_security", label: "Safety & security during the night" },
+                                        { key: "venue_volunteers", label: "Help from volunteers" }
+                                    ]}
+                                    values={feedbackForm}
+                                    onChange={(key, val) => setFeedbackForm({ ...feedbackForm, [key]: val })}
+                                />
 
-                                    {/* Mentorship */}
-                                    <RatingField
-                                        label="Mentorship & Technical Guidance"
-                                        description="Availability and helpfulness of industry and technical mentors."
-                                        value={feedbackForm.rating_mentorship}
-                                        onChange={(val) => setFeedbackForm({ ...feedbackForm, rating_mentorship: val })}
-                                    />
+                                {/* Section 3: Rate the technical support */}
+                                <MatrixQuestionSection
+                                    title="Rate the technical support"
+                                    columns={["Excellent", "Good", "Average", "Poor", "Didn't attend / use"]}
+                                    rows={[
+                                        { key: "tech_credentials", label: "Access to technical credentials / tools provided" },
+                                        { key: "tech_mentor_support", label: "Mentor support during the build" },
+                                        { key: "tech_evaluation_fairness", label: "Fairness of the Evaluation" }
+                                    ]}
+                                    values={feedbackForm}
+                                    onChange={(key, val) => setFeedbackForm({ ...feedbackForm, [key]: val })}
+                                />
 
-                                    {/* Judging & Fair Play */}
-                                    <RatingField
-                                        label="Evaluation & Judging Fair-Play"
-                                        description="Clarity of rubric guidelines, time per team, and jury feedback."
-                                        value={feedbackForm.rating_judging}
-                                        onChange={(val) => setFeedbackForm({ ...feedbackForm, rating_judging: val })}
-                                    />
-
-                                    {/* Food & Hospitality */}
-                                    <RatingField
-                                        label="Food, Hospitality & Venue"
-                                        description="Meal quality, workspace comfort, internet connectivity, and snacks."
-                                        value={feedbackForm.rating_food}
-                                        onChange={(val) => setFeedbackForm({ ...feedbackForm, rating_food: val })}
-                                    />
-                                </div>
-
-                                {/* Qualitative Text Inputs */}
+                                {/* Section 4: Overall & Qualitative Comments */}
                                 <div className="space-y-6 pt-4 border-t border-slate-100">
+                                    <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-900 block">Overall Hackathon Rating</label>
+                                                <p className="text-[11px] text-slate-400">Your total satisfaction with Happeno Hackathon OS</p>
+                                            </div>
+                                            <span className="text-xs font-mono font-bold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200">
+                                                {feedbackForm.rating_overall} / 5 Stars
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2 pt-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setFeedbackForm({ ...feedbackForm, rating_overall: star })}
+                                                    className="p-1 rounded-lg transition hover:scale-110 cursor-pointer"
+                                                >
+                                                    <Star
+                                                        size={24}
+                                                        className={
+                                                            star <= feedbackForm.rating_overall
+                                                                ? "text-amber-400 fill-amber-400"
+                                                                : "text-slate-300 hover:text-amber-200"
+                                                        }
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
                                     <div>
                                         <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">
                                             What was the biggest highlight of your hackathon?
                                         </label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. Mentor session at 2 AM, building the live prototype, keynote..."
+                                            placeholder="e.g. Midnight coding vibe, mentor session, project showcase..."
                                             value={feedbackForm.highlight}
                                             onChange={(e) => setFeedbackForm({ ...feedbackForm, highlight: e.target.value })}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition"
@@ -473,44 +526,84 @@ export default function TeamCertificatePage() {
     );
 }
 
-function RatingField({
-    label,
-    description,
-    value,
+function MatrixQuestionSection({
+    title,
+    columns,
+    rows,
+    values,
     onChange
 }: {
-    label: string;
-    description: string;
-    value: number;
-    onChange: (val: number) => void;
+    title: string;
+    columns: string[];
+    rows: { key: string; label: string }[];
+    values: Record<string, any>;
+    onChange: (key: string, val: string) => void;
 }) {
     return (
-        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-            <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900">{label}</label>
-                <span className="text-xs font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                    {value} / 5
-                </span>
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+            {/* Matrix Title Header */}
+            <div className="px-6 py-4 bg-slate-50/70 border-b border-slate-200">
+                <h3 className="text-base font-bold text-slate-900 tracking-tight">{title}</h3>
             </div>
-            <p className="text-[11px] text-slate-400">{description}</p>
-            <div className="flex items-center gap-1.5 pt-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                        key={star}
-                        type="button"
-                        onClick={() => onChange(star)}
-                        className="p-1 rounded-lg transition hover:scale-110 cursor-pointer"
-                    >
-                        <Star
-                            size={20}
-                            className={
-                                star <= value
-                                    ? "text-amber-400 fill-amber-400"
-                                    : "text-slate-300 hover:text-amber-200"
-                            }
-                        />
-                    </button>
-                ))}
+
+            {/* Scrollable Table on mobile for flawless layout */}
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[620px]">
+                    <thead>
+                        <tr className="border-b border-slate-200 bg-white">
+                            <th className="py-4 px-6 w-2/5 font-semibold text-xs text-slate-500 uppercase tracking-wider">
+                                Criteria
+                            </th>
+                            {columns.map((col, idx) => (
+                                <th
+                                    key={idx}
+                                    className="py-4 px-3 text-center text-xs font-semibold text-slate-600 tracking-tight"
+                                >
+                                    {col}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {rows.map((row, rIdx) => (
+                            <tr
+                                key={row.key}
+                                className={`transition-colors hover:bg-teal-50/30 ${
+                                    rIdx % 2 === 1 ? "bg-slate-50/40" : "bg-white"
+                                }`}
+                            >
+                                <td className="py-4 px-6 text-xs sm:text-sm font-medium text-slate-800">
+                                    {row.label}
+                                </td>
+
+                                {columns.map((col, cIdx) => {
+                                    const isSelected = values[row.key] === col;
+                                    return (
+                                        <td
+                                            key={cIdx}
+                                            onClick={() => onChange(row.key, col)}
+                                            className="py-4 px-3 text-center cursor-pointer group"
+                                        >
+                                            <div className="flex items-center justify-center">
+                                                <div
+                                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                        isSelected
+                                                            ? "border-teal-600 bg-teal-50 shadow-sm"
+                                                            : "border-slate-300 group-hover:border-slate-400 bg-white"
+                                                    }`}
+                                                >
+                                                    {isSelected && (
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-teal-600" />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
