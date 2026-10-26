@@ -8,8 +8,9 @@ interface Feature {
   number: string;
   title: string;
   category: string;
-  description: string;
   badge: string;
+  badgeColor: string;
+  description: string;
 }
 
 const FEATURES: Feature[] = [
@@ -19,6 +20,7 @@ const FEATURES: Feature[] = [
     title: 'Stage-Gate Sprint Pipeline',
     category: 'Competition Workflow',
     badge: 'Multi-Round',
+    badgeColor: 'bg-[#FBBF24]',
     description:
       'Orchestrate multi-phase hackathons effortlessly. Configure Round 1 ideation checkpoints, mid-way mentor evaluations, and Final Pitch shortlists with automated lock-in timers.',
   },
@@ -28,6 +30,7 @@ const FEATURES: Feature[] = [
     title: 'Sub-Second QR Logistics',
     category: 'Access & Ticketing',
     badge: '< 200ms Scan',
+    badgeColor: 'bg-[#34D399]',
     description:
       'Tamper-proof digital QR participant passes. Streamline venue check-in, eliminate registration queues, and track table and room assignments instantly.',
   },
@@ -37,6 +40,7 @@ const FEATURES: Feature[] = [
     title: 'Smart Meal & Token Control',
     category: 'On-Ground Logistics',
     badge: 'Zero Fraud',
+    badgeColor: 'bg-[#C084FC]',
     description:
       'Prevent duplicate food claims across breakfast, lunch, midnight snacks, and high tea. Live station counters give organizers real-time consumption telemetry.',
   },
@@ -46,6 +50,7 @@ const FEATURES: Feature[] = [
     title: 'Fair-Play Rubric & Scoring',
     category: 'Evaluation Engine',
     badge: 'Normalized',
+    badgeColor: 'bg-[#FF5722] text-white',
     description:
       'Custom multi-parameter weighted rubrics with blind evaluation modes. Automatically normalize scoring across different jury panels to guarantee genuine merit.',
   },
@@ -55,6 +60,7 @@ const FEATURES: Feature[] = [
     title: 'Team Formation & Repo Sync',
     category: 'Builder Experience',
     badge: 'Automated',
+    badgeColor: 'bg-[#38BDF8]',
     description:
       'Effortless team building with private invite links, role distribution, and GitHub repository tracking to verify genuine commit history during the sprint window.',
   },
@@ -64,6 +70,7 @@ const FEATURES: Feature[] = [
     title: 'Granular Multi-Role Access',
     category: 'Security & Ops',
     badge: 'Role-Based',
+    badgeColor: 'bg-[#F472B6]',
     description:
       'Role-isolated portals for Head Organizers, Volunteer Scanners, Track Mentors, and Grand Jury. Maintain complete operational control without leaking sensitive data.',
   },
@@ -83,7 +90,7 @@ function FadeIn({ children, delay = 0, className = '' }: FadeInProps) {
       ref={ref}
       initial={{ opacity: 0, y: 30 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.25, 0.8, 0.25, 1] }}
+      transition={{ duration: 0.5, delay, ease: [0.25, 0.8, 0.25, 1] }}
       className={className}
     >
       {children}
@@ -93,28 +100,27 @@ function FadeIn({ children, delay = 0, className = '' }: FadeInProps) {
 
 export default function Features() {
   return (
-    <section id="features" className="relative py-24 sm:py-32 px-6 bg-black">
+    <section id="features" className="relative py-20 sm:py-28 px-6 bg-[#FAF9F5] border-t-2 border-black">
       <div className="relative max-w-6xl mx-auto">
         <FadeIn>
           <div className="flex items-center gap-3 mb-4">
-            <span className="font-mono text-xs tracking-[0.25em] uppercase text-orange-400 font-bold">
-              02
+            <span className="inline-block px-3 py-1 rounded-full bg-[#FF5722] text-white border-2 border-black font-mono text-xs font-black shadow-[2px_2px_0px_#000]">
+              02 CAPABILITIES
             </span>
-            <span className="h-[1px] w-10 bg-gradient-to-r from-orange-500/60 to-transparent" />
-            <span className="font-mono text-xs tracking-[0.25em] uppercase text-zinc-500">
-              Platform Architecture
+            <span className="font-mono text-xs tracking-widest uppercase text-neutral-600 font-bold">
+              PLATFORM ARCHITECTURE
             </span>
           </div>
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-white leading-tight mb-4">
+          <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-black leading-tight mb-4 tracking-tight">
             Everything Required to Run a Flawless Hackathon
           </h2>
         </FadeIn>
 
         <FadeIn delay={0.2}>
-          <p className="font-body text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed mb-14">
+          <p className="text-base sm:text-lg text-neutral-700 max-w-2xl leading-relaxed mb-12 font-medium">
             Happeno replaces chaotic spreadsheets, disconnected forms, and manual judging sheets with one cohesive, battle-tested platform.
           </p>
         </FadeIn>
@@ -122,37 +128,34 @@ export default function Features() {
         {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((feature, i) => (
-            <FadeIn key={feature.id} delay={0.1 + i * 0.07}>
-              <div className="pro-card rounded-2xl p-7 transition-all duration-300 flex flex-col justify-between min-h-[260px] group">
+            <FadeIn key={feature.id} delay={0.1 + i * 0.06}>
+              <div className="bg-white border-2 border-black rounded-2xl p-7 flex flex-col justify-between min-h-[260px] shadow-[3px_3px_0px_#000000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#000000] transition-all">
                 <div>
                   {/* Card Header */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className="font-mono text-xs font-bold tracking-widest text-orange-400 uppercase">
+                    <span className="font-mono text-xs font-black tracking-wider text-black uppercase">
                       {feature.number} · {feature.category}
                     </span>
-                    <span className="inline-block px-3 py-0.5 rounded-full text-[10px] font-mono font-medium tracking-wide uppercase badge-orange-grain">
+                    <span className={`inline-block px-3 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wide uppercase border border-black shadow-[1px_1px_0px_#000] ${feature.badgeColor}`}>
                       {feature.badge}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="font-display font-bold text-xl text-white mb-2.5 group-hover:text-orange-300 transition-colors">
+                  <h3 className="font-display font-black text-xl text-black mb-2.5">
                     {feature.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="font-body text-sm text-zinc-400 leading-relaxed">
+                  <p className="text-sm text-neutral-600 leading-relaxed font-medium">
                     {feature.description}
                   </p>
                 </div>
 
-                <div className="pt-4 mt-6 border-t border-zinc-800/80 flex items-center justify-between text-xs font-mono text-zinc-500">
+                <div className="pt-4 mt-6 border-t-2 border-neutral-100 flex items-center justify-between text-xs font-mono text-neutral-500 font-bold">
                   <span>Happeno Engine</span>
-                  <span className="text-orange-400 font-semibold flex items-center gap-1">
-                    Integrated
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                  <span className="text-black font-black flex items-center gap-1">
+                    Integrated ✓
                   </span>
                 </div>
               </div>

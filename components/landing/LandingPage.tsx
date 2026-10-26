@@ -10,17 +10,13 @@ import Footer from './Footer';
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen bg-black text-white">
+    <div className="relative min-h-screen bg-[#FAF9F5] text-black selection:bg-[#FBBF24] selection:text-black">
       <Navbar />
       <main>
         <Hero />
-        <div className="section-divider-line" />
         <About />
-        <div className="section-divider-line" />
         <Features />
-        <div className="section-divider-line" />
         <FAQ />
-        <div className="section-divider-line" />
         <FinalCTA />
       </main>
       <Footer />

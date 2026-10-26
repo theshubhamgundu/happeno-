@@ -9,40 +9,40 @@ export default function FinalCTA() {
 
   return (
     <section
-      className="relative py-24 sm:py-32 px-6 bg-black border-t border-zinc-800"
+      className="relative py-20 sm:py-28 px-6 bg-[#FAF9F5] border-t-2 border-black"
       ref={ref}
     >
       <div className="relative z-10 max-w-4xl mx-auto text-center">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 25 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.25, 0.8, 0.25, 1] }}
+          transition={{ duration: 0.5 }}
         >
-          {/* Date Badge */}
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full badge-orange-grain">
-            <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse shadow-[0_0_8px_rgba(251,146,60,0.8)]" />
-            <span className="font-mono text-xs tracking-wider uppercase font-semibold">
+          {/* Eyebrow Badge */}
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-[#FBBF24] border-2 border-black shadow-[2px_2px_0px_#000]">
+            <span className="w-2 h-2 rounded-full bg-black animate-pulse" />
+            <span className="font-mono text-xs tracking-wider uppercase font-bold text-black">
               Happeno · The Modern Hackathon OS
             </span>
           </div>
 
-          <h2 className="font-display font-extrabold text-3xl sm:text-5xl md:text-6xl text-white leading-tight mb-4">
-            Build with the <span className="text-orange-gradient">Happeno Community</span>
+          <h2 className="font-display font-black text-3xl sm:text-5xl md:text-6xl text-black leading-tight mb-4 tracking-tight">
+            Build with the <span className="text-[#FF5722] [text-shadow:_3px_3px_0_#000]">Happeno Community</span>
           </h2>
 
-          <p className="font-body text-base sm:text-lg text-zinc-400 max-w-xl mx-auto leading-relaxed mb-3">
+          <p className="text-base sm:text-lg text-neutral-700 max-w-xl mx-auto leading-relaxed mb-4 font-medium">
             Join thousands of developers, organizers, and mentors executing world-class hackathons with zero chaos.
           </p>
 
-          <p className="font-mono text-xs text-orange-400 mb-10 font-medium">
+          <p className="font-mono text-xs text-neutral-500 mb-8 font-bold">
             Stage Pipelines · Live Rubrics · Sub-Second QR Passes
           </p>
 
-          {/* Login Button with user icon + Sponsor button */}
+          {/* Login Button */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="/login"
-              className="btn-primary text-sm py-4 px-10"
+              className="inline-flex items-center gap-2 px-9 py-4 rounded-full bg-[#FF5722] text-white font-black text-sm uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_#000000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000000] transition-all"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -52,7 +52,7 @@ export default function FinalCTA() {
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span>Login</span>
+              <span>ACCESS WORKSPACE →</span>
             </a>
           </div>
         </motion.div>

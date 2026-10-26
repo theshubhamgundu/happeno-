@@ -88,10 +88,8 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${montserrat.variable} ${dmSans.variable} ${syne.variable} ${spaceMono.variable} ${poppins.className} antialiased overflow-x-hidden bg-black text-white relative`}
+          className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable} ${montserrat.variable} ${dmSans.variable} ${syne.variable} ${spaceMono.variable} ${poppins.className} antialiased overflow-x-hidden bg-[#FAF9F5] text-black relative`}
         >
-          {/* Subtle tactile film grain texture overlay */}
-          <div className="grain-overlay" aria-hidden="true" />
           <AuthProvider>
             <HackathonProvider>
               <SmoothScroll>
@@ -100,28 +98,23 @@ export default function RootLayout({
                 </LayoutWrapper>
                 <Toaster
                   position="top-center"
-                  theme="dark"
+                  theme="light"
                   richColors
                   toastOptions={{
                     style: {
-                      background: "rgba(13, 13, 18, 0.95)",
-                      backdropFilter: "blur(12px)",
-                      border: "1px solid #27272a",
-                      color: "#ffffff",
+                      background: "#FFFFFF",
+                      border: "2px solid #000000",
+                      color: "#000000",
                       fontFamily: "var(--font-geist-sans)",
                       borderRadius: "14px",
-                      boxShadow: "0 16px 35px -18px rgba(15, 23, 42, 0.25)",
+                      boxShadow: "2px 2px 0px #000000",
                     },
                     classNames: {
                       toast: "group toast-group",
                       title: "group-[.toast]:font-bold group-[.toast]:text-base",
-                      description: "group-[.toast]:text-slate-500",
-                      actionButton: "group-[.toast]:bg-orange-600 group-[.toast]:text-white",
-                      cancelButton: "group-[.toast]:bg-zinc-800 group-[.toast]:text-zinc-200",
-                      error: "group-[.toast]:text-red-400 group-[.toast]:border-red-500/20",
-                      success: "group-[.toast]:text-green-400 group-[.toast]:border-green-500/20",
-                      warning: "group-[.toast]:text-yellow-400 group-[.toast]:border-yellow-500/20",
-                      info: "group-[.toast]:text-orange-400 group-[.toast]:border-orange-500/20",
+                      description: "group-[.toast]:text-neutral-600",
+                      actionButton: "group-[.toast]:bg-[#FF5722] group-[.toast]:text-white",
+                      cancelButton: "group-[.toast]:bg-neutral-100 group-[.toast]:text-black",
                     },
                   }}
                 />
