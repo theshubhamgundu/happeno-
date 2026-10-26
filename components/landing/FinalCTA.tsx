@@ -19,8 +19,8 @@ export default function FinalCTA() {
           transition={{ duration: 0.6, ease: [0.25, 0.8, 0.25, 1] }}
         >
           {/* Date Badge */}
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full border border-teal-200 bg-teal-50 text-[#0f766e]">
-            <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full border border-orange-200 bg-orange-50 text-[#ea580c]">
+            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
             <span className="font-mono text-xs tracking-wider uppercase font-semibold">
               Happeno · The Modern Hackathon OS
             </span>
@@ -34,7 +34,7 @@ export default function FinalCTA() {
             Join thousands of developers, organizers, and mentors executing world-class hackathons with zero chaos.
           </p>
 
-          <p className="font-mono text-xs text-teal-700 mb-10 font-medium">
+          <p className="font-mono text-xs text-orange-600 mb-10 font-medium">
             Stage Pipelines · Live Rubrics · Sub-Second QR Passes
           </p>
 

@@ -20,10 +20,10 @@ export default function Loading() {
                     {/* Outer ring */}
                     <div className="w-16 h-16 rounded-full border-2 border-gray-200" />
                     {/* Spinning arc */}
-                    <div className="absolute inset-0 w-16 h-16 rounded-full border-2 border-transparent border-t-[#0f766e] animate-spin" />
+                    <div className="absolute inset-0 w-16 h-16 rounded-full border-2 border-transparent border-t-[#ea580c] animate-spin" />
                     {/* Center logo mark */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-md bg-[#0f766e] flex items-center justify-center text-white font-display font-extrabold text-[12px] shadow-sm">
+                        <div className="w-8 h-8 rounded-md bg-[#ea580c] flex items-center justify-center text-white font-display font-extrabold text-[12px] shadow-sm">
                             H
                         </div>
                     </div>
@@ -35,15 +35,15 @@ export default function Loading() {
                 </h2>
 
                 {/* Subtitle */}
-                <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-teal-700 mb-6 font-semibold">
+                <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-orange-600 mb-6 font-semibold">
                     Hackathon Operating System
                 </p>
 
                 {/* Loading dots */}
                 <div className="flex gap-1.5">
-                    <div className="w-1.5 h-1.5 bg-[#0f766e] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                    <div className="w-1.5 h-1.5 bg-[#0f766e] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                    <div className="w-1.5 h-1.5 bg-[#0f766e] rounded-full animate-bounce" />
+                    <div className="w-1.5 h-1.5 bg-[#ea580c] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <div className="w-1.5 h-1.5 bg-[#ea580c] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <div className="w-1.5 h-1.5 bg-[#ea580c] rounded-full animate-bounce" />
                 </div>
             </div>
         </div>

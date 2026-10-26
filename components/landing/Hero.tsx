@@ -16,12 +16,12 @@ function PlatformHighlights() {
       {highlights.map((h) => (
         <div
           key={h.title}
-          className="flex flex-col items-center bg-white border border-gray-200 hover:border-teal-500 rounded-lg p-3 text-center transition-all duration-200 shadow-sm"
+          className="flex flex-col items-center bg-white border border-gray-200 hover:border-orange-500 rounded-lg p-3 text-center transition-all duration-200 shadow-sm"
         >
           <span className="font-display font-bold text-xs sm:text-sm text-[#0f172a]">
             {h.title}
           </span>
-          <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-teal-700 mt-0.5">
+          <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-orange-600 mt-0.5 font-semibold">
             {h.sub}
           </span>
         </div>
@@ -51,11 +51,11 @@ export default function Hero() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-3 sm:px-4 py-1.5 rounded-full border border-teal-200 bg-teal-50 text-teal-900"
+          className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-3 sm:px-4 py-1.5 rounded-full border border-orange-200 bg-orange-50 text-orange-950"
         >
-          <span className="w-2 h-2 shrink-0 rounded-full bg-teal-600 animate-pulse" />
-          <span className="font-mono text-[10px] sm:text-xs tracking-wider uppercase font-medium text-center leading-snug">
-            Happeno 2.0 · The Premier Hackathon OS
+          <span className="w-2 h-2 shrink-0 rounded-full bg-orange-500 animate-pulse" />
+          <span className="font-mono text-[10px] sm:text-xs tracking-wider uppercase font-semibold text-center leading-snug">
+            HAPPENO · HMS
           </span>
         </motion.div>
 
@@ -67,7 +67,7 @@ export default function Hero() {
           className="font-display font-extrabold text-[2.5rem] sm:text-6xl md:text-7xl lg:text-8xl leading-[1.08] tracking-tight text-[#0f172a] mb-4 sm:mb-6"
         >
           Happeno
-          <span className="block text-lg sm:text-3xl md:text-4xl font-semibold text-[#0f766e] tracking-normal mt-1 sm:mt-2">
+          <span className="block text-lg sm:text-3xl md:text-4xl font-semibold text-[#ea580c] tracking-normal mt-1 sm:mt-2">
             The Modern Hackathon Operating System
           </span>
         </motion.h1>

@@ -1252,20 +1252,20 @@ export default function AdminDashboard() {
     <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#0f172a;color:#fff;
         padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:Arial,sans-serif;">
         <span style="font-weight:700;font-size:13px;">HAPPENO hackathon— ${title} (${rows.length} records)</span>
-        <button onclick="window.print()" style="background:#0f766e;color:#fff;border:none;padding:8px 22px;
+        <button onclick="window.print()" style="background:#ea580c;color:#fff;border:none;padding:8px 22px;
             border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">Print / Save as PDF</button>
     </div>
     <div style="padding:18px 24px;margin-top:50px;">
         <div style="display:flex;align-items:center;justify-content:flex-start;gap:20px;margin-bottom:8px;">
-            <div style="width:48px;height:48px;background:#0f766e;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:900;font-size:24px;">H</div>
+            <div style="width:48px;height:48px;background:#ea580c;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:900;font-size:24px;">H</div>
             <div style="font-family:'Segoe UI',Arial,sans-serif;">
-                <div style="font-size:11px;color:#0f766e;letter-spacing:1px;font-weight:700;">HAPPENO PLATFORM</div>
+                <div style="font-size:11px;color:#ea580c;letter-spacing:1px;font-weight:700;">HAPPENO PLATFORM</div>
                 <div style="font-size:22px;font-weight:900;letter-spacing:2px;color:#0f172a;margin-top:4px;">HACKATHON OPERATING SYSTEM</div>
-                <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#0f766e;margin-top:2px;">${title.toUpperCase()}</div>
+                <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#ea580c;margin-top:2px;">${title.toUpperCase()}</div>
                 <div style="font-size:10px;color:#888;margin-top:5px;">Date: ${now} &nbsp;|&nbsp; ${subtitle}: ${rows.length}</div>
             </div>
         </div>
-        <div style="height:3px;background:linear-gradient(90deg,#0f766e,#0f172a,#0f766e);margin:8px 0 14px;border-radius:2px;"></div>
+        <div style="height:3px;background:linear-gradient(90deg,#ea580c,#0f172a,#ea580c);margin:8px 0 14px;border-radius:2px;"></div>
         <table><thead>${headerRow}</thead><tbody>${dataRows}</tbody></table>
         <div style="margin-top:14px;text-align:center;font-size:9px;color:#bbb;border-top:1px solid #eee;padding-top:8px;">
             Happeno hackathon&nbsp;|&nbsp; ${title} &nbsp;|&nbsp; Generated: ${now}
@@ -1323,7 +1323,7 @@ export default function AdminDashboard() {
                                 <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white">Registration entries</h2>
                                 <p className="mt-1 text-xs text-white/45">Search registrations or open a participant&apos;s complete record.</p>
                             </div>
-                            <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-[#14b8a6]" /> {filteredTeams.length} shown</div>
+                            <div className="flex items-center gap-2 text-xs font-bold text-white/45"><span className="h-2 w-2 rounded-full bg-[#f97316]" /> {filteredTeams.length} shown</div>
                         </div>
                         <div className="flex items-center gap-3 flex-wrap">
                             <div className="relative flex-grow">
@@ -1335,17 +1335,17 @@ export default function AdminDashboard() {
                                         setSearchQuery(e.target.value);
                                         setCurrentPage(1);
                                     }}
-                                    className="h-14 w-full rounded-xl border border-white/10 bg-[#0B0114]/60 py-3 pl-12 pr-4 text-sm font-medium text-white outline-none transition-all placeholder:text-white/25 focus:border-[#14b8a6]/70 focus:ring-2 focus:ring-[#14b8a6]/10"
+                                    className="h-14 w-full rounded-xl border border-white/10 bg-[#0B0114]/60 py-3 pl-12 pr-4 text-sm font-medium text-white outline-none transition-all placeholder:text-white/25 focus:border-[#f97316]/70 focus:ring-2 focus:ring-[#f97316]/10"
                                 />
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={19} />
                             </div>
                             <div className="flex h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Total</span>
-                                <span className="text-xl font-black italic text-[#14b8a6]">{projects.length}</span>
+                                <span className="text-xl font-black italic text-[#f97316]">{projects.length}</span>
                             </div>
                             <button
                                 onClick={handleExportTeams}
-                                className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-[10px] font-black uppercase tracking-wider text-white transition hover:border-[#14b8a6]/50 hover:text-[#14b8a6]"
+                                className="flex h-14 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-[10px] font-black uppercase tracking-wider text-white transition hover:border-[#f97316]/50 hover:text-[#f97316]"
                             >
                                 <Download size={18} /> Export
                             </button>
@@ -1353,7 +1353,7 @@ export default function AdminDashboard() {
                             {/* Submissions & Reviews Portal */}
                             <Link
                                 href="/dashboard/admin/reviews"
-                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/50 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-400 hover:bg-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.15)]"
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-orange-500/50 bg-orange-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-orange-300 transition hover:border-orange-400 hover:bg-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.15)]"
                             >
                                 <Award size={18} /> Submissions & Reviews
                             </Link>
@@ -1365,7 +1365,7 @@ export default function AdminDashboard() {
                                     window.location.hash = "certificates";
                                     setActiveTab("certificates");
                                 }}
-                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/50 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-400 hover:bg-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.15)] cursor-pointer"
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-orange-500/50 bg-orange-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-orange-300 transition hover:border-orange-400 hover:bg-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.15)] cursor-pointer"
                             >
                                 <Award size={18} /> Certificates & Feedback
                             </button>
@@ -1377,7 +1377,7 @@ export default function AdminDashboard() {
                                     setShowRosterModal(true);
                                     void fetchRosterSettings();
                                 }}
-                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-teal-300 transition hover:border-teal-500/70 hover:bg-teal-500/30 cursor-pointer"
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-orange-500/40 bg-orange-500/20 px-5 text-[10px] font-black uppercase tracking-wider text-orange-300 transition hover:border-orange-500/70 hover:bg-orange-500/30 cursor-pointer"
                             >
                                 <GitMerge size={18} /> Team Edit Window & Logs
                                 <span className={`w-2 h-2 rounded-full ${rosterPortalMode === 'edit' ? 'bg-emerald-400 animate-pulse' : 'bg-white/40'}`} />
@@ -1386,7 +1386,7 @@ export default function AdminDashboard() {
                             {/* Merge Teams */}
                             <button
                                 onClick={() => setShowMergeModal(true)}
-                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-teal-500/40 bg-teal-500/10 px-5 text-[10px] font-bold uppercase tracking-wider text-teal-700 transition hover:border-teal-500/70 hover:bg-teal-500/20"
+                                className="flex h-14 shrink-0 items-center gap-2 rounded-xl border border-orange-500/40 bg-orange-500/10 px-5 text-[10px] font-bold uppercase tracking-wider text-orange-600 transition hover:border-orange-500/70 hover:bg-orange-500/20"
                             >
                                 <Users size={18} /> Merge Teams
                             </button>
@@ -1460,9 +1460,9 @@ export default function AdminDashboard() {
                                     type="button"
                                     onClick={handleToggleSelectAllPage}
                                     className={`w-7 h-7 rounded-xl border flex items-center justify-center transition-all ${isAllPageSelected
-                                        ? 'bg-[#14b8a6] border-[#14b8a6] text-black shadow-[0_0_12px_rgba(20,184,166,0.5)]'
+                                        ? 'bg-[#f97316] border-[#f97316] text-black shadow-[0_0_12px_rgba(249,115,22,0.5)]'
                                         : selectedTeamIds.length > 0
-                                            ? 'bg-[#14b8a6]/20 border-[#14b8a6] text-[#14b8a6]'
+                                            ? 'bg-[#f97316]/20 border-[#f97316] text-[#f97316]'
                                             : 'border-white/20 bg-white/5 hover:border-white/40 text-transparent'
                                         }`}
                                     title={isAllPageSelected ? "Deselect this page" : "Select all on this page"}
@@ -1470,13 +1470,13 @@ export default function AdminDashboard() {
                                     {isAllPageSelected ? (
                                         <Check size={16} className="stroke-[3] text-black" />
                                     ) : selectedTeamIds.length > 0 ? (
-                                        <span className="w-2.5 h-0.5 bg-[#14b8a6] rounded-full" />
+                                        <span className="w-2.5 h-0.5 bg-[#f97316] rounded-full" />
                                     ) : null}
                                 </button>
                                 <div>
                                     <span className="text-xs font-black uppercase italic tracking-wider text-white block">
                                         {selectedTeamIds.length > 0 ? (
-                                            <span className="text-[#14b8a6]">{selectedTeamIds.length} of {filteredTeams.length} Selected</span>
+                                            <span className="text-[#f97316]">{selectedTeamIds.length} of {filteredTeams.length} Selected</span>
                                         ) : (
                                             <span className="text-white/60">Bulk Actions & Direct Select</span>
                                         )}
@@ -1523,7 +1523,7 @@ export default function AdminDashboard() {
                                     <div
                                         key={team.id}
                                         className={`border rounded-[2rem] transition-all cursor-pointer overflow-hidden ${isSelected
-                                            ? 'bg-[#14b8a6]/[0.06] border-[#14b8a6]/60 shadow-[0_0_20px_rgba(20,184,166,0.15)]'
+                                            ? 'bg-[#f97316]/[0.06] border-[#f97316]/60 shadow-[0_0_20px_rgba(249,115,22,0.15)]'
                                             : expandedTeamId === team.id
                                                 ? 'bg-white/[0.08] border-white/20 shadow-2xl'
                                                 : 'bg-white/5 border-white/10 hover:bg-white/[0.07] opacity-90'
@@ -1540,7 +1540,7 @@ export default function AdminDashboard() {
                                                             toggleSelectTeam(teamKey);
                                                         }}
                                                         className={`w-7 h-7 rounded-xl border flex items-center justify-center cursor-pointer transition-all shrink-0 ${isSelected
-                                                            ? 'bg-[#14b8a6] border-[#14b8a6] text-black shadow-[0_0_12px_rgba(20,184,166,0.6)]'
+                                                            ? 'bg-[#f97316] border-[#f97316] text-black shadow-[0_0_12px_rgba(249,115,22,0.6)]'
                                                             : 'border-white/20 bg-white/5 hover:border-white/40 text-transparent'
                                                             }`}
                                                         title={isSelected ? "Deselect team" : "Select team"}
@@ -1554,7 +1554,7 @@ export default function AdminDashboard() {
                                                     <div>
                                                         <div className="flex items-center flex-wrap gap-2">
                                                             <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">{team.team}</h3>
-                                                            <span className="text-[10px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{team.teamId}</span>
+                                                            <span className="text-[10px] font-black text-[#f97316] px-2 py-0.5 border border-[#f97316]/30 rounded bg-[#f97316]/5">{team.teamId}</span>
                                                             {team.isCheckedIn && (
                                                                 <span className="text-[9px] font-black uppercase text-green-400 px-2 py-0.5 border border-green-500/30 rounded bg-green-500/10">Checked In ✓</span>
                                                             )}
@@ -1571,7 +1571,7 @@ export default function AdminDashboard() {
                                                     <button
                                                         type="button"
                                                         onClick={() => setPassModalTeam(team)}
-                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#14b8a6]/40 bg-[#14b8a6]/10 hover:bg-[#14b8a6]/20 text-[#14b8a6] text-[10px] font-black uppercase tracking-wider transition-all"
+                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#f97316]/40 bg-[#f97316]/10 hover:bg-[#f97316]/20 text-[#f97316] text-[10px] font-black uppercase tracking-wider transition-all"
                                                         title="View Official Digital Pass & QR on screen"
                                                     >
                                                         <QrCode size={14} /> Pass
@@ -1581,7 +1581,7 @@ export default function AdminDashboard() {
                                                     <button
                                                         type="button"
                                                         onClick={() => openEditModal(team)}
-                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-teal-500/40 bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 text-[10px] font-bold uppercase tracking-wider transition-all"
+                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-orange-500/40 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 text-[10px] font-bold uppercase tracking-wider transition-all"
                                                         title="Correct email typos, phone, name, or resend pass"
                                                     >
                                                         <Edit3 size={14} /> Edit
@@ -1745,7 +1745,7 @@ export default function AdminDashboard() {
                                 <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Add Official Evaluator</h3>
                                 <button
                                     onClick={handleExportJudges}
-                                    className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
+                                    className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#f97316] hover:border-[#f97316]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
                                 >
                                     <Download size={18} /> Export Evaluators CSV
                                 </button>
@@ -1754,7 +1754,7 @@ export default function AdminDashboard() {
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Full Name</label>
                                     <input
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#f97316]"
                                         value={newJudge.name}
                                         placeholder="e.g. Dr. Smith"
                                         onChange={(e) => setNewJudge({ ...newJudge, name: e.target.value })}
@@ -1763,7 +1763,7 @@ export default function AdminDashboard() {
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Phone</label>
                                     <input
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#f97316]"
                                         value={newJudge.phone || ''}
                                         placeholder="10 digit number"
                                         onChange={(e) => setNewJudge({ ...newJudge, phone: e.target.value.replace(/\D/g, '').slice(-10) })}
@@ -1780,7 +1780,7 @@ export default function AdminDashboard() {
                                                 setNewJudge({ name: "", specialization: "", phone: "" });
                                             }
                                         }}
-                                        className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
+                                        className="w-full py-4 rounded-2xl bg-[#f97316] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
                                     >
                                         <Plus size={18} /> Add Evaluator
                                     </button>
@@ -1813,7 +1813,7 @@ export default function AdminDashboard() {
                                                     <div>
                                                         <div className="flex items-center gap-3">
                                                             <h4 className="text-lg font-black italic uppercase tracking-tight">{judge.name}</h4>
-                                                            <span className="text-[9px] font-black text-[#14b8a6] px-2 py-0.5 border border-[#14b8a6]/30 rounded bg-[#14b8a6]/5">{judge.generatedId}</span>
+                                                            <span className="text-[9px] font-black text-[#f97316] px-2 py-0.5 border border-[#f97316]/30 rounded bg-[#f97316]/5">{judge.generatedId}</span>
                                                         </div>
                                                         <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{judge.specialization}</p>
                                                     </div>
@@ -1841,7 +1841,7 @@ export default function AdminDashboard() {
                                 <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Assign Station Volunteer</h3>
                                 <button
                                     onClick={handleExportVolunteers}
-                                    className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#14b8a6] hover:border-[#14b8a6]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
+                                    className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-[#f97316] hover:border-[#f97316]/50 transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
                                 >
                                     <Download size={18} /> Export Volunteers
                                 </button>
@@ -1859,7 +1859,7 @@ export default function AdminDashboard() {
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Phone</label>
                                     <input
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#f97316]"
                                         value={newVolunteer.phone}
                                         placeholder="10 digit number"
                                         onChange={(e) => setNewVolunteer({ ...newVolunteer, phone: e.target.value.replace(/\D/g, '').slice(-10) })}
@@ -1873,7 +1873,7 @@ export default function AdminDashboard() {
                                                 setNewVolunteer({ name: "", phone: "", role: "" });
                                             }
                                         }}
-                                        className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2"
+                                        className="w-full py-4 rounded-2xl bg-[#f97316] text-black font-black uppercase italic tracking-widest flex items-center justify-center gap-2"
                                     >
                                         <Plus size={18} /> Register Staff
                                     </button>
@@ -1919,7 +1919,7 @@ export default function AdminDashboard() {
                         <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                                 <div>
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#14b8a6]">Purchased Addons</h3>
+                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#f97316]">Purchased Addons</h3>
                                     <p className="mt-1 text-xs text-white/40">View which participants have purchased Networking Passes and Meal Passes.</p>
                                 </div>
                                 <div className="relative w-full md:w-64">
@@ -1929,7 +1929,7 @@ export default function AdminDashboard() {
                                         placeholder="Search name, team, or ID..."
                                         value={addonsSearchQuery}
                                         onChange={(e) => setAddonsSearchQuery(e.target.value)}
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#14b8a6]/50 transition-all"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#f97316]/50 transition-all"
                                     />
                                 </div>
                             </div>
@@ -2035,7 +2035,7 @@ export default function AdminDashboard() {
                         <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5 lg:flex-row lg:items-center">
                             <div>
                                 <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
-                                    <Headphones className="text-[#14b8a6]" size={26} />
+                                    <Headphones className="text-[#f97316]" size={26} />
                                     Help Desk & Inbound Inquiries
                                 </h2>
                                 <p className="mt-1 text-xs text-white/50">Manage live table requests and inbound email queries from participants.</p>
@@ -2047,14 +2047,14 @@ export default function AdminDashboard() {
                                     type="button"
                                     onClick={() => setHelpdeskSubTab('tickets')}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${helpdeskSubTab === 'tickets'
-                                        ? 'bg-[#14b8a6] text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]'
+                                        ? 'bg-[#f97316] text-black shadow-[0_0_15px_rgba(249,115,22,0.3)]'
                                         : 'text-white/60 hover:text-white'
                                         }`}
                                 >
                                     <Clock size={14} />
                                     Onsite Table Queue
                                     {helpTickets.filter(t => t.status === 'open').length > 0 && (
-                                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${helpdeskSubTab === 'tickets' ? 'bg-black text-[#14b8a6]' : 'bg-amber-400 text-black'
+                                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${helpdeskSubTab === 'tickets' ? 'bg-black text-[#f97316]' : 'bg-amber-400 text-black'
                                             }`}>
                                             {helpTickets.filter(t => t.status === 'open').length}
                                         </span>
@@ -2068,14 +2068,14 @@ export default function AdminDashboard() {
                                         if (inboundEmails.length === 0) void fetchInboundEmails();
                                     }}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${helpdeskSubTab === 'inbox'
-                                        ? 'bg-[#14b8a6] text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]'
+                                        ? 'bg-[#f97316] text-black shadow-[0_0_15px_rgba(249,115,22,0.3)]'
                                         : 'text-white/60 hover:text-white'
                                         }`}
                                 >
                                     <Inbox size={14} />
                                     Inbound Mailbox
                                     {inboxStatus?.unseen ? (
-                                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${helpdeskSubTab === 'inbox' ? 'bg-black text-[#14b8a6]' : 'bg-teal-400 text-black'
+                                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${helpdeskSubTab === 'inbox' ? 'bg-black text-[#f97316]' : 'bg-orange-400 text-black'
                                             }`}>
                                             {inboxStatus.unseen}
                                         </span>
@@ -2101,7 +2101,7 @@ export default function AdminDashboard() {
 
                                 {isLoadingTickets && helpTickets.length === 0 ? (
                                     <div className="flex items-center justify-center py-20">
-                                        <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                        <div className="w-10 h-10 border-4 border-[#f97316] border-t-transparent rounded-full animate-spin" />
                                     </div>
                                 ) : helpTickets.length === 0 ? (
                                     <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
@@ -2113,13 +2113,13 @@ export default function AdminDashboard() {
                                     <div className="space-y-3">
                                         {helpTickets.map(ticket => (
                                             <div key={ticket.id} className={`p-6 rounded-2xl border transition-all ${ticket.status === 'open' ? 'bg-amber-500/5 border-amber-500/20' :
-                                                ticket.status === 'accepted' ? 'bg-teal-500/10 border-teal-500/30' :
+                                                ticket.status === 'accepted' ? 'bg-orange-500/10 border-orange-500/30' :
                                                     'bg-green-500/5 border-green-500/20 opacity-60'
                                                 }`}>
                                                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                                                     <div className="flex items-start gap-4">
                                                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${ticket.status === 'open' ? 'bg-amber-500/20 text-amber-400' :
-                                                            ticket.status === 'accepted' ? 'bg-teal-500/20 text-teal-300' :
+                                                            ticket.status === 'accepted' ? 'bg-orange-500/20 text-orange-300' :
                                                                 'bg-green-500/20 text-green-400'
                                                             }`}>
                                                             {ticket.status === 'open' ? <Clock size={20} /> :
@@ -2138,9 +2138,9 @@ export default function AdminDashboard() {
                                                                         No Team ID Entered
                                                                     </span>
                                                                 )}
-                                                                <span className={`text-[9px] font-black px-2 py-0.5 rounded ${ticket.category === 'Technical' ? 'bg-teal-500/20 text-teal-300' :
+                                                                <span className={`text-[9px] font-black px-2 py-0.5 rounded ${ticket.category === 'Technical' ? 'bg-orange-500/20 text-orange-300' :
                                                                     ticket.category === 'WiFi/Infra' ? 'bg-red-500/20 text-red-300' :
-                                                                        ticket.category === 'Email Query' ? 'bg-teal-500/20 text-teal-300' :
+                                                                        ticket.category === 'Email Query' ? 'bg-orange-500/20 text-orange-300' :
                                                                             'bg-purple-500/20 text-purple-300'
                                                                     }`}>{ticket.category}</span>
                                                                 {ticket.source === 'edit_registration' && (
@@ -2165,7 +2165,7 @@ export default function AdminDashboard() {
                                                                         <div className="flex items-center gap-2">
                                                                             <a
                                                                                 href={`tel:${ticket.contactPhone}`}
-                                                                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/30 text-teal-300 font-bold text-[11px] transition"
+                                                                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-orange-300 font-bold text-[11px] transition"
                                                                                 title="Call Contact"
                                                                             >
                                                                                 <Phone size={11} />
@@ -2203,7 +2203,7 @@ export default function AdminDashboard() {
                                                         {ticket.status === 'open' && (
                                                             <button
                                                                 onClick={() => handleTicketAction(ticket.id, 'accept')}
-                                                                className="px-4 py-2 rounded-xl bg-teal-500/20 border border-teal-500/30 text-teal-300 text-[10px] font-black uppercase tracking-wider hover:bg-teal-500/30 transition cursor-pointer"
+                                                                className="px-4 py-2 rounded-xl bg-orange-500/20 border border-orange-500/30 text-orange-300 text-[10px] font-black uppercase tracking-wider hover:bg-orange-500/30 transition cursor-pointer"
                                                             >
                                                                 Accept
                                                             </button>
@@ -2237,7 +2237,7 @@ export default function AdminDashboard() {
                                 {/* Mailbox Status Banner */}
                                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-400 flex items-center justify-center shrink-0">
+                                        <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0">
                                             <Inbox size={20} />
                                         </div>
                                         <div>
@@ -2256,7 +2256,7 @@ export default function AdminDashboard() {
                                         type="button"
                                         onClick={fetchInboundEmails}
                                         disabled={isLoadingEmails}
-                                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0"
+                                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#f97316] hover:bg-[#f97316]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50 shrink-0"
                                     >
                                         <RefreshCw size={14} className={isLoadingEmails ? 'animate-spin' : ''} />
                                         {isLoadingEmails ? 'Syncing...' : 'Sync Mailbox'}
@@ -2277,7 +2277,7 @@ export default function AdminDashboard() {
                                 {/* Inbound Emails List */}
                                 {isLoadingEmails && inboundEmails.length === 0 ? (
                                     <div className="flex items-center justify-center py-20">
-                                        <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                        <div className="w-10 h-10 border-4 border-[#f97316] border-t-transparent rounded-full animate-spin" />
                                     </div>
                                 ) : inboundEmails.length === 0 ? (
                                     <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
@@ -2291,13 +2291,13 @@ export default function AdminDashboard() {
                                             <div
                                                 key={email.id}
                                                 className={`p-5 rounded-2xl border transition-all ${email.isUnread
-                                                    ? 'bg-teal-500/[0.06] border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]'
+                                                    ? 'bg-orange-500/[0.06] border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.1)]'
                                                     : 'bg-white/[0.02] border-white/10'
                                                     }`}
                                             >
                                                 <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                                                     <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${email.isUnread ? 'bg-[#14b8a6]/20 text-[#14b8a6] border border-[#14b8a6]/40' : 'bg-white/10 text-white/50'
+                                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${email.isUnread ? 'bg-[#f97316]/20 text-[#f97316] border border-[#f97316]/40' : 'bg-white/10 text-white/50'
                                                             }`}>
                                                             <Mail size={16} />
                                                         </div>
@@ -2315,7 +2315,7 @@ export default function AdminDashboard() {
                                                                 )}
 
                                                                 {email.isUnread && (
-                                                                    <span className="px-2 py-0.5 rounded-full bg-teal-400 text-black text-[9px] font-black uppercase">
+                                                                    <span className="px-2 py-0.5 rounded-full bg-orange-400 text-black text-[9px] font-black uppercase">
                                                                         New
                                                                     </span>
                                                                 )}
@@ -2370,7 +2370,7 @@ export default function AdminDashboard() {
                         <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-6 lg:flex-row lg:items-center">
                             <div>
                                 <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-white flex items-center gap-3">
-                                    <FileSpreadsheet className="text-[#14b8a6]" size={28} />
+                                    <FileSpreadsheet className="text-[#f97316]" size={28} />
                                     One-Click CSV Export Hub
                                 </h2>
                                 <p className="mt-1 text-xs text-white/50 max-w-2xl">
@@ -2381,7 +2381,7 @@ export default function AdminDashboard() {
                                 <button
                                     onClick={() => handleCSVExport('master', 'Master Event Dump')}
                                     disabled={isExporting !== null}
-                                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase text-xs tracking-wider transition-all shadow-[0_0_20px_rgba(20,184,166,0.25)] active:scale-95 disabled:opacity-50"
+                                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#f97316] hover:bg-[#f97316]/90 text-black font-black uppercase text-xs tracking-wider transition-all shadow-[0_0_20px_rgba(249,115,22,0.25)] active:scale-95 disabled:opacity-50"
                                 >
                                     <Database size={16} />
                                     {isExporting === 'master' ? 'Generating...' : 'Export Complete Master Archive'}
@@ -2391,7 +2391,7 @@ export default function AdminDashboard() {
 
                         {/* Section 1: Ceremony & Evaluation */}
                         <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#f97316]">
                                 <Award size={16} />
                                 <span>1. Judging, Ceremony & Deliverables</span>
                             </div>
@@ -2429,7 +2429,7 @@ export default function AdminDashboard() {
                                         className="group p-6 rounded-2xl border border-white/10 bg-white/5 text-left hover:bg-white/[0.08] hover:border-white/20 transition-all disabled:opacity-50 relative overflow-hidden"
                                     >
                                         <div className="flex items-start justify-between">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${exp.color === 'amber' ? 'bg-amber-500/20 text-amber-300' : 'bg-teal-500/20 text-teal-400'
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${exp.color === 'amber' ? 'bg-amber-500/20 text-amber-300' : 'bg-orange-500/20 text-orange-400'
                                                 }`}>
                                                 <exp.icon size={22} />
                                             </div>
@@ -2438,15 +2438,15 @@ export default function AdminDashboard() {
                                                     {exp.badge}
                                                 </span>
                                                 {isExporting === exp.type ? (
-                                                    <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                                    <div className="w-5 h-5 border-2 border-[#f97316] border-t-transparent rounded-full animate-spin" />
                                                 ) : (
-                                                    <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                                    <Download size={16} className="text-white/20 group-hover:text-[#f97316] transition" />
                                                 )}
                                             </div>
                                         </div>
                                         <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
                                         <p className="mt-1 text-xs text-white/50 leading-relaxed">{exp.desc}</p>
-                                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#f97316]">
                                             <FileSpreadsheet size={13} />
                                             Download CSV
                                         </div>
@@ -2457,7 +2457,7 @@ export default function AdminDashboard() {
 
                         {/* Section 2: Catering & Venue Logistics */}
                         <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#f97316]">
                                 <Coffee size={16} />
                                 <span>2. Catering & Venue Operations</span>
                             </div>
@@ -2499,14 +2499,14 @@ export default function AdminDashboard() {
                                                 <exp.icon size={22} />
                                             </div>
                                             {isExporting === exp.type ? (
-                                                <div className="w-5 h-5 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                                <div className="w-5 h-5 border-2 border-[#f97316] border-t-transparent rounded-full animate-spin" />
                                             ) : (
-                                                <Download size={16} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                                <Download size={16} className="text-white/20 group-hover:text-[#f97316] transition" />
                                             )}
                                         </div>
                                         <h3 className="mt-4 text-lg font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
                                         <p className="mt-1 text-xs text-white/50 leading-relaxed">{exp.desc}</p>
-                                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#f97316]">
                                             <FileSpreadsheet size={13} />
                                             Download CSV
                                         </div>
@@ -2517,7 +2517,7 @@ export default function AdminDashboard() {
 
                         {/* Section 3: Communications & Staff Directories */}
                         <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#14b8a6]">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#f97316]">
                                 <Users size={16} />
                                 <span>3. Communications & People Directories</span>
                             </div>
@@ -2560,20 +2560,20 @@ export default function AdminDashboard() {
                                     >
                                         <div className="flex items-start justify-between">
                                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${exp.color === 'blue' ? 'bg-sky-500/20 text-sky-300' :
-                                                exp.color === 'teal' ? 'bg-teal-500/20 text-teal-300' :
+                                                exp.color === 'teal' ? 'bg-orange-500/20 text-orange-300' :
                                                     'bg-purple-500/20 text-purple-300'
                                                 }`}>
                                                 <exp.icon size={18} />
                                             </div>
                                             {isExporting === exp.type ? (
-                                                <div className="w-4 h-4 border-2 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
+                                                <div className="w-4 h-4 border-2 border-[#f97316] border-t-transparent rounded-full animate-spin" />
                                             ) : (
-                                                <Download size={14} className="text-white/20 group-hover:text-[#14b8a6] transition" />
+                                                <Download size={14} className="text-white/20 group-hover:text-[#f97316] transition" />
                                             )}
                                         </div>
                                         <h3 className="mt-3 text-base font-black italic uppercase tracking-tight text-white">{exp.label}</h3>
                                         <p className="mt-1 text-[11px] text-white/50 leading-relaxed">{exp.desc}</p>
-                                        <div className="mt-3 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#14b8a6]">
+                                        <div className="mt-3 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#f97316]">
                                             <FileSpreadsheet size={11} />
                                             Download CSV
                                         </div>
@@ -2629,7 +2629,7 @@ export default function AdminDashboard() {
                                     {recentView === 'gate' && (
                                         <>
                                             <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Checked In</span>
-                                            <span className="text-xl font-black italic text-[#14b8a6]">{projects.filter(p => p.isCheckedIn).length}</span>
+                                            <span className="text-xl font-black italic text-[#f97316]">{projects.filter(p => p.isCheckedIn).length}</span>
                                             <span className="text-white/30 font-bold">/</span>
                                             <span className="text-lg font-black text-white/50">{projects.length}</span>
                                         </>
@@ -2639,7 +2639,7 @@ export default function AdminDashboard() {
                                         return (
                                             <>
                                                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Meals Claimed</span>
-                                                <span className="text-xl font-black italic text-[#14b8a6]">{mealsScannedCount}</span>
+                                                <span className="text-xl font-black italic text-[#f97316]">{mealsScannedCount}</span>
                                             </>
                                         );
                                     })()}
@@ -2648,7 +2648,7 @@ export default function AdminDashboard() {
                                         return (
                                             <>
                                                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Networking Claimed</span>
-                                                <span className="text-xl font-black italic text-[#14b8a6]">{networkingScannedCount}</span>
+                                                <span className="text-xl font-black italic text-[#f97316]">{networkingScannedCount}</span>
                                             </>
                                         );
                                     })()}
@@ -2671,8 +2671,8 @@ export default function AdminDashboard() {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-16 space-y-6">
-                                        <div className="w-24 h-24 rounded-3xl bg-[#14b8a6]/10 border border-[#14b8a6]/20 flex items-center justify-center">
-                                            <ScanLine size={48} className="text-[#14b8a6]" />
+                                        <div className="w-24 h-24 rounded-3xl bg-[#f97316]/10 border border-[#f97316]/20 flex items-center justify-center">
+                                            <ScanLine size={48} className="text-[#f97316]" />
                                         </div>
                                         <div className="text-center">
                                             <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Ready to Scan</h3>
@@ -2680,7 +2680,7 @@ export default function AdminDashboard() {
                                         </div>
                                         <button
                                             onClick={() => setShowCheckinScanner(true)}
-                                            className="px-8 py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic tracking-widest text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(20,184,166,0.2)]"
+                                            className="px-8 py-4 rounded-2xl bg-[#f97316] text-black font-black uppercase italic tracking-widest text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(249,115,22,0.2)]"
                                         >
                                             Open Scanner
                                         </button>
@@ -2698,7 +2698,7 @@ export default function AdminDashboard() {
                                                 key={view}
                                                 onClick={() => setRecentView(view)}
                                                 className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-md transition-all ${recentView === view
-                                                    ? 'bg-[#14b8a6] text-black shadow-[0_0_10px_rgba(20,184,166,0.3)]'
+                                                    ? 'bg-[#f97316] text-black shadow-[0_0_10px_rgba(249,115,22,0.3)]'
                                                     : 'text-white/40 hover:text-white hover:bg-white/5'
                                                     }`}
                                             >
@@ -2801,7 +2801,7 @@ export default function AdminDashboard() {
                                             value={grantPassTeamId}
                                             onChange={(e) => setGrantPassTeamId(e.target.value.toUpperCase())}
                                             placeholder="e.g. TRI12345"
-                                            className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white font-mono placeholder:text-white/20 focus:outline-none focus:border-[#14b8a6]"
+                                            className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white font-mono placeholder:text-white/20 focus:outline-none focus:border-[#f97316]"
                                         />
                                     </div>
                                 </div>
@@ -2836,7 +2836,7 @@ export default function AdminDashboard() {
                                                     <select
                                                         value={grantPassType}
                                                         onChange={(e) => setGrantPassType(e.target.value)}
-                                                        className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white font-bold focus:outline-none focus:border-[#14b8a6] appearance-none [&>option]:bg-slate-900 [&>option]:text-white"
+                                                        className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white font-bold focus:outline-none focus:border-[#f97316] appearance-none [&>option]:bg-slate-900 [&>option]:text-white"
                                                     >
                                                         <option value="both">Grant Both Passes</option>
                                                         <option value="meal">Grant Meal Only</option>
@@ -2923,14 +2923,14 @@ export default function AdminDashboard() {
                                 <div className="space-y-6">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">New Team Name</label>
-                                        <input value={mergeTeamName} onChange={(e) => setMergeTeamName(e.target.value)} placeholder="e.g. The Innovators" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#14b8a6]" />
+                                        <input value={mergeTeamName} onChange={(e) => setMergeTeamName(e.target.value)} placeholder="e.g. The Innovators" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:border-[#f97316]" />
                                     </div>
 
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Search Teams to Merge</label>
                                         <div className="relative">
                                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={16} />
-                                            <input value={mergeSearchQuery} onChange={(e) => setMergeSearchQuery(e.target.value)} placeholder="Search by name, ID, or captain..." className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white outline-none focus:border-[#14b8a6]" />
+                                            <input value={mergeSearchQuery} onChange={(e) => setMergeSearchQuery(e.target.value)} placeholder="Search by name, ID, or captain..." className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white outline-none focus:border-[#f97316]" />
                                         </div>
                                     </div>
 
@@ -2942,7 +2942,7 @@ export default function AdminDashboard() {
                                                     <input type="checkbox" checked={selectedMergeTeams.includes(team.id.toString())} onChange={(e) => {
                                                         if (e.target.checked) setSelectedMergeTeams([...selectedMergeTeams, team.id.toString()]);
                                                         else setSelectedMergeTeams(selectedMergeTeams.filter(id => id !== team.id.toString()));
-                                                    }} className="w-4 h-4 rounded bg-black border-white/20 text-[#14b8a6] focus:ring-[#14b8a6] focus:ring-offset-black" />
+                                                    }} className="w-4 h-4 rounded bg-black border-white/20 text-[#f97316] focus:ring-[#f97316] focus:ring-offset-black" />
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-sm font-bold text-white truncate">{team.team}</span>
@@ -2956,7 +2956,7 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
 
-                                    <button onClick={handleMergeTeams} disabled={isMerging || selectedMergeTeams.length < 2 || !mergeTeamName} className="w-full py-4 rounded-2xl bg-[#14b8a6] text-black font-black uppercase italic text-sm tracking-widest shadow-[0_0_20px_rgba(20,184,166,0.2)] hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 transition-all flex items-center justify-center gap-2">
+                                    <button onClick={handleMergeTeams} disabled={isMerging || selectedMergeTeams.length < 2 || !mergeTeamName} className="w-full py-4 rounded-2xl bg-[#f97316] text-black font-black uppercase italic text-sm tracking-widest shadow-[0_0_20px_rgba(249,115,22,0.2)] hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 transition-all flex items-center justify-center gap-2">
                                         {isMerging ? <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : <Users size={18} />}
                                         {isMerging ? "Merging Teams..." : "Confirm Merge"}
                                     </button>
@@ -2971,7 +2971,7 @@ export default function AdminDashboard() {
                         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
                             <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0B0114] p-7 shadow-2xl">
                                 <div className="mb-6">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14b8a6]">Merge complete</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#f97316]">Merge complete</p>
                                     <h3 className="mt-2 text-2xl font-black uppercase text-white">{mergeResult.teamName}</h3>
                                     <p className="mt-1 text-sm text-white/50">{mergeResult.memberCount} members can use these participant credentials.</p>
                                 </div>
@@ -2982,10 +2982,10 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="rounded-xl border border-white/10 bg-white/5 p-4">
                                         <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Password</p>
-                                        <p className="mt-2 select-all break-all font-mono text-lg font-bold text-[#14b8a6]">{mergeResult.password}</p>
+                                        <p className="mt-2 select-all break-all font-mono text-lg font-bold text-[#f97316]">{mergeResult.password}</p>
                                     </div>
                                 </div>
-                                <button onClick={() => { setMergeResult(null); window.location.reload(); }} className="mt-6 w-full rounded-xl bg-[#14b8a6] py-3 text-sm font-black uppercase tracking-wider text-black transition hover:bg-white">Done</button>
+                                <button onClick={() => { setMergeResult(null); window.location.reload(); }} className="mt-6 w-full rounded-xl bg-[#f97316] py-3 text-sm font-black uppercase tracking-wider text-black transition hover:bg-white">Done</button>
                             </motion.div>
                         </div>
                     )}
@@ -3014,7 +3014,7 @@ export default function AdminDashboard() {
                                                     if (e.target.checked) setSelectedBulkMeals(prev => [...prev, meal.key]);
                                                     else setSelectedBulkMeals(prev => prev.filter(k => k !== meal.key));
                                                 }}
-                                                className="w-5 h-5 rounded border-white/20 bg-black/50 text-[#14b8a6] focus:ring-[#14b8a6]"
+                                                className="w-5 h-5 rounded border-white/20 bg-black/50 text-[#f97316] focus:ring-[#f97316]"
                                             />
                                             <div>
                                                 <div className="font-bold text-white uppercase text-sm tracking-wider">{meal.mealLabel}</div>
@@ -3027,7 +3027,7 @@ export default function AdminDashboard() {
                                     <button
                                         onClick={handleBulkMealAssign}
                                         disabled={isBulkAssigning || selectedBulkMeals.length === 0}
-                                        className="w-full py-4 rounded-xl font-black uppercase italic tracking-widest transition-all bg-[#14b8a6] text-black hover:bg-[#14b8a6]/80 disabled:opacity-50"
+                                        className="w-full py-4 rounded-xl font-black uppercase italic tracking-widest transition-all bg-[#f97316] text-black hover:bg-[#f97316]/80 disabled:opacity-50"
                                     >
                                         {isBulkAssigning ? 'ASSIGNING...' : selectedTeamIds.length > 0 ? `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ${selectedTeamIds.length} TEAMS` : `ASSIGN ${selectedBulkMeals.length} MEAL(S) TO ALL`}
                                     </button>
@@ -3045,10 +3045,10 @@ export default function AdminDashboard() {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 100, opacity: 0 }}
                             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-4xl bg-[#0D0219]/95 border-2 border-[#14b8a6]/50 rounded-2xl p-4 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl flex flex-wrap items-center justify-between gap-4"
+                            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-4xl bg-[#0D0219]/95 border-2 border-[#f97316]/50 rounded-2xl p-4 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl flex flex-wrap items-center justify-between gap-4"
                         >
                             <div className="flex items-center gap-3">
-                                <span className="w-9 h-9 rounded-xl bg-[#14b8a6] text-black font-black flex items-center justify-center text-sm shadow-[0_0_15px_rgba(20,184,166,0.5)]">
+                                <span className="w-9 h-9 rounded-xl bg-[#f97316] text-black font-black flex items-center justify-center text-sm shadow-[0_0_15px_rgba(249,115,22,0.5)]">
                                     {selectedTeamIds.length}
                                 </span>
                                 <div>
@@ -3089,7 +3089,7 @@ export default function AdminDashboard() {
                                     type="button"
                                     onClick={handleBulkCheckIn}
                                     disabled={isBulkProcessing}
-                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#14b8a6]/20 border border-[#14b8a6]/40 text-[#14b8a6] hover:bg-[#14b8a6]/30 text-xs font-black uppercase italic tracking-wider transition-all disabled:opacity-50"
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#f97316]/20 border border-[#f97316]/40 text-[#f97316] hover:bg-[#f97316]/30 text-xs font-black uppercase italic tracking-wider transition-all disabled:opacity-50"
                                 >
                                     <CheckCircle2 size={14} /> Check In ({selectedTeamIds.length})
                                 </button>
@@ -3170,7 +3170,7 @@ export default function AdminDashboard() {
                                         return (
                                             <div key={id} className="flex justify-between items-center py-0.5 border-b border-white/5 last:border-0">
                                                 <span className="text-white truncate">{t?.team || t?.name || id}</span>
-                                                <span className="text-[#14b8a6] text-[10px] ml-2 shrink-0">{id}</span>
+                                                <span className="text-[#f97316] text-[10px] ml-2 shrink-0">{id}</span>
                                             </div>
                                         );
                                     })}
@@ -3365,7 +3365,7 @@ export default function AdminDashboard() {
                                 transition={{ duration: 0.2 }}
                                 className={`w-full max-w-md ${passTheme === 'light'
                                     ? 'bg-white text-slate-900 border border-slate-200 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)]'
-                                    : 'bg-[#0a0216] text-white border-2 border-[#14b8a6]/40 shadow-[0_0_60px_rgba(20,184,166,0.25)]'
+                                    : 'bg-[#0a0216] text-white border-2 border-[#f97316]/40 shadow-[0_0_60px_rgba(249,115,22,0.25)]'
                                     } rounded-[2.2rem] p-6 sm:p-7 overflow-hidden relative`}
                             >
                                 {/* VIP Lanyard Notch */}
@@ -3376,8 +3376,8 @@ export default function AdminDashboard() {
                                     }`}>
                                     <div className="flex items-center gap-3">
                                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${passTheme === 'light'
-                                            ? 'bg-teal-50 border-teal-200 text-teal-700 shadow-sm'
-                                            : 'bg-[#14b8a6]/20 border-[#14b8a6]/40 text-[#14b8a6] shadow-[0_0_15px_rgba(20,184,166,0.25)]'
+                                            ? 'bg-teal-50 border-teal-200 text-orange-600 shadow-sm'
+                                            : 'bg-[#f97316]/20 border-[#f97316]/40 text-[#f97316] shadow-[0_0_15px_rgba(249,115,22,0.25)]'
                                             }`}>
                                             <QrCode size={20} />
                                         </div>
@@ -3386,11 +3386,11 @@ export default function AdminDashboard() {
                                                 }`}>
                                                 Event Digital Pass
                                             </h3>
-                                            <p className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mt-0.5 ${passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                            <p className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mt-0.5 ${passTheme === 'light' ? 'text-orange-600' : 'text-[#f97316]'
                                                 }`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${passTheme === 'light' ? 'bg-teal-600' : 'bg-[#14b8a6]'
+                                                <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${passTheme === 'light' ? 'bg-teal-600' : 'bg-[#f97316]'
                                                     }`} />
-                                                Happeno Hackathon OS
+                                                Happeno Hackathon
                                             </p>
                                         </div>
                                     </div>
@@ -3433,18 +3433,18 @@ export default function AdminDashboard() {
                                 >
                                     {/* Sci-fi Corner Brackets around QR */}
                                     <div className="relative inline-block mb-3.5">
-                                        <div className={`absolute -top-1.5 -left-1.5 w-4 h-4 border-t-2 border-l-2 rounded-tl pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                        <div className={`absolute -top-1.5 -left-1.5 w-4 h-4 border-t-2 border-l-2 rounded-tl pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#f97316]'
                                             }`} />
-                                        <div className={`absolute -top-1.5 -right-1.5 w-4 h-4 border-t-2 border-r-2 rounded-tr pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                        <div className={`absolute -top-1.5 -right-1.5 w-4 h-4 border-t-2 border-r-2 rounded-tr pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#f97316]'
                                             }`} />
-                                        <div className={`absolute -bottom-1.5 -left-1.5 w-4 h-4 border-b-2 border-l-2 rounded-bl pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                        <div className={`absolute -bottom-1.5 -left-1.5 w-4 h-4 border-b-2 border-l-2 rounded-bl pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#f97316]'
                                             }`} />
-                                        <div className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 border-b-2 border-r-2 rounded-br pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#14b8a6]'
+                                        <div className={`absolute -bottom-1.5 -right-1.5 w-4 h-4 border-b-2 border-r-2 rounded-br pointer-events-none ${passTheme === 'light' ? 'border-teal-600' : 'border-[#f97316]'
                                             }`} />
 
                                         <div className={`p-3 bg-white rounded-2xl border ${passTheme === 'light'
                                             ? 'border-slate-200/90 shadow-sm'
-                                            : 'border-white/10 shadow-[0_0_30px_rgba(20,184,166,0.25)]'
+                                            : 'border-white/10 shadow-[0_0_30px_rgba(249,115,22,0.25)]'
                                             }`}>
                                             {passQrDataUrl ? (
                                                 <img src={passQrDataUrl} alt="Check-in QR" className="w-44 h-44 sm:w-52 sm:h-52 mx-auto object-contain block" />
@@ -3456,7 +3456,7 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
 
-                                    <div className={`text-[10px] font-mono tracking-widest uppercase font-black mb-1.5 ${passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                    <div className={`text-[10px] font-mono tracking-widest uppercase font-black mb-1.5 ${passTheme === 'light' ? 'text-orange-600' : 'text-[#f97316]'
                                         }`}>
                                         OFFICIAL ENTRY BADGE
                                     </div>
@@ -3468,7 +3468,7 @@ export default function AdminDashboard() {
 
                                     <div className={`inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full border shadow-xs ${passTheme === 'light'
                                         ? 'bg-teal-50 border-teal-200/90 text-teal-800'
-                                        : 'border-[#14b8a6]/40 text-[#14b8a6]'
+                                        : 'border-[#f97316]/40 text-[#f97316]'
                                         }`} style={passTheme === 'dark' ? { backgroundColor: 'rgba(20, 184, 166, 0.12)' } : undefined}>
                                         <span className="font-mono text-xs font-black tracking-wider">{passModalTeam.teamId || passModalTeam.id}</span>
                                         <button
@@ -3477,7 +3477,7 @@ export default function AdminDashboard() {
                                                 void navigator.clipboard.writeText(passModalTeam.teamId || passModalTeam.id);
                                                 toast.success("Team ID copied!");
                                             }}
-                                            className={`transition p-0.5 ${passTheme === 'light' ? 'text-teal-600 hover:text-teal-900' : 'text-[#14b8a6]/70 hover:text-white'
+                                            className={`transition p-0.5 ${passTheme === 'light' ? 'text-teal-600 hover:text-teal-900' : 'text-[#f97316]/70 hover:text-white'
                                                 }`}
                                             title="Copy Team ID"
                                         >
@@ -3493,7 +3493,7 @@ export default function AdminDashboard() {
                                                 }`}
                                             style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.04)' } : undefined}
                                         >
-                                            <span className={`text-[9px] uppercase tracking-wider font-black block mb-0.5 ${passTheme === 'light' ? 'text-teal-700' : 'text-[#14b8a6]'
+                                            <span className={`text-[9px] uppercase tracking-wider font-black block mb-0.5 ${passTheme === 'light' ? 'text-orange-600' : 'text-[#f97316]'
                                                 }`}>
                                                 Team Lead
                                             </span>
@@ -3585,7 +3585,7 @@ export default function AdminDashboard() {
                                             }}
                                             className={`w-full py-3.5 rounded-xl active:scale-95 font-black uppercase italic tracking-wider text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md ${passTheme === 'light'
                                                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25'
-                                                : 'bg-gradient-to-r from-emerald-500 via-[#14b8a6] to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-[0_0_25px_rgba(20,184,166,0.35)]'
+                                                : 'bg-gradient-to-r from-emerald-500 via-[#f97316] to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-[0_0_25px_rgba(249,115,22,0.35)]'
                                                 }`}
                                         >
                                             <CheckCircle size={16} /> {isCheckingInFromPass ? 'Checking in...' : 'Check-In Team Now'}
@@ -3598,7 +3598,7 @@ export default function AdminDashboard() {
                                             download={`Happeno-pass-${passModalTeam.teamId || passModalTeam.id}.png`}
                                             className={`w-full py-3.5 rounded-xl border font-bold uppercase tracking-wider text-xs transition text-center flex items-center justify-center gap-2 cursor-pointer shadow-xs ${passTheme === 'light'
                                                 ? 'border-slate-300 bg-slate-900 hover:bg-slate-800 text-white'
-                                                : 'border-white/15 text-white hover:border-[#14b8a6]/50 hover:text-[#14b8a6]'
+                                                : 'border-white/15 text-white hover:border-[#f97316]/50 hover:text-[#f97316]'
                                                 }`}
                                             style={passTheme === 'dark' ? { backgroundColor: 'rgba(255, 255, 255, 0.06)' } : undefined}
                                         >
@@ -3805,7 +3805,7 @@ export default function AdminDashboard() {
                                 <div className="p-4 rounded-xl bg-black/50 border border-amber-400/30 space-y-2 mb-4">
                                     <div className="flex justify-between items-center text-xs">
                                         <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Team ID:</span>
-                                        <span className="text-[#14b8a6] font-mono font-bold">{credentialResetResult.teamId}</span>
+                                        <span className="text-[#f97316] font-mono font-bold">{credentialResetResult.teamId}</span>
                                     </div>
                                     <div className="flex justify-between items-center text-xs">
                                         <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">New Password:</span>
@@ -4049,7 +4049,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
                                         <div
-                                            className="bg-gradient-to-r from-emerald-500 to-[#14b8a6] h-full transition-all duration-300 rounded-full"
+                                            className="bg-gradient-to-r from-emerald-500 to-[#f97316] h-full transition-all duration-300 rounded-full"
                                             style={{
                                                 width: `${dispatchStatus?.total ? Math.min(100, Math.round(((dispatchStatus.issued) / dispatchStatus.total) * 100)) : 0}%`
                                             }}
@@ -4134,7 +4134,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
                                         <div
-                                            className="bg-gradient-to-r from-purple-500 to-[#14b8a6] h-full transition-all duration-300 rounded-full"
+                                            className="bg-gradient-to-r from-purple-500 to-[#f97316] h-full transition-all duration-300 rounded-full"
                                             style={{
                                                 width: `${Math.round((importProgress.processedTeams / importProgress.totalTeams) * 100)}%`
                                             }}
@@ -4286,18 +4286,18 @@ export default function AdminDashboard() {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="w-full max-w-4xl max-h-[90vh] bg-[#0D0219] border-2 border-teal-500/40 rounded-[2.5rem] p-6 sm:p-8 shadow-2xl overflow-y-auto custom-scrollbar"
+                                className="w-full max-w-4xl max-h-[90vh] bg-[#0D0219] border-2 border-orange-500/40 rounded-[2.5rem] p-6 sm:p-8 shadow-2xl overflow-y-auto custom-scrollbar"
                             >
                                 <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
                                     <div className="flex items-center gap-3.5">
-                                        <div className="w-12 h-12 rounded-2xl bg-teal-500/20 text-[#14b8a6] border border-teal-500/40 flex items-center justify-center shrink-0">
+                                        <div className="w-12 h-12 rounded-2xl bg-orange-500/20 text-[#f97316] border border-orange-500/40 flex items-center justify-center shrink-0">
                                             <GitMerge size={24} />
                                         </div>
                                         <div>
                                             <h3 className="text-xl font-black uppercase italic tracking-tight text-white">
                                                 Team Edit Window & Activity Logs
                                             </h3>
-                                            <p className="text-xs text-teal-400 font-bold uppercase tracking-widest mt-0.5">
+                                            <p className="text-xs text-orange-400 font-bold uppercase tracking-widest mt-0.5">
                                                 Self-Service Control Hub (Oct 5–6 Team Edit Window)
                                             </p>
                                         </div>
@@ -4356,7 +4356,7 @@ export default function AdminDashboard() {
                                             <button
                                                 type="button"
                                                 onClick={() => void handleSetRosterOverride('auto')}
-                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${rosterOverride === 'auto' ? 'bg-teal-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${rosterOverride === 'auto' ? 'bg-orange-500 text-black font-black' : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
                                                     }`}
                                             >
                                                 Auto (Oct 5–6)
@@ -4368,14 +4368,14 @@ export default function AdminDashboard() {
                                 {/* Section 2: Launch Campaign Dispatchers */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                     {/* Lead Dispatcher Card */}
-                                    <div className="p-5 rounded-3xl bg-teal-500/[0.05] border border-teal-500/30 space-y-3">
+                                    <div className="p-5 rounded-3xl bg-orange-500/[0.05] border border-orange-500/30 space-y-3">
                                         <div className="flex items-center gap-2.5">
-                                            <div className="w-8 h-8 rounded-xl bg-teal-500/20 text-[#14b8a6] flex items-center justify-center font-bold">
+                                            <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-[#f97316] flex items-center justify-center font-bold">
                                                 <Mail size={16} />
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-white text-sm">1. Magic Links to Team Leads</h4>
-                                                <span className="text-[10px] text-teal-400 font-semibold">Primary Roster Access</span>
+                                                <span className="text-[10px] text-orange-400 font-semibold">Primary Roster Access</span>
                                             </div>
                                         </div>
                                         <p className="text-xs text-white/60 leading-relaxed">
@@ -4385,7 +4385,7 @@ export default function AdminDashboard() {
                                             type="button"
                                             disabled={isDispatchingRosterLinks}
                                             onClick={() => void handleDispatchRosterEmails('leads')}
-                                            className="w-full py-2.5 rounded-xl bg-[#14b8a6] hover:bg-[#14b8a6]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
+                                            className="w-full py-2.5 rounded-xl bg-[#f97316] hover:bg-[#f97316]/90 text-black font-black uppercase tracking-wider text-xs transition cursor-pointer disabled:opacity-50"
                                         >
                                             {isDispatchingRosterLinks && rosterDispatchTarget === 'leads' ? 'Dispatching Leads...' : 'Dispatch Magic Links to Leads'}
                                         </button>
@@ -4421,10 +4421,10 @@ export default function AdminDashboard() {
                                     <div className="p-4 rounded-2xl bg-white/5 border border-white/10 mb-6 space-y-2">
                                         <div className="flex justify-between text-xs font-bold text-white">
                                             <span>Dispatching to {rosterDispatchTarget}...</span>
-                                            <span className="text-teal-400">Processed: {rosterDispatchProgress.processed} (Sent: {rosterDispatchProgress.sent})</span>
+                                            <span className="text-orange-400">Processed: {rosterDispatchProgress.processed} (Sent: {rosterDispatchProgress.sent})</span>
                                         </div>
                                         <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                            <div className="bg-teal-400 h-full animate-pulse w-full rounded-full" />
+                                            <div className="bg-orange-400 h-full animate-pulse w-full rounded-full" />
                                         </div>
                                     </div>
                                 )}
@@ -4433,7 +4433,7 @@ export default function AdminDashboard() {
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between px-1">
                                         <div className="flex items-center gap-2">
-                                            <History size={16} className="text-[#14b8a6]" />
+                                            <History size={16} className="text-[#f97316]" />
                                             <h4 className="font-bold text-white text-sm">Live Roster Audit Trail</h4>
                                         </div>
                                         <button
@@ -4462,7 +4462,7 @@ export default function AdminDashboard() {
                                                         <div className="flex items-center gap-2 flex-wrap">
                                                             <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${log.action === 'MERGE_TEAMS' ? 'bg-purple-500/20 text-purple-300' :
                                                                 log.action === 'REPLACE_MEMBER' ? 'bg-amber-500/20 text-amber-300' :
-                                                                    'bg-teal-500/20 text-teal-300'
+                                                                    'bg-orange-500/20 text-orange-300'
                                                                 }`}>
                                                                 {log.action}
                                                             </span>
@@ -4498,7 +4498,7 @@ export default function AdminDashboard() {
                         <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-slate-200 bg-white p-5 lg:flex-row lg:items-center">
                             <div>
                                 <h2 className="font-kanit text-2xl font-black uppercase italic tracking-tight text-slate-800 flex items-center gap-3">
-                                    <Award className="text-[#14b8a6]" size={28} />
+                                    <Award className="text-[#f97316]" size={28} />
                                     Rabbit Race Scores
                                 </h2>
                                 <p className="mt-1 max-w-xl text-sm font-medium text-slate-500">
@@ -4524,7 +4524,7 @@ export default function AdminDashboard() {
                                                 <td className="px-6 py-4 font-bold text-slate-800">{project.teamId}</td>
                                                 <td className="px-6 py-4 font-semibold text-slate-600">{project.team}</td>
                                                 <td className="px-6 py-4 text-xs font-semibold text-slate-500">{project.track || 'Unassigned'}</td>
-                                                <td className="px-6 py-4 text-right font-black text-[#14b8a6]">{project.preScore} / 100</td>
+                                                <td className="px-6 py-4 text-right font-black text-[#f97316]">{project.preScore} / 100</td>
                                             </tr>
                                         ))}
                                         {projects.filter(p => p.preScore !== undefined && p.preScore > 0).length === 0 && (
@@ -4550,7 +4550,7 @@ function MetricCard({ label, value, icon: Icon, tone }: { label: string; value: 
         purple: "bg-purple-50 text-purple-700 border-purple-200",
         amber: "bg-amber-50 text-amber-700 border-amber-200",
         green: "bg-emerald-50 text-emerald-700 border-emerald-200",
-        blue: "bg-teal-50 text-teal-700 border-teal-200",
+        blue: "bg-teal-50 text-orange-600 border-teal-200",
         orange: "bg-orange-50 text-orange-700 border-orange-200",
         red: "bg-rose-50 text-rose-700 border-rose-200",
     };
@@ -4619,7 +4619,7 @@ function JudgingRoundSettings({ rounds, onSave }: { rounds: JudgingRound[]; onSa
                     <button type="button" onClick={addRound} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-white hover:bg-white/10">
                         <Plus size={14} /> Add round
                     </button>
-                    <button type="button" onClick={() => void save()} disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-[#14b8a6] px-3 py-2 text-xs font-black uppercase text-black disabled:opacity-50">
+                    <button type="button" onClick={() => void save()} disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-[#f97316] px-3 py-2 text-xs font-black uppercase text-black disabled:opacity-50">
                         <Save size={14} /> {isSaving ? 'Saving...' : 'Save rounds'}
                     </button>
                 </div>

@@ -54,13 +54,13 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://happeno.in'),
   title: {
-    default: "HAPPENO | The Premier Hackathon Operating System",
+    default: "HAPPENO | HMS Operating System",
     template: "%s | HAPPENO"
   },
   description: "Happeno is the modern hackathon platform for universities and builder communities. Stage-wise pipelines, live rubric scoring, sub-second QR entry, and team management.",
   keywords: ["Hackathon", "Happeno", "Coding", "Tech Event", "Hackathon Platform", "Judging Rubric", "Team Workspace"],
   openGraph: {
-    title: "HAPPENO | The Premier Hackathon Operating System",
+    title: "HAPPENO | HMS Operating System",
     description: "Modern hackathon platform for universities and builder communities.",
     url: 'https://happeno.in',
     siteName: 'HAPPENO',

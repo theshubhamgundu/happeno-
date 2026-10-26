@@ -123,14 +123,14 @@ export async function POST(req: Request) {
                     html: `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
                             <div style="background: #0f172a; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
-                                <h2 style="color: #14b8a6; margin: 0; font-size: 20px;">ROSTER ACCESS LINK</h2>
+                                <h2 style="color: #ea580c; margin: 0; font-size: 20px;">ROSTER ACCESS LINK</h2>
                                 <p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0;">Team ID: ${team.team_id}</p>
                             </div>
                             <div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; background: #ffffff;">
                                 <p>Hello <strong>${team.captain}</strong>,</p>
                                 <p>Here is your secure, direct access link to manage team <strong>"${team.team_name}"</strong>:</p>
                                 <div style="text-align: center; margin: 24px 0;">
-                                    <a href="${magicUrl}" style="background: #14b8a6; color: #000000; font-weight: bold; text-decoration: none; padding: 14px 28px; border-radius: 10px; display: inline-block; font-size: 14px;">
+                                    <a href="${magicUrl}" style="background: #ea580c; color: #000000; font-weight: bold; text-decoration: none; padding: 14px 28px; border-radius: 10px; display: inline-block; font-size: 14px;">
                                         Open My Team Roster
                                     </a>
                                 </div>

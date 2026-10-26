@@ -92,13 +92,13 @@ export default function CertificatePreview({
             ctx.lineWidth = 8;
             ctx.strokeRect(20, 20, width - 40, height - 40);
 
-            ctx.strokeStyle = "#0F766E";
+            ctx.strokeStyle = "#EA580C";
             ctx.lineWidth = 2;
             ctx.strokeRect(30, 30, width - 60, height - 60);
 
             // Corner ornamental accents
             const drawCorner = (x: number, y: number) => {
-                ctx.fillStyle = "#0F766E";
+                ctx.fillStyle = "#EA580C";
                 ctx.fillRect(x, y, 12, 12);
             };
             drawCorner(26, 26);
@@ -107,7 +107,7 @@ export default function CertificatePreview({
             drawCorner(width - 38, height - 38);
 
             // Brand Header
-            ctx.fillStyle = "#0F766E";
+            ctx.fillStyle = "#EA580C";
             ctx.font = "bold 13px 'Space Mono', monospace";
             ctx.textAlign = "center";
             ctx.fillText("HAPPENO • HACKATHON OPERATING SYSTEM", width / 2, 80);
@@ -128,7 +128,7 @@ export default function CertificatePreview({
             ctx.fillText(recipientName.toUpperCase(), width / 2, 255);
 
             // Decorative underline below name
-            ctx.strokeStyle = "#0F766E";
+            ctx.strokeStyle = "#EA580C";
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(width / 2 - 160, 275);
@@ -267,7 +267,7 @@ export default function CertificatePreview({
                         onClick={handleDownloadPNG}
                         disabled={isDownloading}
                         type="button"
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50"
                     >
                         <Download size={14} />
                         {isDownloading ? "Generating..." : "Download High-Res PNG"}
@@ -282,17 +282,17 @@ export default function CertificatePreview({
                 className="relative w-full aspect-[1.414/1] max-w-4xl mx-auto bg-[#FAF9F6] text-[#0F172A] rounded-2xl border-4 border-[#0F172A] p-8 sm:p-12 shadow-2xl flex flex-col justify-between overflow-hidden select-none"
             >
                 {/* Secondary inner border */}
-                <div className="absolute inset-3 border border-teal-700 pointer-events-none" />
+                <div className="absolute inset-3 border border-orange-600 pointer-events-none" />
 
                 {/* Corner Accents */}
-                <div className="absolute top-2.5 left-2.5 w-2.5 h-2.5 bg-teal-700" />
-                <div className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-teal-700" />
-                <div className="absolute bottom-2.5 left-2.5 w-2.5 h-2.5 bg-teal-700" />
-                <div className="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 bg-teal-700" />
+                <div className="absolute top-2.5 left-2.5 w-2.5 h-2.5 bg-orange-600" />
+                <div className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-orange-600" />
+                <div className="absolute bottom-2.5 left-2.5 w-2.5 h-2.5 bg-orange-600" />
+                <div className="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 bg-orange-600" />
 
                 {/* Certificate Header */}
                 <div className="text-center pt-2 relative z-10">
-                    <p className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-teal-800 mb-2">
+                    <p className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-orange-700 mb-2">
                         HAPPENO • HACKATHON OPERATING SYSTEM
                     </p>
                     <h1 className="font-serif text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
@@ -305,7 +305,7 @@ export default function CertificatePreview({
 
                 {/* Recipient Block */}
                 <div className="text-center my-4 relative z-10">
-                    <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight underline decoration-teal-700 decoration-2 underline-offset-8">
+                    <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight underline decoration-orange-600 decoration-2 underline-offset-8">
                         {recipientName}
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-600 mt-4 max-w-xl mx-auto leading-relaxed">
@@ -331,7 +331,7 @@ export default function CertificatePreview({
                         {/* Signatory 1 */}
                         <div className="text-center w-40 sm:w-48">
                             <div className="h-9 flex items-center justify-center">
-                                <span className="font-serif italic text-lg sm:text-xl text-teal-800 opacity-80">
+                                <span className="font-serif italic text-lg sm:text-xl text-orange-700 opacity-80">
                                     {signatory1Name.split(" ")[0]}
                                 </span>
                             </div>

@@ -144,7 +144,7 @@ export default function LiveScorePage() {
                             <div className="inline-block p-4 bg-slate-900 rounded-lg mb-4">
                                 <Lock className="text-white" size={24} />
                             </div>
-                            <h1 className="text-2xl font-bold text-neutral-900 tracking-tight">HAPPENO HACKATHON OS</h1>
+                            <h1 className="text-2xl font-bold text-neutral-900 tracking-tight">HAPPENO Hackathon</h1>
                             <p className="text-sm text-neutral-500 mt-2 uppercase tracking-widest font-semibold">Live Scoreboard Access</p>
                         </div>
 

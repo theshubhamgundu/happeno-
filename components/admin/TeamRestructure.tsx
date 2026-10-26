@@ -160,7 +160,7 @@ export function TeamRestructure() {
         <div className="space-y-6">
             <div className="flex items-center justify-between gap-4 mb-2 px-2">
                 <div className="flex items-center gap-4">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-teal-50 text-teal-600 shadow-sm border border-teal-100">
+                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-orange-50 text-orange-600 shadow-sm border border-orange-100">
                         <ArrowRightLeft className="w-6 h-6" />
                     </div>
                     <div>
@@ -179,7 +179,7 @@ export function TeamRestructure() {
             </div>
 
             <div className="bg-white border border-slate-200 rounded-[1.5rem] shadow-sm relative overflow-hidden flex flex-col min-h-[400px]">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 via-emerald-400 to-teal-500"></div>
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600"></div>
                 
                 <AnimatePresence mode="wait">
                     {(!fetchedSource || !fetchedTarget) ? (
@@ -195,7 +195,7 @@ export function TeamRestructure() {
                                     onClick={() => setAction('SYNC')}
                                     className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all ${
                                         action === 'SYNC' 
-                                        ? 'bg-teal-50/50 border-teal-500 text-teal-700 shadow-sm' 
+                                        ? 'bg-orange-50/50 border-orange-500 text-orange-700 shadow-sm' 
                                         : 'bg-[#fafafa] border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                                     }`}
                                 >
@@ -225,7 +225,7 @@ export function TeamRestructure() {
                                             value={sourceTeamId}
                                             onChange={(e) => setSourceTeamId(e.target.value)}
                                             placeholder="e.g. TRI-101"
-                                            className="w-full bg-[#fafafa] border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 uppercase transition-all"
+                                            className="w-full bg-[#fafafa] border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 uppercase transition-all"
                                         />
                                     </div>
                                 </div>
@@ -246,7 +246,7 @@ export function TeamRestructure() {
                                                     value={targetTeamId}
                                                     onChange={(e) => setTargetTeamId(e.target.value)}
                                                     placeholder="e.g. TRI-102"
-                                                    className="w-full bg-[#fafafa] border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 uppercase transition-all"
+                                                    className="w-full bg-[#fafafa] border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 uppercase transition-all"
                                                 />
                                             </div>
                                         </motion.div>
@@ -302,7 +302,7 @@ export function TeamRestructure() {
                                                         draggable={true}
                                                         onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent, email)}
                                                         onClick={() => moveMember(email, 'to_target')}
-                                                        className="p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-teal-300 hover:shadow-md cursor-grab active:cursor-grabbing transition-all flex items-center justify-between group"
+                                                        className="p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-orange-300 hover:shadow-md cursor-grab active:cursor-grabbing transition-all flex items-center justify-between group"
                                                     >
                                                         <div className="flex items-center gap-3 overflow-hidden">
                                                             <div className="shrink-0 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
@@ -313,7 +313,7 @@ export function TeamRestructure() {
                                                                 <div className="text-xs text-slate-500 truncate">{member.email}</div>
                                                             </div>
                                                         </div>
-                                                        <div className="shrink-0 w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-teal-50 group-hover:text-teal-600 group-hover:border-teal-200 transition-colors">
+                                                        <div className="shrink-0 w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-200 transition-colors">
                                                             <ArrowRight size={16} />
                                                         </div>
                                                     </motion.div>
@@ -366,9 +366,9 @@ export function TeamRestructure() {
                                                         draggable={true}
                                                         onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent, email)}
                                                         onClick={() => moveMember(email, 'to_source')}
-                                                        className="p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-teal-300 hover:shadow-md cursor-grab active:cursor-grabbing transition-all flex items-center justify-between group"
+                                                        className="p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-orange-300 hover:shadow-md cursor-grab active:cursor-grabbing transition-all flex items-center justify-between group"
                                                     >
-                                                        <div className="shrink-0 w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-teal-50 group-hover:text-teal-600 group-hover:border-teal-200 transition-colors">
+                                                        <div className="shrink-0 w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-200 transition-colors">
                                                             <ArrowLeft size={16} />
                                                         </div>
                                                         <div className="flex items-center gap-3 overflow-hidden ml-3 justify-end text-right w-full">
@@ -401,7 +401,7 @@ export function TeamRestructure() {
                                     disabled={loading}
                                     className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-md ${
                                         loading ? 'opacity-50 cursor-not-allowed bg-slate-200 text-slate-500 shadow-none' :
-                                        'bg-teal-600 hover:bg-teal-700 text-white shadow-teal-600/20 hover:shadow-lg hover:shadow-teal-600/30' 
+                                        'bg-orange-600 hover:bg-orange-700 text-white shadow-orange-600/20 hover:shadow-lg hover:shadow-orange-600/30' 
                                     }`}
                                 >
                                     {loading ? 'Processing...' : (

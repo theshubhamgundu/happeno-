@@ -16,12 +16,12 @@ export default async function CertificateVerificationPage({
     const config = await getCertificateConfig();
 
     return (
-        <main className="min-h-screen bg-[#F8F9FA] text-[#0f172a] font-sans selection:bg-teal-100 flex flex-col justify-between">
+        <main className="min-h-screen bg-[#F8F9FA] text-[#0f172a] font-sans selection:bg-orange-100 flex flex-col justify-between">
             {/* Top Navbar */}
             <header className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-40">
                 <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-[#0f766e] flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                        <div className="w-8 h-8 rounded-lg bg-[#ea580c] flex items-center justify-center text-white font-bold text-sm shadow-sm">
                             H
                         </div>
                         <HappenoMark compact className="text-lg" />
@@ -40,13 +40,13 @@ export default async function CertificateVerificationPage({
                 {record ? (
                     <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_20px_50px_rgba(15,23,42,0.06)] overflow-hidden">
                         {/* Status Banner */}
-                        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-teal-700 px-8 py-6 text-white flex items-center justify-between flex-wrap gap-4">
+                        <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 px-8 py-6 text-white flex items-center justify-between flex-wrap gap-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white">
-                                    <ShieldCheck size={26} className="text-emerald-300" />
+                                    <ShieldCheck size={26} className="text-orange-200" />
                                 </div>
                                 <div>
-                                    <span className="text-[10px] font-mono uppercase font-extrabold tracking-[0.2em] text-emerald-200">
+                                    <span className="text-[10px] font-mono uppercase font-extrabold tracking-[0.2em] text-orange-200">
                                         Happeno Verified Credential
                                     </span>
                                     <h1 className="text-xl font-black tracking-tight text-white">
@@ -54,8 +54,8 @@ export default async function CertificateVerificationPage({
                                     </h1>
                                 </div>
                             </div>
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-300/30 text-emerald-100 text-xs font-bold">
-                                <CheckCircle2 size={14} className="text-emerald-300" /> Authentic
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-300/30 text-orange-100 text-xs font-bold">
+                                <CheckCircle2 size={14} className="text-orange-200" /> Authentic
                             </div>
                         </div>
 
@@ -68,7 +68,7 @@ export default async function CertificateVerificationPage({
                                 <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight font-display">
                                     {record.member_name}
                                 </h2>
-                                <p className="text-sm text-teal-800 font-bold mt-2">
+                                <p className="text-sm text-orange-700 font-bold mt-2">
                                     Team: <span className="text-slate-800 font-semibold">{record.team_name}</span> ({record.team_id})
                                 </p>
                             </div>
@@ -79,7 +79,7 @@ export default async function CertificateVerificationPage({
                                         Event
                                     </span>
                                     <p className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                        <Award size={16} className="text-teal-600 shrink-0" />
+                                        <Award size={16} className="text-orange-600 shrink-0" />
                                         {config.event_title}
                                     </p>
                                 </div>
@@ -89,7 +89,7 @@ export default async function CertificateVerificationPage({
                                         Issue Date
                                     </span>
                                     <p className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                        <Calendar size={16} className="text-teal-600 shrink-0" />
+                                        <Calendar size={16} className="text-orange-600 shrink-0" />
                                         {config.issue_date}
                                     </p>
                                 </div>

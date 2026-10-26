@@ -214,20 +214,20 @@ export default function UsersManagement() {
     <div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#0f172a;color:#fff;
         padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:Arial,sans-serif;">
         <span style="font-weight:700;font-size:13px;">HAPPENO hackathon— Participant Directory (${rows.length} participants)</span>
-        <button onclick="window.print()" style="background:#0f766e;color:#fff;border:none;padding:8px 22px;
+        <button onclick="window.print()" style="background:#ea580c;color:#fff;border:none;padding:8px 22px;
             border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;">Print / Save as PDF</button>
     </div>
     <div style="padding:18px 24px;margin-top:50px;">
         <div style="display:flex;align-items:center;justify-content:flex-start;gap:20px;margin-bottom:8px;">
-            <div style="width:48px;height:48px;background:#0f766e;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:900;font-size:24px;">H</div>
+            <div style="width:48px;height:48px;background:#ea580c;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:900;font-size:24px;">H</div>
             <div style="font-family:'Segoe UI',Arial,sans-serif;">
-                <div style="font-size:11px;color:#0f766e;letter-spacing:1px;font-weight:700;">HAPPENO PLATFORM</div>
+                <div style="font-size:11px;color:#ea580c;letter-spacing:1px;font-weight:700;">HAPPENO PLATFORM</div>
                 <div style="font-size:22px;font-weight:900;letter-spacing:2px;color:#0f172a;margin-top:4px;">HACKATHON OPERATING SYSTEM</div>
-                <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#0f766e;margin-top:2px;">BUILDER DIRECTORY</div>
+                <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#ea580c;margin-top:2px;">BUILDER DIRECTORY</div>
                 <div style="font-size:10px;color:#888;margin-top:5px;">Date: ${now} &nbsp;|&nbsp; Total Participants: ${rows.length}</div>
             </div>
         </div>
-        <div style="height:3px;background:linear-gradient(90deg,#0f766e,#0f172a,#0f766e);margin:8px 0 14px;border-radius:2px;"></div>
+        <div style="height:3px;background:linear-gradient(90deg,#ea580c,#0f172a,#ea580c);margin:8px 0 14px;border-radius:2px;"></div>
         <table><thead>${headerRow}</thead><tbody>${dataRows}</tbody></table>
         <div style="margin-top:14px;text-align:center;font-size:9px;color:#bbb;border-top:1px solid #eee;padding-top:8px;">
             Happeno hackathon&nbsp;|&nbsp; Official Builder Directory &nbsp;|&nbsp; Generated: ${now}

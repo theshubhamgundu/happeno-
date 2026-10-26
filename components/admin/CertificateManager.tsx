@@ -186,7 +186,7 @@ export default function CertificateManager({ className = "" }: CertificateManage
     if (isLoading) {
         return (
             <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center">
-                <div className="w-8 h-8 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <div className="w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Loading Certificate Management Hub...</p>
             </div>
         );
@@ -198,7 +198,7 @@ export default function CertificateManager({ className = "" }: CertificateManage
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold">
+                        <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold">
                             <Award size={26} />
                         </div>
                         <div>
@@ -256,10 +256,10 @@ export default function CertificateManager({ className = "" }: CertificateManage
                     <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                                <Clock size={15} className="text-teal-700" /> Timed Auto-Unlock
+                                <Clock size={15} className="text-orange-600" /> Timed Auto-Unlock
                             </span>
                             {config.unlock_at && (
-                                <span className="text-[10px] font-mono text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                                <span className="text-[10px] font-mono text-orange-700 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
                                     Scheduled: {new Date(config.unlock_at).toLocaleString()}
                                 </span>
                             )}
@@ -273,7 +273,7 @@ export default function CertificateManager({ className = "" }: CertificateManage
                                 type="datetime-local"
                                 value={scheduledDateTime}
                                 onChange={(e) => setScheduledDateTime(e.target.value)}
-                                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
+                                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-600"
                             />
                             <button
                                 onClick={handleSaveSchedule}
@@ -298,10 +298,10 @@ export default function CertificateManager({ className = "" }: CertificateManage
                                     type="checkbox"
                                     checked={Boolean(config.require_feedback)}
                                     onChange={(e) => setConfig({ ...config, require_feedback: e.target.checked })}
-                                    className="mt-0.5 w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300"
+                                    className="mt-0.5 w-4 h-4 rounded text-orange-600 focus:ring-orange-500 border-slate-300"
                                 />
                                 <div>
-                                    <span className="text-xs font-bold text-slate-900 block group-hover:text-teal-700 transition">
+                                    <span className="text-xs font-bold text-slate-900 block group-hover:text-orange-600 transition">
                                         Require Hackathon Feedback Form
                                     </span>
                                     <span className="text-[11px] text-slate-500">
@@ -315,10 +315,10 @@ export default function CertificateManager({ className = "" }: CertificateManage
                                     type="checkbox"
                                     checked={Boolean(config.require_checkin)}
                                     onChange={(e) => setConfig({ ...config, require_checkin: e.target.checked })}
-                                    className="mt-0.5 w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300"
+                                    className="mt-0.5 w-4 h-4 rounded text-orange-600 focus:ring-orange-500 border-slate-300"
                                 />
                                 <div>
-                                    <span className="text-xs font-bold text-slate-900 block group-hover:text-teal-700 transition">
+                                    <span className="text-xs font-bold text-slate-900 block group-hover:text-orange-600 transition">
                                         Require Venue Check-In
                                     </span>
                                     <span className="text-[11px] text-slate-500">
@@ -438,7 +438,7 @@ export default function CertificateManager({ className = "" }: CertificateManage
                         <button
                             type="submit"
                             disabled={isSaving}
-                            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
                         >
                             <Save size={14} /> Save Template & Conditions
                         </button>
@@ -484,7 +484,7 @@ export default function CertificateManager({ className = "" }: CertificateManage
                                     <div className="flex items-center justify-between gap-2">
                                         <div className="flex items-center gap-2">
                                             <span className="font-bold text-slate-900">{item.submitted_by_name || "Team Lead"}</span>
-                                            <span className="text-[10px] text-teal-800 font-mono bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                                            <span className="text-[10px] text-orange-700 font-mono bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
                                                 {item.team_name ? `${item.team_name} (${item.team_id})` : item.team_id}
                                             </span>
                                         </div>

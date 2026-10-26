@@ -59,15 +59,15 @@ function FAQItem({ faq, index }: FAQItemProps) {
         aria-expanded={open}
       >
         <div className="flex items-start gap-3.5">
-          <span className="font-mono text-xs text-[#0f766e] font-semibold mt-1 flex-shrink-0">
+          <span className="font-mono text-xs text-[#ea580c] font-semibold mt-1 flex-shrink-0">
             {String(index + 1).padStart(2, '0')}
           </span>
-          <span className="font-display font-semibold text-base text-[#0f172a] group-hover:text-[#0f766e] transition-colors">
+          <span className="font-display font-semibold text-base text-[#0f172a] group-hover:text-[#ea580c] transition-colors">
             {faq.q}
           </span>
         </div>
         <span
-          className={`flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 text-sm transition-all duration-200 ${open ? 'rotate-45 border-[#0f766e] text-[#0f766e] bg-teal-50' : ''
+          className={`flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 text-sm transition-all duration-200 ${open ? 'rotate-45 border-[#ea580c] text-[#ea580c] bg-orange-50' : ''
             }`}
         >
           +
@@ -106,10 +106,10 @@ export default function FAQ() {
           transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-3 mb-4">
-            <span className="font-mono text-xs tracking-[0.25em] uppercase text-[#0f766e] font-semibold">
+            <span className="font-mono text-xs tracking-[0.25em] uppercase text-[#ea580c] font-semibold">
               03
             </span>
-            <span className="h-[1px] w-10 bg-teal-600/40" />
+            <span className="h-[1px] w-10 bg-orange-500/40" />
             <span className="font-mono text-xs tracking-[0.25em] uppercase text-gray-500">
               Questions
             </span>

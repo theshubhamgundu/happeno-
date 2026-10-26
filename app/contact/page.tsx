@@ -31,8 +31,8 @@ export default function ContactPage() {
                         </div>
 
                         <div className="w-48 md:w-64 py-10 text-center animate-float">
-                            <span className="font-kanit font-black italic text-5xl md:text-7xl text-teal-400">HAPPENO</span>
-                            <span className="block mt-2 text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-white/70">Hackathon OS</span>
+                            <span className="font-kanit font-black italic text-5xl md:text-7xl text-orange-500">HAPPENO</span>
+                            <span className="block mt-2 text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-white/70">Hackathon</span>
                         </div>
                     </div>
                 </FadeInView>
@@ -49,7 +49,7 @@ export default function ContactPage() {
                             <ContactCard
                                 icon={<MapPin className="text-[#FFEE00]" />}
                                 title="Platform Support"
-                                value="Happeno Hackathon OS, Hyderabad, Telangana, India."
+                                value="Happeno Hackathon, Hyderabad, Telangana, India."
                                 color="#FFEE00"
                             />
                         </FadeInView>

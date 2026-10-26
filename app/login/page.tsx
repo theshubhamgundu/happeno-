@@ -32,7 +32,7 @@ export default function LoginPage() {
     if (isLoading || (user && user.role)) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-teal-200 border-t-[#0f766e] rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-orange-200 border-t-[#ea580c] rounded-full animate-spin" />
             </div>
         );
     }
@@ -151,7 +151,7 @@ export default function LoginPage() {
                     </p>
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-medium mt-3 shadow-xs">
                         <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-                        <span>Happeno Hackathon OS</span>
+                        <span>Happeno Hackathon</span>
                     </div>
                 </motion.div>
 
@@ -181,7 +181,7 @@ export default function LoginPage() {
                                     value={loginId}
                                     onChange={(e) => { setLoginId(e.target.value); setError(""); }}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-base font-body text-[#0f172a] placeholder:text-gray-400 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-teal-500/20 transition-all"
+                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-base font-body text-[#0f172a] placeholder:text-gray-400 focus:outline-none focus:border-[#ea580c] focus:ring-1 focus:ring-orange-500/20 transition-all"
                                 />
                             </div>
 
@@ -199,7 +199,7 @@ export default function LoginPage() {
                                         value={loginPass}
                                         onChange={(e) => { setLoginPass(e.target.value); setError(""); }}
                                         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-base font-body text-[#0f172a] placeholder:text-gray-400 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-teal-500/20 transition-all pr-12"
+                                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-base font-body text-[#0f172a] placeholder:text-gray-400 focus:outline-none focus:border-[#ea580c] focus:ring-1 focus:ring-orange-500/20 transition-all pr-12"
                                     />
                                     <button
                                         type="button"
@@ -254,7 +254,7 @@ export default function LoginPage() {
                             {/* Credentials hint */}
                             <div className="pt-4 border-t border-gray-100 text-center">
                                 <p className="font-body text-xs text-gray-500 mb-1">
-                                    Happeno Hackathon OS
+                                    Happeno Hackathon
                                 </p>
                                 <div className="font-body text-xs text-gray-600 font-medium">
                                     <p>support@happeno.in</p>

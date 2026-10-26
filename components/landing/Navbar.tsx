@@ -32,24 +32,23 @@ export default function Navbar() {
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.8, 0.25, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
             ? 'bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm'
             : 'bg-white/70 backdrop-blur-sm border-b border-transparent'
-        }`}
+          }`}
       >
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           {/* Logo */}
           <a href="#hero" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-md bg-[#0f766e] flex items-center justify-center text-white font-display font-extrabold text-sm shadow-sm">
+            <div className="w-8 h-8 rounded-md bg-[#ea580c] flex items-center justify-center text-white font-display font-extrabold text-sm shadow-sm">
               H
             </div>
             <div className="flex flex-col">
               <span className="font-display font-bold text-sm tracking-wider uppercase text-[#0f172a]">
                 Happeno
               </span>
-              <span className="text-[10px] font-mono text-teal-700 uppercase tracking-widest -mt-0.5">
-                Hackathon OS
+              <span className="text-[10px] font-mono text-orange-600 uppercase tracking-widest -mt-0.5">
+                Hackathon
               </span>
             </div>
           </a>
@@ -71,7 +70,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             <a
               href="/login"
-              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#0f172a] hover:bg-[#0f766e] text-white font-display text-xs font-semibold tracking-wider uppercase shadow-sm transition-all duration-200"
+              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#0f172a] hover:bg-[#ea580c] text-white font-display text-xs font-semibold tracking-wider uppercase shadow-sm transition-all duration-200"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -90,19 +89,16 @@ export default function Navbar() {
               aria-label="Toggle menu"
             >
               <span
-                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${
-                  mobileOpen ? 'rotate-45 translate-y-[4.5px]' : ''
-                }`}
+                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-[4.5px]' : ''
+                  }`}
               />
               <span
-                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${
-                  mobileOpen ? 'opacity-0' : ''
-                }`}
+                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''
+                  }`}
               />
               <span
-                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${
-                  mobileOpen ? '-rotate-45 -translate-y-[4.5px]' : ''
-                }`}
+                className={`block w-5 h-[1.5px] bg-[#0f172a] transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-[4.5px]' : ''
+                  }`}
               />
             </button>
           </div>
@@ -127,7 +123,7 @@ export default function Navbar() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="font-display text-2xl font-bold text-gray-800 hover:text-[#0f766e] transition-colors"
+                className="font-display text-2xl font-bold text-gray-800 hover:text-[#ea580c] transition-colors"
               >
                 {link.label}
               </motion.a>

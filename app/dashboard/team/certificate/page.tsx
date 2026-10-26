@@ -194,8 +194,8 @@ export default function TeamCertificatePage() {
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
-                            <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-teal-700">
+                            <span className="w-2 h-2 rounded-full bg-orange-600 animate-pulse" />
+                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-orange-600">
                                 Happeno Credential Center
                             </span>
                         </div>
@@ -209,7 +209,7 @@ export default function TeamCertificatePage() {
 
                     {data?.teamStatus && (
                         <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl shrink-0">
-                            <Users size={18} className="text-teal-700" />
+                            <Users size={18} className="text-orange-600" />
                             <div>
                                 <p className="text-[10px] font-mono text-slate-400 uppercase font-bold">Your Team</p>
                                 <p className="text-xs font-bold text-slate-900">{data.teamStatus.team_name} ({data.teamStatus.team_id})</p>
@@ -221,7 +221,7 @@ export default function TeamCertificatePage() {
                 {/* State Machine Renderer */}
                 {isLoading ? (
                     <div className="bg-white rounded-3xl p-16 text-center border border-slate-200 shadow-sm">
-                        <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                        <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                         <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Loading Certificate Registry...</p>
                     </div>
                 ) : !data?.window.is_open ? (
@@ -267,7 +267,7 @@ export default function TeamCertificatePage() {
                                     <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Mins</span>
                                 </div>
                                 <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                                    <span className="block text-2xl sm:text-3xl font-black text-teal-700 font-mono">
+                                    <span className="block text-2xl sm:text-3xl font-black text-orange-600 font-mono">
                                         {String(countdown.seconds).padStart(2, "0")}
                                     </span>
                                     <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Secs</span>
@@ -277,7 +277,7 @@ export default function TeamCertificatePage() {
 
                         <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 text-left text-xs text-slate-500 space-y-2">
                             <p className="font-bold text-slate-700 flex items-center gap-1.5">
-                                <HelpCircle size={14} className="text-teal-700" /> What to expect when the window opens:
+                                <HelpCircle size={14} className="text-orange-600" /> What to expect when the window opens:
                             </p>
                             <ul className="list-disc pl-5 space-y-1 text-slate-500">
                                 <li>All verified team members receive individual participation certificates.</li>
@@ -305,7 +305,7 @@ export default function TeamCertificatePage() {
                         {/* Stepper Guide */}
                         <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-xs font-bold">
+                                <div className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-bold">
                                     1
                                 </div>
                                 <div>
@@ -328,7 +328,7 @@ export default function TeamCertificatePage() {
                         {/* Feedback Form Card */}
                         <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-sm">
                             <div className="mb-8 pb-6 border-b border-slate-100">
-                                <span className="text-[10px] font-mono uppercase font-bold text-teal-700 tracking-wider">
+                                <span className="text-[10px] font-mono uppercase font-bold text-orange-600 tracking-wider">
                                     Participant Feedback Matrix
                                 </span>
                                 <h2 className="text-2xl font-black text-slate-900 tracking-tight mt-1">
@@ -387,9 +387,9 @@ export default function TeamCertificatePage() {
                                         <div className="flex items-center justify-between mb-2">
                                             <div>
                                                 <label className="text-xs font-bold text-slate-900 block">Overall Hackathon Rating</label>
-                                                <p className="text-[11px] text-slate-400">Your total satisfaction with Happeno Hackathon OS</p>
+                                                <p className="text-[11px] text-slate-400">Your total satisfaction with Happeno Hackathon</p>
                                             </div>
-                                            <span className="text-xs font-mono font-bold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200">
+                                            <span className="text-xs font-mono font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200">
                                                 {feedbackForm.rating_overall} / 5 Stars
                                             </span>
                                         </div>
@@ -423,7 +423,7 @@ export default function TeamCertificatePage() {
                                             placeholder="e.g. Midnight coding vibe, mentor session, project showcase..."
                                             value={feedbackForm.highlight}
                                             onChange={(e) => setFeedbackForm({ ...feedbackForm, highlight: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-600 transition"
                                         />
                                     </div>
 
@@ -436,7 +436,7 @@ export default function TeamCertificatePage() {
                                             placeholder="Share any constructive criticism, ideas for the next edition, or shoutouts..."
                                             value={feedbackForm.feedback_text}
                                             onChange={(e) => setFeedbackForm({ ...feedbackForm, feedback_text: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-600 transition"
                                         />
                                     </div>
                                 </div>
@@ -446,7 +446,7 @@ export default function TeamCertificatePage() {
                                     <button
                                         type="submit"
                                         disabled={isSubmittingFeedback}
-                                        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-teal-600/20 transition disabled:opacity-50"
+                                        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-orange-600/20 transition disabled:opacity-50"
                                     >
                                         <Send size={15} />
                                         {isSubmittingFeedback ? "Submitting..." : "Submit Review & Unlock Certificates"}
@@ -482,17 +482,15 @@ export default function TeamCertificatePage() {
                                     <button
                                         key={idx}
                                         onClick={() => setSelectedMemberIndex(idx)}
-                                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-2 ${
-                                            selectedMemberIndex === idx
+                                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-2 ${selectedMemberIndex === idx
                                                 ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
                                                 : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-                                        }`}
+                                            }`}
                                     >
-                                        <Award size={14} className={selectedMemberIndex === idx ? "text-teal-400" : "text-slate-400"} />
+                                        <Award size={14} className={selectedMemberIndex === idx ? "text-orange-400" : "text-slate-400"} />
                                         <span>{member.name}</span>
-                                        <span className={`text-[10px] font-normal px-1.5 py-0.5 rounded ${
-                                            selectedMemberIndex === idx ? "bg-white/10 text-white/80" : "bg-slate-100 text-slate-500"
-                                        }`}>
+                                        <span className={`text-[10px] font-normal px-1.5 py-0.5 rounded ${selectedMemberIndex === idx ? "bg-white/10 text-white/80" : "bg-slate-100 text-slate-500"
+                                            }`}>
                                             {member.role}
                                         </span>
                                     </button>
@@ -568,9 +566,8 @@ function MatrixQuestionSection({
                         {rows.map((row, rIdx) => (
                             <tr
                                 key={row.key}
-                                className={`transition-colors hover:bg-teal-50/30 ${
-                                    rIdx % 2 === 1 ? "bg-slate-50/40" : "bg-white"
-                                }`}
+                                className={`transition-colors hover:bg-orange-50/30 ${rIdx % 2 === 1 ? "bg-slate-50/40" : "bg-white"
+                                    }`}
                             >
                                 <td className="py-4 px-6 text-xs sm:text-sm font-medium text-slate-800">
                                     {row.label}
@@ -586,14 +583,13 @@ function MatrixQuestionSection({
                                         >
                                             <div className="flex items-center justify-center">
                                                 <div
-                                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                                                        isSelected
-                                                            ? "border-teal-600 bg-teal-50 shadow-sm"
+                                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSelected
+                                                            ? "border-orange-600 bg-orange-50 shadow-sm"
                                                             : "border-slate-300 group-hover:border-slate-400 bg-white"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {isSelected && (
-                                                        <div className="w-2.5 h-2.5 rounded-full bg-teal-600" />
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-orange-600" />
                                                     )}
                                                 </div>
                                             </div>

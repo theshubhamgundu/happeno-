@@ -127,7 +127,7 @@ export async function POST(req: Request) {
                     html: `
                         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1a1a1a;line-height:1.6;padding:24px;border:1px solid #e2e8f0;border-radius:12px;background:#ffffff;">
                             <div style="text-align:center;padding-bottom:16px;border-bottom:1px solid #f1f5f9;">
-                                <h1 style="color:#0f172a;font-size:22px;margin:0;">HAPPENO HACKATHON OS</h1>
+                                <h1 style="color:#0f172a;font-size:22px;margin:0;">HAPPENO Hackathon</h1>
                                 <p style="color:#64748b;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin:4px 0 0;">Updated Team Pass & Access Credentials</p>
                             </div>
                             <p style="margin-top:20px;">Hello <strong>${safeLeadName}</strong>,</p>

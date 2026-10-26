@@ -89,7 +89,7 @@ export default function RoleTestSwitcher() {
                         disabled={isSwitching !== null}
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all border ${
                             user?.role === 'team'
-                                ? "bg-teal-600 text-white border-teal-600 shadow-sm"
+                                ? "bg-orange-600 text-white border-orange-600 shadow-sm"
                                 : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
                         }`}
                         title="Switch session to Participant Portal"
@@ -104,7 +104,7 @@ export default function RoleTestSwitcher() {
                         disabled={isSwitching !== null}
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all border ${
                             user?.role === 'judge'
-                                ? "bg-teal-600 text-white border-teal-600 shadow-sm"
+                                ? "bg-orange-600 text-white border-orange-600 shadow-sm"
                                 : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
                         }`}
                         title="Switch session to Evaluator Portal"
@@ -119,7 +119,7 @@ export default function RoleTestSwitcher() {
                         disabled={isSwitching !== null}
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all border ${
                             user?.role === 'volunteer'
-                                ? "bg-teal-600 text-white border-teal-600 shadow-sm"
+                                ? "bg-orange-600 text-white border-orange-600 shadow-sm"
                                 : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
                         }`}
                         title="Switch session to Volunteer Portal"
@@ -134,7 +134,7 @@ export default function RoleTestSwitcher() {
                         disabled={isSwitching !== null}
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all border ${
                             user?.role === 'admin'
-                                ? "bg-teal-600 text-white border-teal-600 shadow-sm"
+                                ? "bg-orange-600 text-white border-orange-600 shadow-sm"
                                 : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
                         }`}
                         title="Switch session to Admin Dashboard"
@@ -146,7 +146,7 @@ export default function RoleTestSwitcher() {
 
                     <button
                         onClick={() => setIsExpanded(prev => !prev)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] transition-all ml-1 shadow-sm"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold text-[11px] transition-all ml-1 shadow-sm"
                         title="Test all 3 dashboards simultaneously"
                     >
                         <Laptop size={12} />
@@ -163,7 +163,7 @@ export default function RoleTestSwitcher() {
                         <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <div>
                                 <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                    <Laptop size={18} className="text-teal-600" /> Test All 3 Dashboards Simultaneously
+                                    <Laptop size={18} className="text-orange-600" /> Test All 3 Dashboards Simultaneously
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-0.5">
                                     Because browser cookies isolate accounts per window, use these direct links and credentials to test Participant, Evaluator, and Volunteer screens all at once!
@@ -182,10 +182,10 @@ export default function RoleTestSwitcher() {
                             {/* Card 1: Participant */}
                             <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 shadow-sm">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-teal-800 font-bold text-sm">
-                                        <Award size={16} className="text-teal-600" /> 1. Participant
+                                    <div className="flex items-center gap-2 text-orange-700 font-bold text-sm">
+                                        <Award size={16} className="text-orange-600" /> 1. Participant
                                     </div>
-                                    <span className="text-[10px] font-mono bg-teal-50 text-teal-700 border border-teal-200 px-2 py-0.5 rounded">
+                                    <span className="text-[10px] font-mono bg-orange-50 text-orange-600 border border-orange-200 px-2 py-0.5 rounded">
                                         /dashboard/team
                                     </span>
                                 </div>
@@ -195,7 +195,7 @@ export default function RoleTestSwitcher() {
                                 <div className="space-y-1.5 pt-2 border-t border-slate-100 text-[11px]">
                                     <div className="flex items-center justify-between text-slate-500">
                                         <span>Test ID:</span>
-                                        <code className="text-teal-700 font-mono font-bold bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">TRI26009</code>
+                                        <code className="text-orange-600 font-mono font-bold bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">TRI26009</code>
                                     </div>
                                     <div className="flex items-center justify-between text-slate-500">
                                         <span>Mode:</span>
@@ -206,7 +206,7 @@ export default function RoleTestSwitcher() {
                                     <button
                                         onClick={() => void handleSwitchRole('team')}
                                         disabled={isSwitching !== null}
-                                        className="flex-1 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition-colors text-center shadow-sm"
+                                        className="flex-1 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs transition-colors text-center shadow-sm"
                                     >
                                         1-Click Switch
                                     </button>
@@ -217,7 +217,7 @@ export default function RoleTestSwitcher() {
                             <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 shadow-sm">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-                                        <ShieldCheck size={16} className="text-teal-600" /> 2. Evaluator
+                                        <ShieldCheck size={16} className="text-orange-600" /> 2. Evaluator
                                     </div>
                                     <span className="text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded">
                                         /dashboard/judge
@@ -240,7 +240,7 @@ export default function RoleTestSwitcher() {
                                     <button
                                         onClick={() => void handleSwitchRole('judge')}
                                         disabled={isSwitching !== null}
-                                        className="flex-1 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition-colors text-center shadow-sm"
+                                        className="flex-1 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs transition-colors text-center shadow-sm"
                                     >
                                         1-Click Switch
                                     </button>
@@ -251,7 +251,7 @@ export default function RoleTestSwitcher() {
                             <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 shadow-sm">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-                                        <Phone size={16} className="text-teal-600" /> 3. Volunteer
+                                        <Phone size={16} className="text-orange-600" /> 3. Volunteer
                                     </div>
                                     <span className="text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded">
                                         /dashboard/volunteer
@@ -274,7 +274,7 @@ export default function RoleTestSwitcher() {
                                     <button
                                         onClick={() => void handleSwitchRole('volunteer')}
                                         disabled={isSwitching !== null}
-                                        className="flex-1 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition-colors text-center shadow-sm"
+                                        className="flex-1 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs transition-colors text-center shadow-sm"
                                     >
                                         1-Click Switch
                                     </button>
@@ -286,7 +286,7 @@ export default function RoleTestSwitcher() {
                         <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                             <div className="space-y-1">
                                 <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                                    <Laptop size={14} className="text-teal-600" />
+                                    <Laptop size={14} className="text-orange-600" />
                                     How to test all 3 simultaneously:
                                 </h4>
                                 <p className="text-[11px] text-slate-500 leading-relaxed">
@@ -297,7 +297,7 @@ export default function RoleTestSwitcher() {
                             </div>
                             <Link
                                 href="/dashboard/role-preview"
-                                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition-all shrink-0 shadow-sm"
+                                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs transition-all shrink-0 shadow-sm"
                             >
                                 <Laptop size={14} /> Open 3-in-1 Simulator <ExternalLink size={12} />
                             </Link>

@@ -473,12 +473,12 @@ input:-webkit-autofill:active {
 html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
-  scrollbar-color: #0f766e #F8F9FA;
+  scrollbar-color: #ea580c #F8F9FA;
 }
 
 ::selection {
-  background: rgba(15, 118, 110, 0.2);
-  color: #0f766e;
+  background: rgba(234, 88, 12, 0.2);
+  color: #ea580c;
 }
 
 ::-webkit-scrollbar {
@@ -490,7 +490,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0f766e;
+  background: #ea580c;
   border-radius: 3px;
 }
 
@@ -537,10 +537,10 @@ html {
 }
 
 .btn-primary:hover {
-  background: #0f766e;
-  border-color: #0f766e;
+  background: #ea580c;
+  border-color: #ea580c;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(15, 118, 110, 0.25);
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.25);
 }
 
 /* ───── Secondary / Ghost Button ───── */
