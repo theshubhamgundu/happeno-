@@ -253,8 +253,8 @@ export default function AdminTickets() {
                     onClick={() => setFilter('all')}
                     className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all border flex items-center gap-2 ${
                         filter === 'all'
-                            ? 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-600/20'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+                            ? 'bg-[#f7cb46] text-black border-2 border-black shadow-[3px_3px_0px_#000]'
+                            : 'bg-white text-black border-2 border-black hover:bg-[#ffdc8b] shadow-[2px_2px_0px_#000]'
                     }`}
                 >
                     <span>Active Queue</span>
@@ -267,8 +267,8 @@ export default function AdminTickets() {
                     onClick={() => setFilter('assigned')}
                     className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all border flex items-center gap-2 ${
                         filter === 'assigned'
-                            ? 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-600/20'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+                            ? 'bg-[#f7cb46] text-black border-2 border-black shadow-[3px_3px_0px_#000]'
+                            : 'bg-white text-black border-2 border-black hover:bg-[#ffdc8b] shadow-[2px_2px_0px_#000]'
                     }`}
                 >
                     <span>My Claims</span>
@@ -281,8 +281,8 @@ export default function AdminTickets() {
                     onClick={() => setFilter('resolved')}
                     className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all border flex items-center gap-2 ${
                         filter === 'resolved'
-                            ? 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-600/20'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+                            ? 'bg-[#f7cb46] text-black border-2 border-black shadow-[3px_3px_0px_#000]'
+                            : 'bg-white text-black border-2 border-black hover:bg-[#ffdc8b] shadow-[2px_2px_0px_#000]'
                     }`}
                 >
                     <span>Resolved</span>

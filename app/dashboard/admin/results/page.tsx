@@ -108,54 +108,56 @@ export default function AdminResults() {
 
     return (
         <DashboardLayout type="admin" title="Leaderboard">
-            <main className="mx-auto max-w-[1500px] space-y-6 pb-10">
-                <section className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+            <main className="mx-auto max-w-[1500px] space-y-6 pb-10 text-black">
+                <section className="rounded-2xl border-3 border-black bg-white p-6 md:p-8 shadow-[6px_6px_0px_#000]">
                     <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
                         <div>
-                            <p className="mb-1 text-[10px] font-black uppercase tracking-[.2em] text-teal-600">Evaluation results</p>
-                            <h1 className="text-2xl font-black italic uppercase text-slate-900 md:text-4xl tracking-tight">Leaderboard</h1>
-                            <p className="mt-2 max-w-2xl text-xs text-slate-500">Rankings use each team’s average percentage across completed evaluation rounds. Teams with no evaluation are kept separate, never ranked as zero.</p>
+                            <span className="inline-block rounded-md border-2 border-black bg-[#f7cb46] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-black shadow-[1.5px_1.5px_0px_#000] mb-2">
+                                OFFICIAL RANKINGS
+                            </span>
+                            <h1 className="text-2xl font-black uppercase text-black md:text-3xl tracking-tight">Leaderboard & Results</h1>
+                            <p className="mt-1 max-w-2xl text-xs font-semibold text-neutral-700">Rankings use each team’s average percentage across completed evaluation rounds. Teams with no evaluation are kept separate, never ranked as zero.</p>
                         </div>
-                        <button onClick={exportLeaderboard} className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-teal-700 shadow-sm">
+                        <button onClick={exportLeaderboard} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#f7cb46] hover:bg-[#ffdc8b] px-5 py-2.5 text-xs font-black uppercase tracking-wider text-black transition border-2 border-black shadow-[3px_3px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 active:shadow-none">
                             <Download size={16} /> Export current view
                         </button>
                     </div>
                 </section>
 
-                <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    <Stat label="Registered teams" value={totals.total} />
-                    <Stat label="Ranked teams" value={totals.ranked} accent="text-teal-700" />
-                    <Stat label="Awaiting evaluation" value={totals.pending} accent="text-amber-600" />
-                    <Stat label="All rounds complete" value={totals.complete} accent="text-emerald-700" />
+                <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                    <Stat label="Registered teams" value={totals.total} bg="bg-[#c0f7fe]" />
+                    <Stat label="Ranked teams" value={totals.ranked} bg="bg-[#99e885]" />
+                    <Stat label="Awaiting evaluation" value={totals.pending} bg="bg-[#ffdc8b]" />
+                    <Stat label="All rounds complete" value={totals.complete} bg="bg-[#fe90e8]" />
                 </section>
 
-                <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
+                <section className="rounded-2xl border-3 border-black bg-white p-4 md:p-5 shadow-[5px_5px_0px_#000]">
                     <div className="flex flex-col gap-3 lg:flex-row">
                         <div className="relative flex-1">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search team, ID, captain, or project" className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-11 pr-4 text-xs font-semibold text-slate-900 outline-none placeholder:text-slate-400 focus:border-teal-500 focus:bg-white transition" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+                            <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search team, ID, captain, or project..." className="h-11 w-full rounded-xl border-2 border-black bg-white py-2.5 pl-11 pr-4 text-xs font-bold text-black outline-none placeholder:text-neutral-400 focus:shadow-[2px_2px_0px_#000] transition" />
                         </div>
-                        <select value={track} onChange={event => setTrack(event.target.value)} className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-xs font-semibold text-slate-800 outline-none focus:border-teal-500">
+                        <select value={track} onChange={event => setTrack(event.target.value)} className="h-11 rounded-xl border-2 border-black bg-white px-4 text-xs font-bold text-black outline-none shadow-[2px_2px_0px_#000]">
                             <option value="all">All tracks</option>
                             {tracks.map(item => <option key={item} value={item}>{item}</option>)}
                         </select>
-                        <div className="flex rounded-xl border border-slate-200 bg-slate-100 p-1">
+                        <div className="flex rounded-xl border-2 border-black bg-white p-1 shadow-[2px_2px_0px_#000] gap-1">
                             {([['ranked', 'Ranked'], ['all', 'All'], ['pending', 'Pending']] as const).map(([id, label]) => (
-                                <button key={id} onClick={() => setView(id)} className={`rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition ${view === id ? "bg-teal-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>{label}</button>
+                                <button key={id} onClick={() => setView(id)} className={`rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition ${view === id ? "bg-[#f7cb46] text-black border border-black shadow-[1.5px_1.5px_0px_#000]" : "text-neutral-700 hover:text-black"}`}>{label}</button>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <section className="overflow-hidden rounded-2xl border-3 border-black bg-white shadow-[6px_6px_0px_#000]">
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full min-w-[900px] text-left">
-                            <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase tracking-[.16em] text-slate-500">
-                                <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{roundConfigs.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title} (/200)</th>)}<th className="px-4 py-4 text-center text-teal-600">Rabbit Race (/100)</th><th className="px-4 py-4 text-center">Overall (/500)</th><th className="px-5 py-4 text-right">Details</th></tr>
+                            <thead className="bg-[#f7cb46] border-b-2 border-black text-[10px] font-black uppercase tracking-[.16em] text-black">
+                                <tr><th className="px-5 py-4">Rank</th><th className="px-5 py-4">Team</th>{roundConfigs.map(round => <th key={round.id} className="px-4 py-4 text-center">{round.title} (/200)</th>)}<th className="px-4 py-4 text-center">Rabbit Race (/100)</th><th className="px-4 py-4 text-center">Overall (/500)</th><th className="px-5 py-4 text-right">Details</th></tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y-2 divide-black">
                                 {displayedRows.map((row, index) => <LeaderboardRow key={row.project.id} row={row} rounds={roundConfigs} rank={row.score.overallScore === null ? null : index + 1} onSelect={() => setSelectedProject(row.project)} />)}
-                                {!displayedRows.length && <tr><td colSpan={roundConfigs.length + 4} className="px-5 py-16 text-center text-xs text-slate-400 font-semibold">No teams match this view.</td></tr>}
+                                {!displayedRows.length && <tr><td colSpan={roundConfigs.length + 4} className="px-5 py-16 text-center text-xs text-neutral-500 font-bold">No teams match this view.</td></tr>}
                             </tbody>
                         </table>
                     </div>
@@ -167,16 +169,16 @@ export default function AdminResults() {
     );
 }
 
-function Stat({ label, value, accent = "text-slate-900" }: { label: string; value: number; accent?: string }) {
-    return <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><p className="text-[9px] font-black uppercase tracking-[.14em] text-slate-400">{label}</p><p className={`mt-1.5 text-2xl font-black ${accent}`}>{value}</p></div>;
+function Stat({ label, value, bg = "bg-white" }: { label: string; value: number; bg?: string }) {
+    return <div className={`rounded-2xl border-3 border-black ${bg} p-4 shadow-[4px_4px_0px_#000]`}><p className="text-[9px] font-black uppercase tracking-[.14em] text-neutral-700">{label}</p><p className="mt-1.5 text-2xl font-black text-black">{value}</p></div>;
 }
 
 function LeaderboardRow({ row, rounds, rank, onSelect }: { row: { project: Project; score: ScoreSummary }; rounds: JudgingRound[]; rank: number | null; onSelect: () => void }) {
-    return <tr className="text-sm transition hover:bg-slate-50/80">
-        <td className="px-5 py-4"><span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-lg text-xs font-bold ${rank && rank <= 3 ? "bg-teal-50 text-teal-800 border border-teal-200" : "bg-slate-100 text-slate-600"}`}>{rank ? `#${rank}` : "—"}</span></td>
-        <td className="px-5 py-4"><p className="font-bold text-slate-900">{row.project.team || "Untitled team"}</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">{row.project.teamId} · {row.project.track || "No track"}</p></td>
+    return <tr className="text-sm transition hover:bg-[#ffdc8b]/20">
+        <td className="px-5 py-4"><span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-lg text-xs font-black border-2 border-black ${rank && rank <= 3 ? "bg-[#f7cb46] text-black shadow-[1.5px_1.5px_0px_#000]" : "bg-[#ede8f5] text-black"}`}>{rank ? `#${rank}` : "—"}</span></td>
+        <td className="px-5 py-4"><p className="font-black text-black">{row.project.team || "Untitled team"}</p><p className="mt-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-600">{row.project.teamId} · {row.project.track || "No track"}</p></td>
         {rounds.map(round => <td key={round.id} className="px-4 py-4 text-center"><ScoreCell value={row.score.roundScores[round.id]} evaluations={row.score.evaluations[round.id]} max={200} percent={row.score.roundPercents[round.id]} /></td>)}
-        <td className="px-4 py-4 text-center font-black text-sm text-teal-600">{row.project.preScore ? `${row.project.preScore.toFixed(1)} / 100` : "—"}</td>
+        <td className="px-4 py-4 text-center font-black text-sm text-black">{row.project.preScore ? `${row.project.preScore.toFixed(1)} / 100` : "—"}</td>
         <td className="px-4 py-4 text-center"><ScoreCell value={row.score.overallScore} evaluations={row.score.completedRounds} bold max={500} /></td>
         <td className="px-5 py-4 text-right"><button onClick={onSelect} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:border-teal-300 hover:text-teal-700 hover:bg-teal-50 shadow-sm"><MessageSquare size={13} /> Review</button></td>
     </tr>;

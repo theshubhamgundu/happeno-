@@ -115,23 +115,23 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
 
     if (isLoading || !user || user.role !== type) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-[#ede8f5] flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-black border-t-[#f7cb46] rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className={`dashboard-app dashboard-${type} min-h-screen bg-black p-0 text-white`}>
-            <div className={`w-full min-h-screen bg-black ${hasSidebar ? (isSidebarCollapsed ? "lg:grid lg:grid-cols-[68px_minmax(0,1fr)]" : "lg:grid lg:grid-cols-[230px_minmax(0,1fr)]") : "block"}`}>
+        <div className={`dashboard-app dashboard-${type} min-h-screen bg-[#ede8f5] p-0 text-black font-sans`}>
+            <div className={`w-full min-h-screen bg-[#ede8f5] ${hasSidebar ? (isSidebarCollapsed ? "lg:grid lg:grid-cols-[68px_minmax(0,1fr)]" : "lg:grid lg:grid-cols-[240px_minmax(0,1fr)]") : "block"}`}>
                 {hasSidebar && (
-                    <aside className={`hidden lg:flex lg:flex-col lg:border-r lg:border-zinc-800/80 lg:bg-[#09090c] ${isSidebarCollapsed ? "lg:p-2" : "lg:p-3"}`}>
+                    <aside className={`hidden lg:flex lg:flex-col lg:border-r-2 lg:border-black lg:bg-white ${isSidebarCollapsed ? "lg:p-2" : "lg:p-3"}`}>
                         <div className={`flex items-center ${isSidebarCollapsed ? "flex-col gap-2" : "justify-between"}`}>
-                            <Link href="/" aria-label="Happeno home" className={`flex items-center gap-2.5 rounded-xl px-2 py-2 transition hover:bg-zinc-800/60 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-                                <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 text-sm font-bold text-white shadow-[0_0_12px_rgba(234,88,12,0.35)] border border-orange-400/30">H</div>
+                            <Link href="/" aria-label="Happeno home" className={`flex items-center gap-2.5 rounded-xl px-2 py-2 transition hover:bg-[#ffdc8b] ${isSidebarCollapsed ? "justify-center" : ""}`}>
+                                <div className="grid h-9 w-9 place-items-center rounded-lg bg-[#f7cb46] text-base font-black text-black shadow-[2px_2px_0px_#000] border-2 border-black">H</div>
                                 {!isSidebarCollapsed && <div>
-                                    <HappenoMark compact className="text-base text-white" />
-                                    <p className="mt-0.5 text-[8px] font-bold uppercase tracking-[.19em] text-zinc-500">Hackathon</p>
+                                    <HappenoMark compact className="text-base text-black font-black" />
+                                    <p className="mt-0.5 text-[8px] font-black uppercase tracking-[.2em] text-neutral-600">Hackathon</p>
                                 </div>}
                             </Link>
                             <button
@@ -139,14 +139,14 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                                 onClick={() => setIsSidebarCollapsed(collapsed => !collapsed)}
                                 aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                                 title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                                className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+                                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white border-2 border-black text-black shadow-[2px_2px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_#000] transition-all"
                             >
-                                <ChevronRight size={15} className={`transition-transform ${isSidebarCollapsed ? "" : "rotate-180"}`} />
+                                <ChevronRight size={15} className={`transition-transform duration-200 ${isSidebarCollapsed ? "" : "rotate-180"}`} />
                             </button>
                         </div>
 
-                        {!isSidebarCollapsed && <div className="mt-5 px-3 text-[9px] font-bold uppercase tracking-[.2em] text-zinc-500">Navigation</div>}
-                        <nav className={`mt-1.5 space-y-0.5 ${isSidebarCollapsed ? "mt-4" : ""}`}>
+                        {!isSidebarCollapsed && <div className="mt-5 px-3 text-[10px] font-black uppercase tracking-[.2em] text-neutral-600">Navigation</div>}
+                        <nav className={`mt-2 space-y-1 ${isSidebarCollapsed ? "mt-4" : ""}`}>
                             {menuItems[type].map((item: any) => {
                                 const isActive = pathname === item.href;
                                 return <Link 
@@ -154,32 +154,28 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                                     href={item.href} 
                                     title={isSidebarCollapsed ? item.label : undefined} 
                                     aria-label={isSidebarCollapsed ? item.label : undefined} 
-                                    className={`group relative flex items-center gap-2.5 rounded-lg py-2 text-xs font-medium transition-all ${
-                                        isSidebarCollapsed ? "justify-center px-2" : "px-2.5"
+                                    className={`group relative flex items-center gap-2.5 rounded-lg py-2.5 text-xs font-bold transition-all ${
+                                        isSidebarCollapsed ? "justify-center px-2" : "px-3"
                                     } ${
                                         isActive 
-                                            ? "bg-orange-500/10 text-orange-400 border border-orange-500/25 shadow-[0_0_14px_rgba(234,88,12,0.12)] font-semibold" 
-                                            : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 border border-transparent"
+                                            ? "bg-[#ffdc8b] text-black border-2 border-black shadow-[3px_3px_0px_#000] font-black" 
+                                            : "text-neutral-800 hover:text-black hover:bg-[#ffdc8b]/40 border-2 border-transparent hover:border-black hover:shadow-[2px_2px_0px_#000]"
                                     }`}
                                 >
-                                    <span className={`grid h-6 w-6 place-items-center rounded-md transition-colors ${
-                                        isActive 
-                                            ? "text-orange-400" 
-                                            : "text-zinc-400 group-hover:text-zinc-200"
-                                    }`}>
-                                        <item.icon size={15} />
+                                    <span className="grid h-6 w-6 place-items-center rounded-md text-black">
+                                        <item.icon size={16} />
                                     </span>
                                     {!isSidebarCollapsed && <span>{item.label}</span>}
                                     {!isSidebarCollapsed && (item.label === "Submissions" || item.label === "Sponsor APIs") && effectiveSubmissionLocked && (
-                                        <Lock size={12} className={isActive ? "ml-auto text-orange-400/80" : "ml-auto text-zinc-500"} />
+                                        <Lock size={13} className={isActive ? "ml-auto text-black" : "ml-auto text-neutral-500"} />
                                     )}
                                 </Link>;
                             })}
                         </nav>
 
                         {type === "admin" && <div className="mt-5">
-                            {!isSidebarCollapsed && <div className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[.16em] text-zinc-500">Manage event operations</div>}
-                            <nav className="space-y-0.5" aria-label="Manage event operations">
+                            {!isSidebarCollapsed && <div className="mb-2 px-3 text-[10px] font-black uppercase tracking-[.16em] text-neutral-600">Manage event operations</div>}
+                            <nav className="space-y-1" aria-label="Manage event operations">
                                 {adminOperationItems.map(item => {
                                     const isActive = pathname === "/dashboard/admin" && activeAdminSection === item.section;
                                     return <Link
@@ -188,19 +184,15 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                                         onClick={() => window.dispatchEvent(new CustomEvent("admin-section-change", { detail: item.section }))}
                                         title={isSidebarCollapsed ? item.label : undefined}
                                         aria-label={isSidebarCollapsed ? item.label : undefined}
-                                        className={`group relative flex items-center gap-2.5 rounded-lg py-2 text-xs font-medium transition-all ${
+                                        className={`group relative flex items-center gap-2.5 rounded-lg py-2 text-xs font-bold transition-all ${
                                             isSidebarCollapsed ? "justify-center px-2" : "ml-2 px-2.5"
                                         } ${
                                             isActive 
-                                                ? "bg-orange-500/10 text-orange-400 border border-orange-500/25 shadow-[0_0_14px_rgba(234,88,12,0.12)] font-semibold" 
-                                                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 border border-transparent"
+                                                ? "bg-[#99e885] text-black border-2 border-black shadow-[3px_3px_0px_#000] font-black" 
+                                                : "text-neutral-800 hover:text-black hover:bg-[#ffdc8b]/40 border-2 border-transparent hover:border-black hover:shadow-[2px_2px_0px_#000]"
                                         }`}
                                     >
-                                        <span className={`grid h-6 w-6 place-items-center rounded-md transition-colors ${
-                                            isActive 
-                                                ? "text-orange-400" 
-                                                : "text-zinc-400 group-hover:text-zinc-200"
-                                        }`}>
+                                        <span className="grid h-6 w-6 place-items-center rounded-md text-black">
                                             <item.icon size={15} />
                                         </span>
                                         {!isSidebarCollapsed && <span>{item.label}</span>}
@@ -209,30 +201,33 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                             </nav>
                         </div>}
 
-                        <div className={`mt-auto rounded-xl border border-zinc-800/80 bg-zinc-900/40 ${isSidebarCollapsed ? "p-1.5" : "p-2.5"}`}>
+                        <div className={`mt-auto rounded-xl border-2 border-black bg-white shadow-[3px_3px_0px_#000] ${isSidebarCollapsed ? "p-1.5" : "p-2.5"}`}>
                             <div className={`flex items-center gap-2.5 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-                                <div className="grid h-8 w-8 place-items-center rounded-full bg-orange-950/60 border border-orange-500/25 text-orange-400"><User size={15} /></div>
-                                {!isSidebarCollapsed && <div className="min-w-0"><p className="truncate text-xs font-bold text-white">{displayName}</p><p className="text-[9px] font-semibold uppercase tracking-wider text-zinc-400">{type} access</p></div>}
+                                <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#99e885] border-2 border-black text-black font-black shadow-[1.5px_1.5px_0px_#000]"><User size={15} /></div>
+                                {!isSidebarCollapsed && <div className="min-w-0"><p className="truncate text-xs font-black text-black">{displayName}</p><p className="text-[9px] font-bold uppercase tracking-wider text-neutral-600">{type} access</p></div>}
                             </div>
                         </div>
                     </aside>
                 )}
 
                 <div className={`min-w-0 ${hasSidebar ? "lg:col-start-2" : ""}`}>
-                    <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between border-b border-zinc-800/80 bg-[#09090c]/90 px-4 backdrop-blur-md md:px-6">
+                    <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b-2 border-black bg-white px-4 md:px-6 shadow-[0_2px_0px_0px_rgba(0,0,0,0.06)]">
                         <div className="flex items-center gap-3">
                             {hasSidebar ? (
                                 <>
-                                    <button onClick={() => setIsMobileMenuOpen(true)} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-800 text-zinc-300 hover:text-white lg:hidden"><Menu size={18} /></button>
-                                    <div className="lg:hidden"><p className="text-sm font-black text-orange-500">HAPPENO</p><p className="text-[8px] font-bold uppercase tracking-wider text-zinc-400">Workspace</p></div>
-                                    <div className="hidden lg:block"><p className="text-[11px] font-medium text-zinc-400">{type.charAt(0).toUpperCase() + type.slice(1)} workspace</p><p className="text-xs font-bold text-white leading-tight">Happeno Hackathon</p></div>
+                                    <button onClick={() => setIsMobileMenuOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg border-2 border-black bg-[#f7cb46] text-black shadow-[2px_2px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] lg:hidden"><Menu size={18} /></button>
+                                    <div className="lg:hidden"><p className="text-sm font-black text-black">HAPPENO</p><p className="text-[8px] font-black uppercase tracking-wider text-neutral-600">Workspace</p></div>
+                                    <div className="hidden lg:block">
+                                        <p className="text-[11px] font-bold text-neutral-600">{type.charAt(0).toUpperCase() + type.slice(1)} workspace</p>
+                                        <p className="text-xs font-black text-black leading-tight">Happeno Hackathon</p>
+                                    </div>
                                 </>
                             ) : (
-                                <Link href="/" aria-label="Happeno home" className="flex items-center gap-2.5 rounded-xl transition hover:opacity-85">
-                                    <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 text-sm font-bold text-white shadow-[0_0_12px_rgba(234,88,12,0.35)] border border-orange-400/30">H</div>
+                                <Link href="/" aria-label="Happeno home" className="flex items-center gap-2.5 rounded-xl transition hover:opacity-90">
+                                    <div className="grid h-9 w-9 place-items-center rounded-lg bg-[#f7cb46] text-base font-black text-black shadow-[2px_2px_0px_#000] border-2 border-black">H</div>
                                     <div>
-                                        <p className="text-sm font-black text-white tracking-tight leading-none">Happeno OS</p>
-                                        <p className="text-[9px] font-semibold uppercase tracking-wider text-zinc-400 mt-0.5">
+                                        <p className="text-sm font-black text-black tracking-tight leading-none">Happeno OS</p>
+                                        <p className="text-[9px] font-bold uppercase tracking-wider text-neutral-600 mt-0.5">
                                             {type === 'judge' ? 'Evaluator Portal' : type === 'volunteer' ? 'Volunteer Scanner' : 'Portal'}
                                         </p>
                                     </div>
@@ -241,8 +236,8 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                         </div>
                         <div className="flex items-center gap-3">
                             {!hasSidebar && (
-                                <div className="hidden sm:flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 px-2.5 py-1.5 text-xs font-bold text-white">
-                                    <User size={13} className="text-orange-400" />
+                                <div className="hidden sm:flex items-center gap-2 rounded-lg border-2 border-black bg-white px-3 py-1.5 text-xs font-black text-black shadow-[2px_2px_0px_#000]">
+                                    <User size={13} className="text-black" />
                                     <span className="truncate max-w-[150px]">{displayName}</span>
                                 </div>
                             )}
@@ -250,24 +245,34 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
                                 onClick={logout}
                                 aria-label="Sign out"
                                 title="Sign out"
-                                className="flex h-8 items-center justify-center gap-2 rounded-lg border border-zinc-800/80 bg-zinc-900/50 px-2.5 text-xs font-semibold text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
+                                className="flex h-8 items-center justify-center gap-2 rounded-lg border-2 border-black bg-[#fe90e8] hover:bg-[#fe90e8]/85 px-3 text-xs font-black text-black shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                             >
                                 <LogOut size={14} />
                                 <span className="hidden sm:inline">Sign out</span>
                             </button>
                             {hasSidebar && (
-                                <div className="grid h-8 w-8 place-items-center rounded-full bg-orange-950/60 border border-orange-500/25 text-orange-400"><User size={15} /></div>
+                                <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#99e885] border-2 border-black text-black font-black shadow-[1.5px_1.5px_0px_#000]"><User size={15} /></div>
                             )}
                         </div>
                     </header>
 
                     <main className="mx-auto w-full max-w-[1480px] px-4 py-5 md:px-6 md:py-6">
-                        {type !== "admin" && !hideHeader && <div className="mb-5 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                        {type !== "admin" && !hideHeader && <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end border-b-3 border-black pb-4">
                             <div>
-                                <p className="text-[10px] font-bold uppercase tracking-[.18em] text-orange-400/90">{type === 'judge' ? 'evaluator' : type} portal</p>
-                                <h1 className="mt-1 text-2xl font-bold tracking-[-0.02em] text-white md:text-3xl">{title}</h1>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="inline-block rounded-md border-2 border-black bg-[#f7cb46] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[.18em] text-black shadow-[2px_2px_0px_#000]">
+                                        {type === 'judge' ? 'evaluator' : type} portal
+                                    </span>
+                                    <span className="rounded-md border-2 border-black bg-[#fe90e8] px-2 py-0.5 text-[10px] font-mono font-black text-black shadow-[1.5px_1.5px_0px_#000]">
+                                        ✦ 2026
+                                    </span>
+                                </div>
+                                <h1 className="text-3xl font-black tracking-tight text-black md:text-4xl font-sans">{title}</h1>
                             </div>
-                            <p className="max-w-sm text-xs leading-relaxed text-zinc-400">{subtitle || "Stay informed, complete your tasks, and keep the event moving."}</p>
+                            <div className="max-w-md text-xs font-bold leading-relaxed text-black bg-white border-2 border-black p-3 rounded-xl shadow-[3px_3px_0px_#000] relative">
+                                <span className="absolute -top-2 right-4 bg-[#c0f7fe] border border-black text-[9px] font-black px-1.5 py-0.2 rounded shadow-[1px_1px_0px_#000]">NOTICE</span>
+                                {subtitle || "Stay informed, complete your tasks, and keep the event moving."}
+                            </div>
                         </div>}
                         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="dashboard-content min-w-0">{children}</motion.div>
                     </main>
@@ -275,29 +280,35 @@ export const DashboardLayout = ({ children, type, title, subtitle, hideSidebar, 
             </div>
 
             <AnimatePresence>
-                {hasSidebar && isMobileMenuOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/80 p-4 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-                    <motion.div initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -24, opacity: 0 }} onClick={(event) => event.stopPropagation()} className="flex h-full w-full max-w-[320px] flex-col rounded-2xl bg-[#0d0d12] border border-zinc-800 p-5 shadow-2xl text-white">
-                        <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 font-bold text-white shadow-[0_0_12px_rgba(234,88,12,0.35)] border border-orange-400/30">H</div><HappenoMark compact className="text-xl text-white" /></div><button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-zinc-400 hover:text-white"><X size={20} /></button></div>
-                        <p className="mt-8 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-zinc-500">Workspace</p>
-                        <nav className="mt-2.5 space-y-1">{menuItems[type].map((item: any) => {
+                {hasSidebar && isMobileMenuOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/60 p-4 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
+                    <motion.div initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -24, opacity: 0 }} onClick={(event) => event.stopPropagation()} className="flex h-full w-full max-w-[320px] flex-col rounded-2xl bg-[#ede8f5] border-3 border-black p-5 shadow-[6px_6px_0px_#000] text-black">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="grid h-9 w-9 place-items-center rounded-lg bg-[#f7cb46] border-2 border-black font-black text-black shadow-[2px_2px_0px_#000]">H</div>
+                                <HappenoMark compact className="text-xl text-black font-black" />
+                            </div>
+                            <button onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-black hover:bg-neutral-200 border-2 border-black shadow-[2px_2px_0px_#000]"><X size={18} /></button>
+                        </div>
+                        <p className="mt-8 px-2 text-[10px] font-black uppercase tracking-[.18em] text-neutral-600">Workspace</p>
+                        <nav className="mt-2.5 space-y-1.5">{menuItems[type].map((item: any) => {
                             const isActive = pathname === item.href;
                             const isLocked = (item.label === "Submissions" || item.label === "Sponsor APIs") && effectiveSubmissionLocked;
                             return (
-                                <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition-all ${
+                                <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
                                     isActive 
-                                        ? "bg-orange-500/10 text-orange-400 border border-orange-500/25 shadow-[0_0_14px_rgba(234,88,12,0.12)] font-semibold" 
-                                        : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+                                        ? "bg-[#ffdc58] text-black border-2 border-black shadow-[3px_3px_0px_#000] font-black" 
+                                        : "text-neutral-800 hover:text-black hover:bg-[#fff9db] border-2 border-transparent hover:border-black"
                                 }`}>
                                     <item.icon size={16} />
                                     <span>{item.label}</span>
-                                    {isLocked && <Lock size={13} className={`ml-auto ${isActive ? "text-orange-400" : "text-zinc-500"}`} />}
+                                    {isLocked && <Lock size={13} className="ml-auto text-neutral-600" />}
                                 </Link>
                             );
                         })}</nav>
                         {type === "admin" && <div className="mt-6">
-                            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-zinc-500">Manage event operations</p>
-                            <nav className="space-y-1" aria-label="Manage event operations">
-                                {adminOperationItems.map(item => <Link key={item.section} href={item.href} onClick={() => { window.dispatchEvent(new CustomEvent("admin-section-change", { detail: item.section })); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition-all ${pathname === "/dashboard/admin" && activeAdminSection === item.section ? "bg-orange-500/10 text-orange-400 border border-orange-500/25 shadow-[0_0_14px_rgba(234,88,12,0.12)] font-semibold" : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"}`}><item.icon size={16} />{item.label}</Link>)}
+                            <p className="mb-2 px-3 text-[10px] font-black uppercase tracking-[.16em] text-neutral-600">Manage event operations</p>
+                            <nav className="space-y-1.5" aria-label="Manage event operations">
+                                {adminOperationItems.map(item => <Link key={item.section} href={item.href} onClick={() => { window.dispatchEvent(new CustomEvent("admin-section-change", { detail: item.section })); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-bold transition-all ${pathname === "/dashboard/admin" && activeAdminSection === item.section ? "bg-[#bef264] text-black border-2 border-black shadow-[3px_3px_0px_#000] font-black" : "text-neutral-800 hover:text-black hover:bg-[#fff9db] border-2 border-transparent hover:border-black"}`}><item.icon size={16} />{item.label}</Link>)}
                             </nav>
                         </div>}
                     </motion.div>

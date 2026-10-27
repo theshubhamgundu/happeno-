@@ -422,16 +422,16 @@ export default function JudgeDashboard() {
                         {/* Status bar: Evaluator name & sync status */}
                         <div className="flex items-center justify-between gap-3 px-1">
                             {currentJudge && (
-                                <div className="inline-flex items-center gap-2 text-xs font-bold text-white">
-                                    <UserCircle2 size={16} className="text-orange-500" />
-                                    <span>Evaluator: <strong className="text-white">{currentJudge.name}</strong></span>
+                                <div className="inline-flex items-center gap-2 text-xs font-black text-black bg-white border-2 border-black px-3 py-1 rounded-lg shadow-[2px_2px_0px_#000]">
+                                    <UserCircle2 size={16} className="text-black" />
+                                    <span>Evaluator: <strong>{currentJudge.name}</strong></span>
                                 </div>
                             )}
-                            <div className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${!isOnline
-                                    ? "border-amber-400 bg-black text-amber-400"
+                            <div className={`ml-auto inline-flex items-center gap-1.5 rounded-lg border-2 border-black px-3 py-1 text-xs font-black shadow-[2px_2px_0px_#000] ${!isOnline
+                                    ? "bg-[#fe90e8] text-black"
                                     : offlineQueue.length > 0
-                                        ? "border-amber-400 bg-black text-amber-400"
-                                        : "border-zinc-800 bg-black text-white"
+                                        ? "bg-[#ffdc8b] text-black"
+                                        : "bg-[#99e885] text-black"
                                 }`}>
                                 {!isOnline ? (
                                     <>
@@ -440,12 +440,12 @@ export default function JudgeDashboard() {
                                     </>
                                 ) : offlineQueue.length > 0 ? (
                                     <>
-                                        <CloudUpload size={13} className="animate-bounce text-orange-400" />
+                                        <CloudUpload size={13} className="animate-bounce" />
                                         <span>{offlineQueue.length} Queued to Sync</span>
                                     </>
                                 ) : (
                                     <>
-                                        <Wifi size={13} className="text-orange-400" />
+                                        <Wifi size={13} />
                                         <span>Online & Synced</span>
                                     </>
                                 )}
@@ -454,16 +454,16 @@ export default function JudgeDashboard() {
 
                         {/* Offline Queue Pending Sync Banner */}
                         {offlineQueue.length > 0 && (
-                            <div className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                            <div className="rounded-xl border-2 border-black bg-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[4px_4px_0px_#000]">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-xl bg-black border border-zinc-800 text-orange-400 shrink-0">
+                                    <div className="p-2 rounded-lg bg-[#ffdc8b] border-2 border-black text-black shrink-0 shadow-[1.5px_1.5px_0px_#000]">
                                         <CloudUpload size={20} />
                                     </div>
                                     <div>
-                                        <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+                                        <h4 className="text-xs font-black uppercase tracking-wider text-black">
                                             {offlineQueue.length} Evaluation{offlineQueue.length === 1 ? '' : 's'} Stored Locally on this Phone
                                         </h4>
-                                        <p className="text-[11px] text-white/90">
+                                        <p className="text-[11px] text-neutral-700 font-semibold">
                                             Saved safely during poor connection. They will auto-upload the instant network stabilizes.
                                         </p>
                                     </div>
@@ -471,7 +471,7 @@ export default function JudgeDashboard() {
                                 <button
                                     onClick={() => void processOfflineQueue()}
                                     disabled={isSyncingQueue || !isOnline}
-                                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 px-4 py-2 text-xs font-bold text-white hover:opacity-90 disabled:opacity-50 transition-colors shrink-0 shadow-sm"
+                                    className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#f7cb46] hover:bg-[#ffd24d] px-4 py-2 text-xs font-black text-black border-2 border-black shadow-[2px_2px_0px_#000] disabled:opacity-50 transition-transform shrink-0"
                                 >
                                     <RefreshCw size={13} className={isSyncingQueue ? "animate-spin" : ""} />
                                     {isSyncingQueue ? "Syncing..." : "Sync Now"}
@@ -484,20 +484,20 @@ export default function JudgeDashboard() {
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-5 shadow-sm"
+                                className="rounded-xl border-2 border-black bg-[#ffdc8b] p-5 shadow-[4px_4px_0px_#000]"
                             >
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex items-start gap-3">
-                                        <CheckCircle2 className="h-6 w-6 text-orange-500 shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-6 w-6 text-black shrink-0 mt-0.5" />
                                         <div>
-                                            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+                                            <h3 className="text-sm font-black uppercase tracking-wider text-black">
                                                 Team Already Evaluated & Recorded
                                             </h3>
-                                            <p className="mt-1 text-xs text-white">
-                                                <span className="font-mono font-bold text-white">{alreadyEvaluatedInfo.teamId}</span> ({alreadyEvaluatedInfo.teamName}) has already been evaluated for <span className="font-bold text-white">{alreadyEvaluatedInfo.roundTitle}</span>.
+                                            <p className="mt-1 text-xs text-black font-semibold">
+                                                <span className="font-mono font-black text-black">{alreadyEvaluatedInfo.teamId}</span> ({alreadyEvaluatedInfo.teamName}) has already been evaluated for <span className="font-black text-black">{alreadyEvaluatedInfo.roundTitle}</span>.
                                             </p>
                                             {alreadyEvaluatedInfo.score !== null && (
-                                                <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-black border border-zinc-800 px-3 py-1 text-xs font-mono font-bold text-white">
+                                                <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-white border-2 border-black px-3 py-1 text-xs font-mono font-black text-black shadow-[1.5px_1.5px_0px_#000]">
                                                     Submitted Score: {alreadyEvaluatedInfo.score} pts
                                                 </div>
                                             )}
@@ -505,7 +505,7 @@ export default function JudgeDashboard() {
                                     </div>
                                     <button
                                         onClick={() => setAlreadyEvaluatedInfo(null)}
-                                        className="text-white hover:text-orange-400 text-xs font-bold uppercase"
+                                        className="text-black hover:opacity-75 text-xs font-black uppercase border-2 border-black px-2 py-1 bg-white rounded shadow-[1px_1px_0px_#000]"
                                     >
                                         Dismiss
                                     </button>
@@ -516,20 +516,20 @@ export default function JudgeDashboard() {
                         {/* Direct Team ID Input Form */}
                         <form
                             onSubmit={event => { event.preventDefault(); void handleStartEvaluation(); }}
-                            className="rounded-3xl border border-zinc-800 bg-[#0d0d12] p-6 sm:p-10 shadow-sm space-y-6"
+                            className="rounded-xl border-2 border-black bg-white p-6 sm:p-8 shadow-[4px_4px_0px_#000] space-y-6"
                         >
                             <div className="space-y-1.5">
-                                <h2 className="text-2xl sm:text-3xl font-black uppercase italic text-white tracking-tight">
+                                <h2 className="text-2xl sm:text-3xl font-black uppercase text-black tracking-tight">
                                     Start Evaluation
                                 </h2>
-                                <p className="text-xs sm:text-sm text-white leading-relaxed">
+                                <p className="text-xs sm:text-sm text-neutral-700 font-semibold leading-relaxed">
                                     Enter the assigned Team ID to open the scoring rubric and project details.
                                 </p>
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <div className="flex h-14 w-full items-center rounded-2xl border border-zinc-800 bg-black focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20 transition-all overflow-hidden shadow-inner">
-                                    <div className="flex h-full items-center bg-zinc-900 px-5 border-r border-zinc-800 text-white font-mono text-lg sm:text-xl font-black tracking-widest">
+                                <div className="flex h-14 w-full items-center rounded-xl border-2 border-black bg-white focus-within:shadow-[4px_4px_0px_#000] transition-all overflow-hidden shadow-[2px_2px_0px_#000]">
+                                    <div className="flex h-full items-center bg-[#f7cb46] px-5 border-r-2 border-black text-black font-mono text-lg sm:text-xl font-black tracking-widest">
                                         TRI
                                     </div>
                                     <input
@@ -542,13 +542,13 @@ export default function JudgeDashboard() {
                                         }}
                                         placeholder="26058"
                                         aria-label="Team ID"
-                                        className="h-full w-full bg-transparent px-4 font-mono text-lg sm:text-xl font-bold uppercase tracking-wider text-white placeholder:text-zinc-600 outline-none"
+                                        className="h-full w-full bg-white px-4 font-mono text-lg sm:text-xl font-black uppercase tracking-wider text-black placeholder:text-neutral-400 outline-none"
                                     />
                                 </div>
                                 <button
                                     type="submit"
                                     disabled={isStarting || !teamIdInput.trim()}
-                                    className="h-14 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 px-6 text-sm font-bold uppercase tracking-wider text-white disabled:cursor-not-allowed disabled:opacity-40 hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_15px_rgba(234,88,12,0.35)]"
+                                    className="h-14 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#f7cb46] hover:bg-[#ffd24d] px-6 text-sm font-black uppercase tracking-wider text-black border-2 border-black shadow-[3px_3px_0px_#000] disabled:cursor-not-allowed disabled:opacity-40 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
                                 >
                                     <ClipboardCheck size={18} />
                                     {isStarting ? 'Loading Project Details...' : 'Start Evaluation'}
@@ -562,39 +562,39 @@ export default function JudgeDashboard() {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
-                        className="space-y-8"
+                        className="space-y-6"
                     >
                         {/* Header & Navigation */}
                         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
                             <button
                                 onClick={returnToTeamLookup}
-                                className="flex items-center gap-2 self-start text-white hover:text-orange-400 transition-colors group"
+                                className="flex items-center gap-2 self-start text-black hover:bg-neutral-100 bg-white border-2 border-black px-3 py-1.5 rounded-lg shadow-[2px_2px_0px_#000] transition-colors group"
                             >
-                                <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                                <span className="text-xs font-bold uppercase tracking-wider">Back to Projects</span>
+                                <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+                                <span className="text-xs font-black uppercase tracking-wider">Back to Projects</span>
                             </button>
-                            <div className="flex max-w-full flex-wrap items-center gap-2 px-3 py-1.5 bg-black border border-zinc-800 rounded-xl">
-                                <Target size={15} className="text-orange-500" />
-                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                            <div className="flex max-w-full flex-wrap items-center gap-2 px-3 py-1.5 bg-[#c0f7fe] border-2 border-black rounded-lg shadow-[2px_2px_0px_#000]">
+                                <Target size={15} className="text-black" />
+                                <span className="text-[10px] font-black text-black uppercase tracking-wider">
                                     {evaluationRound.title} Evaluation Active
                                 </span>
                             </div>
                         </div>
 
                         {/* Project Information Card */}
-                        <div className="bg-[#0d0d12] border border-zinc-800 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 relative overflow-hidden shadow-sm">
+                        <div className="bg-white border-2 border-black rounded-xl p-6 sm:p-8 relative overflow-hidden shadow-[4px_4px_0px_#000]">
                             <div className="relative z-10 space-y-6 md:space-y-8">
                                 <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-5 text-center md:text-left">
-                                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 border border-orange-400/40 shadow-[0_0_15px_rgba(234,88,12,0.4)] flex items-center justify-center text-2xl font-black text-white shrink-0">
+                                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-[#c0f7fe] border-2 border-black shadow-[3px_3px_0px_#000] flex items-center justify-center text-2xl font-black text-black shrink-0">
                                         {activeProject.name[0]}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black italic uppercase tracking-tight text-white leading-tight break-words">
+                                        <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-black leading-tight break-words">
                                             {activeProject.name}
                                         </h2>
                                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2">
-                                            <span className="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider bg-black px-2.5 py-0.5 rounded border border-zinc-800">ID: {activeProject.teamId}</span>
-                                            {activeProject.track && <span className="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider bg-black px-2.5 py-0.5 rounded border border-zinc-800">{activeProject.track}</span>}
+                                            <span className="text-[10px] md:text-xs font-black text-black uppercase tracking-wider bg-[#ffdc8b] px-2.5 py-0.5 rounded border-2 border-black shadow-[1.5px_1.5px_0px_#000]">ID: {activeProject.teamId}</span>
+                                            {activeProject.track && <span className="text-[10px] md:text-xs font-black text-black uppercase tracking-wider bg-[#99e885] px-2.5 py-0.5 rounded border-2 border-black shadow-[1.5px_1.5px_0px_#000]">{activeProject.track}</span>}
                                         </div>
                                     </div>
                                 </div>
@@ -602,8 +602,8 @@ export default function JudgeDashboard() {
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div>
                                         <div className="flex items-center gap-2 mb-3">
-                                            <Users size={15} className="text-orange-500" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-white">Participants</span>
+                                            <Users size={15} className="text-black" />
+                                            <span className="text-[10px] font-black uppercase tracking-wider text-black">Participants</span>
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2">
                                             {activeProject.members?.map((member, i) => {
@@ -611,11 +611,11 @@ export default function JudgeDashboard() {
                                                 const isCaptain = displayName === activeProject.captain;
 
                                                 return (
-                                                    <div key={i} className="px-3 py-1.5 bg-black border border-zinc-800 rounded-lg flex items-center gap-2">
-                                                        <UserCircle2 size={13} className="text-white shrink-0" />
-                                                        <span className="text-xs font-semibold text-white truncate">{displayName}</span>
+                                                    <div key={i} className="px-3 py-1.5 bg-white border-2 border-black rounded-lg flex items-center gap-2 shadow-[1.5px_1.5px_0px_#000]">
+                                                        <UserCircle2 size={13} className="text-black shrink-0" />
+                                                        <span className="text-xs font-bold text-black truncate">{displayName}</span>
                                                         {isCaptain && (
-                                                            <span className="text-[8px] font-bold bg-orange-600 text-white px-1.5 py-0.2 rounded shrink-0">C</span>
+                                                            <span className="text-[8px] font-black bg-[#fe90e8] text-black px-1.5 py-0.2 rounded border border-black shrink-0">C</span>
                                                         )}
                                                     </div>
                                                 );
@@ -624,38 +624,38 @@ export default function JudgeDashboard() {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2 mb-3">
-                                            <Info size={15} className="text-orange-500" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-white">Project Title</span>
+                                            <Info size={15} className="text-black" />
+                                            <span className="text-[10px] font-black uppercase tracking-wider text-black">Project Title</span>
                                         </div>
-                                        <p className="text-base sm:text-lg text-white leading-relaxed italic font-semibold">
+                                        <p className="text-base sm:text-lg text-black leading-relaxed font-bold bg-[#ede8f5] p-3 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000]">
                                             &ldquo;{activeProject.problemStatement}&rdquo;
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 gap-6 border-t border-zinc-800 pt-6 lg:grid-cols-2">
+                                <div className="grid grid-cols-1 gap-6 border-t-2 border-black pt-6 lg:grid-cols-2">
                                     <div>
-                                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-white">Proposed idea</h3>
-                                        <p className="mt-1.5 whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-white">{activeProject.proposedIdea || 'No proposed idea submitted.'}</p>
+                                        <h3 className="text-[10px] font-black uppercase tracking-wider text-black">Proposed idea</h3>
+                                        <p className="mt-1.5 whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-black font-semibold bg-white p-3 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000]">{activeProject.proposedIdea || 'No proposed idea submitted.'}</p>
                                     </div>
                                     <div>
-                                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-white">Technology stack</h3>
+                                        <h3 className="text-[10px] font-black uppercase tracking-wider text-black">Technology stack</h3>
                                         <div className="mt-1.5 flex flex-wrap gap-1.5">
                                             {Object.entries(activeProject.techStack || {}).flatMap(([category, items]) =>
-                                                (items || []).map(item => <span key={`${category}-${item}`} className="rounded-lg border border-zinc-800 bg-black px-2.5 py-1 text-[10px] font-semibold text-white">{category}: {item}</span>)
+                                                (items || []).map(item => <span key={`${category}-${item}`} className="rounded-lg border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black shadow-[1.5px_1.5px_0px_#000]">{category}: {item}</span>)
                                             )}
-                                            {!Object.values(activeProject.techStack || {}).some(items => items?.length) && <span className="text-xs text-white">No technology stack submitted.</span>}
+                                            {!Object.values(activeProject.techStack || {}).some(items => items?.length) && <span className="text-xs text-neutral-600 font-bold">No technology stack submitted.</span>}
                                         </div>
                                     </div>
                                     {activeProject.submission?.projectZip && (
-                                        <div className="border-t border-zinc-800 pt-6">
+                                        <div className="border-t-2 border-black pt-6">
                                             <a
                                                 href={activeProject.submission.projectZip}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 rounded-xl border border-zinc-800 bg-black px-4 py-3 text-sm font-semibold text-white hover:bg-zinc-900"
+                                                className="inline-flex items-center gap-2 rounded-lg border-2 border-black bg-[#ffdc8b] px-4 py-3 text-sm font-black text-black hover:bg-[#ffd24d] shadow-[2px_2px_0px_#000]"
                                             >
-                                                <ExternalLink size={16} className="text-orange-400" />
+                                                <ExternalLink size={16} className="text-black" />
                                                 Open project ZIP in Google Drive
                                             </a>
                                         </div>
@@ -665,27 +665,25 @@ export default function JudgeDashboard() {
                         </div>
 
                         {/* Evaluation Form */}
-                        <div className="bg-[#0d0d12] border border-zinc-800 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-12 space-y-8 md:space-y-12 shadow-sm">
+                        <div className="bg-white border-2 border-black rounded-xl p-6 sm:p-8 md:p-10 space-y-8 shadow-[4px_4px_0px_#000]">
                             <div className="space-y-8 md:space-y-10">
                                 {evaluationRound.criteria.map((criterion, i) => (
                                     <div key={criterion.id} className="group">
                                         <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6">
                                             {/* Number badge */}
-                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-black border border-zinc-800 flex items-center justify-center text-sm md:text-base font-bold text-white group-hover:border-orange-500 transition-all shrink-0">
+                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-[#f7cb46] border-2 border-black flex items-center justify-center text-sm md:text-base font-black text-black shadow-[2px_2px_0px_#000] shrink-0">
                                                 {String(i + 1).padStart(2, '0')}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex flex-col gap-3">
                                                     <div>
-                                                        <h4 className="text-base md:text-xl font-bold italic uppercase tracking-tight text-white mb-1">{criterion.label}</h4>
-                                                        <p className="text-white text-xs md:text-sm leading-relaxed">{criterion.desc}</p>
+                                                        <h4 className="text-base md:text-xl font-black uppercase tracking-tight text-black mb-1">{criterion.label}</h4>
+                                                        <p className="text-neutral-700 font-semibold text-xs md:text-sm leading-relaxed">{criterion.desc}</p>
                                                     </div>
                                                     {/* Score Picker — ten scores in a compact, touch-friendly grid */}
-                                                    <div className="grid w-full grid-cols-5 gap-1.5">
+                                                    <div className="grid w-full grid-cols-5 gap-2">
                                                         {Array.from({ length: 10 }, (_, index) => index + 1).map(v => {
                                                             const selected = currentScores[criterion.id] === v;
-                                                            const selectedColor = "bg-black border-orange-500 text-white shadow-[0_0_10px_rgba(234,88,12,0.3)]";
-                                                            const hoverColor = "hover:border-zinc-700 hover:text-white";
                                                             const label = v === 1 ? "Poor" : v === 5 ? "Fair" : v === 8 ? "Good" : v === 10 ? "Best" : "";
                                                             return (
                                                                 <button
@@ -694,13 +692,13 @@ export default function JudgeDashboard() {
                                                                     aria-label={`Score ${v} out of 10${label ? `, ${label}` : ""}`}
                                                                     aria-pressed={selected}
                                                                     onClick={() => handleScoreChange(criterion.id, v)}
-                                                                    className={`flex min-h-11 flex-col items-center justify-center rounded-xl border-2 px-1 py-1.5 transition-all active:scale-95 ${selected
-                                                                        ? selectedColor
-                                                                        : `bg-black border-zinc-800 text-white ${hoverColor}`
+                                                                    className={`flex min-h-11 flex-col items-center justify-center rounded-lg border-2 border-black px-1 py-1.5 transition-all ${selected
+                                                                        ? "bg-[#f7cb46] text-black font-black shadow-[3px_3px_0px_#000] translate-x-[-1px] translate-y-[-1px]"
+                                                                        : "bg-white hover:bg-[#ffdc8b]/30 text-black font-bold shadow-[1.5px_1.5px_0px_#000]"
                                                                         }`}
                                                                 >
-                                                                    <span className="text-sm md:text-lg font-bold leading-none">{v}</span>
-                                                                    {label && <span className="mt-0.5 text-[8px] font-bold uppercase leading-none tracking-wide">{label}</span>}
+                                                                    <span className="text-sm md:text-lg font-black leading-none">{v}</span>
+                                                                    {label && <span className="mt-0.5 text-[8px] font-black uppercase leading-none tracking-wide">{label}</span>}
                                                                 </button>
                                                             );
                                                         })}
@@ -709,27 +707,27 @@ export default function JudgeDashboard() {
                                             </div>
                                         </div>
                                         {i < evaluationRound.criteria.length - 1 && (
-                                            <div className="mt-6 md:mt-8 h-[1px] w-full bg-slate-100" />
+                                            <div className="mt-6 md:mt-8 h-[2px] w-full bg-black" />
                                         )}
                                     </div>
                                 ))}
                             </div>
 
                             {/* Feedback Area */}
-                            <div className="pt-6 md:pt-10 border-t border-zinc-800">
+                            <div className="pt-6 md:pt-8 border-t-2 border-black">
                                 <div className="flex items-center gap-2.5 mb-4">
-                                    <div className="p-2 rounded-xl bg-black text-orange-500 border border-zinc-800">
+                                    <div className="p-2 rounded-lg bg-[#c0f7fe] text-black border-2 border-black shadow-[1.5px_1.5px_0px_#000]">
                                         <MessageSquare size={16} />
                                     </div>
-                                    <h4 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-white">Additional Feedback <span className="text-orange-400 text-xs normal-case font-bold ml-1">(Required)</span></h4>
+                                    <h4 className="text-lg font-black uppercase tracking-tight text-black">Additional Feedback <span className="text-black text-xs normal-case font-bold ml-1">(Required)</span></h4>
                                 </div>
                                 <textarea
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
                                     placeholder="Add constructive comments here..."
-                                    className="w-full h-28 md:h-36 bg-black border-2 border-zinc-800 rounded-2xl p-4 md:p-5 text-sm md:text-base font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-orange-500 transition-all resize-none shadow-sm"
+                                    className="w-full h-28 md:h-36 bg-white border-2 border-black rounded-lg p-4 text-sm md:text-base font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:shadow-[4px_4px_0px_#000] transition-all resize-none shadow-[2px_2px_0px_#000]"
                                 />
-                                <p aria-live="polite" className={`mt-2 text-xs ${draftStatus === 'error' ? 'text-rose-500' : 'text-white'}`}>
+                                <p aria-live="polite" className={`mt-2 text-xs font-bold ${draftStatus === 'error' ? 'text-rose-600' : 'text-neutral-700'}`}>
                                     {draftStatus === 'saving' ? 'Saving draft…' : draftStatus === 'saved' ? 'Draft saved' : draftStatus === 'error' ? 'Draft save failed. Keep this page open and retry before submitting.' : ''}
                                 </p>
                             </div>
@@ -739,23 +737,23 @@ export default function JudgeDashboard() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="rounded-2xl border border-zinc-800 bg-[#0d0d12] p-5 space-y-3 shadow-sm"
+                                    className="rounded-xl border-2 border-black bg-[#ffdc8b] p-5 space-y-3 shadow-[4px_4px_0px_#000]"
                                 >
                                     <div className="flex items-start gap-3">
-                                        <WifiOff className="h-5 w-5 text-orange-400 shrink-0 mt-0.5" />
+                                        <WifiOff className="h-5 w-5 text-black shrink-0 mt-0.5" />
                                         <div className="min-w-0 flex-1">
-                                            <h4 className="text-sm font-bold uppercase tracking-wider text-white">
+                                            <h4 className="text-sm font-black uppercase tracking-wider text-black">
                                                 Weak / Offline Connection — Scores Safely Saved!
                                             </h4>
-                                            <p className="mt-1 text-xs text-white leading-relaxed">
-                                                Your evaluation for <strong className="text-white font-bold">{offlineSubmitNotice.teamName}</strong> is safely preserved in this phone&apos;s memory. You won&apos;t lose anything even if you close the app.
+                                            <p className="mt-1 text-xs text-black font-semibold leading-relaxed">
+                                                Your evaluation for <strong className="text-black font-black">{offlineSubmitNotice.teamName}</strong> is safely preserved in this phone&apos;s memory. You won&apos;t lose anything even if you close the app.
                                             </p>
                                             <div className="mt-3 flex flex-wrap gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={() => void handleScoreSubmit()}
                                                     disabled={isSubmitting}
-                                                    className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 px-4 py-2 text-xs font-bold text-white hover:opacity-90 transition-colors shadow-sm"
+                                                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#f7cb46] hover:bg-[#ffd24d] px-4 py-2 text-xs font-black text-black border-2 border-black shadow-[2px_2px_0px_#000] transition-transform"
                                                 >
                                                     <RefreshCw size={13} className={isSubmitting ? "animate-spin" : ""} /> Retry Upload Now
                                                 </button>
@@ -772,7 +770,7 @@ export default function JudgeDashboard() {
                                                         setTeamIdInput('');
                                                         setOfflineSubmitNotice(null);
                                                     }}
-                                                    className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-800 bg-black px-4 py-2 text-xs font-bold text-white hover:bg-zinc-900 transition-colors shadow-sm"
+                                                    className="inline-flex items-center gap-1.5 rounded-lg border-2 border-black bg-white px-4 py-2 text-xs font-black text-black hover:bg-neutral-100 transition-colors shadow-[2px_2px_0px_#000]"
                                                 >
                                                     <ClipboardCheck size={13} /> Queue & Score Next Team
                                                 </button>
@@ -786,14 +784,14 @@ export default function JudgeDashboard() {
                             <div className="pt-4 md:pt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4">
                                 <button
                                     onClick={returnToTeamLookup}
-                                    className="w-full sm:w-auto h-11 px-6 rounded-xl font-bold uppercase tracking-wider text-white hover:text-orange-400 hover:bg-black transition-all text-xs"
+                                    className="w-full sm:w-auto h-11 px-6 rounded-lg font-black uppercase tracking-wider text-black bg-white border-2 border-black hover:bg-neutral-100 shadow-[2px_2px_0px_#000] transition-all text-xs"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleScoreSubmit}
                                     disabled={isSubmitting || evaluationRound.criteria.some(criterion => !currentScores[criterion.id]) || !comment.trim()}
-                                    className="w-full sm:w-auto h-11 px-8 bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 hover:opacity-95 text-white font-bold uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(234,88,12,0.35)] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed group"
+                                    className="w-full sm:w-auto h-11 px-8 bg-[#f7cb46] hover:bg-[#ffd24d] text-black font-black uppercase tracking-wider rounded-lg border-2 border-black shadow-[3px_3px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-40 disabled:cursor-not-allowed group transition-all"
                                 >
                                     <span className="flex items-center justify-center gap-2 text-xs">
                                         {isSubmitting ? 'Submitting…' : 'Submit Evaluation'} <CheckCircle2 size={16} />

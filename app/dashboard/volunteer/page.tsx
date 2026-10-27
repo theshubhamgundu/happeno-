@@ -195,8 +195,8 @@ export default function VolunteerDashboard() {
         return (
             <DashboardLayout type="volunteer" title="Scanner" hideHeader hideSidebar>
                 <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-                    <div className="w-10 h-10 border-4 border-[#14b8a6] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-slate-400 font-bold uppercase text-xs tracking-widest text-center">Loading Scanner...</p>
+                    <div className="w-10 h-10 border-4 border-black border-t-[#f7cb46] rounded-full animate-spin" />
+                    <p className="text-black font-black uppercase text-xs tracking-widest text-center">Loading Scanner...</p>
                 </div>
             </DashboardLayout>
         );
@@ -207,13 +207,13 @@ export default function VolunteerDashboard() {
             <div className="max-w-2xl mx-auto space-y-5 py-4">
                 
                 {/* ═══════════ MODULE TABS ═══════════ */}
-                <div className="flex bg-slate-100 p-1.5 rounded-2xl w-full border border-slate-200">
+                <div className="flex bg-white p-1.5 rounded-xl w-full border-2 border-black shadow-[4px_4px_0px_#000] gap-1.5">
                     <button
                         onClick={() => { setActiveModule('checkin'); setLastScanEntry(null); }}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-2 ${
                             activeModule === 'checkin'
-                                ? 'bg-white text-teal-700 shadow-sm border border-slate-200/50'
-                                : 'text-slate-500 hover:bg-slate-200/50'
+                                ? 'bg-[#c0f7fe] text-black border-black shadow-[2px_2px_0px_#000]'
+                                : 'bg-transparent text-neutral-800 border-transparent hover:bg-neutral-100 hover:border-black'
                         }`}
                     >
                         <Users size={16} />
@@ -221,10 +221,10 @@ export default function VolunteerDashboard() {
                     </button>
                     <button
                         onClick={() => { setActiveModule('meal'); setLastScanEntry(null); setIsRapidMode(true); }}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-2 ${
                             activeModule === 'meal'
-                                ? 'bg-white text-amber-700 shadow-sm border border-slate-200/50'
-                                : 'text-slate-500 hover:bg-slate-200/50'
+                                ? 'bg-[#ffdc8b] text-black border-black shadow-[2px_2px_0px_#000]'
+                                : 'bg-transparent text-neutral-800 border-transparent hover:bg-neutral-100 hover:border-black'
                         }`}
                     >
                         <Utensils size={16} />
@@ -232,10 +232,10 @@ export default function VolunteerDashboard() {
                     </button>
                     <button
                         onClick={() => { setActiveModule('networking'); setLastScanEntry(null); setIsRapidMode(true); }}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-2 ${
                             activeModule === 'networking'
-                                ? 'bg-white text-orange-600 shadow-sm border border-slate-200/50'
-                                : 'text-slate-500 hover:bg-slate-200/50'
+                                ? 'bg-[#fe90e8] text-black border-black shadow-[2px_2px_0px_#000]'
+                                : 'bg-transparent text-neutral-800 border-transparent hover:bg-neutral-100 hover:border-black'
                         }`}
                     >
                         <Network size={16} />
@@ -245,9 +245,9 @@ export default function VolunteerDashboard() {
 
                 {/* Mode & Sound controls bar */}
                 <div className="flex items-center justify-between px-1">
-                    <div className="flex items-center gap-2">
-                        <span className={`h-2.5 w-2.5 rounded-full animate-pulse ${activeModule === 'checkin' ? 'bg-[#14b8a6]' : (activeModule === 'networking' ? 'bg-orange-500' : 'bg-amber-500')}`} />
-                        <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                    <div className="flex items-center gap-2 bg-white border-2 border-black px-3 py-1.5 rounded-lg shadow-[2px_2px_0px_#000]">
+                        <span className={`h-2.5 w-2.5 rounded-full border border-black animate-pulse ${activeModule === 'checkin' ? 'bg-[#c0f7fe]' : (activeModule === 'networking' ? 'bg-[#fe90e8]' : 'bg-[#ffdc8b]')}`} />
+                        <span className="text-xs font-black uppercase tracking-wider text-black">
                             {activeModule === 'checkin' ? 'Gate QR Scanner' : (activeModule === 'networking' ? 'Networking QR Scanner' : 'Dinner QR Scanner')}
                         </span>
                     </div>
@@ -257,14 +257,14 @@ export default function VolunteerDashboard() {
                         {activeModule === 'checkin' && (
                             <button
                                 onClick={() => setIsRapidMode(v => !v)}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-wider transition-all ${
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-black text-[10px] font-black uppercase tracking-wider transition-all shadow-[2px_2px_0px_#000] ${
                                     isRapidMode
-                                        ? 'bg-amber-400/10 border-amber-400/40 text-amber-700'
-                                        : 'bg-slate-100 border-slate-200 text-slate-500'
+                                        ? 'bg-[#f7cb46] text-black'
+                                        : 'bg-white text-black hover:bg-neutral-100'
                                 }`}
                                 title="In Rapid Mode, the scanner resets automatically without opening a modal"
                             >
-                                <Zap size={12} className={isRapidMode ? "text-amber-500" : "text-slate-400"} />
+                                <Zap size={12} className="text-black" />
                                 {isRapidMode ? "Rapid Continuous ON" : "Inspect Mode"}
                             </button>
                         )}
@@ -272,10 +272,10 @@ export default function VolunteerDashboard() {
                         {/* Audio Toggle */}
                         <button
                             onClick={() => setSoundEnabled(v => !v)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-wider transition-all ${
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-black text-[10px] font-black uppercase tracking-wider transition-all shadow-[2px_2px_0px_#000] ${
                                 soundEnabled
-                                    ? 'bg-[#14b8a6]/10 border-[#14b8a6]/40 text-[#0d9488]'
-                                    : 'bg-slate-100 border-slate-200 text-slate-400'
+                                    ? 'bg-[#99e885] text-black'
+                                    : 'bg-white text-black hover:bg-neutral-100'
                             }`}
                         >
                             {soundEnabled ? <Volume2 size={13} /> : <VolumeX size={13} />}
@@ -285,7 +285,7 @@ export default function VolunteerDashboard() {
                 </div>
 
                 {/* QR Scanner Component */}
-                <div className="rounded-3xl overflow-hidden shadow-sm border border-slate-200 bg-white">
+                <div className="rounded-xl overflow-hidden shadow-[4px_4px_0px_#000] border-2 border-black bg-white">
                     <QRScanner
                         onScan={processScan}
                         embedded={true}
@@ -304,51 +304,39 @@ export default function VolunteerDashboard() {
                         key={lastScanEntry.id}
                         initial={{ scale: 0.96, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className={`rounded-2xl border p-5 relative overflow-hidden shadow-sm ${
+                        className={`rounded-xl border-2 border-black p-5 relative overflow-hidden shadow-[4px_4px_0px_#000] ${
                             lastScanEntry.status === 'PERMITTED'
-                                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
+                                ? 'bg-[#99e885] text-black'
                                 : lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'ALREADY_CLAIMED'
-                                    ? 'bg-amber-50/70 border-amber-200 text-amber-950'
-                                    : 'bg-rose-50/70 border-rose-200 text-rose-950'
+                                    ? 'bg-[#ffdc8b] text-black'
+                                    : 'bg-[#fe90e8] text-black'
                         }`}
                     >
                         <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-3">
-                                <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-black ${
-                                    lastScanEntry.status === 'PERMITTED'
-                                        ? 'bg-emerald-600 text-white'
-                                        : lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'ALREADY_CLAIMED'
-                                            ? 'bg-amber-500 text-white'
-                                            : 'bg-rose-600 text-white'
-                                }`}>
+                                <div className="w-11 h-11 rounded-lg border-2 border-black flex items-center justify-center font-black bg-white text-black shadow-[2px_2px_0px_#000]">
                                     {lastScanEntry.status === 'PERMITTED' ? <CheckCircle2 size={22} /> :
                                         (lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'ALREADY_CLAIMED') ? <Clock size={22} /> :
                                             <ShieldAlert size={22} />}
                                 </div>
                                 <div>
-                                    <h4 className="text-lg font-black uppercase tracking-tight leading-tight">
+                                    <h4 className="text-lg font-black uppercase tracking-tight leading-tight text-black">
                                         {lastScanEntry.teamName}
                                     </h4>
-                                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                    <span className="text-[11px] font-bold text-neutral-800 uppercase tracking-wider">
                                         ID: {lastScanEntry.teamId} • {lastScanEntry.timestamp}
                                     </span>
                                 </div>
                             </div>
-                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
-                                lastScanEntry.status === 'PERMITTED'
-                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                                    : lastScanEntry.status === 'ALREADY_CHECKED_IN' || lastScanEntry.status === 'ALREADY_CLAIMED'
-                                        ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                                        : 'bg-rose-100 text-rose-800 border border-rose-300'
-                            }`}>
+                            <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-white border-2 border-black text-black shadow-[1.5px_1.5px_0px_#000]">
                                 {lastScanEntry.passType === 'member' ? 'Meal Token' : 'Gate Pass'}
                             </span>
                         </div>
-                        <p className="text-sm font-semibold mt-3 pt-3 border-t border-slate-200/60">
+                        <p className="text-sm font-bold mt-3 pt-3 border-t-2 border-black text-black">
                             {lastScanEntry.message}
                         </p>
                         {lastScanEntry.mealLabel && (
-                            <div className="mt-2 text-xs font-bold text-teal-700">
+                            <div className="mt-2 text-xs font-black text-black bg-white inline-block px-2 py-0.5 rounded border border-black">
                                 Meal Slot: {lastScanEntry.mealLabel}
                             </div>
                         )}
@@ -365,41 +353,41 @@ export default function VolunteerDashboard() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setInspectedTeam(null)}
-                            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                         />
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl z-[260] overflow-hidden text-slate-900"
+                            className="relative w-full max-w-lg bg-white border-3 border-black rounded-2xl p-6 sm:p-8 shadow-[6px_6px_0px_#000] z-[260] overflow-hidden text-black"
                         >
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tight text-slate-900">
+                                    <h3 className="text-2xl font-black uppercase tracking-tight text-black">
                                         {inspectedTeam.team || inspectedTeam.name}
                                     </h3>
-                                    <span className="text-xs font-mono font-bold text-teal-700 mt-0.5 block">
+                                    <span className="text-xs font-mono font-black text-black bg-[#ffdc8b] px-2 py-0.5 rounded border border-black mt-1 inline-block">
                                         ID: {inspectedTeam.teamId || inspectedTeam.id}
                                     </span>
                                 </div>
                                 <button
                                     onClick={() => setInspectedTeam(null)}
-                                    className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition-colors"
+                                    className="p-2 text-black hover:bg-neutral-100 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000] transition-colors"
                                 >
-                                    <X size={20} />
+                                    <X size={18} />
                                 </button>
                             </div>
 
                             <div className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1 text-xs">
                                 {/* Captain info */}
-                                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                                    <span className="text-[10px] font-bold uppercase text-slate-500 block">Team Lead / Captain</span>
-                                    <div className="text-sm font-bold text-slate-900">{inspectedTeam.captain || 'Unassigned'}</div>
+                                <div className="p-3.5 rounded-lg bg-white border-2 border-black space-y-1 shadow-[2px_2px_0px_#000]">
+                                    <span className="text-[10px] font-black uppercase text-neutral-600 block">Team Lead / Captain</span>
+                                    <div className="text-sm font-black text-black">{inspectedTeam.captain || 'Unassigned'}</div>
                                     {inspectedTeam.captainMobile && (
-                                        <div className="text-slate-600 font-mono text-xs">{inspectedTeam.captainMobile}</div>
+                                        <div className="text-neutral-800 font-mono text-xs font-bold">{inspectedTeam.captainMobile}</div>
                                     )}
                                     {inspectedTeam.college && (
-                                        <div className="text-slate-500">{inspectedTeam.college}</div>
+                                        <div className="text-neutral-700 font-semibold">{inspectedTeam.college}</div>
                                     )}
                                 </div>
 
@@ -407,15 +395,15 @@ export default function VolunteerDashboard() {
                                 {(inspectedTeam.room || inspectedTeam.track) && (
                                     <div className="grid grid-cols-2 gap-3">
                                         {inspectedTeam.room && (
-                                            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                                                <span className="text-[9px] font-bold uppercase text-slate-400 block">Assigned Room</span>
-                                                <span className="text-xs font-bold text-slate-800">{inspectedTeam.room}</span>
+                                            <div className="p-3 rounded-lg bg-[#ffdc8b] border-2 border-black shadow-[2px_2px_0px_#000]">
+                                                <span className="text-[9px] font-black uppercase text-neutral-700 block">Assigned Room</span>
+                                                <span className="text-xs font-black text-black">{inspectedTeam.room}</span>
                                             </div>
                                         )}
                                         {inspectedTeam.track && (
-                                            <div className="p-3 rounded-xl bg-teal-50 border border-teal-200">
-                                                <span className="text-[9px] font-bold uppercase text-teal-700 block">Track</span>
-                                                <span className="text-xs font-bold text-teal-800">{inspectedTeam.track}</span>
+                                            <div className="p-3 rounded-lg bg-[#c0f7fe] border-2 border-black shadow-[2px_2px_0px_#000]">
+                                                <span className="text-[9px] font-black uppercase text-black block">Track</span>
+                                                <span className="text-xs font-black text-black">{inspectedTeam.track}</span>
                                             </div>
                                         )}
                                     </div>
@@ -423,19 +411,19 @@ export default function VolunteerDashboard() {
 
                                 {/* Roster */}
                                 <div className="space-y-2">
-                                    <span className="text-[10px] font-bold uppercase text-slate-500 block">
+                                    <span className="text-[10px] font-black uppercase text-neutral-600 block">
                                         Team Members ({inspectedTeam.members?.length || 0})
                                     </span>
                                     {inspectedTeam.members?.map((member, idx) => {
                                         const name = typeof member === 'string' ? member : member.fullName;
                                         const email = typeof member === 'string' ? '' : member.email;
                                         return (
-                                            <div key={idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                                            <div key={idx} className="p-2.5 rounded-lg bg-white border-2 border-black flex items-center justify-between shadow-[2px_2px_0px_#000]">
                                                 <div>
-                                                    <span className="font-bold text-slate-800 block">{name}</span>
-                                                    {email && <span className="text-[10px] text-slate-500">{email}</span>}
+                                                    <span className="font-black text-black block">{name}</span>
+                                                    {email && <span className="text-[10px] text-neutral-700 font-semibold">{email}</span>}
                                                 </div>
-                                                <span className="text-[10px] font-mono font-semibold text-slate-400">#{idx + 1}</span>
+                                                <span className="text-[10px] font-mono font-black text-black bg-[#ffdc8b] px-1.5 py-0.5 rounded border border-black">#{idx + 1}</span>
                                             </div>
                                         );
                                     })}
@@ -443,19 +431,19 @@ export default function VolunteerDashboard() {
                             </div>
 
                             {/* Check in action in modal */}
-                            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                            <div className="mt-6 pt-4 border-t-2 border-black flex items-center justify-between gap-3">
                                 {!inspectedTeam.isCheckedIn ? (
                                     <button
                                         onClick={async () => {
                                             await confirmInspectionCheckIn(inspectedTeam.id, inspectedTeam.team || inspectedTeam.name);
                                             setInspectedTeam(null);
                                         }}
-                                        className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 active:scale-95 text-white font-bold uppercase text-xs tracking-wider transition-all shadow-sm"
+                                        className="w-full py-3 rounded-lg bg-[#99e885] hover:bg-[#86efac] text-black font-black uppercase text-xs tracking-wider border-2 border-black shadow-[3px_3px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
                                     >
                                         Check In Team Now
                                     </button>
                                 ) : (
-                                    <div className="w-full py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold uppercase text-xs text-center">
+                                    <div className="w-full py-2.5 rounded-lg bg-[#99e885] border-2 border-black text-black font-black uppercase text-xs text-center shadow-[2px_2px_0px_#000]">
                                         Team Already Checked In ✓
                                     </div>
                                 )}

@@ -191,28 +191,28 @@ export default function TeamCertificatePage() {
         <DashboardLayout type="team" title="Official Certificates">
             <div className="max-w-6xl mx-auto space-y-8 pb-16">
                 {/* Header Banner */}
-                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-black shadow-[4px_4px_0px_#000] flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
-                            <span className="w-2 h-2 rounded-full bg-orange-600 animate-pulse" />
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-orange-600">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#f7cb46] border border-black animate-pulse" />
+                            <span className="text-[10px] font-mono font-black uppercase tracking-widest text-black bg-[#ffdc8b] px-2 py-0.5 rounded border border-black shadow-[1px_1px_0px_#000]">
                                 Happeno Credential Center
                             </span>
                         </div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-display">
+                        <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight font-display">
                             Hackathon Certificates
                         </h1>
-                        <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
+                        <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1 max-w-xl">
                             Verified participation certificates with verifiable digital signatures and public QR validation for every team member.
                         </p>
                     </div>
 
                     {data?.teamStatus && (
-                        <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl shrink-0">
-                            <Users size={18} className="text-orange-600" />
+                        <div className="flex items-center gap-3 bg-[#ede8f5] border-2 border-black px-4 py-3 rounded-2xl shrink-0 shadow-[3px_3px_0px_#000]">
+                            <Users size={18} className="text-black" />
                             <div>
-                                <p className="text-[10px] font-mono text-slate-400 uppercase font-bold">Your Team</p>
-                                <p className="text-xs font-bold text-slate-900">{data.teamStatus.team_name} ({data.teamStatus.team_id})</p>
+                                <p className="text-[10px] font-mono text-slate-600 uppercase font-black">Your Team</p>
+                                <p className="text-xs font-black text-black">{data.teamStatus.team_name} ({data.teamStatus.team_id})</p>
                             </div>
                         </div>
                     )}
@@ -220,25 +220,25 @@ export default function TeamCertificatePage() {
 
                 {/* State Machine Renderer */}
                 {isLoading ? (
-                    <div className="bg-white rounded-3xl p-16 text-center border border-slate-200 shadow-sm">
-                        <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Loading Certificate Registry...</p>
+                    <div className="bg-white rounded-3xl p-16 text-center border-2 border-black shadow-[4px_4px_0px_#000]">
+                        <div className="w-10 h-10 border-4 border-black border-t-[#f7cb46] rounded-full animate-spin mx-auto mb-4" />
+                        <p className="text-xs font-black uppercase tracking-wider text-black">Loading Certificate Registry...</p>
                     </div>
                 ) : !data?.window.is_open ? (
                     /* STATE 1: WINDOW IS LOCKED / COUNTDOWN */
-                    <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-sm text-center max-w-2xl mx-auto space-y-8">
-                        <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center mx-auto shadow-sm">
+                    <div className="bg-white rounded-3xl p-8 sm:p-12 border-2 border-black shadow-[6px_6px_0px_#000] text-center max-w-2xl mx-auto space-y-8">
+                        <div className="w-16 h-16 rounded-2xl bg-[#ffdc8b] text-black border-2 border-black flex items-center justify-center mx-auto shadow-[3px_3px_0px_#000]">
                             <Lock size={30} />
                         </div>
 
                         <div>
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-mono font-bold uppercase tracking-widest mb-3 border border-amber-200">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#fe90e8] text-black text-[10px] font-black uppercase tracking-widest mb-3 border-2 border-black shadow-[2px_2px_0px_#000]">
                                 Certificate Window Locked
                             </span>
-                            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                            <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
                                 Certificates Unlock Soon
                             </h2>
-                            <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">
+                            <p className="text-xs sm:text-sm font-medium text-slate-700 mt-2 max-w-md mx-auto leading-relaxed">
                                 {data?.window.unlock_at
                                     ? `Organizers have scheduled certificate distribution for ${new Date(data.window.unlock_at).toLocaleString()}. The claim portal will open automatically once the timer expires.`
                                     : "Certificate distribution is currently closed by the organizing committee. Please check back after the closing ceremony."}
@@ -248,38 +248,38 @@ export default function TeamCertificatePage() {
                         {/* Live Countdown Display */}
                         {timeLeftMs > 0 && (
                             <div className="grid grid-cols-4 gap-3 max-w-md mx-auto pt-2">
-                                <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                                    <span className="block text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+                                <div className="bg-white rounded-2xl p-3 border-2 border-black shadow-[3px_3px_0px_#000]">
+                                    <span className="block text-2xl sm:text-3xl font-black text-black font-mono">
                                         {countdown.days}
                                     </span>
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Days</span>
+                                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">Days</span>
                                 </div>
-                                <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                                    <span className="block text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+                                <div className="bg-white rounded-2xl p-3 border-2 border-black shadow-[3px_3px_0px_#000]">
+                                    <span className="block text-2xl sm:text-3xl font-black text-black font-mono">
                                         {String(countdown.hours).padStart(2, "0")}
                                     </span>
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Hours</span>
+                                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">Hours</span>
                                 </div>
-                                <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                                    <span className="block text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+                                <div className="bg-white rounded-2xl p-3 border-2 border-black shadow-[3px_3px_0px_#000]">
+                                    <span className="block text-2xl sm:text-3xl font-black text-black font-mono">
                                         {String(countdown.minutes).padStart(2, "0")}
                                     </span>
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Mins</span>
+                                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">Mins</span>
                                 </div>
-                                <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200">
-                                    <span className="block text-2xl sm:text-3xl font-black text-orange-600 font-mono">
+                                <div className="bg-white rounded-2xl p-3 border-2 border-black shadow-[3px_3px_0px_#000]">
+                                    <span className="block text-2xl sm:text-3xl font-black text-black font-mono">
                                         {String(countdown.seconds).padStart(2, "0")}
                                     </span>
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Secs</span>
+                                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">Secs</span>
                                 </div>
                             </div>
                         )}
 
-                        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 text-left text-xs text-slate-500 space-y-2">
-                            <p className="font-bold text-slate-700 flex items-center gap-1.5">
-                                <HelpCircle size={14} className="text-orange-600" /> What to expect when the window opens:
+                        <div className="bg-[#ede8f5] rounded-2xl p-4 border-2 border-black text-left text-xs text-black space-y-2 shadow-[3px_3px_0px_#000]">
+                            <p className="font-black text-black flex items-center gap-1.5">
+                                <HelpCircle size={16} className="text-black" /> What to expect when the window opens:
                             </p>
-                            <ul className="list-disc pl-5 space-y-1 text-slate-500">
+                            <ul className="list-disc pl-5 space-y-1 font-medium text-slate-800">
                                 <li>All verified team members receive individual participation certificates.</li>
                                 {data?.config.require_feedback && (
                                     <li>A brief 2-minute feedback form must be submitted by your team lead to unlock instant downloads.</li>
@@ -290,12 +290,12 @@ export default function TeamCertificatePage() {
                     </div>
                 ) : data?.config.require_checkin && !data?.teamStatus?.is_checked_in ? (
                     /* GATING ERROR: NOT CHECKED IN */
-                    <div className="bg-white rounded-3xl p-10 text-center border border-rose-200 shadow-sm max-w-lg mx-auto space-y-4">
-                        <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto border border-rose-100">
+                    <div className="bg-white rounded-3xl p-10 text-center border-2 border-black shadow-[6px_6px_0px_#000] max-w-lg mx-auto space-y-4">
+                        <div className="w-14 h-14 rounded-2xl bg-[#fe90e8] text-black flex items-center justify-center mx-auto border-2 border-black shadow-[3px_3px_0px_#000]">
                             <ShieldAlert size={28} />
                         </div>
-                        <h2 className="text-xl font-black text-slate-900">Check-in Required</h2>
-                        <p className="text-xs text-slate-500 leading-relaxed">
+                        <h2 className="text-xl font-black text-black">Check-in Required</h2>
+                        <p className="text-xs font-medium text-slate-700 leading-relaxed">
                             Organizers have enabled venue check-in verification. Your team is not currently marked as checked-in. Please contact the help desk or event volunteers to record your attendance.
                         </p>
                     </div>
@@ -303,38 +303,38 @@ export default function TeamCertificatePage() {
                     /* STATE 2: WINDOW OPEN, BUT FEEDBACK REQUIRED */
                     <div className="space-y-6">
                         {/* Stepper Guide */}
-                        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between gap-4">
+                        <div className="bg-white rounded-2xl p-4 border-2 border-black shadow-[4px_4px_0px_#000] flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-bold">
+                                <div className="w-8 h-8 rounded-xl bg-[#f7cb46] border-2 border-black text-black flex items-center justify-center text-xs font-black shadow-[2px_2px_0px_#000]">
                                     1
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-slate-900">Step 1: Event Feedback (Required)</p>
-                                    <p className="text-[10px] text-slate-500">Help organizers improve future hackathon editions</p>
+                                    <p className="text-xs font-black text-black">Step 1: Event Feedback (Required)</p>
+                                    <p className="text-[10px] font-medium text-slate-600">Help organizers improve future hackathon editions</p>
                                 </div>
                             </div>
 
-                            <div className="hidden sm:flex items-center gap-3 opacity-40">
-                                <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold">
+                            <div className="hidden sm:flex items-center gap-3 opacity-50">
+                                <div className="w-8 h-8 rounded-xl bg-slate-200 border-2 border-black text-black flex items-center justify-center text-xs font-black">
                                     2
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-slate-900">Step 2: Certificate Download</p>
-                                    <p className="text-[10px] text-slate-500">Unlocks instantly upon submitting review</p>
+                                    <p className="text-xs font-black text-black">Step 2: Certificate Download</p>
+                                    <p className="text-[10px] font-medium text-slate-600">Unlocks instantly upon submitting review</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Feedback Form Card */}
-                        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-sm">
-                            <div className="mb-8 pb-6 border-b border-slate-100">
-                                <span className="text-[10px] font-mono uppercase font-bold text-orange-600 tracking-wider">
+                        <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-black shadow-[6px_6px_0px_#000]">
+                            <div className="mb-8 pb-6 border-b-2 border-black">
+                                <span className="text-[10px] font-mono uppercase font-black text-black bg-[#ffdc8b] px-2 py-0.5 rounded border border-black shadow-[1px_1px_0px_#000]">
                                     Participant Feedback Matrix
                                 </span>
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tight mt-1">
+                                <h2 className="text-2xl font-black text-black tracking-tight mt-2">
                                     Share Your Sprint Experience
                                 </h2>
-                                <p className="text-xs text-slate-500 mt-1">
+                                <p className="text-xs font-medium text-slate-700 mt-1">
                                     Ratings help recognize top mentors, evaluate food & venue logistics, and calibrate future jury sessions.
                                 </p>
                             </div>
@@ -382,14 +382,14 @@ export default function TeamCertificatePage() {
                                 />
 
                                 {/* Section 4: Overall & Qualitative Comments */}
-                                <div className="space-y-6 pt-4 border-t border-slate-100">
-                                    <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                <div className="space-y-6 pt-4 border-t-2 border-black">
+                                    <div className="p-5 rounded-2xl bg-white border-2 border-black shadow-[3px_3px_0px_#000]">
                                         <div className="flex items-center justify-between mb-2">
                                             <div>
-                                                <label className="text-xs font-bold text-slate-900 block">Overall Hackathon Rating</label>
-                                                <p className="text-[11px] text-slate-400">Your total satisfaction with Happeno Hackathon</p>
+                                                <label className="text-xs font-black text-black block">Overall Hackathon Rating</label>
+                                                <p className="text-[11px] font-medium text-slate-600">Your total satisfaction with the hackathon</p>
                                             </div>
-                                            <span className="text-xs font-mono font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200">
+                                            <span className="text-xs font-mono font-black text-black bg-[#f7cb46] px-2.5 py-1 rounded-lg border-2 border-black shadow-[1px_1px_0px_#000]">
                                                 {feedbackForm.rating_overall} / 5 Stars
                                             </span>
                                         </div>
@@ -405,8 +405,8 @@ export default function TeamCertificatePage() {
                                                         size={24}
                                                         className={
                                                             star <= feedbackForm.rating_overall
-                                                                ? "text-amber-400 fill-amber-400"
-                                                                : "text-slate-300 hover:text-amber-200"
+                                                                ? "text-black fill-[#f7cb46]"
+                                                                : "text-slate-300"
                                                         }
                                                     />
                                                 </button>
@@ -415,7 +415,7 @@ export default function TeamCertificatePage() {
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">
+                                        <label className="block text-xs font-black text-black mb-1.5 uppercase tracking-wide">
                                             What was the biggest highlight of your hackathon?
                                         </label>
                                         <input
@@ -423,12 +423,12 @@ export default function TeamCertificatePage() {
                                             placeholder="e.g. Midnight coding vibe, mentor session, project showcase..."
                                             value={feedbackForm.highlight}
                                             onChange={(e) => setFeedbackForm({ ...feedbackForm, highlight: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-600 transition"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-black bg-white text-xs font-medium text-black placeholder:text-slate-400 focus:outline-none shadow-[2px_2px_0px_#000] transition"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">
+                                        <label className="block text-xs font-black text-black mb-1.5 uppercase tracking-wide">
                                             Any suggestions or feedback for the organizing team?
                                         </label>
                                         <textarea
@@ -436,7 +436,7 @@ export default function TeamCertificatePage() {
                                             placeholder="Share any constructive criticism, ideas for the next edition, or shoutouts..."
                                             value={feedbackForm.feedback_text}
                                             onChange={(e) => setFeedbackForm({ ...feedbackForm, feedback_text: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-600 transition"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-black bg-white text-xs font-medium text-black placeholder:text-slate-400 focus:outline-none shadow-[2px_2px_0px_#000] transition"
                                         />
                                     </div>
                                 </div>
@@ -446,7 +446,7 @@ export default function TeamCertificatePage() {
                                     <button
                                         type="submit"
                                         disabled={isSubmittingFeedback}
-                                        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-orange-600/20 transition disabled:opacity-50"
+                                        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border-2 border-black bg-[#f7cb46] hover:bg-[#ffdc8b] text-black font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 active:shadow-none transition disabled:opacity-50"
                                     >
                                         <Send size={15} />
                                         {isSubmittingFeedback ? "Submitting..." : "Submit Review & Unlock Certificates"}
@@ -459,18 +459,18 @@ export default function TeamCertificatePage() {
                     /* STATE 3: UNLOCKED AND READY TO CLAIM/DOWNLOAD */
                     <div className="space-y-6">
                         {/* Status banner */}
-                        <div className="bg-emerald-50 border border-emerald-200/80 rounded-2xl p-4 flex items-center justify-between flex-wrap gap-3">
+                        <div className="bg-[#99e885] border-2 border-black rounded-2xl p-4 flex items-center justify-between flex-wrap gap-3 shadow-[4px_4px_0px_#000]">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-xl bg-white border-2 border-black text-black flex items-center justify-center font-bold shadow-[2px_2px_0px_#000]">
                                     <CheckCircle2 size={18} />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-emerald-950">Certificates Unlocked & Ready</p>
-                                    <p className="text-[10px] text-emerald-700">All member credentials have been signed and registered with the Happeno Registry.</p>
+                                    <p className="text-xs font-black text-black">Certificates Unlocked & Ready</p>
+                                    <p className="text-[10px] font-semibold text-slate-800">All member credentials have been signed and registered with the Happeno Registry.</p>
                                 </div>
                             </div>
 
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
+                            <span className="text-[10px] font-mono font-black uppercase tracking-widest text-black bg-white px-3 py-1 rounded-md border-2 border-black shadow-[2px_2px_0px_#000]">
                                 {data?.teamStatus?.members.length || 0} Certificates Available
                             </span>
                         </div>
@@ -482,14 +482,14 @@ export default function TeamCertificatePage() {
                                     <button
                                         key={idx}
                                         onClick={() => setSelectedMemberIndex(idx)}
-                                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-2 ${selectedMemberIndex === idx
-                                                ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
-                                                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                                        className={`px-4 py-2.5 rounded-xl text-xs font-black transition shrink-0 flex items-center gap-2 border-2 border-black shadow-[3px_3px_0px_#000] ${selectedMemberIndex === idx
+                                                ? "bg-[#f7cb46] text-black"
+                                                : "bg-white text-black hover:bg-[#ffdc8b]/30"
                                             }`}
                                     >
-                                        <Award size={14} className={selectedMemberIndex === idx ? "text-orange-400" : "text-slate-400"} />
+                                        <Award size={14} className="text-black" />
                                         <span>{member.name}</span>
-                                        <span className={`text-[10px] font-normal px-1.5 py-0.5 rounded ${selectedMemberIndex === idx ? "bg-white/10 text-white/80" : "bg-slate-100 text-slate-500"
+                                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border border-black ${selectedMemberIndex === idx ? "bg-white text-black" : "bg-[#c0f7fe] text-black"
                                             }`}>
                                             {member.role}
                                         </span>
@@ -538,38 +538,38 @@ function MatrixQuestionSection({
     onChange: (key: string, val: string) => void;
 }) {
     return (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border-2 border-black shadow-[4px_4px_0px_#000] overflow-hidden">
             {/* Matrix Title Header */}
-            <div className="px-6 py-4 bg-slate-50/70 border-b border-slate-200">
-                <h3 className="text-base font-bold text-slate-900 tracking-tight">{title}</h3>
+            <div className="px-6 py-4 bg-[#c0f7fe] border-b-2 border-black">
+                <h3 className="text-base font-black text-black tracking-tight">{title}</h3>
             </div>
 
             {/* Scrollable Table on mobile for flawless layout */}
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[620px]">
                     <thead>
-                        <tr className="border-b border-slate-200 bg-white">
-                            <th className="py-4 px-6 w-2/5 font-semibold text-xs text-slate-500 uppercase tracking-wider">
+                        <tr className="border-b-2 border-black bg-white">
+                            <th className="py-4 px-6 w-2/5 font-black text-xs text-black uppercase tracking-wider">
                                 Criteria
                             </th>
                             {columns.map((col, idx) => (
                                 <th
                                     key={idx}
-                                    className="py-4 px-3 text-center text-xs font-semibold text-slate-600 tracking-tight"
+                                    className="py-4 px-3 text-center text-xs font-black text-black tracking-tight"
                                 >
                                     {col}
                                 </th>
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-black/20">
                         {rows.map((row, rIdx) => (
                             <tr
                                 key={row.key}
-                                className={`transition-colors hover:bg-orange-50/30 ${rIdx % 2 === 1 ? "bg-slate-50/40" : "bg-white"
+                                className={`transition-colors hover:bg-[#ffdc8b]/20 ${rIdx % 2 === 1 ? "bg-slate-50/60" : "bg-white"
                                     }`}
                             >
-                                <td className="py-4 px-6 text-xs sm:text-sm font-medium text-slate-800">
+                                <td className="py-4 px-6 text-xs sm:text-sm font-bold text-black">
                                     {row.label}
                                 </td>
 
@@ -583,13 +583,13 @@ function MatrixQuestionSection({
                                         >
                                             <div className="flex items-center justify-center">
                                                 <div
-                                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSelected
-                                                            ? "border-orange-600 bg-orange-50 shadow-sm"
-                                                            : "border-slate-300 group-hover:border-slate-400 bg-white"
+                                                    className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center transition-all ${isSelected
+                                                            ? "bg-[#f7cb46] shadow-[1px_1px_0px_#000]"
+                                                            : "bg-white group-hover:bg-[#ffdc8b]/40"
                                                         }`}
                                                 >
                                                     {isSelected && (
-                                                        <div className="w-2.5 h-2.5 rounded-full bg-orange-600" />
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-black" />
                                                     )}
                                                 </div>
                                             </div>

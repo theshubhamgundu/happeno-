@@ -5,17 +5,22 @@
 @source "../lib";
 
 :root {
-    --foreground: #000000;
-    --background: #FAF9F5;
+    --foreground: #ffffff;
+    --background: #000000;
     overflow-x: hidden;
 }
 
 html {
-    color-scheme: light;
-    background-color: #FAF9F5;
-    /* Clean dot grid pattern matching Promptify reference */
-    background-image: radial-gradient(#d1cfc7 1.25px, transparent 1.25px);
-    background-size: 24px 24px;
+    color-scheme: dark;
+    background: #000000;
+    /* Atmospheric dark canvas with subtle warm amber/orange aura, radial glows, and grid */
+    background-image: 
+      radial-gradient(ellipse 90% 60% at 50% -15%, rgba(234, 88, 12, 0.16) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 40% at 85% 75%, rgba(249, 115, 22, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 15% 40%, rgba(217, 119, 6, 0.05) 0%, transparent 50%),
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px), 
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
     background-attachment: fixed;
 }
 
@@ -53,7 +58,7 @@ html.lenis body {
     --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) { :root { --background: #FAF9F5; --foreground: #000000; } }
+@media (prefers-color-scheme: dark) { :root { --background: #000000; --foreground: #ffffff; } html { background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px); background-size: 40px 40px; } }
 
 body {
     background: var(--background);
@@ -244,206 +249,326 @@ body {
     background: rgba(147, 51, 234, 0.85);
 }
 
-/* Dashboard — intentionally separate from the public-site visual language. */
+/* ==========================================================================
+   NEO-BRUTALISM DESIGN SYSTEM FOR DASHBOARDS
+   Color palette from reference:
+     - Pink:             #FE90E8
+     - Soft Cyan:        #C0F7FE
+     - Vivid Lime:       #99E885
+     - Goldenrod Yellow: #F7CB46
+     - Butter Cream:     #FFDC8B
+     - Pitch Black:      #000000
+     - Background:       #EDE8F5 (Lilac grid canvas)
+     - Card Surface:     #FFFFFF (Pure white with 2px/3px black border & hard shadows)
+   ========================================================================== */
+:root {
+    --nb-pink: #fe90e8;
+    --nb-cyan: #c0f7fe;
+    --nb-lime: #99e885;
+    --nb-yellow: #f7cb46;
+    --nb-butter: #ffdc8b;
+    --nb-black: #000000;
+    --nb-canvas: #ede8f5;
+    --nb-surface: #ffffff;
+    --nb-muted: #27272a;
+}
+
+html:has(.dashboard-app),
+body:has(.dashboard-app) {
+    background-color: #ede8f5 !important;
+    background-image: 
+        linear-gradient(to right, rgba(124, 58, 237, 0.14) 1.5px, transparent 1.5px),
+        linear-gradient(to bottom, rgba(124, 58, 237, 0.14) 1.5px, transparent 1.5px) !important;
+    background-size: 28px 28px !important;
+    color: #000000 !important;
+    color-scheme: light !important;
+}
+
 .dashboard-app {
-    --dash-ink: #3d3a38;
-    --dash-muted: #77716d;
-    --dash-line: #ebe5e1;
-    --dash-panel: #ffffff;
-    background:
-        radial-gradient(circle at 90% 0%, rgba(253, 229, 217, .72), transparent 28rem),
-        radial-gradient(circle at 0% 100%, rgba(242, 235, 222, .7), transparent 24rem),
-        #f7f5f3;
+    background-color: #ede8f5 !important;
+    background-image: 
+        linear-gradient(to right, rgba(124, 58, 237, 0.14) 1.5px, transparent 1.5px),
+        linear-gradient(to bottom, rgba(124, 58, 237, 0.14) 1.5px, transparent 1.5px) !important;
+    background-size: 28px 28px !important;
+    color: #000000 !important;
+    min-height: 100vh;
 }
 
 .dashboard-app .font-kanit { font-style: normal; }
-.dashboard-app .text-\[\#FFEE00\] { color: #d75f4c !important; }
-.dashboard-app .custom-scrollbar::-webkit-scrollbar-track { background: #eef1f6; }
-.dashboard-app .custom-scrollbar::-webkit-scrollbar-thumb { background: #e9b0a5; border-color: #f4f0ed; }
+.dashboard-app .custom-scrollbar::-webkit-scrollbar-track { 
+    background: #ede8f5; 
+    border-left: 2px solid #000000;
+}
+.dashboard-app .custom-scrollbar::-webkit-scrollbar-thumb { 
+    background: #f7cb46; 
+    border: 2px solid #000000;
+    border-radius: 4px;
+}
 
-/* Legacy dashboard views use utility-first dark surfaces. These scoped rules
-   retain hierarchy while bringing every role view into the light workspace. */
-.dashboard-app .dashboard-content [class*="bg-[#06000D]"],
-.dashboard-app .dashboard-content [class*="bg-[#0B0114]"],
-.dashboard-app .dashboard-content [class*="bg-[#0D0219]"],
-.dashboard-app .dashboard-content [class*="bg-[#10091c]"] {
+/* Base typography resets inside dashboard */
+.dashboard-app,
+.dashboard-app .dashboard-content {
+    color: #000000 !important;
+}
+
+.dashboard-app [class*="text-white"],
+.dashboard-app [class*="text-zinc-100"],
+.dashboard-app [class*="text-zinc-200"],
+.dashboard-app [class*="text-zinc-300"],
+.dashboard-app [class*="text-slate-900"],
+.dashboard-app [class*="text-slate-800"],
+.dashboard-app [class*="text-slate-700"] {
+    color: #000000 !important;
+}
+
+.dashboard-app [class*="text-white/"],
+.dashboard-app [class*="text-zinc-400"],
+.dashboard-app [class*="text-zinc-500"],
+.dashboard-app [class*="text-slate-400"],
+.dashboard-app [class*="text-slate-500"],
+.dashboard-app [class*="text-neutral-400"],
+.dashboard-app [class*="text-neutral-500"],
+.dashboard-app [class*="text-neutral-600"] {
+    color: #374151 !important;
+}
+
+.dashboard-app [class*="text-orange-"],
+.dashboard-app [class*="text-amber-"],
+.dashboard-app [class*="text-emerald-"],
+.dashboard-app [class*="text-red-"],
+.dashboard-app [class*="text-[#f97316]"],
+.dashboard-app [class*="text-[#c084fc]"] {
+    color: #000000 !important;
+    font-weight: 800 !important;
+}
+
+/* Neo-Brutalist Surfaces & Pure White Cards with Hard Black Drop Shadow */
+.dashboard-app [class*="bg-[#06000D]"],
+.dashboard-app [class*="bg-[#0B0114]"],
+.dashboard-app [class*="bg-[#0D0219]"],
+.dashboard-app [class*="bg-[#10091c]"],
+.dashboard-app [class*="bg-[#0c0c10]"],
+.dashboard-app [class*="bg-[#0d0d12]"],
+.dashboard-app [class*="bg-[#09090c]"],
+.dashboard-app [class*="bg-[#09090b]"],
+.dashboard-app [class*="bg-zinc-900"],
+.dashboard-app [class*="bg-zinc-950"],
+.dashboard-app [class*="bg-white/"]:not(button):not(span):not(th):not(td),
+.dashboard-app [class*="bg-black"]:not(button):not(input):not(span):not(.badge-black) {
     background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 4px 4px 0px 0px #000000 !important;
+    color: #000000 !important;
 }
 
-.dashboard-app .dashboard-content [class*="bg-white/"] {
+/* Secondary containers & muted wells */
+.dashboard-app [class*="bg-black/60"],
+.dashboard-app [class*="bg-black/40"],
+.dashboard-app [class*="bg-black/50"],
+.dashboard-app [class*="bg-zinc-900/60"],
+.dashboard-app [class*="bg-zinc-900/80"],
+.dashboard-app [class*="bg-zinc-900/90"],
+.dashboard-app [class*="bg-slate-50"],
+.dashboard-app [class*="bg-slate-100"] {
     background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 2.5px 2.5px 0px 0px #000000 !important;
+    color: #000000 !important;
 }
 
-.dashboard-app .dashboard-content [class*="bg-[linear-gradient"] {
-    background-image: linear-gradient(135deg, #ffffff 0%, #f6f7ff 100%) !important;
+/* Universal border darkening to bold 2px black */
+.dashboard-app [class*="border-zinc-"],
+.dashboard-app [class*="border-slate-"],
+.dashboard-app [class*="border-white/"],
+.dashboard-app [class*="border-neutral-"],
+.dashboard-app [class*="border-gray-"] {
+    border-color: #000000 !important;
 }
 
-.dashboard-app .dashboard-content [class*="border-white/"] {
-    border-color: var(--dash-line) !important;
+.dashboard-app [class*="rounded-"][class*="border"] {
+    border-width: 2px !important;
+    border-color: #000000 !important;
+    box-shadow: 4px 4px 0px 0px #000000 !important;
 }
 
-.dashboard-app .dashboard-content [class*="text-white"] {
-    color: var(--dash-ink) !important;
+/* Accent Badges & Action Buttons using reference swatches */
+.dashboard-app [class*="bg-orange-500"],
+.dashboard-app [class*="bg-amber-500"],
+.dashboard-app [class*="bg-yellow-400"],
+.dashboard-app [class*="bg-[#f97316]"] {
+    background-color: #f7cb46 !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 3px 3px 0px 0px #000000 !important;
+    font-weight: 800 !important;
 }
 
-.dashboard-app .dashboard-content [class*="text-black"] { color: #172033 !important; }
-.dashboard-app .dashboard-content [class*="text-purple"] { color: #d75f4c !important; }
-.dashboard-app .dashboard-content [class*="text-green"] { color: #159b70 !important; }
-
-.dashboard-app .dashboard-content input,
-.dashboard-app .dashboard-content textarea,
-.dashboard-app .dashboard-content select {
-    background: #ffffff !important;
-    border-color: var(--dash-line) !important;
-    color: var(--dash-ink) !important;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, .03);
+.dashboard-app [class*="bg-emerald-"],
+.dashboard-app [class*="bg-green-"] {
+    background-color: #99e885 !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 3px 3px 0px 0px #000000 !important;
+    font-weight: 800 !important;
 }
 
-.dashboard-app .dashboard-content input::placeholder,
-.dashboard-app .dashboard-content textarea::placeholder { color: #94a3b8 !important; }
-
-.dashboard-app .dashboard-content [class*="rounded-"][class*="border"] {
-    box-shadow: 0 1px 2px rgba(15, 23, 42, .025), 0 10px 26px rgba(15, 23, 42, .035);
+.dashboard-app [class*="bg-cyan-"],
+.dashboard-app [class*="bg-sky-"],
+.dashboard-app [class*="bg-blue-"] {
+    background-color: #c0f7fe !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 3px 3px 0px 0px #000000 !important;
+    font-weight: 800 !important;
 }
 
-/* Keep legacy pages as compact workspace modules rather than oversized promo cards. */
-.dashboard-app .dashboard-content .italic { font-style: normal !important; }
-.dashboard-app .dashboard-content [class*="rounded-3xl"],
-.dashboard-app .dashboard-content [class*="rounded-[2rem]"],
-.dashboard-app .dashboard-content [class*="rounded-[2.5rem]"],
-.dashboard-app .dashboard-content [class*="rounded-[3rem]"] {
-    border-radius: 16px !important;
+.dashboard-app [class*="bg-rose-"],
+.dashboard-app [class*="bg-pink-"],
+.dashboard-app [class*="bg-red-"],
+.dashboard-app [class*="bg-purple-"],
+.dashboard-app [class*="bg-[#a855f7]"] {
+    background-color: #fe90e8 !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 3px 3px 0px 0px #000000 !important;
+    font-weight: 800 !important;
 }
 
-.dashboard-app .dashboard-content h1,
-.dashboard-app .dashboard-content h2,
-.dashboard-app .dashboard-content h3 {
-    letter-spacing: -0.025em !important;
-}
-
-/* Product-scale density: legacy views cannot expand beyond normal app spacing. */
-.dashboard-app .dashboard-content [class~="p-10"] { padding: 1rem !important; }
-.dashboard-app .dashboard-content [class~="p-8"] { padding: 1rem !important; }
-.dashboard-app .dashboard-content [class~="p-6"] { padding: 1rem !important; }
-.dashboard-app .dashboard-content [class~="gap-8"] { gap: 1rem !important; }
-.dashboard-app .dashboard-content [class~="mb-10"] { margin-bottom: 1rem !important; }
-.dashboard-app .dashboard-content [class~="text-3xl"] { font-size: 1.5rem !important; line-height: 1.9rem !important; }
-.dashboard-app .dashboard-content [class~="text-2xl"] { font-size: 1.25rem !important; line-height: 1.65rem !important; }
-
-/* Operations roles prioritise scanability and density over editorial breathing room. */
-.dashboard-admin .dashboard-content,
-.dashboard-judge .dashboard-content,
-.dashboard-volunteer .dashboard-content { font-size: 0.8125rem; }
-
-.dashboard-admin .dashboard-content [class~="p-6"],
-.dashboard-judge .dashboard-content [class~="p-6"],
-.dashboard-volunteer .dashboard-content [class~="p-6"],
-.dashboard-admin .dashboard-content [class~="p-5"],
-.dashboard-judge .dashboard-content [class~="p-5"],
-.dashboard-volunteer .dashboard-content [class~="p-5"],
-.dashboard-admin .dashboard-content [class~="p-4"],
-.dashboard-judge .dashboard-content [class~="p-4"],
-.dashboard-volunteer .dashboard-content [class~="p-4"] { padding: 0.75rem !important; }
-
-.dashboard-admin .dashboard-content [class~="gap-6"],
-.dashboard-judge .dashboard-content [class~="gap-6"],
-.dashboard-volunteer .dashboard-content [class~="gap-6"],
-.dashboard-admin .dashboard-content [class~="gap-4"],
-.dashboard-judge .dashboard-content [class~="gap-4"],
-.dashboard-volunteer .dashboard-content [class~="gap-4"] { gap: 0.625rem !important; }
-
-.dashboard-admin .dashboard-content [class*="h-14"],
-.dashboard-judge .dashboard-content [class*="h-14"],
-.dashboard-volunteer .dashboard-content [class*="h-14"] { height: 2.5rem !important; }
-
-.dashboard-admin .dashboard-content [class~="py-4"],
-.dashboard-judge .dashboard-content [class~="py-4"],
-.dashboard-volunteer .dashboard-content [class~="py-4"] { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
-
-.dashboard-admin .dashboard-content [class~="text-xl"],
-.dashboard-judge .dashboard-content [class~="text-xl"],
-.dashboard-volunteer .dashboard-content [class~="text-xl"] { font-size: 1rem !important; line-height: 1.35rem !important; }
-
-.dashboard-admin .dashboard-content [class~="text-lg"],
-.dashboard-judge .dashboard-content [class~="text-lg"],
-.dashboard-volunteer .dashboard-content [class~="text-lg"] { font-size: 0.9375rem !important; line-height: 1.25rem !important; }
-
-.dashboard-admin .dashboard-content table th,
-.dashboard-admin .dashboard-content table td,
-.dashboard-judge .dashboard-content table th,
-.dashboard-judge .dashboard-content table td { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-
-/* Extra-dense desktop console treatment for staff who work through long queues. */
-@media (min-width: 1024px) {
-    .dashboard-admin .dashboard-content,
-    .dashboard-judge .dashboard-content,
-    .dashboard-volunteer .dashboard-content {
-        width: 100%;
-        min-width: 0;
-    }
-
-    .dashboard-admin main,
-    .dashboard-judge main,
-    .dashboard-volunteer main { padding: 0.75rem !important; }
-
-    .dashboard-admin .dashboard-content [class~="p-4"],
-    .dashboard-judge .dashboard-content [class~="p-4"],
-    .dashboard-volunteer .dashboard-content [class~="p-4"],
-    .dashboard-admin .dashboard-content [class~="p-5"],
-    .dashboard-judge .dashboard-content [class~="p-5"],
-    .dashboard-volunteer .dashboard-content [class~="p-5"] { padding: 0.5rem !important; }
-
-    .dashboard-admin .dashboard-content [class~="rounded-2xl"],
-    .dashboard-judge .dashboard-content [class~="rounded-2xl"],
-    .dashboard-volunteer .dashboard-content [class~="rounded-2xl"] { border-radius: 0.625rem !important; }
-
-    .dashboard-admin .dashboard-content [class~="py-3"],
-    .dashboard-judge .dashboard-content [class~="py-3"],
-    .dashboard-volunteer .dashboard-content [class~="py-3"] { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
-}
-
-/* Remove remaining legacy neon surfaces inside the rebuilt light workspace. */
-.dashboard-app .dashboard-content [class*="bg-purple-600"],
-.dashboard-app .dashboard-content [class*="bg-purple-700"],
-.dashboard-app .dashboard-content [class*="bg-purple-800"] {
-    background-color: #df6d59 !important;
+/* Strip dark gradients and substitute solid neo-brutalist yellow */
+.dashboard-app [class*="from-amber"],
+.dashboard-app [class*="from-orange"],
+.dashboard-app [class*="bg-gradient-to-r"][class*="orange"],
+.dashboard-app [class*="bg-gradient-to-br"][class*="orange"] {
     background-image: none !important;
-    color: #ffffff !important;
+    background-color: #f7cb46 !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 3px 3px 0px 0px #000000 !important;
+    font-weight: 800 !important;
 }
 
-.dashboard-app .dashboard-content [class*="bg-purple-"],
-.dashboard-app .dashboard-content [class*="from-purple"],
-.dashboard-app .dashboard-content [class*="to-purple"] {
-    background-color: #fdf0ec !important;
-    background-image: none !important;
+/* Hard unblurred shadows */
+.dashboard-app [class*="shadow-["],
+.dashboard-app .dashboard-content [class*="shadow-["] {
+    box-shadow: 3px 3px 0px 0px #000000 !important;
 }
 
-.dashboard-app .dashboard-content [class*="shadow-purple"],
-.dashboard-app .dashboard-content [class*="shadow-[0_0_50px"] { box-shadow: none !important; }
+/* Admin Data Tables */
+.dashboard-app table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+.dashboard-app th {
+    background-color: #ede8f5 !important;
+    color: #000000 !important;
+    font-weight: 900 !important;
+    border-bottom: 2px solid #000000 !important;
+}
+.dashboard-app td {
+    color: #000000 !important;
+    border-bottom: 1px solid #000000 !important;
+}
+.dashboard-app tr:hover td {
+    background-color: rgba(247, 203, 70, 0.15) !important;
+}
 
-/* Legacy staff pages contain display-scale utility classes. Cap those to practical console sizes. */
-.dashboard-admin .dashboard-content [class~="text-7xl"],
-.dashboard-judge .dashboard-content [class~="text-7xl"],
-.dashboard-volunteer .dashboard-content [class~="text-7xl"] { font-size: 1.75rem !important; line-height: 2rem !important; }
+/* Neo-Brutalist Form Inputs & Textareas */
+.dashboard-app input:not([type="checkbox"]):not([type="radio"]),
+.dashboard-app textarea,
+.dashboard-app select {
+    background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: 2.5px 2.5px 0px 0px #000000 !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+}
 
-.dashboard-admin .dashboard-content [class~="text-5xl"],
-.dashboard-judge .dashboard-content [class~="text-5xl"],
-.dashboard-volunteer .dashboard-content [class~="text-5xl"] { font-size: 1.5rem !important; line-height: 1.8rem !important; }
+.dashboard-app input::placeholder,
+.dashboard-app textarea::placeholder {
+    color: #6b7280 !important;
+}
 
-.dashboard-admin .dashboard-content [class~="space-y-10"] > :not([hidden]) ~ :not([hidden]),
-.dashboard-judge .dashboard-content [class~="space-y-10"] > :not([hidden]) ~ :not([hidden]),
-.dashboard-volunteer .dashboard-content [class~="space-y-10"] > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem !important; }
+.dashboard-app input:focus,
+.dashboard-app textarea:focus,
+.dashboard-app select:focus {
+    outline: none !important;
+    border-color: #000000 !important;
+    box-shadow: 4px 4px 0px 0px #000000 !important;
+}
 
-.dashboard-admin .dashboard-content [class~="pb-20"],
-.dashboard-judge .dashboard-content [class~="pb-20"],
-.dashboard-volunteer .dashboard-content [class~="pb-20"] { padding-bottom: 1rem !important; }
+/* Neo-Brutalist Tactile Buttons */
+.dashboard-app button,
+.dashboard-app a[class*="rounded"] {
+    border-color: #000000;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
 
-.dashboard-volunteer .dashboard-content [class~="min-h-[50vh]"] { min-height: auto !important; }
+.dashboard-app button:hover:not(:disabled),
+.dashboard-app a[class*="rounded"]:hover {
+    transform: translate(-1px, -1px);
+}
 
-.dashboard-app .dashboard-content [class*="bg-[#FFEE00]"] {
-    background-color: #df6d59 !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 18px rgba(223, 109, 89, .17) !important;
+.dashboard-app button:active:not(:disabled),
+.dashboard-app a[class*="rounded"]:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px 0px #000000 !important;
+}
+
+/* Primary Button utility */
+.dashboard-app .btn-primary,
+.dashboard-app [class*="btn-primary"] {
+    background-color: #f7cb46 !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 3px 3px 0px 0px #000000 !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+}
+
+.dashboard-app .btn-primary:hover:not(:disabled) {
+    background-color: #ffd24d !important;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px 0px #000000 !important;
+}
+
+/* Neo-Brutalist Tables */
+.dashboard-app table {
+    border: 2px solid #000000 !important;
+    box-shadow: 4px 4px 0px 0px #000000 !important;
+    background-color: #ffffff !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.dashboard-app table th {
+    background-color: #f7cb46 !important;
+    color: #000000 !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    border-bottom: 2px solid #000000 !important;
+    border-right: 1px solid #000000 !important;
+}
+
+.dashboard-app table td {
+    color: #000000 !important;
+    border-bottom: 1px solid #000000 !important;
+    border-right: 1px solid #e5e7eb !important;
+}
+
+.dashboard-app table tr:hover td {
+    background-color: #fbf8eb !important;
+}
+
+/* Headings in dashboard */
+.dashboard-app h1,
+.dashboard-app h2,
+.dashboard-app h3 {
+    font-weight: 900 !important;
+    color: #000000 !important;
+    letter-spacing: -0.03em !important;
 }
 
 /* Hide Scrollbar Utility (keeps scroll functionality) */
@@ -503,107 +628,126 @@ html {
 }
 
 /* ───── Clean Professional Card with subtle depth and grain ───── */
-/* ───── Clean Neo-Brutalist Card (Promptify Style) ───── */
-.pro-card, .neo-card {
+.pro-card {
   position: relative;
-  background: #FFFFFF;
-  border: 2px solid #000000;
-  border-radius: 20px;
-  box-shadow: 2px 2px 0px #000000;
-  transition: all 0.15s ease;
-  color: #000000;
+  background: linear-gradient(180deg, #111116 0%, #09090c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 4px 20px -2px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #ffffff;
 }
 
-.pro-card:hover, .neo-card:hover {
-  box-shadow: 3px 3px 0px #000000;
+.pro-card:hover {
+  border-color: rgba(234, 88, 12, 0.35);
+  box-shadow: 
+    0 12px 35px -5px rgba(0, 0, 0, 0.8),
+    0 0 25px -5px rgba(234, 88, 12, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* ───── Primary Button (Promptify Bright Orange with Black Border) ───── */
+/* ───── Primary Button (Login / CTA) with Grain Texture & Warm Amber/Orange Glow ───── */
 .btn-primary {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  gap: 0.625rem;
+  padding: 0.875rem 1.75rem;
   font-family: var(--font-syne), sans-serif;
-  font-weight: 800;
-  font-size: 0.8125rem;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  background: #FF5722;
-  border: 2px solid #000000;
-  border-radius: 14px;
+  background: linear-gradient(135deg, #fb923c 0%, #ea580c 50%, #c2410c 100%);
+  border: 1px solid rgba(253, 186, 116, 0.35);
+  border-radius: 8px;
   color: #FFFFFF;
   cursor: pointer;
-  box-shadow: 2px 2px 0px #000000;
-  transition: all 0.15s ease-in-out;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    0 4px 20px -2px rgba(234, 88, 12, 0.5),
+    0 0 15px rgba(234, 88, 12, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.18'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
 .btn-primary:hover {
-  background: #F4511E;
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0px #000000;
+  background: linear-gradient(135deg, #fdba74 0%, #f97316 50%, #ea580c 100%);
+  border-color: rgba(253, 186, 116, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    0 8px 25px -2px rgba(234, 88, 12, 0.65),
+    0 0 22px rgba(234, 88, 12, 0.4);
 }
 
-.btn-primary:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px #000000;
-}
-
-/* ───── Secondary / Ghost Button with crisp black border ───── */
+/* ───── Secondary / Ghost Button with glass depth ───── */
 .btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.875rem 1.75rem;
   font-family: var(--font-syne), sans-serif;
   font-weight: 700;
-  font-size: 0.8125rem;
-  background: #FFFFFF;
-  border: 2px solid #000000;
-  border-radius: 14px;
-  color: #000000;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(24, 24, 27, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
   cursor: pointer;
-  box-shadow: 2px 2px 0px #000000;
-  transition: all 0.15s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.25s ease;
 }
 
 .btn-ghost:hover {
-  background: #F4F4F0;
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0px #000000;
+  border-color: rgba(234, 88, 12, 0.4);
+  color: #ffffff;
+  background: rgba(39, 39, 42, 0.9);
+  box-shadow: 0 0 18px -4px rgba(234, 88, 12, 0.25);
 }
 
-.btn-ghost:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px #000000;
-}
-
-/* ───── Utilities ───── */
+/* ───── Film Grain & Textured Glow Utilities ───── */
 .grain-overlay {
-  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  mix-blend-mode: screen;
 }
 
 .text-orange-gradient {
-  color: #FF5722;
-  font-weight: 800;
+  background: linear-gradient(135deg, #fcd34d 0%, #fb923c 35%, #ea580c 70%, #f97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(234, 88, 12, 0.3));
 }
 
 .badge-orange-grain {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.75rem;
-  background: #FFF7ED;
-  border: 1.5px solid #000000;
-  border-radius: 9999px;
-  box-shadow: 1.5px 1.5px 0px #000000;
-  color: #EA580C;
-  font-size: 0.75rem;
-  font-weight: 700;
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.2) 0%, rgba(180, 83, 9, 0.1) 100%);
+  border: 1px solid rgba(251, 146, 60, 0.35);
+  box-shadow: 0 0 15px -3px rgba(234, 88, 12, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #fed7aa;
 }
 
 /* ───── Lightbox Modal ───── */
@@ -698,65 +842,128 @@ html {
   transition: transform 0.7s ease-out;
 }
 
-.group:hover .group-hover\:scale-108 {
-  transform: scale(1.08);
-}
-
-/* ───────────────────────────────────────────────────────────────────────────
-   Neo-Brutalist Light Theme Styles (Promptify Aesthetic)
-   ─────────────────────────────────────────────────────────────────────────── */
-body {
-  background-color: #FAF9F5 !important;
+/* ───── Neo-Brutalism Dashboard Styling & Blueprint Grid ───── */
+.dashboard-app {
+  background-color: #ede8f5 !important;
+  background-image: 
+    linear-gradient(to right, rgba(124, 58, 237, 0.14) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(124, 58, 237, 0.14) 1.5px, transparent 1.5px) !important;
+  background-size: 28px 28px !important;
+  background-attachment: fixed !important;
   color: #000000 !important;
+  min-height: 100vh;
 }
 
-/* Form Inputs, Selects, and Textareas */
-input:not(#printable-certificate input),
-textarea:not(#printable-certificate textarea),
-select:not(#printable-certificate select) {
-  background-color: #FFFFFF !important;
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Neo-Brutalist tactile buttons and badge helpers */
+.nb-card {
+  background-color: #ffffff;
+  border: 2.5px solid #000000;
+  box-shadow: 5px 5px 0px #000000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nb-button-tactile {
+  border: 2px solid #000000;
+  box-shadow: 3px 3px 0px #000000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.nb-button-tactile:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #000000;
+}
+
+.nb-button-tactile:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+/* ───── Dashboard-Only Neo-Brutalism Overrides (Homepage Untouched) ───── */
+.dashboard-app {
+  /* Ensure clean text and borders across all dashboard views */
+  --dashboard-bg: #ede8f5;
+  --dashboard-card: #ffffff;
+  --dashboard-border: #000000;
+}
+
+/* Force dark card backgrounds in dashboard to clean white cards with black borders */
+.dashboard-app .bg-\[\#0B0114\],
+.dashboard-app .bg-\[\#0B0114\]\/60,
+.dashboard-app .bg-slate-900,
+.dashboard-app .bg-white\/5,
+.dashboard-app .bg-white\/\[0\.035\] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+/* Map generic dashboard borders to solid 2px black borders */
+.dashboard-app .border-slate-200,
+.dashboard-app .border-slate-100,
+.dashboard-app .border-white\/10,
+.dashboard-app .border-white\/15,
+.dashboard-app .border-white\/20 {
+  border-color: #000000 !important;
+}
+
+/* Map faded/dark texts to high-contrast readable tones within dashboard */
+.dashboard-app .text-white\/45,
+.dashboard-app .text-white\/40,
+.dashboard-app .text-white\/30,
+.dashboard-app .text-white\/25 {
+  color: #374151 !important;
+}
+
+/* Map teal/orange action buttons inside dashboard to Neo-Brutalist yellow/cyan */
+.dashboard-app button.bg-teal-600,
+.dashboard-app a.bg-teal-600,
+.dashboard-app button.bg-orange-600,
+.dashboard-app a.bg-orange-600 {
+  background-color: #f7cb46 !important;
   color: #000000 !important;
   border: 2px solid #000000 !important;
-  border-radius: 12px !important;
-  box-shadow: 2px 2px 0px #000000;
-  transition: all 0.15s ease;
+  box-shadow: 2.5px 2.5px 0px #000000 !important;
+  font-weight: 900 !important;
 }
 
-input:focus, textarea:focus, select:focus {
-  outline: none !important;
-  border-color: #000000 !important;
-  box-shadow: 3px 3px 0px #000000 !important;
+.dashboard-app button.bg-teal-600:hover,
+.dashboard-app a.bg-teal-600:hover,
+.dashboard-app button.bg-orange-600:hover,
+.dashboard-app a.bg-orange-600:hover {
+  background-color: #ffdc8b !important;
+  transform: translate(1px, 1px);
 }
 
-/* Neo-brutalist shadow utility */
-.shadow-neo {
-  box-shadow: 3px 3px 0px #000000;
+/* Scoped table headers inside dashboards */
+.dashboard-app table thead tr {
+  background-color: #f7cb46 !important;
+  border-bottom: 2px solid #000000 !important;
 }
 
-.shadow-neo-sm {
-  box-shadow: 2px 2px 0px #000000;
+.dashboard-app table thead th {
+  color: #000000 !important;
+  font-weight: 900 !important;
 }
 
-.shadow-neo-lg {
-  box-shadow: 4px 4px 0px #000000;
+.dashboard-app table tbody tr {
+  border-bottom: 1.5px solid #000000 !important;
 }
 
-/* 3D text stroke/shadow effect matching "PROMPT TO REALITY" */
-.text-pop-orange {
-  color: #FF5722;
-  font-weight: 900;
-  text-shadow: 4px 4px 0px #000000;
-  -webkit-text-stroke: 1.5px #000000;
-  paint-order: stroke fill;
+.dashboard-app table tbody tr:hover {
+  background-color: rgba(255, 220, 139, 0.2) !important;
 }
-
-.text-pop-purple {
-  color: #8B5CF6;
-  font-weight: 900;
-  text-shadow: 4px 4px 0px #000000;
-  -webkit-text-stroke: 1.5px #000000;
-  paint-order: stroke fill;
-}
-
-
-

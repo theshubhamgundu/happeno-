@@ -233,14 +233,14 @@ export default function CertificatePreview({
     return (
         <div className="space-y-6">
             {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-[#0d0d12] p-4 rounded-2xl border border-zinc-800 shadow-sm text-white">
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border-2 border-black shadow-[4px_4px_0px_#000] text-black">
                 <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-xl bg-orange-950/40 text-orange-400 border border-orange-500/30 flex items-center justify-center font-bold">
+                    <div className="w-9 h-9 rounded-xl bg-[#99e885] text-black border-2 border-black flex items-center justify-center font-bold shadow-[2px_2px_0px_#000]">
                         <ShieldCheck size={20} />
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-white">Certificate for {recipientName}</p>
-                        <p className="text-[10px] font-mono text-zinc-400 font-medium">{certificateId}</p>
+                        <p className="text-xs font-black text-black">Certificate for {recipientName}</p>
+                        <p className="text-[10px] font-mono text-slate-600 font-bold">{certificateId}</p>
                     </div>
                 </div>
 
@@ -248,17 +248,17 @@ export default function CertificatePreview({
                     <button
                         onClick={handleCopyLink}
                         type="button"
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold transition"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border-2 border-black bg-white hover:bg-slate-50 text-black text-xs font-black shadow-[2px_2px_0px_#000] transition active:shadow-none"
                         title="Copy public verification link"
                     >
-                        {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                        {copied ? <Check size={14} className="text-black" /> : <Copy size={14} />}
                         {copied ? "Copied" : "Verification Link"}
                     </button>
 
                     <button
                         onClick={handlePrint}
                         type="button"
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold transition"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border-2 border-black bg-white hover:bg-slate-50 text-black text-xs font-black shadow-[2px_2px_0px_#000] transition active:shadow-none"
                     >
                         <Printer size={14} /> Print / PDF
                     </button>
@@ -267,7 +267,7 @@ export default function CertificatePreview({
                         onClick={handleDownloadPNG}
                         disabled={isDownloading}
                         type="button"
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-black bg-[#f7cb46] hover:bg-[#ffdc8b] text-black text-xs font-black shadow-[3px_3px_0px_#000] transition active:shadow-none disabled:opacity-50"
                     >
                         <Download size={14} />
                         {isDownloading ? "Generating..." : "Download High-Res PNG"}

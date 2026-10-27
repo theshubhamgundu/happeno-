@@ -148,57 +148,59 @@ export default function TicketPage() {
     return (
         <DashboardLayout type="team" title="Event Passes">
             <div className="mb-6">
-                <h1 className="text-2xl font-black uppercase italic tracking-tight text-slate-900 flex items-center gap-2">
-                    <Ticket className="text-[#14b8a6]" size={28} />
+                <h1 className="text-2xl font-black uppercase tracking-tight text-black flex items-center gap-2">
+                    <Ticket className="text-black" size={28} />
                     Event Pass
                 </h1>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-[1fr_320px] items-start">
+            <div className="grid gap-6 lg:grid-cols-[1fr_320px] items-start text-black">
                 <div className="flex flex-col items-center">
                     {/* The Pass Card */}
-                    <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-gray-200 bg-white p-5 shadow-xl sm:p-8">
+                    <div className="relative w-full max-w-sm overflow-hidden rounded-xl border-2 border-black bg-white p-5 shadow-[6px_6px_0px_#000] sm:p-8">
                         {/* Header */}
-                        <div className="mb-5 flex items-center justify-between border-b border-gray-200 pb-4 sm:mb-6">
+                        <div className="mb-5 flex items-center justify-between border-b-2 border-black pb-4 sm:mb-6">
                             <div className="min-w-0">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Hackathon Event Pass</p>
-                                <h3 className="mt-1 truncate text-lg font-bold text-gray-900">{team.team || team.name}</h3>
+                                <span className="inline-block rounded border border-black bg-[#f7cb46] px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.15em] text-black">
+                                    HACKATHON EVENT PASS
+                                </span>
+                                <h3 className="mt-1.5 truncate text-lg font-black text-black">{team.team || team.name}</h3>
                             </div>
-                            <div className="ml-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100">
-                                <QrCode size={20} className="text-teal-700" />
+                            <div className="ml-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-black bg-[#99e885] shadow-[1.5px_1.5px_0px_#000]">
+                                <QrCode size={20} className="text-black" />
                             </div>
                         </div>
 
                         {/* QR Code */}
-                        <div className="mx-auto mb-5 w-fit rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:mb-6 sm:p-4">
+                        <div className="mx-auto mb-5 w-fit rounded-lg border-2 border-black bg-white p-3 shadow-[3px_3px_0px_#000] sm:mb-6 sm:p-4">
                             {memberQrs[currentMemberId] ? (
                                 <img src={memberQrs[currentMemberId]} alt={`${currentMemberName} QR`} className="w-48 h-48" />
                             ) : (
-                                <div className="h-48 w-48 animate-pulse rounded-xl bg-gray-200" />
+                                <div className="h-48 w-48 animate-pulse rounded-lg bg-neutral-200 border-2 border-black" />
                             )}
                         </div>
 
                         {/* Details */}
                         <div className="space-y-4">
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-500">Participant</p>
-                                <p className="mt-0.5 text-base font-bold uppercase text-gray-900">{currentMemberName}</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-600">Participant</p>
+                                <p className="mt-0.5 text-base font-black uppercase text-black">{currentMemberName}</p>
                             </div>
                             
                             <div className="space-y-3">
-                                <div className="min-w-0 rounded-xl border border-gray-200 bg-gray-50 p-3">
-                                    <p className="flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.15em] text-gray-500"><MapPin size={10}/> Allocated Place</p>
-                                    <p className="mt-1 truncate text-sm font-bold uppercase text-teal-700">{allocatedPlace}</p>
+                                <div className="min-w-0 rounded-lg border-2 border-black bg-white p-3 shadow-[2px_2px_0px_#000]">
+                                    <p className="flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.15em] text-neutral-600"><MapPin size={10}/> Allocated Place</p>
+                                    <p className="mt-1 truncate text-sm font-black uppercase text-black">{allocatedPlace}</p>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                                    <div className="min-w-0 rounded-xl border border-gray-200 bg-gray-50 p-3">
-                                        <p className="flex items-center justify-between gap-1 text-[9px] font-black uppercase tracking-[0.12em] text-gray-500">
+                                    <div className="min-w-0 rounded-lg border-2 border-black bg-white p-3 shadow-[2px_2px_0px_#000]">
+                                        <p className="flex items-center justify-between gap-1 text-[9px] font-black uppercase tracking-[0.12em] text-neutral-700">
                                             <span className="flex items-center gap-1"><CheckCircle2 size={10}/> Meals</span>
                                             <span role="img" aria-label={hasMealPass ? "Meal pass purchased" : "Meal pass not purchased"}>{hasMealPass ? "✅" : "❌"}</span>
                                         </p>
                                     </div>
-                                    <div className="min-w-0 rounded-xl border border-gray-200 bg-gray-50 p-3">
-                                        <p className="flex items-center justify-between gap-1 text-[9px] font-black uppercase tracking-[0.12em] text-gray-500">
+                                    <div className="min-w-0 rounded-lg border-2 border-black bg-white p-3 shadow-[2px_2px_0px_#000]">
+                                        <p className="flex items-center justify-between gap-1 text-[9px] font-black uppercase tracking-[0.12em] text-neutral-700">
                                             <span className="flex items-center gap-1"><Ticket size={10}/> Activity Pass</span>
                                             <span role="img" aria-label={hasNetworkingPass ? "Activity pass purchased" : "Activity pass not purchased"}>{hasNetworkingPass ? "✅" : "❌"}</span>
                                         </p>
@@ -208,13 +210,13 @@ export default function TicketPage() {
                         </div>
 
                         {/* Edge punches effect */}
-                        <div className="absolute left-0 top-1/2 -ml-3 h-6 w-6 -translate-y-1/2 rounded-full bg-[#faf9f7]"></div>
-                        <div className="absolute right-0 top-1/2 -mr-3 h-6 w-6 -translate-y-1/2 rounded-full bg-[#faf9f7]"></div>
+                        <div className="absolute left-0 top-1/2 -ml-3 h-6 w-6 -translate-y-1/2 rounded-full border-2 border-black bg-[#ede8f5]"></div>
+                        <div className="absolute right-0 top-1/2 -mr-3 h-6 w-6 -translate-y-1/2 rounded-full border-2 border-black bg-[#ede8f5]"></div>
                     </div>
 
                     <button
                         onClick={() => handleDownload(activePassIndex)}
-                        className="mt-6 flex items-center gap-2 rounded-xl bg-teal-600 px-6 py-3 text-xs font-black uppercase tracking-wider text-white shadow-lg transition hover:bg-teal-700 hover:-translate-y-0.5"
+                        className="mt-6 flex items-center gap-2 rounded-lg bg-[#f7cb46] hover:bg-[#ffd24d] px-6 py-3 text-xs font-black uppercase tracking-wider text-black border-2 border-black shadow-[3px_3px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] transition-transform"
                     >
                         <Download size={16} /> Download QR Code
                     </button>
@@ -222,25 +224,22 @@ export default function TicketPage() {
 
                 {/* Sidebar Navigation */}
                 <aside className="space-y-4">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">Team Roster</h3>
+                    <div className="rounded-xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_#000]">
+                        <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-black">Team Roster</h3>
                         <div className="space-y-2">
                             {members.map((member: any, i: number) => {
-                                const mId = getMemberId(member, i);
-                                const mEmail = getMemberEmail(member);
-                                const mMeal = hasIndividualMealPass(team, mId, mEmail);
                                 const isSelected = i === activePassIndex;
                                 return (
                                     <button
                                         key={i}
                                         onClick={() => setActivePassIndex(i)}
-                                        className={`w-full flex items-center justify-between rounded-xl px-3 py-3 text-left transition-colors border ${isSelected ? 'bg-teal-50 border-teal-200' : 'bg-transparent border-transparent hover:bg-slate-50'}`}
+                                        className={`w-full flex items-center justify-between rounded-lg px-3 py-3 text-left transition-transform border-2 border-black shadow-[2px_2px_0px_#000] ${isSelected ? 'bg-[#ffdc8b] text-black font-black' : 'bg-white hover:bg-neutral-50 text-neutral-900 font-bold hover:translate-x-[1px] hover:translate-y-[1px]'}`}
                                     >
                                         <div className="min-w-0">
-                                            <p className={`truncate text-sm font-bold ${isSelected ? 'text-teal-900' : 'text-slate-700'}`}>
+                                            <p className="truncate text-sm font-black">
                                                 {getMemberName(member)}
                                             </p>
-                                            <p className={`text-[10px] uppercase tracking-wider font-semibold mt-0.5 ${isSelected ? 'text-teal-600' : 'text-slate-400'}`}>
+                                            <p className={`text-[10px] uppercase tracking-wider font-bold mt-0.5 ${isSelected ? 'text-neutral-800' : 'text-neutral-500'}`}>
                                                 {i === 0 ? 'Team Lead' : 'Member'}
                                             </p>
                                         </div>
@@ -250,9 +249,9 @@ export default function TicketPage() {
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm text-amber-800">
-                        <p className="flex items-start gap-2 text-xs font-medium leading-relaxed">
-                            <Info size={16} className="shrink-0 mt-0.5" />
+                    <div className="rounded-xl border-2 border-black bg-[#ffdc8b] p-4 shadow-[3px_3px_0px_#000] text-black">
+                        <p className="flex items-start gap-2 text-xs font-semibold leading-relaxed">
+                            <Info size={16} className="shrink-0 mt-0.5 text-black" />
                             <span>
                                 <strong>Important:</strong> Present this single QR code to volunteers for gate entry, hackathon check-in, and dining access (if eligible).
                             </span>

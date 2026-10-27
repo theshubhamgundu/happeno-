@@ -119,15 +119,17 @@ export default function TeamTimelinePage() {
     return (
         <DashboardLayout type="team" title="Hackathon timeline" subtitle="Key event dates and milestones">
             <div className="mx-auto w-full max-w-4xl">
-                <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-8">
-                    <div className="mb-6 flex items-start gap-3 border-b border-slate-100 pb-5 sm:mb-8 sm:gap-4 sm:pb-6">
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700 sm:h-12 sm:w-12">
+                <section className="rounded-2xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_#000] sm:p-8">
+                    <div className="mb-6 flex items-start gap-3 border-b-2 border-black pb-5 sm:mb-8 sm:gap-4 sm:pb-6">
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-black bg-[#f7cb46] text-black shadow-[2px_2px_0px_#000] sm:h-12 sm:w-12">
                             <CalendarDays size={20} className="sm:h-[22px] sm:w-[22px]" />
                         </span>
                         <div className="min-w-0 flex-1">
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-teal-700 sm:text-xs">Student dashboard</p>
-                            <h2 className="mt-1 text-lg font-bold leading-tight text-slate-900 sm:text-2xl">Event schedule</h2>
-                            <p className="mt-1.5 text-xs leading-relaxed text-slate-500 sm:mt-2 sm:text-sm">Key event milestones · All times in India Standard Time (IST)</p>
+                            <span className="inline-block rounded-md border border-black bg-[#fe90e8] px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-black sm:text-xs">
+                                Student dashboard
+                            </span>
+                            <h2 className="mt-1.5 text-lg font-black leading-tight text-black sm:text-2xl">Event schedule</h2>
+                            <p className="mt-1 text-xs font-medium leading-relaxed text-slate-700 sm:text-sm">Key event milestones · All times in India Standard Time (IST)</p>
                         </div>
                     </div>
 
@@ -140,23 +142,26 @@ export default function TeamTimelinePage() {
                             }, {} as Record<string, typeof timeline>)
                         ).map(([date, events], index) => (
                             <div key={date}>
-                                <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-800 sm:text-sm border-b border-slate-100 pb-3 flex items-center gap-2">
-                                    <span className="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">Day {index + 1}</span>
-                                    <span className="text-teal-700">{date}</span>
+                                <h3 className="mb-4 text-xs font-black uppercase tracking-wider text-black sm:text-sm border-b-2 border-black pb-3 flex items-center gap-2">
+                                    <span className="border-2 border-black bg-[#ffdc8b] text-black px-2.5 py-1 rounded-md shadow-[2px_2px_0px_#000] font-bold">Day {index + 1}</span>
+                                    <span className="text-black font-extrabold">{date}</span>
                                 </h3>
-                                <ol className="relative ml-2 space-y-4 border-l-2 border-slate-100 pl-5 sm:ml-3 sm:space-y-6 sm:pl-8">
+                                <ol className="relative ml-2 space-y-4 border-l-2 border-black pl-5 sm:ml-3 sm:space-y-6 sm:pl-8">
                                     {events.map((event) => (
                                         <li key={`${event.date}-${event.title}`} className="relative min-w-0">
                                             <span
                                                 aria-hidden="true"
-                                                className="absolute -left-[27px] top-[18px] h-3 w-3 rounded-full border-2 border-white bg-teal-600 shadow-[0_0_0_2px_rgba(20,184,166,0.18)] sm:-left-[39px] sm:top-[22px] sm:h-3.5 sm:w-3.5"
+                                                className="absolute -left-[27px] top-[18px] h-3.5 w-3.5 rounded-full border-2 border-black bg-[#99e885] shadow-[1px_1px_0px_#000] sm:-left-[39px] sm:top-[22px] sm:h-4 sm:w-4"
                                             />
-                                            <article className="min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 sm:p-5">
-                                                <div className="flex flex-col gap-1.5 text-xs font-semibold leading-5 text-teal-700 min-[380px]:flex-row min-[380px]:flex-wrap min-[380px]:gap-x-4 sm:text-sm">
-                                                    <span className="inline-flex min-w-0 items-center gap-1.5"><Clock3 size={14} className="shrink-0" /><span>{event.time}</span></span>
+                                            <article className="min-w-0 rounded-xl border-2 border-black bg-white p-3.5 sm:p-5 shadow-[3px_3px_0px_#000]">
+                                                <div className="flex flex-col gap-1.5 text-xs font-semibold leading-5 text-black min-[380px]:flex-row min-[380px]:flex-wrap min-[380px]:gap-x-4 sm:text-sm">
+                                                    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-md border border-black bg-[#c0f7fe] px-2 py-0.5 font-bold text-black shadow-[1px_1px_0px_#000]">
+                                                        <Clock3 size={14} className="shrink-0" />
+                                                        <span>{event.time}</span>
+                                                    </span>
                                                 </div>
-                                                <h4 className="mt-2.5 break-words text-sm font-bold leading-snug text-slate-900 sm:mt-3 sm:text-base">{event.title}</h4>
-                                                <p className="mt-1 break-words text-xs leading-relaxed text-slate-600 sm:text-sm">{event.description}</p>
+                                                <h4 className="mt-2.5 break-words text-sm font-black leading-snug text-black sm:mt-3 sm:text-base">{event.title}</h4>
+                                                <p className="mt-1 break-words text-xs font-medium leading-relaxed text-slate-700 sm:text-sm">{event.description}</p>
                                             </article>
                                         </li>
                                     ))}
@@ -165,8 +170,8 @@ export default function TeamTimelinePage() {
                         ))}
                     </div>
 
-                    <p className="mt-5 flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-900 sm:mt-8 sm:p-4 sm:text-sm">
-                        <MapPin size={16} className="mt-0.5 shrink-0" />
+                    <p className="mt-6 flex items-start gap-2.5 rounded-xl border-2 border-black bg-[#ffdc8b] p-3.5 text-xs font-semibold leading-relaxed text-black shadow-[3px_3px_0px_#000] sm:mt-8 sm:p-4 sm:text-sm">
+                        <MapPin size={18} className="mt-0.5 shrink-0" />
                         Check your event pass or contact the organizers for your assigned venue and room.
                     </p>
                 </section>

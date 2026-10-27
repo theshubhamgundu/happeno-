@@ -381,15 +381,15 @@ export default function AdminReviewsPage() {
                             <button
                                 onClick={handleRefresh}
                                 disabled={isRefreshing}
-                                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300 disabled:opacity-50"
+                                className="inline-flex items-center gap-2 rounded-xl border-2 border-black bg-white px-4 py-2.5 text-xs font-black text-black shadow-[3px_3px_0px_#000] transition hover:bg-[#ffdc8b] disabled:opacity-50"
                             >
-                                <RefreshCw size={15} className={isRefreshing ? "animate-spin text-teal-600" : ""} />
+                                <RefreshCw size={15} className={isRefreshing ? "animate-spin text-black" : ""} />
                                 <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
                             </button>
 
                             <button
                                 onClick={exportSubmissionsCSV}
-                                className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-md shadow-teal-600/20 transition hover:bg-teal-700 hover:shadow-lg"
+                                className="inline-flex items-center gap-2 rounded-xl border-2 border-black bg-[#f7cb46] px-5 py-2.5 text-xs font-black uppercase tracking-wider text-black shadow-[3px_3px_0px_#000] transition hover:bg-[#ffd24d]"
                             >
                                 <Download size={16} />
                                 <span>Export Full CSV ({filteredRows.length})</span>
@@ -507,12 +507,16 @@ export default function AdminReviewsPage() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-semibold text-slate-400">Rows per page:</span>
+                            <span className="text-[11px] font-black uppercase tracking-wider text-neutral-700">Rows per page:</span>
                             {[25, 50, 100, -1].map(size => (
                                 <button
                                     key={size}
                                     onClick={() => { setPageSize(size); setCurrentPage(1); }}
-                                    className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition ${pageSize === size ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+                                    className={`rounded-lg px-2.5 py-1 text-[11px] font-black border-2 border-black transition ${
+                                        pageSize === size
+                                            ? "bg-[#f7cb46] text-black shadow-[2px_2px_0px_#000]"
+                                            : "bg-white text-black hover:bg-[#ffdc8b] shadow-[1.5px_1.5px_0px_#000]"
+                                    }`}
                                 >
                                     {size === -1 ? "All" : size}
                                 </button>
@@ -798,7 +802,7 @@ export default function AdminReviewsPage() {
 
                     {/* Pagination Footer */}
                     {pageSize !== -1 && totalPages > 1 && (
-                        <div className="flex items-center justify-between border-t border-slate-200 bg-white px-5 py-3 text-xs text-slate-600">
+                        <div className="flex items-center justify-between border-t-2 border-black bg-white px-5 py-3 text-xs font-bold text-black">
                             <div>
                                 Page <b>{currentPage}</b> of <b>{totalPages}</b> ({filteredRows.length} total entries)
                             </div>
@@ -806,7 +810,7 @@ export default function AdminReviewsPage() {
                                 <button
                                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                     disabled={currentPage === 1}
-                                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold transition hover:bg-slate-50 disabled:opacity-40"
+                                    className="inline-flex items-center gap-1 rounded-lg border-2 border-black bg-white px-3 py-1.5 text-xs font-black text-black shadow-[2px_2px_0px_#000] transition hover:bg-[#ffdc8b] disabled:opacity-40 disabled:shadow-none"
                                 >
                                     <ChevronLeft size={14} /> Previous
                                 </button>
@@ -821,7 +825,11 @@ export default function AdminReviewsPage() {
                                         <button
                                             key={pageNum}
                                             onClick={() => setCurrentPage(pageNum)}
-                                            className={`h-8 w-8 rounded-lg text-xs font-bold transition ${currentPage === pageNum ? "bg-teal-600 text-white shadow-sm" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+                                            className={`h-8 w-8 rounded-lg text-xs font-black border-2 border-black transition ${
+                                                currentPage === pageNum
+                                                    ? "bg-[#f7cb46] text-black shadow-[2px_2px_0px_#000]"
+                                                    : "bg-white text-black hover:bg-[#ffdc8b] shadow-[1.5px_1.5px_0px_#000]"
+                                            }`}
                                         >
                                             {pageNum}
                                         </button>
@@ -831,7 +839,7 @@ export default function AdminReviewsPage() {
                                 <button
                                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold transition hover:bg-slate-50 disabled:opacity-40"
+                                    className="inline-flex items-center gap-1 rounded-lg border-2 border-black bg-white px-3 py-1.5 text-xs font-black text-black shadow-[2px_2px_0px_#000] transition hover:bg-[#ffdc8b] disabled:opacity-40 disabled:shadow-none"
                                 >
                                     Next <ChevronRight size={14} />
                                 </button>
@@ -972,7 +980,7 @@ export default function AdminReviewsPage() {
                                 type="button"
                                 onClick={handleSaveScores}
                                 disabled={savingScore}
-                                className="rounded-xl bg-teal-600 px-5 py-2 text-xs font-black uppercase tracking-wider text-white hover:bg-teal-700 shadow-md transition disabled:opacity-50"
+                                className="rounded-xl border-2 border-black bg-[#99e885] px-5 py-2 text-xs font-black uppercase tracking-wider text-black hover:bg-[#83df6e] shadow-[2.5px_2.5px_0px_#000] transition disabled:opacity-50"
                             >
                                 {savingScore ? "Saving..." : "Save Scores"}
                             </button>
@@ -1075,7 +1083,7 @@ export default function AdminReviewsPage() {
                                     setSelectedProject(null);
                                     openScoreEditor(team);
                                 }}
-                                className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-teal-700"
+                                className="inline-flex items-center gap-2 rounded-xl border-2 border-black bg-[#f7cb46] px-5 py-2.5 text-xs font-black uppercase tracking-wider text-black shadow-[2.5px_2.5px_0px_#000] transition hover:bg-[#ffd24d]"
                             >
                                 <Edit3 size={15} /> Edit Scores For This Team
                             </button>

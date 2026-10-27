@@ -281,18 +281,18 @@ export default function UsersManagement() {
 
     return (
         <DashboardLayout type="admin" title="Hacker Directory">
-            <div className="max-w-[1600px] mx-auto space-y-8 pb-20">
+            <div className="max-w-[1600px] mx-auto space-y-8 pb-20 text-black">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-colors font-bold text-xs uppercase tracking-widest mb-3">
+                        <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-black hover:bg-[#ffdc8b] transition-all font-black text-xs uppercase tracking-widest mb-3 border-2 border-black bg-white px-3 py-1 rounded-lg shadow-[2px_2px_0px_#000]">
                             <ArrowLeft size={14} /> Back to Dashboard
                         </Link>
-                        <h1 className="text-3xl md:text-5xl font-black italic uppercase tracking-tight text-slate-900 leading-none">
-                            Hacker <span className="text-teal-600">Directory</span>
+                        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-black leading-none">
+                            Hacker <span className="text-black bg-[#f7cb46] px-2 py-0.5 rounded border-2 border-black shadow-[2px_2px_0px_#000]">Directory</span>
                         </h1>
-                        <p className="text-slate-500 font-bold uppercase tracking-[0.16em] mt-3 flex items-center gap-2 text-xs">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <p className="text-neutral-700 font-bold uppercase tracking-[0.16em] mt-3 flex items-center gap-2 text-xs">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#99e885] border border-black animate-pulse" />
                             {allUsers.length} Operational Units Detected
                         </p>
                     </div>
@@ -300,7 +300,7 @@ export default function UsersManagement() {
                     <div className="flex gap-4">
                         <button
                             onClick={handleExportCSV}
-                            className="p-3.5 px-5 rounded-xl bg-teal-600 text-white hover:bg-teal-700 active:scale-95 transition-all shadow-sm flex items-center gap-2 font-bold uppercase text-xs tracking-wider"
+                            className="p-3.5 px-5 rounded-xl bg-[#f7cb46] hover:bg-[#ffdc8b] text-black border-2 border-black shadow-[3px_3px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 font-black uppercase text-xs tracking-wider"
                         >
                             <Download size={16} /> Export CSV
                         </button>
@@ -310,24 +310,24 @@ export default function UsersManagement() {
                 {/* Filters & Search */}
                 <div className="flex flex-col lg:flex-row gap-4 items-center">
                     <div className="relative flex-grow group w-full">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-600 transition-colors" size={18} />
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-500" size={18} />
                         <input
                             type="text"
                             placeholder="Search by hacker, email, or college..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-14 pr-6 text-slate-900 font-semibold outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all placeholder:text-slate-400 tracking-wide text-sm shadow-sm"
+                            className="w-full bg-white border-2 border-black rounded-xl py-3.5 pl-14 pr-6 text-black font-bold outline-none focus:shadow-[3px_3px_0px_#000] transition-all placeholder:text-neutral-400 tracking-wide text-sm shadow-[2px_2px_0px_#000]"
                         />
                     </div>
                 </div>
 
                 {/* User Table */}
-                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm relative">
+                <div className="bg-white border-3 border-black rounded-2xl overflow-hidden shadow-[6px_6px_0px_#000] relative">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-200 bg-slate-50/70">
-                                    <th className="p-5 pl-7 text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Team Name & Track</th>
+                                <tr className="border-b-2 border-black bg-[#f7cb46]">
+                                    <th className="p-5 pl-7 text-[10px] font-black text-black uppercase tracking-[0.16em]">Team Name & Track</th>
                                     <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Members</th>
                                     <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.16em]">Status</th>
                                     <th className="p-5 pr-7 text-[10px] font-black text-slate-500 uppercase tracking-[0.16em] text-right">Actions</th>

@@ -99,14 +99,14 @@ export default function HelpPage() {
     return (
         <DashboardLayout type="team" title="Need Help?" subtitle="Request technical support or mentoring from our expert volunteers">
             <div className="max-w-2xl mx-auto">
-                <section className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
+                <section className="rounded-2xl border-2 border-black bg-white p-6 sm:p-8 shadow-[4px_4px_0px_#000]">
                     <div className="flex items-center gap-4 mb-6">
-                        <span className="grid h-12 w-12 place-items-center rounded-xl bg-amber-100 text-amber-600">
+                        <span className="grid h-12 w-12 place-items-center rounded-xl border-2 border-black bg-[#f7cb46] text-black shadow-[2px_2px_0px_#000]">
                             <Headphones size={24} />
                         </span>
                         <div>
-                            <h3 className="text-lg font-bold text-amber-900">Support Desk</h3>
-                            <p className="text-sm text-amber-700">Submit a ticket and a volunteer will visit your table.</p>
+                            <h3 className="text-lg font-black text-black">Support Desk</h3>
+                            <p className="text-sm font-medium text-slate-700">Submit a ticket and a volunteer will visit your table.</p>
                         </div>
                     </div>
 
@@ -116,20 +116,20 @@ export default function HelpPage() {
                             {myTickets.map(ticket => {
                                 const isCancelling = isCancellingTicketId === ticket.id;
                                 return (
-                                    <div key={ticket.id} className="rounded-xl border border-amber-200/80 bg-white p-4 shadow-sm">
+                                    <div key={ticket.id} className="rounded-xl border-2 border-black bg-white p-4 shadow-[3px_3px_0px_#000]">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex items-center gap-2 flex-wrap">
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-amber-100 text-amber-800">
+                                                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded border border-black bg-[#ffdc8b] text-black shadow-[1px_1px_0px_#000]">
                                                         {ticket.category}
                                                     </span>
                                                     {ticket.tableNumber && (
-                                                        <span className="text-xs font-semibold text-slate-500">
-                                                            · Table {ticket.tableNumber}
+                                                        <span className="text-xs font-bold text-black border border-black bg-[#c0f7fe] px-2 py-0.5 rounded shadow-[1px_1px_0px_#000]">
+                                                            Table {ticket.tableNumber}
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-sm font-medium text-slate-800 mt-2">
+                                                <p className="text-sm font-medium text-black mt-2">
                                                     {ticket.description}
                                                 </p>
                                             </div>
@@ -139,10 +139,10 @@ export default function HelpPage() {
                                                     onClick={() => handleCancelHelp(ticket.id)}
                                                     disabled={isCancelling}
                                                     title="Cancel request"
-                                                    className="text-slate-400 hover:text-rose-500 p-1.5 rounded-md transition-colors disabled:opacity-50 bg-slate-50 hover:bg-rose-50"
+                                                    className="text-black border-2 border-black p-1.5 rounded-lg transition-all disabled:opacity-50 bg-[#fe90e8] hover:bg-[#ffdc8b] shadow-[2px_2px_0px_#000]"
                                                 >
                                                     {isCancelling ? (
-                                                        <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                                                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                                                     ) : (
                                                         <X size={16} />
                                                     )}
@@ -151,21 +151,21 @@ export default function HelpPage() {
                                         </div>
 
                                         {/* Live Status Indicator */}
-                                        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                        <div className="mt-4 pt-3 border-t-2 border-black flex items-center justify-between text-xs">
                                             {ticket.status === 'open' && (
-                                                <span className="inline-flex items-center gap-2 font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-md">
-                                                    <span className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-ping" />
+                                                <span className="inline-flex items-center gap-2 font-black text-black border border-black bg-[#ffdc8b] px-3 py-1 rounded-md shadow-[1px_1px_0px_#000]">
+                                                    <span className="h-2.5 w-2.5 rounded-full bg-black animate-ping" />
                                                     Waiting for volunteer...
                                                 </span>
                                             )}
                                             {ticket.status === 'accepted' && (
-                                                <span className="inline-flex items-center gap-2 font-bold text-teal-700 bg-teal-50 px-3 py-1.5 rounded-md">
-                                                    <CheckCircle2 size={16} className="text-teal-600" />
+                                                <span className="inline-flex items-center gap-2 font-black text-black border border-black bg-[#99e885] px-3 py-1.5 rounded-md shadow-[1px_1px_0px_#000]">
+                                                    <CheckCircle2 size={16} className="text-black" />
                                                     {ticket.acceptedBy ? `${ticket.acceptedBy} is on the way!` : 'Volunteer is on the way!'}
                                                 </span>
                                             )}
                                             {ticket.status === 'resolved' && (
-                                                <span className="inline-flex items-center gap-1.5 text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-md">
+                                                <span className="inline-flex items-center gap-1.5 text-black font-black border border-black bg-[#c0f7fe] px-3 py-1 rounded-md shadow-[1px_1px_0px_#000]">
                                                     <CheckCircle2 size={14} />
                                                     Resolved
                                                 </span>
@@ -182,25 +182,25 @@ export default function HelpPage() {
                             {myTickets.filter(t => t.status !== 'resolved').length < 3 ? (
                                 <button
                                     onClick={() => setShowHelpForm(true)}
-                                    className="w-full py-3 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 shadow-sm"
+                                    className="w-full py-3.5 rounded-xl border-2 border-black bg-[#f7cb46] text-black text-sm font-black hover:bg-[#ffdc8b] transition-all flex items-center justify-center gap-2 shadow-[4px_4px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 active:shadow-none"
                                 >
-                                    <Headphones size={16} />
+                                    <Headphones size={18} />
                                     {myTickets.filter(t => t.status !== 'resolved').length > 0 ? "+ Request Another Help" : "Request Help / Mentor"}
                                 </button>
                             ) : (
-                                <p className="text-sm text-amber-800/80 font-medium text-center bg-amber-100/50 p-3 rounded-lg">
+                                <p className="text-sm text-black font-bold text-center border-2 border-black bg-[#ffdc8b] p-3 rounded-xl shadow-[3px_3px_0px_#000]">
                                     You have 3 active requests in queue. Please wait for a volunteer.
                                 </p>
                             )}
                         </div>
                     ) : (
-                        <div className="space-y-4 bg-white p-5 sm:p-6 rounded-xl border border-amber-200/50 shadow-sm">
+                        <div className="space-y-4 bg-white p-5 sm:p-6 rounded-xl border-2 border-black shadow-[4px_4px_0px_#000]">
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-amber-800 mb-1.5 block">Category</label>
+                                <label className="text-xs font-black uppercase tracking-wider text-black mb-1.5 block">Category</label>
                                 <select
                                     value={helpCategory}
                                     onChange={e => setHelpCategory(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
+                                    className="w-full rounded-xl border-2 border-black bg-white px-4 py-2.5 text-sm font-bold text-black outline-none shadow-[2px_2px_0px_#000] transition-all"
                                 >
                                     <option value="Technical">Technical (Code/Bug)</option>
                                     <option value="Mentor">Need a Mentor</option>
@@ -209,29 +209,29 @@ export default function HelpPage() {
                                 </select>
                             </div>
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-amber-800 mb-1.5 block">Describe your issue</label>
+                                <label className="text-xs font-black uppercase tracking-wider text-black mb-1.5 block">Describe your issue</label>
                                 <textarea
                                     value={helpDescription}
                                     onChange={e => setHelpDescription(e.target.value)}
                                     placeholder="e.g. Our backend API is returning 500 errors..."
                                     rows={4}
-                                    className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all resize-none"
+                                    className="w-full rounded-xl border-2 border-black bg-white px-4 py-3 text-sm font-medium text-black outline-none shadow-[2px_2px_0px_#000] transition-all resize-none placeholder:text-slate-400"
                                 />
                             </div>
-                            <div className="flex gap-3 pt-2 border-t border-slate-100">
+                            <div className="flex gap-3 pt-2 border-t-2 border-black">
                                 <button
                                     onClick={() => setShowHelpForm(false)}
-                                    className="flex-1 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-sm font-bold text-slate-600 hover:bg-slate-100 transition-colors"
+                                    className="flex-1 py-2.5 rounded-xl border-2 border-black bg-white text-sm font-black text-black hover:bg-slate-100 shadow-[2px_2px_0px_#000] transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleSubmitHelp}
                                     disabled={isSubmittingHelp || !helpDescription.trim()}
-                                    className="flex-1 py-2.5 rounded-lg bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                                    className="flex-1 py-2.5 rounded-xl border-2 border-black bg-[#99e885] text-black text-sm font-black hover:bg-[#83df6e] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[3px_3px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 active:shadow-none"
                                 >
                                     {isSubmittingHelp ? (
-                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
                                     ) : (
                                         <Send size={16} />
                                     )}
